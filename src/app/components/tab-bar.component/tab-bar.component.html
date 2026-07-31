@@ -1,0 +1,52 @@
+<nav
+  class="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 flex items-center gap-1 px-1.5 py-1.5 rounded-full bg-gray-900/70 border border-gray-800/70 backdrop-blur-xl shadow-2xl shadow-black/50"
+>
+  @for (tab of tabs; track tab.id) {
+    <button
+      (click)="onSelect(tab.id)"
+      class="relative flex flex-col items-center justify-center gap-0.5 px-3.5 py-2 rounded-full text-[10px] font-medium whitespace-nowrap transition-all duration-200 active:scale-95"
+      [class]="
+        activeTab() === tab.id
+          ? 'bg-linear-to-br from-indigo-500 to-violet-600 text-white shadow-lg shadow-indigo-950/40'
+          : 'text-gray-400 hover:text-gray-200'
+      "
+    >
+      <svg
+        class="w-4.5 h-4.5"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.75"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        @switch (tab.id) {
+          @case ('monthly') {
+            <rect x="3.5" y="4.5" width="17" height="16" rx="2.5" />
+            <line x1="3.5" y1="9.5" x2="20.5" y2="9.5" />
+            <line x1="8" y1="2.5" x2="8" y2="6.5" />
+            <line x1="16" y1="2.5" x2="16" y2="6.5" />
+          }
+          @case ('sumup') {
+            <path d="M12 2 2 7l10 5 10-5-10-5z" />
+            <path d="M2 17l10 5 10-5" />
+            <path d="M2 12l10 5 10-5" />
+          }
+          @case ('create') {
+            <line x1="12" y1="5" x2="12" y2="19" />
+            <line x1="5" y1="12" x2="19" y2="12" />
+          }
+          @case ('oneoffs') {
+            <path d="M13 2 3 14h7l-1 8 10-12h-7l1-8z" />
+          }
+          @case ('charts') {
+            <line x1="5" y1="20" x2="5" y2="11" />
+            <line x1="12" y1="20" x2="12" y2="5" />
+            <line x1="19" y1="20" x2="19" y2="14" />
+          }
+        }
+      </svg>
+      <span>{{ tab.label }}</span>
+    </button>
+  }
+</nav>

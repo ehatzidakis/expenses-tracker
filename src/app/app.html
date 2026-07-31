@@ -1,0 +1,67 @@
+<main
+  class="min-h-screen bg-gray-950 text-gray-100 p-4 pb-28 max-w-md mx-auto md:max-w-3xl md:p-8 md:pb-28 flex flex-col gap-6"
+>
+  <app-header></app-header>
+
+  <!-- Loading State -->
+  @if (state.expensesQuery.isPending()) {
+    <div class="flex flex-col gap-4 animate-pulse">
+      <div class="h-12 bg-gray-900 rounded-xl"></div>
+      <div class="h-32 bg-gray-900 rounded-2xl"></div>
+      <div class="h-64 bg-gray-900 rounded-2xl"></div>
+    </div>
+  }
+
+  <!-- Error State -->
+  @if (state.expensesQuery.isError()) {
+    <div class="p-4 bg-red-950/40 border border-red-800/60 text-red-300 rounded-xl text-sm">
+      Unable to load expenses data from MockAPI.
+    </div>
+  }
+
+  <!-- Success State -->
+  @if (state.expensesQuery.isSuccess() && state.selectedExpense()) {
+    @switch (state.activeTab()) {
+      @case ('monthly') {
+        <app-month-selector
+          [months]="state.processedExpenses()"
+          [selectedId]="state.selectedExpense()?.id ?? null"
+          (monthSelected)="state.selectMonth($event)"
+        >
+        </app-month-selector>
+
+        <app-overview-card
+          [totalSpend]="state.totalMonthlySpend()"
+          [totalWage]="state.selectedTotalWage()"
+          [monthName]="state.selectedExpense()?.MonthName ?? ''"
+          [dateRangeInfo]="null"
+          [topCategory]="state.topCategory()"
+        >
+        </app-overview-card>
+
+        <app-category-breakdown [categories]="state.categoryBreakdown()"> </app-category-breakdown>
+      }
+      @case ('sumup') {
+        <app-overview-card
+          [totalSpend]="state.totalMonthlySpend()"
+          [totalWage]="state.selectedTotalWage()"
+          [monthName]="state.selectedExpense()?.MonthName ?? ''"
+          [dateRangeInfo]="state.dateRangeInfo()"
+          [topCategory]="state.topCategory()"
+        >
+        </app-overview-card>
+
+        <app-category-breakdown [categories]="state.categoryBreakdown()"> </app-category-breakdown>
+      }
+      @default {
+        <div
+          class="flex flex-col items-center justify-center gap-2 text-center py-16 px-4 bg-gray-900/60 border border-gray-800/80 rounded-2xl text-gray-500 text-sm"
+        >
+          Coming soon
+        </div>
+      }
+    }
+  }
+</main>
+
+<app-tab-bar [activeTab]="state.activeTab()" (tabChange)="state.setActiveTab($event)"></app-tab-bar>

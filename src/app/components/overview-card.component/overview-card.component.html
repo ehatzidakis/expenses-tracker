@@ -1,0 +1,54 @@
+<section
+  class="bg-linear-to-br from-gray-900 via-gray-900 to-indigo-950/50 border border-gray-800 rounded-2xl p-5 shadow-xl"
+>
+  @if (dateRangeInfo(); as info) {
+    <span class="text-xs font-medium text-gray-400 uppercase tracking-wider block mb-2">
+      @if (info.first === info.last) {
+        Sum for <span class="text-gray-100 font-semibold">{{ info.count }}</span> month:
+        <span class="text-gray-100 font-semibold">{{ info.first }}</span>
+      } @else {
+        Sum for <span class="text-gray-100 font-semibold">{{ info.count }}</span> months:
+        <span class="text-gray-100 font-semibold">{{ info.first }}</span> to
+        <span class="text-gray-100 font-semibold">{{ info.last }}</span>
+      }
+    </span>
+  }
+  <div class="flex items-start justify-between">
+    <div>
+      <span class="text-xs font-medium text-gray-400 uppercase tracking-wider"
+        >Total Actual Spend</span
+      >
+      <div class="flex items-baseline mt-1">
+        <h2 class="text-3xl font-extrabold text-white tracking-tight">
+          €{{ totalSpend() | number: '1.2-2' }}
+        </h2>
+      </div>
+    </div>
+    <div class="text-left">
+      <span class="text-xs font-medium text-gray-400 uppercase tracking-wider">Total Saved</span>
+      <div class="flex items-baseline mt-1">
+        <h2
+          class="text-3xl font-extrabold tracking-tight"
+          [class]="totalSaved() >= 0 ? 'text-emerald-400' : 'text-red-400'"
+        >
+          €{{ totalSaved() | number: '1.2-2' }}
+        </h2>
+      </div>
+    </div>
+  </div>
+
+  <!-- <div class="grid grid-cols-2 gap-3 mt-6 pt-4 border-t border-gray-800/80">
+    <div>
+      <span class="text-[10px] text-gray-400 block uppercase font-medium">Top Category</span>
+      <span class="text-sm font-semibold text-gray-200 mt-0.5 block">
+        {{ topCategory()?.name ?? 'N/A' }}
+      </span>
+    </div>
+    <div>
+      <span class="text-[10px] text-gray-400 block uppercase font-medium">Top Category Cost</span>
+      <span class="text-sm font-semibold text-emerald-400 mt-0.5 block">
+        €{{ (topCategory()?.amount ?? 0) | number:'1.2-2' }}
+      </span>
+    </div>
+  </div> -->
+</section>
