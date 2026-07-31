@@ -1,0 +1,104 @@
+<form
+  (submit)="onSubmit($event)"
+  class="bg-gray-900/60 border border-gray-800/80 rounded-2xl p-5 space-y-4 backdrop-blur-sm"
+>
+  <h3 class="text-sm font-semibold text-gray-200">Add Transaction</h3>
+
+  <div class="space-y-1.5">
+    <label for="tx-date" class="text-xs font-medium text-gray-400">Date</label>
+    <input
+      id="tx-date"
+      type="date"
+      [formField]="transactionForm.date"
+      class="w-full bg-gray-800/60 border border-gray-800 rounded-xl px-3 py-2.5 text-sm text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/60"
+    />
+    @if (transactionForm.date().touched() && transactionForm.date().invalid()) {
+      <span class="text-[11px] text-red-400">{{
+        transactionForm.date().errors()[0]?.message
+      }}</span>
+    }
+  </div>
+
+  <div class="space-y-1.5">
+    <label for="tx-description" class="text-xs font-medium text-gray-400">Description</label>
+    <input
+      id="tx-description"
+      type="text"
+      placeholder="Placeholder"
+      [formField]="transactionForm.description"
+      class="w-full bg-gray-800/60 border border-gray-800 rounded-xl px-3 py-2.5 text-sm text-gray-100 placeholder:text-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/60"
+    />
+    @if (transactionForm.description().touched() && transactionForm.description().invalid()) {
+      <span class="text-[11px] text-red-400">{{
+        transactionForm.description().errors()[0]?.message
+      }}</span>
+    }
+  </div>
+
+  <div class="space-y-1.5">
+    <label for="tx-category" class="text-xs font-medium text-gray-400">Category</label>
+    <select
+      id="tx-category"
+      [formField]="transactionForm.category"
+      class="w-full bg-gray-800/60 border border-gray-800 rounded-xl px-3 py-2.5 text-sm text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/60"
+    >
+      <option value="">Select a category</option>
+      @for (cat of categories; track cat) {
+        <option [value]="cat">{{ cat }}</option>
+      }
+    </select>
+    @if (transactionForm.category().touched() && transactionForm.category().invalid()) {
+      <span class="text-[11px] text-red-400">{{
+        transactionForm.category().errors()[0]?.message
+      }}</span>
+    }
+  </div>
+
+  <div class="space-y-1.5">
+    <label for="tx-amount" class="text-xs font-medium text-gray-400">Amount</label>
+    <input
+      id="tx-amount"
+      type="number"
+      step="0.01"
+      placeholder="0.00"
+      [formField]="transactionForm.amount"
+      class="w-full bg-gray-800/60 border border-gray-800 rounded-xl px-3 py-2.5 text-sm text-gray-100 placeholder:text-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/60"
+    />
+    @if (transactionForm.amount().touched() && transactionForm.amount().invalid()) {
+      <span class="text-[11px] text-red-400">{{
+        transactionForm.amount().errors()[0]?.message
+      }}</span>
+    }
+  </div>
+
+  @if (successMessage()) {
+    <div
+      class="p-3 bg-emerald-950/40 border border-emerald-800/60 text-emerald-300 rounded-xl text-xs"
+    >
+      <span>{{ successMessage() }}</span>
+    </div>
+  }
+  @if (errorMessage()) {
+    <div class="p-3 bg-red-950/40 border border-red-800/60 text-red-300 rounded-xl text-xs">
+      {{ errorMessage() }}
+    </div>
+  }
+
+  <button
+    type="submit"
+    [disabled]="transactionForm().invalid() || submitting()"
+    class="w-full py-3 rounded-xl text-sm font-semibold text-white bg-linear-to-br from-indigo-500 to-violet-600 shadow-lg disabled:opacity-40 disabled:cursor-not-allowed active:scale-[0.99] transition-all"
+  >
+    {{ submitting() ? 'Adding…' : 'Add Transaction' }}
+  </button>
+  @if (lastAddedTransactionId()) {
+    <button
+      type="button"
+      (click)="onDeleteLatest()"
+      [disabled]="deleting()"
+      class="shrink-0 px-2.5 py-1 text-[11px] font-medium rounded-lg bg-red-950/50 hover:bg-red-900/60 text-red-300 border border-red-800/60 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+    >
+      {{ deleting() ? 'Deleting…' : 'Undo' }}
+    </button>
+  }
+</form>

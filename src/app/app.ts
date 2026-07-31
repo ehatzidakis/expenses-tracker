@@ -7,6 +7,7 @@ import { MonthSelectorComponent } from './components/month-selector.component/mo
 import { CategoryBreakdownComponent } from './components/category-breakdown.component/category-breakdown.component';
 import { TabBarComponent } from './components/tab-bar.component/tab-bar.component';
 import { AdjustmentCardComponent } from './components/adjustment-card.component/adjustment-card.component';
+import { CreateTransactionComponent } from './components/create-transaction.component/create-transaction.component';
 
 @Component({
   selector: 'app-root',
@@ -18,6 +19,7 @@ import { AdjustmentCardComponent } from './components/adjustment-card.component/
     CategoryBreakdownComponent,
     TabBarComponent,
     AdjustmentCardComponent,
+    CreateTransactionComponent,
   ],
   templateUrl: './app.html',
 })

@@ -27,8 +27,12 @@ export const CATEGORY_BUDGETS: Record<string, number | null> = {
   Cats: 50,
   Travel: 30,
   Subscriptions: 15,
-  Gym: 70, // No budget limit defined
+  Gym: 70,
 };
+
+export const CATEGORY_NAMES = Object.keys(CATEGORY_BUDGETS);
+
+export const DEFAULT_TOTAL_WAGE = 1600;
 
 @Injectable({
   providedIn: 'root',
