@@ -1,0 +1,2102 @@
+[
+  {
+    "monthName": "April 2025",
+    "date": "2025-04-09",
+    "description": "Κινητό",
+    "amount": 15.74,
+    "category": "Utilities"
+  },
+  {
+    "monthName": "April 2025",
+    "date": "2025-04-09",
+    "description": "Internet",
+    "amount": 36.09,
+    "category": "Utilities"
+  },
+  {
+    "monthName": "April 2025",
+    "date": "2025-04-14",
+    "description": "Ρεύμα",
+    "amount": 38.0,
+    "category": "Utilities"
+  },
+  {
+    "monthName": "April 2025",
+    "date": "2025-04-30",
+    "description": "ΕΝΦΙΑ",
+    "amount": 10.09,
+    "category": "Utilities"
+  },
+  {
+    "monthName": "April 2025",
+    "date": "2025-04-30",
+    "description": "Service Ποδήλατο",
+    "amount": 22.5,
+    "category": "Utilities"
+  },
+  {
+    "monthName": "May 2025",
+    "date": "2025-05-04",
+    "description": "Κοινόχρηστα",
+    "amount": 10.53,
+    "category": "Utilities"
+  },
+  {
+    "monthName": "May 2025",
+    "date": "2025-05-13",
+    "description": "Κινητό",
+    "amount": 15.74,
+    "category": "Utilities"
+  },
+  {
+    "monthName": "May 2025",
+    "date": "2025-05-16",
+    "description": "Ρεύμα",
+    "amount": 34.5,
+    "category": "Utilities"
+  },
+  {
+    "monthName": "May 2025",
+    "date": "2025-05-21",
+    "description": "Απεντόμωση",
+    "amount": 17.5,
+    "category": "Utilities"
+  },
+  {
+    "monthName": "May 2025",
+    "date": "2025-05-24",
+    "description": "ΕΝΦΙΑ",
+    "amount": 10.09,
+    "category": "Utilities"
+  },
+  {
+    "monthName": "June 2025",
+    "date": "2025-06-03",
+    "description": "Κοινόχρηστα",
+    "amount": 10.85,
+    "category": "Utilities"
+  },
+  {
+    "monthName": "June 2025",
+    "date": "2025-06-09",
+    "description": "Κινητό",
+    "amount": 15.74,
+    "category": "Utilities"
+  },
+  {
+    "monthName": "June 2025",
+    "date": "2025-06-09",
+    "description": "Internet",
+    "amount": 36.1,
+    "category": "Utilities"
+  },
+  {
+    "monthName": "June 2025",
+    "date": "2025-06-15",
+    "description": "Ρεύμα",
+    "amount": 29.5,
+    "category": "Utilities"
+  },
+  {
+    "monthName": "June 2025",
+    "date": "2025-06-27",
+    "description": "Κοινόχρηστα",
+    "amount": 16.3,
+    "category": "Utilities"
+  },
+  {
+    "monthName": "July 2025",
+    "date": "2025-07-04",
+    "description": "Ρεύμα",
+    "amount": 39.0,
+    "category": "Utilities"
+  },
+  {
+    "monthName": "July 2025",
+    "date": "2025-07-04",
+    "description": "Νερό",
+    "amount": 11.88,
+    "category": "Utilities"
+  },
+  {
+    "monthName": "July 2025",
+    "date": "2025-07-04",
+    "description": "Κινητό",
+    "amount": 15.74,
+    "category": "Utilities"
+  },
+  {
+    "monthName": "August 2025",
+    "date": "2025-08-03",
+    "description": "Ρεύμα",
+    "amount": 57.5,
+    "category": "Utilities"
+  },
+  {
+    "monthName": "August 2025",
+    "date": "2025-08-03",
+    "description": "Ίντερνετ",
+    "amount": 36.09,
+    "category": "Utilities"
+  },
+  {
+    "monthName": "August 2025",
+    "date": "2025-08-09",
+    "description": "Κινητό",
+    "amount": 15.74,
+    "category": "Utilities"
+  },
+  {
+    "monthName": "September 2025",
+    "date": "2025-09-03",
+    "description": "Ρεύμα",
+    "amount": 48.5,
+    "category": "Utilities"
+  },
+  {
+    "monthName": "September 2025",
+    "date": "2025-09-03",
+    "description": "Νερό",
+    "amount": 15.62,
+    "category": "Utilities"
+  },
+  {
+    "monthName": "September 2025",
+    "date": "2025-09-10",
+    "description": "Κοινόχρηστα",
+    "amount": 31.5,
+    "category": "Utilities"
+  },
+  {
+    "monthName": "September 2025",
+    "date": "2025-09-10",
+    "description": "Κινητό",
+    "amount": 15.74,
+    "category": "Utilities"
+  },
+  {
+    "monthName": "October 2025",
+    "date": "2025-10-03",
+    "description": "Ρεύμα",
+    "amount": 36.5,
+    "category": "Utilities"
+  },
+  {
+    "monthName": "October 2025",
+    "date": "2025-10-03",
+    "description": "Ίντερνετ",
+    "amount": 36.09,
+    "category": "Utilities"
+  },
+  {
+    "monthName": "October 2025",
+    "date": "2025-10-12",
+    "description": "Κινητό",
+    "amount": 15.74,
+    "category": "Utilities"
+  },
+  {
+    "monthName": "October 2025",
+    "date": "2025-10-24",
+    "description": "Παράβολα Ταυτότητας",
+    "amount": 10.5,
+    "category": "Utilities"
+  },
+  {
+    "monthName": "November 2025",
+    "date": "2025-11-02",
+    "description": "Χαλί",
+    "amount": 16.57,
+    "category": "Utilities"
+  },
+  {
+    "monthName": "November 2025",
+    "date": "2025-11-05",
+    "description": "Ρεύμα",
+    "amount": 30.5,
+    "category": "Utilities"
+  },
+  {
+    "monthName": "November 2025",
+    "date": "2025-11-17",
+    "description": "Κοινόχρηστα",
+    "amount": 11.25,
+    "category": "Utilities"
+  },
+  {
+    "monthName": "November 2025",
+    "date": "2025-11-05",
+    "description": "Κινητό",
+    "amount": 15.74,
+    "category": "Utilities"
+  },
+  {
+    "monthName": "December 2025",
+    "date": "2025-12-03",
+    "description": "Ρεύμα",
+    "amount": 31.17,
+    "category": "Utilities"
+  },
+  {
+    "monthName": "December 2025",
+    "date": "2025-12-03",
+    "description": "Ίντερνετ",
+    "amount": 36.1,
+    "category": "Utilities"
+  },
+  {
+    "monthName": "December 2025",
+    "date": "2025-12-03",
+    "description": "Νερό",
+    "amount": 13.86,
+    "category": "Utilities"
+  },
+  {
+    "monthName": "December 2025",
+    "date": "2025-12-05",
+    "description": "Κοινόχρηστα",
+    "amount": 11.88,
+    "category": "Utilities"
+  },
+  {
+    "monthName": "December 2025",
+    "date": "2025-12-09",
+    "description": "Κινητό",
+    "amount": 21.63,
+    "category": "Utilities"
+  },
+  {
+    "monthName": "January 2026",
+    "date": "2026-01-02",
+    "description": "Ρεύμα",
+    "amount": 30.96,
+    "category": "Utilities"
+  },
+  {
+    "monthName": "January 2026",
+    "date": "2026-01-12",
+    "description": "Κοινόχρηστα",
+    "amount": 26.44,
+    "category": "Utilities"
+  },
+  {
+    "monthName": "January 2026",
+    "date": "2026-01-12",
+    "description": "Κινητό",
+    "amount": 15.38,
+    "category": "Utilities"
+  },
+  {
+    "monthName": "February 2026",
+    "date": "2026-02-02",
+    "description": "Ρεύμα",
+    "amount": 73.06,
+    "category": "Utilities"
+  },
+  {
+    "monthName": "February 2026",
+    "date": "2026-02-02",
+    "description": "Ίντερνετ",
+    "amount": 30.89,
+    "category": "Utilities"
+  },
+  {
+    "monthName": "February 2026",
+    "date": "2026-02-09",
+    "description": "Κοινόχρηστα",
+    "amount": 10.74,
+    "category": "Utilities"
+  },
+  {
+    "monthName": "February 2026",
+    "date": "2026-02-09",
+    "description": "Κινητό",
+    "amount": 16.15,
+    "category": "Utilities"
+  },
+  {
+    "monthName": "March 2026",
+    "date": "2026-03-02",
+    "description": "Ρεύμα",
+    "amount": 53.02,
+    "category": "Utilities"
+  },
+  {
+    "monthName": "March 2026",
+    "date": "2026-03-09",
+    "description": "Κοινόχρηστα",
+    "amount": 11.05,
+    "category": "Utilities"
+  },
+  {
+    "monthName": "March 2026",
+    "date": "2026-03-13",
+    "description": "Κινητό",
+    "amount": 16.15,
+    "category": "Utilities"
+  },
+  {
+    "monthName": "March 2026",
+    "date": "2026-03-16",
+    "description": "ΕΝΦΙΑ",
+    "amount": 110.96,
+    "category": "Utilities"
+  },
+  {
+    "monthName": "April 2026",
+    "date": "2026-04-03",
+    "description": "Νερό",
+    "amount": 13.17,
+    "category": "Utilities"
+  },
+  {
+    "monthName": "April 2026",
+    "date": "2026-04-06",
+    "description": "Κινητό",
+    "amount": 16.15,
+    "category": "Utilities"
+  },
+  {
+    "monthName": "April 2026",
+    "date": "2026-04-07",
+    "description": "Ρεύμα",
+    "amount": 34.35,
+    "category": "Utilities"
+  },
+  {
+    "monthName": "April 2026",
+    "date": "2026-04-11",
+    "description": "Ίντερνετ",
+    "amount": 32.25,
+    "category": "Utilities"
+  },
+  {
+    "monthName": "April 2026",
+    "date": "2026-04-14",
+    "description": "Κοινόχρηστα",
+    "amount": 12.16,
+    "category": "Utilities"
+  },
+  {
+    "monthName": "April 2026",
+    "date": "2026-04-27",
+    "description": "Service Βρύσης",
+    "amount": 55.0,
+    "category": "Utilities"
+  },
+  {
+    "monthName": "May 2026",
+    "date": "2026-05-07",
+    "description": "Ρεύμα",
+    "amount": 35.13,
+    "category": "Utilities"
+  },
+  {
+    "monthName": "May 2026",
+    "date": "2026-05-07",
+    "description": "Κινητό",
+    "amount": 16.15,
+    "category": "Utilities"
+  },
+  {
+    "monthName": "May 2026",
+    "date": "2026-05-14",
+    "description": "Κοινόχρηστα",
+    "amount": 12.65,
+    "category": "Utilities"
+  },
+  {
+    "monthName": "May 2026",
+    "date": "2026-05-31",
+    "description": "Απεντόμωση",
+    "amount": 30.0,
+    "category": "Utilities"
+  },
+  {
+    "monthName": "June 2026",
+    "date": "2026-06-05",
+    "description": "Ρεύμα",
+    "amount": 34.83,
+    "category": "Utilities"
+  },
+  {
+    "monthName": "June 2026",
+    "date": "2026-06-05",
+    "description": "Ίντερνετ",
+    "amount": 32.25,
+    "category": "Utilities"
+  },
+  {
+    "monthName": "June 2026",
+    "date": "2026-06-05",
+    "description": "Νερό",
+    "amount": 22.79,
+    "category": "Utilities"
+  },
+  {
+    "monthName": "June 2026",
+    "date": "2026-06-11",
+    "description": "Κινητό",
+    "amount": 16.15,
+    "category": "Utilities"
+  },
+  {
+    "monthName": "June 2026",
+    "date": "2026-06-22",
+    "description": "Κοινόχρηστα",
+    "amount": 13.05,
+    "category": "Utilities"
+  },
+  {
+    "monthName": "June 2026",
+    "date": "2026-06-25",
+    "description": "Καθαρισμός κλιματιστικών",
+    "amount": 50.0,
+    "category": "Utilities"
+  },
+  {
+    "monthName": "July 2026",
+    "date": "2026-07-08",
+    "description": "Ρεύμα",
+    "amount": 29.37,
+    "category": "Utilities"
+  },
+  {
+    "monthName": "July 2026",
+    "date": "2026-07-08",
+    "description": "Κοινόχρηστα",
+    "amount": 14.56,
+    "category": "Utilities"
+  },
+  {
+    "monthName": "July 2026",
+    "date": "2026-07-08",
+    "description": "Κινητό",
+    "amount": 16.15,
+    "category": "Utilities"
+  },
+  {
+    "monthName": "March 2025",
+    "date": "2025-03-14",
+    "description": "Άγριοι",
+    "amount": 12.0,
+    "category": "Tickets"
+  },
+  {
+    "monthName": "March 2025",
+    "date": "2025-03-16",
+    "description": "Anna-X",
+    "amount": 5.0,
+    "category": "Tickets"
+  },
+  {
+    "monthName": "March 2025",
+    "date": "2025-03-18",
+    "description": "Crowd Work - Σεβαστέρης",
+    "amount": 12.0,
+    "category": "Tickets"
+  },
+  {
+    "monthName": "March 2025",
+    "date": "2025-03-25",
+    "description": "Τα καλά παιδία",
+    "amount": 15.0,
+    "category": "Tickets"
+  },
+  {
+    "monthName": "March 2025",
+    "date": "2025-03-27",
+    "description": "Ράβδος",
+    "amount": 11.0,
+    "category": "Tickets"
+  },
+  {
+    "monthName": "April 2025",
+    "date": "2025-04-07",
+    "description": "Οι γριές που μαζεύουν την τσουκνίδα",
+    "amount": 15.0,
+    "category": "Tickets"
+  },
+  {
+    "monthName": "April 2025",
+    "date": "2025-04-07",
+    "description": "Football",
+    "amount": 12.0,
+    "category": "Tickets"
+  },
+  {
+    "monthName": "April 2025",
+    "date": "2025-04-16",
+    "description": "Στην παλιά εθνική",
+    "amount": 40.88,
+    "category": "Tickets"
+  },
+  {
+    "monthName": "April 2025",
+    "date": "2025-04-18",
+    "description": "Κακά Σκηνικά",
+    "amount": 20.44,
+    "category": "Tickets"
+  },
+  {
+    "monthName": "April 2025",
+    "date": "2025-04-18",
+    "description": "Sinners",
+    "amount": 7.5,
+    "category": "Tickets"
+  },
+  {
+    "monthName": "April 2025",
+    "date": "2025-04-25",
+    "description": "Lex @OAKA",
+    "amount": 30.68,
+    "category": "Tickets"
+  },
+  {
+    "monthName": "May 2025",
+    "date": "2025-05-06",
+    "description": "Thunderbolts",
+    "amount": 10.5,
+    "category": "Tickets"
+  },
+  {
+    "monthName": "May 2025",
+    "date": "2025-05-07",
+    "description": "Νεκρές Ψυχές",
+    "amount": 18.45,
+    "category": "Tickets"
+  },
+  {
+    "monthName": "May 2025",
+    "date": "2025-05-28",
+    "description": "Final Destination 6",
+    "amount": 13.3,
+    "category": "Tickets"
+  },
+  {
+    "monthName": "June 2025",
+    "date": "2025-06-13",
+    "description": "Fantastic Four (for 26/7)",
+    "amount": 15.0,
+    "category": "Tickets"
+  },
+  {
+    "monthName": "June 2025",
+    "date": "2025-06-20",
+    "description": "28 Years Later",
+    "amount": 8.0,
+    "category": "Tickets"
+  },
+  {
+    "monthName": "July 2025",
+    "date": "2025-07-15",
+    "description": "Superman",
+    "amount": 15.0,
+    "category": "Tickets"
+  },
+  {
+    "monthName": "August 2025",
+    "date": "2025-08-17",
+    "description": "Together",
+    "amount": 6.5,
+    "category": "Tickets"
+  },
+  {
+    "monthName": "August 2025",
+    "date": "2025-08-19",
+    "description": "Weapons",
+    "amount": 10.5,
+    "category": "Tickets"
+  },
+  {
+    "monthName": "August 2025",
+    "date": "2025-08-26",
+    "description": "Bring Her Back",
+    "amount": 6.5,
+    "category": "Tickets"
+  },
+  {
+    "monthName": "August 2025",
+    "date": "2025-08-29",
+    "description": "War of the Roses",
+    "amount": 16.0,
+    "category": "Tickets"
+  },
+  {
+    "monthName": "September 2025",
+    "date": "2025-09-04",
+    "description": "Τζόνι Μπλέ",
+    "amount": 18.0,
+    "category": "Tickets"
+  },
+  {
+    "monthName": "September 2025",
+    "date": "2025-09-04",
+    "description": "Το τέλος του παιχνιδιού",
+    "amount": 22.47,
+    "category": "Tickets"
+  },
+  {
+    "monthName": "September 2025",
+    "date": "2025-09-04",
+    "description": "Άσπρο-Μαύρο",
+    "amount": 16.5,
+    "category": "Tickets"
+  },
+  {
+    "monthName": "September 2025",
+    "date": "2025-09-04",
+    "description": "Έντα",
+    "amount": 25.51,
+    "category": "Tickets"
+  },
+  {
+    "monthName": "September 2025",
+    "date": "2025-09-04",
+    "description": "Η Κουζίνα",
+    "amount": 25.5,
+    "category": "Tickets"
+  },
+  {
+    "monthName": "September 2025",
+    "date": "2025-09-10",
+    "description": "Ο εχθρός του λαού",
+    "amount": 9.2,
+    "category": "Tickets"
+  },
+  {
+    "monthName": "September 2025",
+    "date": "2025-09-10",
+    "description": "Intra Muros",
+    "amount": 9.2,
+    "category": "Tickets"
+  },
+  {
+    "monthName": "September 2025",
+    "date": "2025-09-10",
+    "description": "Οι Δημοκράτορες",
+    "amount": 9.2,
+    "category": "Tickets"
+  },
+  {
+    "monthName": "September 2025",
+    "date": "2025-09-10",
+    "description": "Οι Καρέκλες",
+    "amount": 9.2,
+    "category": "Tickets"
+  },
+  {
+    "monthName": "September 2025",
+    "date": "2025-09-11",
+    "description": "Gameathlon",
+    "amount": 30.66,
+    "category": "Tickets"
+  },
+  {
+    "monthName": "September 2025",
+    "date": "2025-09-12",
+    "description": "Interstellar",
+    "amount": 6.0,
+    "category": "Tickets"
+  },
+  {
+    "monthName": "September 2025",
+    "date": "2025-09-19",
+    "description": "Συναισθηματική Αξία",
+    "amount": 9.0,
+    "category": "Tickets"
+  },
+  {
+    "monthName": "September 2025",
+    "date": "2025-09-29",
+    "description": "One Battle After Another",
+    "amount": 15.0,
+    "category": "Tickets"
+  },
+  {
+    "monthName": "October 2025",
+    "date": "2025-10-05",
+    "description": "Μικρά πράγματα σαν κι αυτά",
+    "amount": 8.2,
+    "category": "Tickets"
+  },
+  {
+    "monthName": "October 2025",
+    "date": "2025-10-19",
+    "description": "Χούλιο Τόνγκα",
+    "amount": 22.0,
+    "category": "Tickets"
+  },
+  {
+    "monthName": "October 2025",
+    "date": "2025-10-19",
+    "description": "Εκείνος που έκλεψε",
+    "amount": 23.0,
+    "category": "Tickets"
+  },
+  {
+    "monthName": "October 2025",
+    "date": "2025-10-19",
+    "description": "Κέικ",
+    "amount": 18.0,
+    "category": "Tickets"
+  },
+  {
+    "monthName": "November 2025",
+    "date": "2025-11-29",
+    "description": "Cleansed",
+    "amount": 25.64,
+    "category": "Tickets"
+  },
+  {
+    "monthName": "November 2025",
+    "date": "2025-11-29",
+    "description": "Απόψε κανείς δεν πεθαίνει",
+    "amount": 18.64,
+    "category": "Tickets"
+  },
+  {
+    "monthName": "November 2025",
+    "date": "2025-11-30",
+    "description": "Bugonia",
+    "amount": 8.0,
+    "category": "Tickets"
+  },
+  {
+    "monthName": "December 2025",
+    "date": "2025-12-01",
+    "description": "Ένα Κάποιο Κενό",
+    "amount": 10.6,
+    "category": "Tickets"
+  },
+  {
+    "monthName": "December 2025",
+    "date": "2025-12-02",
+    "description": "Νοχαβελάνδη",
+    "amount": 31.5,
+    "category": "Tickets"
+  },
+  {
+    "monthName": "December 2025",
+    "date": "2025-12-05",
+    "description": "Σπασμένη Φλέβα",
+    "amount": 16.41,
+    "category": "Tickets"
+  },
+  {
+    "monthName": "December 2025",
+    "date": "2025-12-08",
+    "description": "Avatar: Fire and Ash",
+    "amount": 15.0,
+    "category": "Tickets"
+  },
+  {
+    "monthName": "December 2025",
+    "date": "2025-12-16",
+    "description": "Home Alone",
+    "amount": 25.0,
+    "category": "Tickets"
+  },
+  {
+    "monthName": "January 2026",
+    "date": "2026-01-06",
+    "description": "Mother Father Sister Brother",
+    "amount": 8.2,
+    "category": "Tickets"
+  },
+  {
+    "monthName": "January 2026",
+    "date": "2026-01-17",
+    "description": "Marty Supreme",
+    "amount": 16.0,
+    "category": "Tickets"
+  },
+  {
+    "monthName": "January 2026",
+    "date": "2026-01-19",
+    "description": "Ταπ Άουτ (20/1)",
+    "amount": 18.38,
+    "category": "Tickets"
+  },
+  {
+    "monthName": "January 2026",
+    "date": "2026-01-19",
+    "description": "Χαμένη Άνοιξη (26/1)",
+    "amount": 15.38,
+    "category": "Tickets"
+  },
+  {
+    "monthName": "January 2026",
+    "date": "2026-01-23",
+    "description": "Τι ψυχή θα παραδώσεις μωρή",
+    "amount": 8.66,
+    "category": "Tickets"
+  },
+  {
+    "monthName": "January 2026",
+    "date": "2026-01-27",
+    "description": "Άμνετ",
+    "amount": 6.65,
+    "category": "Tickets"
+  },
+  {
+    "monthName": "February 2026",
+    "date": "2026-02-08",
+    "description": "Δυο ή τρία πράγματα",
+    "amount": 22.0,
+    "category": "Tickets"
+  },
+  {
+    "monthName": "February 2026",
+    "date": "2026-02-13",
+    "description": "Το τρίτο στεφανι",
+    "amount": 15.0,
+    "category": "Tickets"
+  },
+  {
+    "monthName": "February 2026",
+    "date": "2026-02-14",
+    "description": "Το ψέμα του μυαλού",
+    "amount": 25.0,
+    "category": "Tickets"
+  },
+  {
+    "monthName": "February 2026",
+    "date": "2026-02-15",
+    "description": "Escape Room - Agnes",
+    "amount": 27.0,
+    "category": "Tickets"
+  },
+  {
+    "monthName": "February 2026",
+    "date": "2026-02-20",
+    "description": "Αποσκίτης Αναλόγιο",
+    "amount": 5.5,
+    "category": "Tickets"
+  },
+  {
+    "monthName": "March 2026",
+    "date": "2026-03-01",
+    "description": "1984",
+    "amount": 20.48,
+    "category": "Tickets"
+  },
+  {
+    "monthName": "March 2026",
+    "date": "2026-03-10",
+    "description": "Αθανασία",
+    "amount": 22.52,
+    "category": "Tickets"
+  },
+  {
+    "monthName": "March 2026",
+    "date": "2026-03-16",
+    "description": "Πόσα τσιγάρα έχω καπνίσει",
+    "amount": 16.4,
+    "category": "Tickets"
+  },
+  {
+    "monthName": "March 2026",
+    "date": "2026-03-24",
+    "description": "They Will Kill You",
+    "amount": 14.37,
+    "category": "Tickets"
+  },
+  {
+    "monthName": "March 2026",
+    "date": "2026-03-27",
+    "description": "Project: Hail Mary",
+    "amount": 15.0,
+    "category": "Tickets"
+  },
+  {
+    "monthName": "March 2026",
+    "date": "2026-03-28",
+    "description": "Σωσμένος",
+    "amount": 25.58,
+    "category": "Tickets"
+  },
+  {
+    "monthName": "April 2026",
+    "date": "2026-04-19",
+    "description": "The Drama",
+    "amount": 8.19,
+    "category": "Tickets"
+  },
+  {
+    "monthName": "April 2026",
+    "date": "2026-04-26",
+    "description": "Girls & Boys",
+    "amount": 18.44,
+    "category": "Tickets"
+  },
+  {
+    "monthName": "April 2026",
+    "date": "2026-04-29",
+    "description": "Συναίνεση",
+    "amount": 12.33,
+    "category": "Tickets"
+  },
+  {
+    "monthName": "May 2026",
+    "date": "2026-05-04",
+    "description": "Τάμα",
+    "amount": 10.29,
+    "category": "Tickets"
+  },
+  {
+    "monthName": "May 2026",
+    "date": "2026-05-05",
+    "description": "Σιρόκος",
+    "amount": 18.44,
+    "category": "Tickets"
+  },
+  {
+    "monthName": "May 2026",
+    "date": "2026-05-08",
+    "description": "Stolen Mic Live",
+    "amount": 24.57,
+    "category": "Tickets"
+  },
+  {
+    "monthName": "May 2026",
+    "date": "2026-05-09",
+    "description": "Μάκβεθ",
+    "amount": 12.33,
+    "category": "Tickets"
+  },
+  {
+    "monthName": "May 2026",
+    "date": "2026-05-10",
+    "description": "Hokum",
+    "amount": 3.8,
+    "category": "Tickets"
+  },
+  {
+    "monthName": "May 2026",
+    "date": "2026-05-26",
+    "description": "Μικρή Ακαδημία Φάμπρικα",
+    "amount": 13.0,
+    "category": "Tickets"
+  },
+  {
+    "monthName": "May 2026",
+    "date": "2026-05-30",
+    "description": "Αντιγόνη",
+    "amount": 18.44,
+    "category": "Tickets"
+  },
+  {
+    "monthName": "May 2026",
+    "date": "2026-05-31",
+    "description": "Backrooms",
+    "amount": 9.5,
+    "category": "Tickets"
+  },
+  {
+    "monthName": "June 2026",
+    "date": "2026-06-02",
+    "description": "Dalkance - Unplugged",
+    "amount": 15.39,
+    "category": "Tickets"
+  },
+  {
+    "monthName": "June 2026",
+    "date": "2026-06-06",
+    "description": "Bacon",
+    "amount": 20.48,
+    "category": "Tickets"
+  },
+  {
+    "monthName": "June 2026",
+    "date": "2026-06-07",
+    "description": "Η καντάδα των Λύκων",
+    "amount": 5.0,
+    "category": "Tickets"
+  },
+  {
+    "monthName": "June 2026",
+    "date": "2026-06-08",
+    "description": "Ελλάδα 3.0",
+    "amount": 7.51,
+    "category": "Tickets"
+  },
+  {
+    "monthName": "June 2026",
+    "date": "2026-06-14",
+    "description": "Εθισμός Live",
+    "amount": 6.0,
+    "category": "Tickets"
+  },
+  {
+    "monthName": "June 2026",
+    "date": "2026-06-27",
+    "description": "Obsession",
+    "amount": 9.5,
+    "category": "Tickets"
+  },
+  {
+    "monthName": "July 2026",
+    "date": "2026-07-15",
+    "description": "Evil Dead Burn",
+    "amount": 7.0,
+    "category": "Tickets"
+  },
+  {
+    "monthName": "July 2026",
+    "date": "2026-07-26",
+    "description": "Odyssey IMAX",
+    "amount": 15.0,
+    "category": "Tickets"
+  },
+  {
+    "monthName": "March 2025",
+    "date": "2025-03-06",
+    "description": "Split Fiction",
+    "amount": 47.0,
+    "category": "Gaming"
+  },
+  {
+    "monthName": "March 2025",
+    "date": "2025-03-20",
+    "description": "Assassin’s Creed: Shadows",
+    "amount": 69.9,
+    "category": "Gaming"
+  },
+  {
+    "monthName": "April 2025",
+    "date": "2025-04-14",
+    "description": "Avatar: Frontiers of Pandora",
+    "amount": 20.7,
+    "category": "Gaming"
+  },
+  {
+    "monthName": "April 2025",
+    "date": "2025-04-16",
+    "description": "First Berzerker: Khazan",
+    "amount": 48.9,
+    "category": "Gaming"
+  },
+  {
+    "monthName": "April 2025",
+    "date": "2025-04-17",
+    "description": "Doom (2016)",
+    "amount": 4.99,
+    "category": "Gaming"
+  },
+  {
+    "monthName": "May 2025",
+    "date": "2025-05-22",
+    "description": "Infamous Second Son",
+    "amount": 4.99,
+    "category": "Gaming"
+  },
+  {
+    "monthName": "July 2025",
+    "date": "2025-07-05",
+    "description": "Death Stranding 2",
+    "amount": 40.0,
+    "category": "Gaming"
+  },
+  {
+    "monthName": "July 2025",
+    "date": "2025-07-08",
+    "description": "Lords of The Fallen (Amazon)",
+    "amount": 20.0,
+    "category": "Gaming"
+  },
+  {
+    "monthName": "August 2025",
+    "date": "2025-08-13",
+    "description": "Mafia: The Old Country",
+    "amount": 25.35,
+    "category": "Gaming"
+  },
+  {
+    "monthName": "August 2025",
+    "date": "2025-08-24",
+    "description": "Doom: The Dark Ages",
+    "amount": 54.18,
+    "category": "Gaming"
+  },
+  {
+    "monthName": "August 2025",
+    "date": "2025-08-27",
+    "description": "Gears of War: Reloaded",
+    "amount": 24.06,
+    "category": "Gaming"
+  },
+  {
+    "monthName": "September 2025",
+    "date": "2025-09-06",
+    "description": "Cronos: The New Dawn",
+    "amount": 30.0,
+    "category": "Gaming"
+  },
+  {
+    "monthName": "October 2025",
+    "date": "2025-10-02",
+    "description": "Ghost of Yotei",
+    "amount": 32.0,
+    "category": "Gaming"
+  },
+  {
+    "monthName": "October 2025",
+    "date": "2025-10-06",
+    "description": "Dualsense 30th Anniversary",
+    "amount": 82.79,
+    "category": "Gaming"
+  },
+  {
+    "monthName": "November 2025",
+    "date": "2025-11-02",
+    "description": "Expedition 33",
+    "amount": 45.9,
+    "category": "Gaming"
+  },
+  {
+    "monthName": "November 2025",
+    "date": "2025-11-20",
+    "description": "Stalker 2",
+    "amount": 31.9,
+    "category": "Gaming"
+  },
+  {
+    "monthName": "December 2025",
+    "date": "2025-12-15",
+    "description": "Indiana Jones And The Great Circle",
+    "amount": 70.98,
+    "category": "Gaming"
+  },
+  {
+    "monthName": "December 2025",
+    "date": "2025-12-16",
+    "description": "Elden Ring",
+    "amount": 31.45,
+    "category": "Gaming"
+  },
+  {
+    "monthName": "February 2026",
+    "date": "2026-02-24",
+    "description": "Doom DLC",
+    "amount": 21.43,
+    "category": "Gaming"
+  },
+  {
+    "monthName": "February 2026",
+    "date": "2026-02-25",
+    "description": "PS Plus Premium Subscription",
+    "amount": 99.99,
+    "category": "Gaming"
+  },
+  {
+    "monthName": "February 2026",
+    "date": "2026-02-28",
+    "description": "Resident Evil Requiem",
+    "amount": 88.9,
+    "category": "Gaming"
+  },
+  {
+    "monthName": "March 2026",
+    "date": "2026-03-28",
+    "description": "Dispatch",
+    "amount": 27.99,
+    "category": "Gaming"
+  },
+  {
+    "monthName": "April 2026",
+    "date": "2026-04-17",
+    "description": "Pragmata",
+    "amount": 56.9,
+    "category": "Gaming"
+  },
+  {
+    "monthName": "April 2026",
+    "date": "2026-04-22",
+    "description": "Dead Island 2 + RE7",
+    "amount": 16.98,
+    "category": "Gaming"
+  },
+  {
+    "monthName": "May 2026",
+    "date": "2026-05-01",
+    "description": "Saros",
+    "amount": 71.9,
+    "category": "Gaming"
+  },
+  {
+    "monthName": "June 2026",
+    "date": "2026-06-01",
+    "description": "007: First Light",
+    "amount": 42.89,
+    "category": "Gaming"
+  },
+  {
+    "monthName": "July 2026",
+    "date": "2026-07-09",
+    "description": "AC: Black Flag Resynced",
+    "amount": 54.9,
+    "category": "Gaming"
+  },
+  {
+    "monthName": "March 2025",
+    "date": "2025-03-28",
+    "description": "Cat Litter",
+    "amount": 19.9,
+    "category": "Cats"
+  },
+  {
+    "monthName": "April 2025",
+    "date": "2025-04-22",
+    "description": "Cat Food & Litter",
+    "amount": 38.35,
+    "category": "Cats"
+  },
+  {
+    "monthName": "April 2025",
+    "date": "2025-04-22",
+    "description": "Scoop Άμμου",
+    "amount": 4.5,
+    "category": "Cats"
+  },
+  {
+    "monthName": "May 2025",
+    "date": "2025-05-12",
+    "description": "Cat Food",
+    "amount": 16.45,
+    "category": "Cats"
+  },
+  {
+    "monthName": "May 2025",
+    "date": "2025-05-16",
+    "description": "Αμπούλες Γατιών",
+    "amount": 21.0,
+    "category": "Cats"
+  },
+  {
+    "monthName": "June 2025",
+    "date": "2025-06-05",
+    "description": "Cat food & litter",
+    "amount": 36.35,
+    "category": "Cats"
+  },
+  {
+    "monthName": "July 2025",
+    "date": "2025-07-04",
+    "description": "Cat food",
+    "amount": 42.85,
+    "category": "Cats"
+  },
+  {
+    "monthName": "July 2025",
+    "date": "2025-07-29",
+    "description": "Tobrex",
+    "amount": 2.0,
+    "category": "Cats"
+  },
+  {
+    "monthName": "August 2025",
+    "date": "2025-08-01",
+    "description": "Αμπούλες Γατιών",
+    "amount": 36.0,
+    "category": "Cats"
+  },
+  {
+    "monthName": "August 2025",
+    "date": "2025-08-21",
+    "description": "Cats",
+    "amount": 36.35,
+    "category": "Cats"
+  },
+  {
+    "monthName": "August 2025",
+    "date": "2025-08-21",
+    "description": "Μπολάκι Γατιών",
+    "amount": 16.54,
+    "category": "Cats"
+  },
+  {
+    "monthName": "September 2025",
+    "date": "2025-09-17",
+    "description": "Cats",
+    "amount": 36.35,
+    "category": "Cats"
+  },
+  {
+    "monthName": "October 2025",
+    "date": "2025-10-12",
+    "description": "Cats",
+    "amount": 32.9,
+    "category": "Cats"
+  },
+  {
+    "monthName": "November 2025",
+    "date": "2025-11-05",
+    "description": "Αμπούλες Γατιών",
+    "amount": 35.0,
+    "category": "Cats"
+  },
+  {
+    "monthName": "December 2025",
+    "date": "2025-12-03",
+    "description": "Cats",
+    "amount": 36.35,
+    "category": "Cats"
+  },
+  {
+    "monthName": "December 2025",
+    "date": "2025-12-28",
+    "description": "PetVet",
+    "amount": 36.35,
+    "category": "Cats"
+  },
+  {
+    "monthName": "January 2026",
+    "date": "2026-01-26",
+    "description": "Cats",
+    "amount": 51.5,
+    "category": "Cats"
+  },
+  {
+    "monthName": "March 2026",
+    "date": "2026-03-02",
+    "description": "Cats",
+    "amount": 49.9,
+    "category": "Cats"
+  },
+  {
+    "monthName": "April 2026",
+    "date": "2026-04-20",
+    "description": "Cats",
+    "amount": 49.9,
+    "category": "Cats"
+  },
+  {
+    "monthName": "April 2026",
+    "date": "2026-04-23",
+    "description": "Αμπούλες Γατιών",
+    "amount": 39.4,
+    "category": "Cats"
+  },
+  {
+    "monthName": "May 2026",
+    "date": "2026-05-05",
+    "description": "Κτηνίατρος",
+    "amount": 40.0,
+    "category": "Cats"
+  },
+  {
+    "monthName": "June 2026",
+    "date": "2026-06-23",
+    "description": "Cats",
+    "amount": 51.2,
+    "category": "Cats"
+  },
+  {
+    "monthName": "March 2025",
+    "date": "2025-03-10",
+    "description": "Uber",
+    "amount": 7.16,
+    "category": "Travel"
+  },
+  {
+    "monthName": "March 2025",
+    "date": "2025-03-12",
+    "description": "10+1 εισιτήρια",
+    "amount": 12.0,
+    "category": "Travel"
+  },
+  {
+    "monthName": "April 2025",
+    "date": "2025-04-05",
+    "description": "Εισιτήρια 10+1",
+    "amount": 12.0,
+    "category": "Travel"
+  },
+  {
+    "monthName": "April 2025",
+    "date": "2025-04-15",
+    "description": "Εισιτήρια Τρένου",
+    "amount": 4.6,
+    "category": "Travel"
+  },
+  {
+    "monthName": "April 2025",
+    "date": "2025-04-21",
+    "description": "Εισιτήρια (2)",
+    "amount": 2.3,
+    "category": "Travel"
+  },
+  {
+    "monthName": "May 2025",
+    "date": "2025-05-09",
+    "description": "Πάρκινγκ Μέτρο Μολ",
+    "amount": 2.0,
+    "category": "Travel"
+  },
+  {
+    "monthName": "May 2025",
+    "date": "2025-05-10",
+    "description": "Εισιτήρια 10+1",
+    "amount": 12.0,
+    "category": "Travel"
+  },
+  {
+    "monthName": "May 2025",
+    "date": "2025-05-13",
+    "description": "Ταξί",
+    "amount": 7.85,
+    "category": "Travel"
+  },
+  {
+    "monthName": "May 2025",
+    "date": "2025-05-17",
+    "description": "Uber",
+    "amount": 6.07,
+    "category": "Travel"
+  },
+  {
+    "monthName": "May 2025",
+    "date": "2025-05-21",
+    "description": "Uber",
+    "amount": 4.2,
+    "category": "Travel"
+  },
+  {
+    "monthName": "May 2025",
+    "date": "2025-05-31",
+    "description": "Uber Βάφτιση + Εισιτήρια",
+    "amount": 7.69,
+    "category": "Travel"
+  },
+  {
+    "monthName": "June 2025",
+    "date": "2025-06-18",
+    "description": "ΟΑΣΑ",
+    "amount": 3.6,
+    "category": "Travel"
+  },
+  {
+    "monthName": "June 2025",
+    "date": "2025-06-21",
+    "description": "ΟΑΣΑ",
+    "amount": 1.2,
+    "category": "Travel"
+  },
+  {
+    "monthName": "June 2025",
+    "date": "2025-06-25",
+    "description": "OASA",
+    "amount": 2.4,
+    "category": "Travel"
+  },
+  {
+    "monthName": "June 2025",
+    "date": "2025-06-28",
+    "description": "Uber",
+    "amount": 18.0,
+    "category": "Travel"
+  },
+  {
+    "monthName": "June 2025",
+    "date": "2025-06-28",
+    "description": "Uber",
+    "amount": 10.68,
+    "category": "Travel"
+  },
+  {
+    "monthName": "June 2025",
+    "date": "2025-06-29",
+    "description": "Uber",
+    "amount": 10.14,
+    "category": "Travel"
+  },
+  {
+    "monthName": "June 2025",
+    "date": "2025-06-29",
+    "description": "Uber",
+    "amount": 5.88,
+    "category": "Travel"
+  },
+  {
+    "monthName": "July 2025",
+    "date": "2025-07-05",
+    "description": "ΟΑΣΑ",
+    "amount": 1.2,
+    "category": "Travel"
+  },
+  {
+    "monthName": "July 2025",
+    "date": "2025-07-09",
+    "description": "ΟΑΣΑ",
+    "amount": 1.2,
+    "category": "Travel"
+  },
+  {
+    "monthName": "July 2025",
+    "date": "2025-07-09",
+    "description": "Lime",
+    "amount": 2.89,
+    "category": "Travel"
+  },
+  {
+    "monthName": "July 2025",
+    "date": "2025-07-19",
+    "description": "OASA",
+    "amount": 1.2,
+    "category": "Travel"
+  },
+  {
+    "monthName": "July 2025",
+    "date": "2025-07-22",
+    "description": "ΟΑΣΑ",
+    "amount": 2.4,
+    "category": "Travel"
+  },
+  {
+    "monthName": "July 2025",
+    "date": "2025-07-26",
+    "description": "OASA",
+    "amount": 1.2,
+    "category": "Travel"
+  },
+  {
+    "monthName": "August 2025",
+    "date": "2025-08-01",
+    "description": "Uber",
+    "amount": 10.62,
+    "category": "Travel"
+  },
+  {
+    "monthName": "August 2025",
+    "date": "2025-08-14",
+    "description": "ΟΑΣΑ",
+    "amount": 1.2,
+    "category": "Travel"
+  },
+  {
+    "monthName": "August 2025",
+    "date": "2025-08-26",
+    "description": "ΟΑΣΑ",
+    "amount": 1.2,
+    "category": "Travel"
+  },
+  {
+    "monthName": "August 2025",
+    "date": "2025-08-27",
+    "description": "ΟΑΣΑ",
+    "amount": 1.2,
+    "category": "Travel"
+  },
+  {
+    "monthName": "August 2025",
+    "date": "2025-08-31",
+    "description": "Uber",
+    "amount": 8.0,
+    "category": "Travel"
+  },
+  {
+    "monthName": "September 2025",
+    "date": "2025-09-03",
+    "description": "ΟΑΣΑ",
+    "amount": 1.2,
+    "category": "Travel"
+  },
+  {
+    "monthName": "September 2025",
+    "date": "2025-09-21",
+    "description": "OASA",
+    "amount": 2.4,
+    "category": "Travel"
+  },
+  {
+    "monthName": "September 2025",
+    "date": "2025-09-24",
+    "description": "OASA",
+    "amount": 2.4,
+    "category": "Travel"
+  },
+  {
+    "monthName": "October 2025",
+    "date": "2025-10-08",
+    "description": "OASA",
+    "amount": 1.2,
+    "category": "Travel"
+  },
+  {
+    "monthName": "October 2025",
+    "date": "2025-10-21",
+    "description": "ΟΑΣΑ",
+    "amount": 2.4,
+    "category": "Travel"
+  },
+  {
+    "monthName": "October 2025",
+    "date": "2025-10-27",
+    "description": "ΟΑΣΑ",
+    "amount": 2.4,
+    "category": "Travel"
+  },
+  {
+    "monthName": "December 2025",
+    "date": "2025-12-02",
+    "description": "Εισιτήρια ΟΑΣΑ",
+    "amount": 7.2,
+    "category": "Travel"
+  },
+  {
+    "monthName": "December 2025",
+    "date": "2025-12-06",
+    "description": "Ταξί από Χάρη",
+    "amount": 10.0,
+    "category": "Travel"
+  },
+  {
+    "monthName": "December 2025",
+    "date": "2025-12-31",
+    "description": "Uber to and from Party",
+    "amount": 8.5,
+    "category": "Travel"
+  },
+  {
+    "monthName": "January 2026",
+    "date": "2026-01-02",
+    "description": "Εισιτήρια ΟΑΣΑ",
+    "amount": 27.6,
+    "category": "Travel"
+  },
+  {
+    "monthName": "January 2026",
+    "date": "2026-01-11",
+    "description": "Uber",
+    "amount": 4.09,
+    "category": "Travel"
+  },
+  {
+    "monthName": "January 2026",
+    "date": "2026-01-31",
+    "description": "ΟΑΣΑ [32]",
+    "amount": 38.4,
+    "category": "Travel"
+  },
+  {
+    "monthName": "February 2026",
+    "date": "2026-02-02",
+    "description": "Μηνιαίο Εισιτήριο ΟΑΣΑ",
+    "amount": 27.0,
+    "category": "Travel"
+  },
+  {
+    "monthName": "February 2026",
+    "date": "2026-02-15",
+    "description": "Uber",
+    "amount": 7.0,
+    "category": "Travel"
+  },
+  {
+    "monthName": "March 2026",
+    "date": "2026-03-10",
+    "description": "ΟΑΣΑ",
+    "amount": 27.0,
+    "category": "Travel"
+  },
+  {
+    "monthName": "March 2026",
+    "date": "2026-03-13",
+    "description": "Ταξί",
+    "amount": 9.15,
+    "category": "Travel"
+  },
+  {
+    "monthName": "March 2026",
+    "date": "2026-03-16",
+    "description": "Uber",
+    "amount": 6.51,
+    "category": "Travel"
+  },
+  {
+    "monthName": "March 2026",
+    "date": "2026-03-28",
+    "description": "Uber",
+    "amount": 6.16,
+    "category": "Travel"
+  },
+  {
+    "monthName": "March 2026",
+    "date": "2026-03-29",
+    "description": "Uber",
+    "amount": 5.76,
+    "category": "Travel"
+  },
+  {
+    "monthName": "April 2026",
+    "date": "2026-04-13",
+    "description": "Uber",
+    "amount": 5.63,
+    "category": "Travel"
+  },
+  {
+    "monthName": "April 2026",
+    "date": "2026-04-14",
+    "description": "ΟΑΣΑ",
+    "amount": 1.2,
+    "category": "Travel"
+  },
+  {
+    "monthName": "April 2026",
+    "date": "2026-04-16",
+    "description": "ΟΑΣΑ",
+    "amount": 27.0,
+    "category": "Travel"
+  },
+  {
+    "monthName": "April 2026",
+    "date": "2026-04-23",
+    "description": "Uber",
+    "amount": 6.04,
+    "category": "Travel"
+  },
+  {
+    "monthName": "May 2026",
+    "date": "2026-05-14",
+    "description": "Bolt",
+    "amount": 5.55,
+    "category": "Travel"
+  },
+  {
+    "monthName": "May 2026",
+    "date": "2026-05-16",
+    "description": "Ταξί Χάρη -> Άλεξ",
+    "amount": 6.2,
+    "category": "Travel"
+  },
+  {
+    "monthName": "May 2026",
+    "date": "2026-05-16",
+    "description": "Ταξί Άλεξ -> Σπίτι",
+    "amount": 6.05,
+    "category": "Travel"
+  },
+  {
+    "monthName": "May 2026",
+    "date": "2026-05-21",
+    "description": "Oasa",
+    "amount": 1.2,
+    "category": "Travel"
+  },
+  {
+    "monthName": "May 2026",
+    "date": "2026-05-24",
+    "description": "ΟΑΣΑ",
+    "amount": 27.0,
+    "category": "Travel"
+  },
+  {
+    "monthName": "June 2026",
+    "date": "2026-06-08",
+    "description": "Ταξί",
+    "amount": 4.21,
+    "category": "Travel"
+  },
+  {
+    "monthName": "June 2026",
+    "date": "2026-06-25",
+    "description": "OASA",
+    "amount": 2.4,
+    "category": "Travel"
+  },
+  {
+    "monthName": "June 2026",
+    "date": "2026-06-26",
+    "description": "OASA",
+    "amount": 1.2,
+    "category": "Travel"
+  },
+  {
+    "monthName": "June 2026",
+    "date": "2026-06-28",
+    "description": "ΟΑΣΑ",
+    "amount": 1.2,
+    "category": "Travel"
+  },
+  {
+    "monthName": "June 2026",
+    "date": "2026-06-29",
+    "description": "OASA",
+    "amount": 4.1,
+    "category": "Travel"
+  },
+  {
+    "monthName": "June 2026",
+    "date": "2026-06-30",
+    "description": "OASA",
+    "amount": 1.2,
+    "category": "Travel"
+  },
+  {
+    "monthName": "July 2026",
+    "date": "2026-07-29",
+    "description": "OASA Sum",
+    "amount": 9.6,
+    "category": "Travel"
+  },
+  {
+    "monthName": "July 2026",
+    "date": "2026-07-29",
+    "description": "ΟΑΣΑ",
+    "amount": 27.0,
+    "category": "Travel"
+  },
+  {
+    "monthName": "March 2025",
+    "date": "2025-03-07",
+    "description": "Spotify",
+    "amount": 9.0,
+    "category": "Subscriptions"
+  },
+  {
+    "monthName": "April 2025",
+    "date": "2025-04-07",
+    "description": "Spotify",
+    "amount": 9.0,
+    "category": "Subscriptions"
+  },
+  {
+    "monthName": "April 2025",
+    "date": "2025-04-10",
+    "description": "YT Premium",
+    "amount": 7.0,
+    "category": "Subscriptions"
+  },
+  {
+    "monthName": "May 2025",
+    "date": "2025-05-07",
+    "description": "Spotify",
+    "amount": 9.0,
+    "category": "Subscriptions"
+  },
+  {
+    "monthName": "June 2025",
+    "date": "2025-06-04",
+    "description": "Apple Subscription",
+    "amount": 0.99,
+    "category": "Subscriptions"
+  },
+  {
+    "monthName": "June 2025",
+    "date": "2025-06-05",
+    "description": "Cinobo",
+    "amount": 1.99,
+    "category": "Subscriptions"
+  },
+  {
+    "monthName": "June 2025",
+    "date": "2025-06-07",
+    "description": "Spotify",
+    "amount": 9.0,
+    "category": "Subscriptions"
+  },
+  {
+    "monthName": "June 2025",
+    "date": "2025-06-10",
+    "description": "Google One",
+    "amount": 17.58,
+    "category": "Subscriptions"
+  },
+  {
+    "monthName": "June 2025",
+    "date": "2025-06-26",
+    "description": "ChatGPT",
+    "amount": 11.5,
+    "category": "Subscriptions"
+  },
+  {
+    "monthName": "July 2025",
+    "date": "2025-07-07",
+    "description": "Spotify Subscription",
+    "amount": 9.0,
+    "category": "Subscriptions"
+  },
+  {
+    "monthName": "July 2025",
+    "date": "2025-07-04",
+    "description": "Apple Subscription",
+    "amount": 0.99,
+    "category": "Subscriptions"
+  },
+  {
+    "monthName": "July 2025",
+    "date": "2025-07-10",
+    "description": "YouTube Subscription",
+    "amount": 6.0,
+    "category": "Subscriptions"
+  },
+  {
+    "monthName": "July 2025",
+    "date": "2025-07-04",
+    "description": "Real-Debrid Subscription",
+    "amount": 10.0,
+    "category": "Subscriptions"
+  },
+  {
+    "monthName": "July 2025",
+    "date": "2025-07-06",
+    "description": "Cinobo Subscription",
+    "amount": 1.99,
+    "category": "Subscriptions"
+  },
+  {
+    "monthName": "August 2025",
+    "date": "2025-08-04",
+    "description": "Apple Subscription",
+    "amount": 0.99,
+    "category": "Subscriptions"
+  },
+  {
+    "monthName": "August 2025",
+    "date": "2025-08-07",
+    "description": "Spotify Subscription",
+    "amount": 8.99,
+    "category": "Subscriptions"
+  },
+  {
+    "monthName": "August 2025",
+    "date": "2025-08-07",
+    "description": "Cinobo Subscription",
+    "amount": 1.99,
+    "category": "Subscriptions"
+  },
+  {
+    "monthName": "September 2025",
+    "date": "2025-09-04",
+    "description": "Apple Subscription",
+    "amount": 0.99,
+    "category": "Subscriptions"
+  },
+  {
+    "monthName": "October 2025",
+    "date": "2025-10-03",
+    "description": "YouTube Subscription",
+    "amount": 11.43,
+    "category": "Subscriptions"
+  },
+  {
+    "monthName": "October 2025",
+    "date": "2025-10-03",
+    "description": "Real-Debrid Subscription",
+    "amount": 4.5,
+    "category": "Subscriptions"
+  },
+  {
+    "monthName": "October 2025",
+    "date": "2025-10-04",
+    "description": "Apple Subscription",
+    "amount": 0.99,
+    "category": "Subscriptions"
+  },
+  {
+    "monthName": "November 2025",
+    "date": "2025-11-04",
+    "description": "Apple Subscription",
+    "amount": 0.99,
+    "category": "Subscriptions"
+  },
+  {
+    "monthName": "December 2025",
+    "date": "2025-12-04",
+    "description": "Apple Subscription",
+    "amount": 0.99,
+    "category": "Subscriptions"
+  },
+  {
+    "monthName": "January 2026",
+    "date": "2026-01-05",
+    "description": "Apple Subscription",
+    "amount": 0.99,
+    "category": "Subscriptions"
+  },
+  {
+    "monthName": "January 2026",
+    "date": "2026-01-04",
+    "description": "Real-Debrid Subscription",
+    "amount": 9.0,
+    "category": "Subscriptions"
+  },
+  {
+    "monthName": "February 2026",
+    "date": "2026-02-04",
+    "description": "Spotify Subscription",
+    "amount": 0.99,
+    "category": "Subscriptions"
+  },
+  {
+    "monthName": "February 2026",
+    "date": "2026-02-11",
+    "description": "YouTube Subscription",
+    "amount": 10.46,
+    "category": "Subscriptions"
+  },
+  {
+    "monthName": "March 2026",
+    "date": "2026-03-03",
+    "description": "Apple Subscription",
+    "amount": 0.99,
+    "category": "Subscriptions"
+  },
+  {
+    "monthName": "April 2026",
+    "date": "2026-04-04",
+    "description": "Apple Subscription",
+    "amount": 0.99,
+    "category": "Subscriptions"
+  },
+  {
+    "monthName": "May 2026",
+    "date": "2026-05-04",
+    "description": "Apple Subscription",
+    "amount": 0.99,
+    "category": "Subscriptions"
+  },
+  {
+    "monthName": "May 2026",
+    "date": "2026-05-09",
+    "description": "Real-Debrid Subscription",
+    "amount": 9.0,
+    "category": "Subscriptions"
+  },
+  {
+    "monthName": "June 2026",
+    "date": "2026-06-04",
+    "description": "Apple Subscription",
+    "amount": 0.99,
+    "category": "Subscriptions"
+  },
+  {
+    "monthName": "June 2026",
+    "date": "2026-06-11",
+    "description": "Google One Subscription",
+    "amount": 17.41,
+    "category": "Subscriptions"
+  },
+  {
+    "monthName": "July 2026",
+    "date": "2026-07-04",
+    "description": "Apple Subscription",
+    "amount": 0.99,
+    "category": "Subscriptions"
+  },
+  {
+    "monthName": "July 2026",
+    "date": "2026-07-06",
+    "description": "Skroutz Subscription",
+    "amount": 15.0,
+    "category": "Subscriptions"
+  },
+  {
+    "monthName": "July 2026",
+    "date": "2026-07-28",
+    "description": "Copilot Subscription",
+    "amount": 8.82,
+    "category": "Subscriptions"
+  }
+]

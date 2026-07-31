@@ -1,4 +1,5 @@
 import { Component, computed, inject } from '@angular/core';
+import { seedAllTransactionFiles } from './utils/seed-transactions';
 import { ExpenseStateService } from './services/expense-state.service';
 import { AdjustmentService } from './services/adjustment-service';
 import { OverviewCardComponent } from './components/overview-card.component/overview-card.component';
@@ -53,4 +54,13 @@ export class AppComponent {
   readonly totalOutgoing = computed(() => this.state.totalMonthlySpend() + this.oneOffExpenses());
   readonly totalIncoming = computed(() => this.state.selectedTotalWage() + this.oneOffBonuses());
   readonly totalSaved = computed(() => this.totalIncoming() - this.totalOutgoing());
+
+  async runSeed() {
+    try {
+      await seedAllTransactionFiles();
+      alert('Seeding complete! Check your Firestore console.');
+    } catch (error) {
+      console.error('Seeding failed:', error);
+    }
+  }
 }

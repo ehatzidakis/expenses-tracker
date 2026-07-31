@@ -1,0 +1,1857 @@
+[
+  {
+    "monthName": "February 2026",
+    "date": "2026-02-04",
+    "description": "Ψυχολόγα #1",
+    "amount": 50.0,
+    "category": "Medical"
+  },
+  {
+    "monthName": "February 2026",
+    "date": "2026-02-11",
+    "description": "Ψυχολόγα #2",
+    "amount": 50.0,
+    "category": "Medical"
+  },
+  {
+    "monthName": "February 2026",
+    "date": "2026-02-18",
+    "description": "Ψυχολόγα #3",
+    "amount": 50.0,
+    "category": "Medical"
+  },
+  {
+    "monthName": "February 2026",
+    "date": "2026-02-25",
+    "description": "Ψυχολόγα #4",
+    "amount": 50.0,
+    "category": "Medical"
+  },
+  {
+    "monthName": "March 2026",
+    "date": "2026-03-04",
+    "description": "Ψυχολόγα #1",
+    "amount": 50.0,
+    "category": "Medical"
+  },
+  {
+    "monthName": "May 2026",
+    "date": "2026-05-08",
+    "description": "Φαρμακείο",
+    "amount": 14.73,
+    "category": "Medical"
+  },
+  {
+    "monthName": "June 2026",
+    "date": "2026-06-04",
+    "description": "Ψυχολόγα #1",
+    "amount": 50.0,
+    "category": "Medical"
+  },
+  {
+    "monthName": "June 2026",
+    "date": "2026-06-11",
+    "description": "Ψυχολόγα #2",
+    "amount": 50.0,
+    "category": "Medical"
+  },
+  {
+    "monthName": "June 2026",
+    "date": "2026-06-16",
+    "description": "Ψυχολόγα #3",
+    "amount": 50.0,
+    "category": "Medical"
+  },
+  {
+    "monthName": "June 2026",
+    "date": "2026-06-23",
+    "description": "Εξετάσεις Αίματος",
+    "amount": 10.0,
+    "category": "Medical"
+  },
+  {
+    "monthName": "June 2026",
+    "date": "2026-06-26",
+    "description": "Ψυχολόγα #4",
+    "amount": 50.0,
+    "category": "Medical"
+  },
+  {
+    "monthName": "June 2026",
+    "date": "2026-06-30",
+    "description": "Ψυχολόγα #5",
+    "amount": 50.0,
+    "category": "Medical"
+  },
+  {
+    "monthName": "July 2026",
+    "date": "2026-07-01",
+    "description": "Εξετάσεις Αίματος",
+    "amount": 28.2,
+    "category": "Medical"
+  },
+  {
+    "monthName": "July 2026",
+    "date": "2026-07-07",
+    "description": "Λεμονίδου",
+    "amount": 15.0,
+    "category": "Medical"
+  },
+  {
+    "monthName": "July 2026",
+    "date": "2026-07-07",
+    "description": "Φαρμακείο",
+    "amount": 18.0,
+    "category": "Medical"
+  },
+  {
+    "monthName": "July 2026",
+    "date": "2026-07-10",
+    "description": "Ψυχολόγα #1",
+    "amount": 50.0,
+    "category": "Medical"
+  },
+  {
+    "monthName": "July 2026",
+    "date": "2026-07-14",
+    "description": "Ψυχολόγα #2",
+    "amount": 50.0,
+    "category": "Medical"
+  },
+  {
+    "monthName": "July 2026",
+    "date": "2026-07-20",
+    "description": "Ψυχολόγα #3",
+    "amount": 50.0,
+    "category": "Medical"
+  },
+  {
+    "monthName": "July 2026",
+    "date": "2026-07-28",
+    "description": "Ψυχολόγα #4",
+    "amount": 50.0,
+    "category": "Medical"
+  },
+  {
+    "monthName": "March 2025",
+    "date": "2025-03-10",
+    "description": "Ovio",
+    "amount": 28.0,
+    "category": "Eating Out"
+  },
+  {
+    "monthName": "March 2025",
+    "date": "2025-03-12",
+    "description": "Black Salami",
+    "amount": 15.5,
+    "category": "Eating Out"
+  },
+  {
+    "monthName": "March 2025",
+    "date": "2025-03-25",
+    "description": "Cultivos",
+    "amount": 12.8,
+    "category": "Eating Out"
+  },
+  {
+    "monthName": "March 2025",
+    "date": "2025-03-26",
+    "description": "Καφεθέατρο",
+    "amount": 12.0,
+    "category": "Eating Out"
+  },
+  {
+    "monthName": "March 2025",
+    "date": "2025-03-29",
+    "description": "Lisa",
+    "amount": 32.5,
+    "category": "Eating Out"
+  },
+  {
+    "monthName": "April 2025",
+    "date": "2025-04-05",
+    "description": "Salero",
+    "amount": 28.0,
+    "category": "Eating Out"
+  },
+  {
+    "monthName": "April 2025",
+    "date": "2025-04-05",
+    "description": "Παγωτό + Monster",
+    "amount": 6.7,
+    "category": "Eating Out"
+  },
+  {
+    "monthName": "April 2025",
+    "date": "2025-04-12",
+    "description": "Ντύλαν",
+    "amount": 47.5,
+    "category": "Eating Out"
+  },
+  {
+    "monthName": "April 2025",
+    "date": "2025-04-12",
+    "description": "Cultivos",
+    "amount": 9.3,
+    "category": "Eating Out"
+  },
+  {
+    "monthName": "April 2025",
+    "date": "2025-04-14",
+    "description": "Ορφέας",
+    "amount": 8.5,
+    "category": "Eating Out"
+  },
+  {
+    "monthName": "April 2025",
+    "date": "2025-04-18",
+    "description": "Αρόλιθος",
+    "amount": 13.0,
+    "category": "Eating Out"
+  },
+  {
+    "monthName": "April 2025",
+    "date": "2025-04-26",
+    "description": "Ικέα",
+    "amount": 5.74,
+    "category": "Eating Out"
+  },
+  {
+    "monthName": "April 2025",
+    "date": "2025-04-27",
+    "description": "Ekiben",
+    "amount": 26.7,
+    "category": "Eating Out"
+  },
+  {
+    "monthName": "April 2025",
+    "date": "2025-04-27",
+    "description": "Flirt",
+    "amount": 7.5,
+    "category": "Eating Out"
+  },
+  {
+    "monthName": "April 2025",
+    "date": "2025-04-28",
+    "description": "Starlight",
+    "amount": 33.4,
+    "category": "Eating Out"
+  },
+  {
+    "monthName": "May 2025",
+    "date": "2025-05-11",
+    "description": "Άμα Λάχει",
+    "amount": 39.5,
+    "category": "Eating Out"
+  },
+  {
+    "monthName": "May 2025",
+    "date": "2025-05-16",
+    "description": "Tanpopo",
+    "amount": 21.5,
+    "category": "Eating Out"
+  },
+  {
+    "monthName": "May 2025",
+    "date": "2025-05-25",
+    "description": "Focacceria Napul’e",
+    "amount": 10.5,
+    "category": "Eating Out"
+  },
+  {
+    "monthName": "May 2025",
+    "date": "2025-05-31",
+    "description": "72H Roof",
+    "amount": 38.5,
+    "category": "Eating Out"
+  },
+  {
+    "monthName": "June 2025",
+    "date": "2025-06-05",
+    "description": "Po’Boys",
+    "amount": 14.75,
+    "category": "Eating Out"
+  },
+  {
+    "monthName": "June 2025",
+    "date": "2025-06-07",
+    "description": "Το Ρίνι",
+    "amount": 26.0,
+    "category": "Eating Out"
+  },
+  {
+    "monthName": "June 2025",
+    "date": "2025-06-10",
+    "description": "Crust",
+    "amount": 4.35,
+    "category": "Eating Out"
+  },
+  {
+    "monthName": "June 2025",
+    "date": "2025-06-14",
+    "description": "Koi",
+    "amount": 25.0,
+    "category": "Eating Out"
+  },
+  {
+    "monthName": "June 2025",
+    "date": "2025-06-14",
+    "description": "Goat it Παγωτό",
+    "amount": 6.0,
+    "category": "Eating Out"
+  },
+  {
+    "monthName": "June 2025",
+    "date": "2025-06-21",
+    "description": "Άκρα",
+    "amount": 38.5,
+    "category": "Eating Out"
+  },
+  {
+    "monthName": "June 2025",
+    "date": "2025-06-21",
+    "description": "Αρμπαρόριζα",
+    "amount": 6.8,
+    "category": "Eating Out"
+  },
+  {
+    "monthName": "June 2025",
+    "date": "2025-06-28",
+    "description": "Κυλικείο Ντυνάν",
+    "amount": 6.4,
+    "category": "Eating Out"
+  },
+  {
+    "monthName": "June 2025",
+    "date": "2025-06-29",
+    "description": "Κυλικείο Ντυνάν",
+    "amount": 6.0,
+    "category": "Eating Out"
+  },
+  {
+    "monthName": "July 2025",
+    "date": "2025-07-03",
+    "description": "Goody’s Mall",
+    "amount": 10.2,
+    "category": "Eating Out"
+  },
+  {
+    "monthName": "July 2025",
+    "date": "2025-07-16",
+    "description": "2H",
+    "amount": 21.66,
+    "category": "Eating Out"
+  },
+  {
+    "monthName": "July 2025",
+    "date": "2025-07-26",
+    "description": "Goody’s Mall",
+    "amount": 14.0,
+    "category": "Eating Out"
+  },
+  {
+    "monthName": "July 2025",
+    "date": "2025-07-31",
+    "description": "Meno Male",
+    "amount": 30.0,
+    "category": "Eating Out"
+  },
+  {
+    "monthName": "August 2025",
+    "date": "2025-08-23",
+    "description": "Κόμνα Τράκα",
+    "amount": 40.0,
+    "category": "Eating Out"
+  },
+  {
+    "monthName": "August 2025",
+    "date": "2025-08-27",
+    "description": "Hafu",
+    "amount": 40.0,
+    "category": "Eating Out"
+  },
+  {
+    "monthName": "August 2025",
+    "date": "2025-08-30",
+    "description": "KFC",
+    "amount": 13.0,
+    "category": "Eating Out"
+  },
+  {
+    "monthName": "August 2025",
+    "date": "2025-08-31",
+    "description": "Kenko",
+    "amount": 40.0,
+    "category": "Eating Out"
+  },
+  {
+    "monthName": "September 2025",
+    "date": "2025-09-07",
+    "description": "Lisa",
+    "amount": 26.5,
+    "category": "Eating Out"
+  },
+  {
+    "monthName": "September 2025",
+    "date": "2025-09-20",
+    "description": "Μπομπίνα",
+    "amount": 25.0,
+    "category": "Eating Out"
+  },
+  {
+    "monthName": "September 2025",
+    "date": "2025-09-21",
+    "description": "McDonald’s",
+    "amount": 11.5,
+    "category": "Eating Out"
+  },
+  {
+    "monthName": "September 2025",
+    "date": "2025-09-23",
+    "description": "Goody’s",
+    "amount": 8.5,
+    "category": "Eating Out"
+  },
+  {
+    "monthName": "October 2025",
+    "date": "2025-10-05",
+    "description": "Cultivos",
+    "amount": 17.5,
+    "category": "Eating Out"
+  },
+  {
+    "monthName": "October 2025",
+    "date": "2025-10-05",
+    "description": "Νικολάτος",
+    "amount": 4.9,
+    "category": "Eating Out"
+  },
+  {
+    "monthName": "October 2025",
+    "date": "2025-10-25",
+    "description": "Καφές",
+    "amount": 3.3,
+    "category": "Eating Out"
+  },
+  {
+    "monthName": "October 2025",
+    "date": "2025-10-26",
+    "description": "Wild Souls",
+    "amount": 11.75,
+    "category": "Eating Out"
+  },
+  {
+    "monthName": "October 2025",
+    "date": "2025-10-26",
+    "description": "Κουκάτσι",
+    "amount": 30.0,
+    "category": "Eating Out"
+  },
+  {
+    "monthName": "October 2025",
+    "date": "2025-10-28",
+    "description": "Lazy Duck",
+    "amount": 9.0,
+    "category": "Eating Out"
+  },
+  {
+    "monthName": "October 2025",
+    "date": "2025-10-29",
+    "description": "Πίτσα",
+    "amount": 3.0,
+    "category": "Eating Out"
+  },
+  {
+    "monthName": "October 2025",
+    "date": "2025-10-31",
+    "description": "Λίσα",
+    "amount": 30.0,
+    "category": "Eating Out"
+  },
+  {
+    "monthName": "November 2025",
+    "date": "2025-11-02",
+    "description": "East Pearl",
+    "amount": 23.05,
+    "category": "Eating Out"
+  },
+  {
+    "monthName": "November 2025",
+    "date": "2025-11-21",
+    "description": "Sweet Nolan",
+    "amount": 10.3,
+    "category": "Eating Out"
+  },
+  {
+    "monthName": "November 2025",
+    "date": "2025-11-30",
+    "description": "Λεμονάδα + Σουβλάκια",
+    "amount": 19.0,
+    "category": "Eating Out"
+  },
+  {
+    "monthName": "December 2025",
+    "date": "2025-12-05",
+    "description": "Tanpopo",
+    "amount": 24.0,
+    "category": "Eating Out"
+  },
+  {
+    "monthName": "December 2025",
+    "date": "2025-12-06",
+    "description": "Ipitou Bar",
+    "amount": 8.0,
+    "category": "Eating Out"
+  },
+  {
+    "monthName": "December 2025",
+    "date": "2025-12-13",
+    "description": "Μιμόσα",
+    "amount": 11.6,
+    "category": "Eating Out"
+  },
+  {
+    "monthName": "December 2025",
+    "date": "2025-12-17",
+    "description": "Valtezziana",
+    "amount": 20.0,
+    "category": "Eating Out"
+  },
+  {
+    "monthName": "December 2025",
+    "date": "2025-12-17",
+    "description": "Αφοί Ασημακόπουλοι",
+    "amount": 19.0,
+    "category": "Eating Out"
+  },
+  {
+    "monthName": "December 2025",
+    "date": "2025-12-21",
+    "description": "Offline Brunch",
+    "amount": 14.85,
+    "category": "Eating Out"
+  },
+  {
+    "monthName": "December 2025",
+    "date": "2025-12-21",
+    "description": "Dilien",
+    "amount": 26.66,
+    "category": "Eating Out"
+  },
+  {
+    "monthName": "December 2025",
+    "date": "2025-12-24",
+    "description": "McDonald’s",
+    "amount": 19.07,
+    "category": "Eating Out"
+  },
+  {
+    "monthName": "December 2025",
+    "date": "2025-12-27",
+    "description": "Zuzuto Ramen",
+    "amount": 23.5,
+    "category": "Eating Out"
+  },
+  {
+    "monthName": "December 2025",
+    "date": "2025-12-29",
+    "description": "Cultivos",
+    "amount": 7.75,
+    "category": "Eating Out"
+  },
+  {
+    "monthName": "December 2025",
+    "date": "2025-12-29",
+    "description": "Ergon",
+    "amount": 10.0,
+    "category": "Eating Out"
+  },
+  {
+    "monthName": "January 2026",
+    "date": "2026-01-04",
+    "description": "Babaji",
+    "amount": 45.0,
+    "category": "Eating Out"
+  },
+  {
+    "monthName": "January 2026",
+    "date": "2026-01-05",
+    "description": "Lisa Athens",
+    "amount": 25.0,
+    "category": "Eating Out"
+  },
+  {
+    "monthName": "January 2026",
+    "date": "2026-01-06",
+    "description": "Indian Haveli",
+    "amount": 25.0,
+    "category": "Eating Out"
+  },
+  {
+    "monthName": "January 2026",
+    "date": "2026-01-18",
+    "description": "Ovio",
+    "amount": 53.5,
+    "category": "Eating Out"
+  },
+  {
+    "monthName": "January 2026",
+    "date": "2026-01-24",
+    "description": "ΙΚΕΑ Φαγητό",
+    "amount": 21.9,
+    "category": "Eating Out"
+  },
+  {
+    "monthName": "January 2026",
+    "date": "2026-01-24",
+    "description": "Don’t be a dick",
+    "amount": 20.0,
+    "category": "Eating Out"
+  },
+  {
+    "monthName": "January 2026",
+    "date": "2026-01-30",
+    "description": "Ρίζα Ρίζα",
+    "amount": 5.0,
+    "category": "Eating Out"
+  },
+  {
+    "monthName": "February 2026",
+    "date": "2026-02-08",
+    "description": "Dilien",
+    "amount": 32.5,
+    "category": "Eating Out"
+  },
+  {
+    "monthName": "February 2026",
+    "date": "2026-02-13",
+    "description": "72Η",
+    "amount": 13.0,
+    "category": "Eating Out"
+  },
+  {
+    "monthName": "February 2026",
+    "date": "2026-02-14",
+    "description": "Καφές",
+    "amount": 11.3,
+    "category": "Eating Out"
+  },
+  {
+    "monthName": "February 2026",
+    "date": "2026-02-14",
+    "description": "Καπάνι",
+    "amount": 30.66,
+    "category": "Eating Out"
+  },
+  {
+    "monthName": "February 2026",
+    "date": "2026-02-25",
+    "description": "Προδόρπιο",
+    "amount": 6.8,
+    "category": "Eating Out"
+  },
+  {
+    "monthName": "March 2026",
+    "date": "2026-03-01",
+    "description": "Σεϋχέλλες",
+    "amount": 36.66,
+    "category": "Eating Out"
+  },
+  {
+    "monthName": "March 2026",
+    "date": "2026-03-01",
+    "description": "Saorsa",
+    "amount": 10.0,
+    "category": "Eating Out"
+  },
+  {
+    "monthName": "March 2026",
+    "date": "2026-03-06",
+    "description": "Anston",
+    "amount": 27.66,
+    "category": "Eating Out"
+  },
+  {
+    "monthName": "March 2026",
+    "date": "2026-03-07",
+    "description": "Μιμόσα",
+    "amount": 12.5,
+    "category": "Eating Out"
+  },
+  {
+    "monthName": "March 2026",
+    "date": "2026-03-13",
+    "description": "Paul Breakfast",
+    "amount": 11.93,
+    "category": "Eating Out"
+  },
+  {
+    "monthName": "March 2026",
+    "date": "2026-03-13",
+    "description": "Alio",
+    "amount": 45.0,
+    "category": "Eating Out"
+  },
+  {
+    "monthName": "March 2026",
+    "date": "2026-03-14",
+    "description": "Cultivos",
+    "amount": 8.85,
+    "category": "Eating Out"
+  },
+  {
+    "monthName": "March 2026",
+    "date": "2026-03-25",
+    "description": "Γιαγία Κούκου",
+    "amount": 43.33,
+    "category": "Eating Out"
+  },
+  {
+    "monthName": "March 2026",
+    "date": "2026-03-27",
+    "description": "Pizza, Λεμονάδα",
+    "amount": 10.0,
+    "category": "Eating Out"
+  },
+  {
+    "monthName": "March 2026",
+    "date": "2026-03-28",
+    "description": "Προδόρπιον",
+    "amount": 8.5,
+    "category": "Eating Out"
+  },
+  {
+    "monthName": "April 2026",
+    "date": "2026-04-14",
+    "description": "Πέπερι",
+    "amount": 27.5,
+    "category": "Eating Out"
+  },
+  {
+    "monthName": "April 2026",
+    "date": "2026-04-25",
+    "description": "Taco Bell",
+    "amount": 12.0,
+    "category": "Eating Out"
+  },
+  {
+    "monthName": "May 2026",
+    "date": "2026-05-01",
+    "description": "Morning Sweetie",
+    "amount": 20.0,
+    "category": "Eating Out"
+  },
+  {
+    "monthName": "May 2026",
+    "date": "2026-05-15",
+    "description": "Bread Factory Μεσημεριανό",
+    "amount": 13.9,
+    "category": "Eating Out"
+  },
+  {
+    "monthName": "May 2026",
+    "date": "2026-05-16",
+    "description": "Jump!",
+    "amount": 36.3,
+    "category": "Eating Out"
+  },
+  {
+    "monthName": "May 2026",
+    "date": "2026-05-24",
+    "description": "Σεράμικο",
+    "amount": 39.16,
+    "category": "Eating Out"
+  },
+  {
+    "monthName": "May 2026",
+    "date": "2026-05-25",
+    "description": "Στάνη",
+    "amount": 2.2,
+    "category": "Eating Out"
+  },
+  {
+    "monthName": "May 2026",
+    "date": "2026-05-26",
+    "description": "Lele Maiko",
+    "amount": 18.0,
+    "category": "Eating Out"
+  },
+  {
+    "monthName": "May 2026",
+    "date": "2026-05-30",
+    "description": "One Burger",
+    "amount": 18.0,
+    "category": "Eating Out"
+  },
+  {
+    "monthName": "June 2026",
+    "date": "2026-06-01",
+    "description": "Mimosa",
+    "amount": 17.0,
+    "category": "Eating Out"
+  },
+  {
+    "monthName": "June 2026",
+    "date": "2026-06-06",
+    "description": "Zuzuto Ramen",
+    "amount": 23.34,
+    "category": "Eating Out"
+  },
+  {
+    "monthName": "June 2026",
+    "date": "2026-06-08",
+    "description": "Kachisabishi",
+    "amount": 22.0,
+    "category": "Eating Out"
+  },
+  {
+    "monthName": "June 2026",
+    "date": "2026-06-12",
+    "description": "Πίτα Καλαμάκι Αιγάλεω",
+    "amount": 14.4,
+    "category": "Eating Out"
+  },
+  {
+    "monthName": "June 2026",
+    "date": "2026-06-26",
+    "description": "Topa",
+    "amount": 30.0,
+    "category": "Eating Out"
+  },
+  {
+    "monthName": "June 2026",
+    "date": "2026-06-28",
+    "description": "Το Ρίνι",
+    "amount": 29.25,
+    "category": "Eating Out"
+  },
+  {
+    "monthName": "July 2026",
+    "date": "2026-07-03",
+    "description": "Lisa Ath",
+    "amount": 25.0,
+    "category": "Eating Out"
+  },
+  {
+    "monthName": "July 2026",
+    "date": "2026-07-03",
+    "description": "Logiotatos",
+    "amount": 17.0,
+    "category": "Eating Out"
+  },
+  {
+    "monthName": "July 2026",
+    "date": "2026-07-07",
+    "description": "Goody’s",
+    "amount": 5.9,
+    "category": "Eating Out"
+  },
+  {
+    "monthName": "July 2026",
+    "date": "2026-07-10",
+    "description": "Beans & Hops",
+    "amount": 14.0,
+    "category": "Eating Out"
+  },
+  {
+    "monthName": "July 2026",
+    "date": "2026-07-19",
+    "description": "Θεσσαλικό",
+    "amount": 6.75,
+    "category": "Eating Out"
+  },
+  {
+    "monthName": "July 2026",
+    "date": "2026-07-20",
+    "description": "Cultivos",
+    "amount": 4.8,
+    "category": "Eating Out"
+  },
+  {
+    "monthName": "July 2026",
+    "date": "2026-07-20",
+    "description": "Πρόεδρος",
+    "amount": 8.0,
+    "category": "Eating Out"
+  },
+  {
+    "monthName": "July 2026",
+    "date": "2026-07-22",
+    "description": "F* Smashing",
+    "amount": 15.0,
+    "category": "Eating Out"
+  },
+  {
+    "monthName": "July 2026",
+    "date": "2026-07-27",
+    "description": "Τα κορίτσια",
+    "amount": 19.0,
+    "category": "Eating Out"
+  },
+  {
+    "monthName": "March 2025",
+    "date": "2025-03-08",
+    "description": "Wabi Sabi",
+    "amount": 11.0,
+    "category": "Take Away"
+  },
+  {
+    "monthName": "March 2025",
+    "date": "2025-03-12",
+    "description": "Άγραφα",
+    "amount": 9.83,
+    "category": "Take Away"
+  },
+  {
+    "monthName": "March 2025",
+    "date": "2025-03-13",
+    "description": "McDonald’s",
+    "amount": 11.0,
+    "category": "Take Away"
+  },
+  {
+    "monthName": "March 2025",
+    "date": "2025-03-21",
+    "description": "Άγραφα",
+    "amount": 7.0,
+    "category": "Take Away"
+  },
+  {
+    "monthName": "March 2025",
+    "date": "2025-03-31",
+    "description": "Άγραφα",
+    "amount": 6.06,
+    "category": "Take Away"
+  },
+  {
+    "monthName": "April 2025",
+    "date": "2025-04-04",
+    "description": "Άγραφα",
+    "amount": 10.54,
+    "category": "Take Away"
+  },
+  {
+    "monthName": "April 2025",
+    "date": "2025-04-06",
+    "description": "Μαύρο Αλάτι",
+    "amount": 12.5,
+    "category": "Take Away"
+  },
+  {
+    "monthName": "April 2025",
+    "date": "2025-04-11",
+    "description": "Περίπτερο",
+    "amount": 3.8,
+    "category": "Take Away"
+  },
+  {
+    "monthName": "April 2025",
+    "date": "2025-04-13",
+    "description": "Crep n’ Roll",
+    "amount": 12.04,
+    "category": "Take Away"
+  },
+  {
+    "monthName": "April 2025",
+    "date": "2025-04-15",
+    "description": "Άγραφα",
+    "amount": 11.8,
+    "category": "Take Away"
+  },
+  {
+    "monthName": "April 2025",
+    "date": "2025-04-18",
+    "description": "McDonald’s",
+    "amount": 12.23,
+    "category": "Take Away"
+  },
+  {
+    "monthName": "April 2025",
+    "date": "2025-04-18",
+    "description": "The Roosters",
+    "amount": 11.04,
+    "category": "Take Away"
+  },
+  {
+    "monthName": "May 2025",
+    "date": "2025-05-03",
+    "description": "KFC",
+    "amount": 18.07,
+    "category": "Take Away"
+  },
+  {
+    "monthName": "May 2025",
+    "date": "2025-05-04",
+    "description": "Σουβλατζής",
+    "amount": 15.0,
+    "category": "Take Away"
+  },
+  {
+    "monthName": "May 2025",
+    "date": "2025-05-05",
+    "description": "Γιώργος",
+    "amount": 11.85,
+    "category": "Take Away"
+  },
+  {
+    "monthName": "May 2025",
+    "date": "2025-05-13",
+    "description": "Κένκο",
+    "amount": 21.5,
+    "category": "Take Away"
+  },
+  {
+    "monthName": "May 2025",
+    "date": "2025-05-14",
+    "description": "Bread Factory",
+    "amount": 10.0,
+    "category": "Take Away"
+  },
+  {
+    "monthName": "May 2025",
+    "date": "2025-05-17",
+    "description": "Πίτσα Eurovision",
+    "amount": 15.0,
+    "category": "Take Away"
+  },
+  {
+    "monthName": "May 2025",
+    "date": "2025-05-22",
+    "description": "Bread Factory",
+    "amount": 13.37,
+    "category": "Take Away"
+  },
+  {
+    "monthName": "May 2025",
+    "date": "2025-05-22",
+    "description": "Just Crispy Strips",
+    "amount": 13.33,
+    "category": "Take Away"
+  },
+  {
+    "monthName": "May 2025",
+    "date": "2025-05-25",
+    "description": "Τ´Άγραφα",
+    "amount": 13.0,
+    "category": "Take Away"
+  },
+  {
+    "monthName": "May 2025",
+    "date": "2025-05-27",
+    "description": "Τ´Άγραφα",
+    "amount": 10.0,
+    "category": "Take Away"
+  },
+  {
+    "monthName": "May 2025",
+    "date": "2025-05-30",
+    "description": "Μαγειρευτό Περιστέρι",
+    "amount": 14.1,
+    "category": "Take Away"
+  },
+  {
+    "monthName": "June 2025",
+    "date": "2025-06-04",
+    "description": "Τ´Άγραφα",
+    "amount": 11.0,
+    "category": "Take Away"
+  },
+  {
+    "monthName": "June 2025",
+    "date": "2025-06-06",
+    "description": "WokmasterX",
+    "amount": 14.27,
+    "category": "Take Away"
+  },
+  {
+    "monthName": "June 2025",
+    "date": "2025-06-08",
+    "description": "Crep’n Roll",
+    "amount": 6.78,
+    "category": "Take Away"
+  },
+  {
+    "monthName": "June 2025",
+    "date": "2025-06-09",
+    "description": "Τ´Άγραφα",
+    "amount": 11.04,
+    "category": "Take Away"
+  },
+  {
+    "monthName": "June 2025",
+    "date": "2025-06-11",
+    "description": "Αρμάντο",
+    "amount": 13.0,
+    "category": "Take Away"
+  },
+  {
+    "monthName": "June 2025",
+    "date": "2025-06-15",
+    "description": "Cultivos",
+    "amount": 8.19,
+    "category": "Take Away"
+  },
+  {
+    "monthName": "June 2025",
+    "date": "2025-06-22",
+    "description": "Έλβις Περιστέρι",
+    "amount": 16.04,
+    "category": "Take Away"
+  },
+  {
+    "monthName": "June 2025",
+    "date": "2025-06-22",
+    "description": "Kosmikon",
+    "amount": 10.85,
+    "category": "Take Away"
+  },
+  {
+    "monthName": "June 2025",
+    "date": "2025-06-28",
+    "description": "Τ´Άγραφα",
+    "amount": 10.0,
+    "category": "Take Away"
+  },
+  {
+    "monthName": "July 2025",
+    "date": "2025-07-06",
+    "description": "Γυρογωνία",
+    "amount": 12.02,
+    "category": "Take Away"
+  },
+  {
+    "monthName": "July 2025",
+    "date": "2025-07-11",
+    "description": "Άγραφα 1977",
+    "amount": 14.6,
+    "category": "Take Away"
+  },
+  {
+    "monthName": "July 2025",
+    "date": "2025-07-19",
+    "description": "Sishan",
+    "amount": 14.71,
+    "category": "Take Away"
+  },
+  {
+    "monthName": "July 2025",
+    "date": "2025-07-20",
+    "description": "Μαύρο Αλάτι",
+    "amount": 14.62,
+    "category": "Take Away"
+  },
+  {
+    "monthName": "July 2025",
+    "date": "2025-07-22",
+    "description": "Πίτσα Παππάς",
+    "amount": 8.4,
+    "category": "Take Away"
+  },
+  {
+    "monthName": "July 2025",
+    "date": "2025-07-23",
+    "description": "Προδόρπιον",
+    "amount": 10.2,
+    "category": "Take Away"
+  },
+  {
+    "monthName": "August 2025",
+    "date": "2025-08-02",
+    "description": "McDonald’s",
+    "amount": 18.44,
+    "category": "Take Away"
+  },
+  {
+    "monthName": "August 2025",
+    "date": "2025-08-02",
+    "description": "Crep’n Roll",
+    "amount": 7.2,
+    "category": "Take Away"
+  },
+  {
+    "monthName": "August 2025",
+    "date": "2025-08-14",
+    "description": "Πρόεδρος",
+    "amount": 11.09,
+    "category": "Take Away"
+  },
+  {
+    "monthName": "August 2025",
+    "date": "2025-08-19",
+    "description": "PizzaFan",
+    "amount": 13.4,
+    "category": "Take Away"
+  },
+  {
+    "monthName": "August 2025",
+    "date": "2025-08-24",
+    "description": "Τ´Άγραφα",
+    "amount": 23.46,
+    "category": "Take Away"
+  },
+  {
+    "monthName": "August 2025",
+    "date": "2025-08-28",
+    "description": "Efood",
+    "amount": 13.7,
+    "category": "Take Away"
+  },
+  {
+    "monthName": "September 2025",
+    "date": "2025-09-12",
+    "description": "Elvis(Efood)",
+    "amount": 13.11,
+    "category": "Take Away"
+  },
+  {
+    "monthName": "September 2025",
+    "date": "2025-09-13",
+    "description": "Efood",
+    "amount": 11.81,
+    "category": "Take Away"
+  },
+  {
+    "monthName": "September 2025",
+    "date": "2025-09-19",
+    "description": "Παραθύρι",
+    "amount": 9.79,
+    "category": "Take Away"
+  },
+  {
+    "monthName": "September 2025",
+    "date": "2025-09-24",
+    "description": "Shishan",
+    "amount": 19.91,
+    "category": "Take Away"
+  },
+  {
+    "monthName": "September 2025",
+    "date": "2025-09-25",
+    "description": "Κρίτσι Κρίτσι",
+    "amount": 10.6,
+    "category": "Take Away"
+  },
+  {
+    "monthName": "September 2025",
+    "date": "2025-09-26",
+    "description": "Taste Eat",
+    "amount": 5.9,
+    "category": "Take Away"
+  },
+  {
+    "monthName": "September 2025",
+    "date": "2025-09-30",
+    "description": "Τ´Άγραφα",
+    "amount": 5.3,
+    "category": "Take Away"
+  },
+  {
+    "monthName": "October 2025",
+    "date": "2025-10-03",
+    "description": "Κοσμικόν",
+    "amount": 8.89,
+    "category": "Take Away"
+  },
+  {
+    "monthName": "October 2025",
+    "date": "2025-10-04",
+    "description": "Beat (Efood)",
+    "amount": 11.48,
+    "category": "Take Away"
+  },
+  {
+    "monthName": "October 2025",
+    "date": "2025-10-07",
+    "description": "2 Όψεις (Efood)",
+    "amount": 11.5,
+    "category": "Take Away"
+  },
+  {
+    "monthName": "October 2025",
+    "date": "2025-10-10",
+    "description": "Τ´Άγραφα(Wolt)",
+    "amount": 12.7,
+    "category": "Take Away"
+  },
+  {
+    "monthName": "October 2025",
+    "date": "2025-10-11",
+    "description": "Juan Cantina (Efood)",
+    "amount": 12.27,
+    "category": "Take Away"
+  },
+  {
+    "monthName": "October 2025",
+    "date": "2025-10-11",
+    "description": "Overall (Wolt)",
+    "amount": 11.76,
+    "category": "Take Away"
+  },
+  {
+    "monthName": "October 2025",
+    "date": "2025-10-12",
+    "description": "Τ´Άγραφα (Wolt)",
+    "amount": 18.46,
+    "category": "Take Away"
+  },
+  {
+    "monthName": "October 2025",
+    "date": "2025-10-19",
+    "description": "Φούρνος Πρωινό",
+    "amount": 9.87,
+    "category": "Take Away"
+  },
+  {
+    "monthName": "October 2025",
+    "date": "2025-10-22",
+    "description": "Juan’s Cantina",
+    "amount": 8.82,
+    "category": "Take Away"
+  },
+  {
+    "monthName": "October 2025",
+    "date": "2025-10-24",
+    "description": "Efood",
+    "amount": 15.9,
+    "category": "Take Away"
+  },
+  {
+    "monthName": "October 2025",
+    "date": "2025-10-25",
+    "description": "Κοτόπουλο",
+    "amount": 7.31,
+    "category": "Take Away"
+  },
+  {
+    "monthName": "November 2025",
+    "date": "2025-11-05",
+    "description": "Σουβλάκια",
+    "amount": 10.0,
+    "category": "Take Away"
+  },
+  {
+    "monthName": "November 2025",
+    "date": "2025-11-16",
+    "description": "Brunchie Περιστέρι (Wolt)",
+    "amount": 6.92,
+    "category": "Take Away"
+  },
+  {
+    "monthName": "November 2025",
+    "date": "2025-11-16",
+    "description": "Άγραφα",
+    "amount": 11.17,
+    "category": "Take Away"
+  },
+  {
+    "monthName": "November 2025",
+    "date": "2025-11-20",
+    "description": "Shishan",
+    "amount": 13.8,
+    "category": "Take Away"
+  },
+  {
+    "monthName": "November 2025",
+    "date": "2025-11-23",
+    "description": "Τ´Άγραφα Efood",
+    "amount": 11.15,
+    "category": "Take Away"
+  },
+  {
+    "monthName": "November 2025",
+    "date": "2025-11-24",
+    "description": "Γυρογωνία (Wolt)",
+    "amount": 16.0,
+    "category": "Take Away"
+  },
+  {
+    "monthName": "November 2025",
+    "date": "2025-11-26",
+    "description": "Φούρνος Νάξου",
+    "amount": 2.2,
+    "category": "Take Away"
+  },
+  {
+    "monthName": "November 2025",
+    "date": "2025-11-29",
+    "description": "KFC",
+    "amount": 17.97,
+    "category": "Take Away"
+  },
+  {
+    "monthName": "December 2025",
+    "date": "2025-12-03",
+    "description": "Σουβλάκια Δουλειά",
+    "amount": 5.0,
+    "category": "Take Away"
+  },
+  {
+    "monthName": "December 2025",
+    "date": "2025-12-04",
+    "description": "Τ´Άγραφα",
+    "amount": 6.71,
+    "category": "Take Away"
+  },
+  {
+    "monthName": "December 2025",
+    "date": "2025-12-07",
+    "description": "Wolt Crepe",
+    "amount": 6.83,
+    "category": "Take Away"
+  },
+  {
+    "monthName": "December 2025",
+    "date": "2025-12-12",
+    "description": "McDonald’s -Wolt",
+    "amount": 15.0,
+    "category": "Take Away"
+  },
+  {
+    "monthName": "December 2025",
+    "date": "2025-12-20",
+    "description": "Jackaroo-Box",
+    "amount": 11.85,
+    "category": "Take Away"
+  },
+  {
+    "monthName": "December 2025",
+    "date": "2025-12-31",
+    "description": "Beat-Efood",
+    "amount": 7.56,
+    "category": "Take Away"
+  },
+  {
+    "monthName": "January 2026",
+    "date": "2026-01-04",
+    "description": "Domino’s Pizza",
+    "amount": 14.64,
+    "category": "Take Away"
+  },
+  {
+    "monthName": "January 2026",
+    "date": "2026-01-11",
+    "description": "ΑγαΠίτσα",
+    "amount": 9.6,
+    "category": "Take Away"
+  },
+  {
+    "monthName": "January 2026",
+    "date": "2026-01-20",
+    "description": "Ο Πρόεδρος",
+    "amount": 12.87,
+    "category": "Take Away"
+  },
+  {
+    "monthName": "January 2026",
+    "date": "2026-01-25",
+    "description": "McDonald’s",
+    "amount": 18.04,
+    "category": "Take Away"
+  },
+  {
+    "monthName": "January 2026",
+    "date": "2026-01-25",
+    "description": "Κρέπα",
+    "amount": 6.73,
+    "category": "Take Away"
+  },
+  {
+    "monthName": "January 2026",
+    "date": "2026-01-28",
+    "description": "Τ´Άγραφα - Efood",
+    "amount": 7.98,
+    "category": "Take Away"
+  },
+  {
+    "monthName": "February 2026",
+    "date": "2026-02-01",
+    "description": "Zuzuto Ramen",
+    "amount": 20.5,
+    "category": "Take Away"
+  },
+  {
+    "monthName": "February 2026",
+    "date": "2026-02-03",
+    "description": "Goody’s - Wolt",
+    "amount": 10.37,
+    "category": "Take Away"
+  },
+  {
+    "monthName": "February 2026",
+    "date": "2026-02-07",
+    "description": "Μαρτίνης - Wolt",
+    "amount": 12.62,
+    "category": "Take Away"
+  },
+  {
+    "monthName": "February 2026",
+    "date": "2026-02-11",
+    "description": "Shisan- Wolt",
+    "amount": 9.62,
+    "category": "Take Away"
+  },
+  {
+    "monthName": "February 2026",
+    "date": "2026-02-15",
+    "description": "Cultivos - Wolt",
+    "amount": 11.95,
+    "category": "Take Away"
+  },
+  {
+    "monthName": "February 2026",
+    "date": "2026-02-15",
+    "description": "Κουντουριώτικο",
+    "amount": 7.5,
+    "category": "Take Away"
+  },
+  {
+    "monthName": "February 2026",
+    "date": "2026-02-15",
+    "description": "Bread Factory",
+    "amount": 5.75,
+    "category": "Take Away"
+  },
+  {
+    "monthName": "February 2026",
+    "date": "2026-02-19",
+    "description": "Jackaroo",
+    "amount": 6.01,
+    "category": "Take Away"
+  },
+  {
+    "monthName": "February 2026",
+    "date": "2026-02-22",
+    "description": "Burgers - Efood",
+    "amount": 11.21,
+    "category": "Take Away"
+  },
+  {
+    "monthName": "February 2026",
+    "date": "2026-02-28",
+    "description": "Τ´άγραφα",
+    "amount": 16.09,
+    "category": "Take Away"
+  },
+  {
+    "monthName": "March 2026",
+    "date": "2026-03-03",
+    "description": "Elvis Efood",
+    "amount": 10.81,
+    "category": "Take Away"
+  },
+  {
+    "monthName": "March 2026",
+    "date": "2026-03-06",
+    "description": "Σουβλάκια",
+    "amount": 5.0,
+    "category": "Take Away"
+  },
+  {
+    "monthName": "March 2026",
+    "date": "2026-03-12",
+    "description": "Τ´Άγραφα",
+    "amount": 9.22,
+    "category": "Take Away"
+  },
+  {
+    "monthName": "March 2026",
+    "date": "2026-03-15",
+    "description": "McDonald’s",
+    "amount": 15.85,
+    "category": "Take Away"
+  },
+  {
+    "monthName": "March 2026",
+    "date": "2026-03-15",
+    "description": "Kuki Ath",
+    "amount": 13.1,
+    "category": "Take Away"
+  },
+  {
+    "monthName": "March 2026",
+    "date": "2026-03-18",
+    "description": "Hanky Panky",
+    "amount": 10.24,
+    "category": "Take Away"
+  },
+  {
+    "monthName": "March 2026",
+    "date": "2026-03-20",
+    "description": "Κρέπες",
+    "amount": 11.44,
+    "category": "Take Away"
+  },
+  {
+    "monthName": "March 2026",
+    "date": "2026-03-21",
+    "description": "Τ´Άγραφα",
+    "amount": 13.14,
+    "category": "Take Away"
+  },
+  {
+    "monthName": "March 2026",
+    "date": "2026-03-26",
+    "description": "Πρόεδρος-Efood",
+    "amount": 9.02,
+    "category": "Take Away"
+  },
+  {
+    "monthName": "March 2026",
+    "date": "2026-03-27",
+    "description": "LaFriedChicken - Efood",
+    "amount": 14.3,
+    "category": "Take Away"
+  },
+  {
+    "monthName": "March 2026",
+    "date": "2026-03-30",
+    "description": "Ευριπίδης-Efood",
+    "amount": 11.41,
+    "category": "Take Away"
+  },
+  {
+    "monthName": "April 2026",
+    "date": "2026-04-02",
+    "description": "Shishan",
+    "amount": 17.62,
+    "category": "Take Away"
+  },
+  {
+    "monthName": "April 2026",
+    "date": "2026-04-04",
+    "description": "Wolt-Κρέπες",
+    "amount": 10.5,
+    "category": "Take Away"
+  },
+  {
+    "monthName": "April 2026",
+    "date": "2026-04-06",
+    "description": "Goody’s",
+    "amount": 15.1,
+    "category": "Take Away"
+  },
+  {
+    "monthName": "April 2026",
+    "date": "2026-04-11",
+    "description": "Ρόκα&Ρόδι Efood",
+    "amount": 12.0,
+    "category": "Take Away"
+  },
+  {
+    "monthName": "April 2026",
+    "date": "2026-04-15",
+    "description": "Τ´Άγραφα - Wolt",
+    "amount": 7.89,
+    "category": "Take Away"
+  },
+  {
+    "monthName": "April 2026",
+    "date": "2026-04-17",
+    "description": "Καλαμάκης-Efood",
+    "amount": 12.42,
+    "category": "Take Away"
+  },
+  {
+    "monthName": "April 2026",
+    "date": "2026-04-21",
+    "description": "Καλαμάκης",
+    "amount": 8.5,
+    "category": "Take Away"
+  },
+  {
+    "monthName": "April 2026",
+    "date": "2026-04-24",
+    "description": "Τ´Άγραφα",
+    "amount": 7.36,
+    "category": "Take Away"
+  },
+  {
+    "monthName": "April 2026",
+    "date": "2026-04-30",
+    "description": "Καλαμάκια Χαμάμ",
+    "amount": 9.0,
+    "category": "Take Away"
+  },
+  {
+    "monthName": "May 2026",
+    "date": "2026-05-02",
+    "description": "Nob - EFood",
+    "amount": 12.66,
+    "category": "Take Away"
+  },
+  {
+    "monthName": "May 2026",
+    "date": "2026-05-07",
+    "description": "Βλάχος-Efood",
+    "amount": 13.32,
+    "category": "Take Away"
+  },
+  {
+    "monthName": "May 2026",
+    "date": "2026-05-10",
+    "description": "Καλαμάκης-Efood",
+    "amount": 12.32,
+    "category": "Take Away"
+  },
+  {
+    "monthName": "May 2026",
+    "date": "2026-05-12",
+    "description": "Nob",
+    "amount": 16.92,
+    "category": "Take Away"
+  },
+  {
+    "monthName": "May 2026",
+    "date": "2026-05-14",
+    "description": "Σουβλάκια Eurovision",
+    "amount": 14.2,
+    "category": "Take Away"
+  },
+  {
+    "monthName": "May 2026",
+    "date": "2026-05-16",
+    "description": "Σούσι Eurovision",
+    "amount": 19.78,
+    "category": "Take Away"
+  },
+  {
+    "monthName": "May 2026",
+    "date": "2026-05-28",
+    "description": "Hamburgerie",
+    "amount": 11.08,
+    "category": "Take Away"
+  },
+  {
+    "monthName": "May 2026",
+    "date": "2026-05-31",
+    "description": "Βλάχος",
+    "amount": 15.42,
+    "category": "Take Away"
+  },
+  {
+    "monthName": "June 2026",
+    "date": "2026-06-03",
+    "description": "Άγραφα",
+    "amount": 9.25,
+    "category": "Take Away"
+  },
+  {
+    "monthName": "June 2026",
+    "date": "2026-06-07",
+    "description": "Μαρτίνης",
+    "amount": 15.23,
+    "category": "Take Away"
+  },
+  {
+    "monthName": "June 2026",
+    "date": "2026-06-11",
+    "description": "Juan’s Cantina",
+    "amount": 11.8,
+    "category": "Take Away"
+  },
+  {
+    "monthName": "June 2026",
+    "date": "2026-06-13",
+    "description": "Τα Σουβλάκια του Γαλατσίου",
+    "amount": 7.8,
+    "category": "Take Away"
+  },
+  {
+    "monthName": "June 2026",
+    "date": "2026-06-17",
+    "description": "Αντωνόπουλος Wolt",
+    "amount": 11.15,
+    "category": "Take Away"
+  },
+  {
+    "monthName": "June 2026",
+    "date": "2026-06-18",
+    "description": "Separato Sandwich",
+    "amount": 11.27,
+    "category": "Take Away"
+  },
+  {
+    "monthName": "June 2026",
+    "date": "2026-06-19",
+    "description": "Πολίτης Wolt",
+    "amount": 9.29,
+    "category": "Take Away"
+  },
+  {
+    "monthName": "June 2026",
+    "date": "2026-06-20",
+    "description": "Berry’s eFood",
+    "amount": 15.02,
+    "category": "Take Away"
+  },
+  {
+    "monthName": "June 2026",
+    "date": "2026-06-21",
+    "description": "Καφέδες",
+    "amount": 5.52,
+    "category": "Take Away"
+  },
+  {
+    "monthName": "June 2026",
+    "date": "2026-06-24",
+    "description": "Goody’s",
+    "amount": 8.7,
+    "category": "Take Away"
+  },
+  {
+    "monthName": "June 2026",
+    "date": "2026-06-27",
+    "description": "Άγραφα",
+    "amount": 20.84,
+    "category": "Take Away"
+  },
+  {
+    "monthName": "July 2026",
+    "date": "2026-07-02",
+    "description": "Ρόκα Ρόδι Efood",
+    "amount": 12.0,
+    "category": "Take Away"
+  },
+  {
+    "monthName": "July 2026",
+    "date": "2026-07-22",
+    "description": "Άγραφα",
+    "amount": 6.77,
+    "category": "Take Away"
+  },
+  {
+    "monthName": "March 2025",
+    "date": "2025-03-07",
+    "description": "Κοινόχρηστα",
+    "amount": 11.31,
+    "category": "Utilities"
+  },
+  {
+    "monthName": "March 2025",
+    "date": "2025-03-14",
+    "description": "Κοινόχρηστα",
+    "amount": 11.0,
+    "category": "Utilities"
+  },
+  {
+    "monthName": "March 2025",
+    "date": "2025-03-17",
+    "description": "Ρεύμα",
+    "amount": 40.0,
+    "category": "Utilities"
+  },
+  {
+    "monthName": "March 2025",
+    "date": "2025-03-29",
+    "description": "ΕΝΦΙΑ",
+    "amount": 10.09,
+    "category": "Utilities"
+  },
+  {
+    "monthName": "April 2025",
+    "date": "2025-04-01",
+    "description": "Νερό",
+    "amount": 12.5,
+    "category": "Utilities"
+  }
+]
