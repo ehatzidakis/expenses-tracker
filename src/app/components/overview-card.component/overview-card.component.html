@@ -1,5 +1,7 @@
 <section
-  class="bg-linear-to-br from-gray-900 via-gray-900 to-indigo-950/50 border border-gray-800 rounded-2xl p-5 shadow-xl"
+  class="bg-linear-to-br from-gray-900 via-gray-900 to-indigo-950/50 border border-gray-800 rounded-2xl p-5 shadow-xl transition-all duration-200"
+  [class.cursor-pointer]="hasBreakdown()"
+  (click)="toggleExpanded()"
 >
   @if (dateRangeInfo(); as info) {
     <span class="text-xs font-medium text-gray-400 uppercase tracking-wider block mb-2">
@@ -23,19 +25,62 @@
           €{{ totalSpend() | number: '1.2-2' }}
         </h2>
       </div>
+      @if (hasBreakdown() && expanded()) {
+        <div class="mt-2.5 space-y-1">
+          <div class="flex justify-between gap-3 text-[11px]">
+            <span class="text-gray-500">Monthly Expenses:</span>
+            <span class="text-gray-300 font-medium"
+              >€{{ monthlyExpenses() | number: '1.2-2' }}</span
+            >
+          </div>
+          <div class="flex justify-between gap-3 text-[11px]">
+            <span class="text-gray-500">One-Off Expenses:</span>
+            <span class="text-gray-300 font-medium">€{{ oneOffExpenses() | number: '1.2-2' }}</span>
+          </div>
+        </div>
+      }
     </div>
     <div class="text-left">
       <span class="text-xs font-medium text-gray-400 uppercase tracking-wider">Total Saved</span>
       <div class="flex items-baseline mt-1">
         <h2
           class="text-3xl font-extrabold tracking-tight"
-          [class]="totalSaved() >= 0 ? 'text-emerald-400' : 'text-red-400'"
+          [class]="computedTotalSaved() >= 0 ? 'text-emerald-400' : 'text-red-400'"
         >
-          €{{ totalSaved() | number: '1.2-2' }}
+          €{{ computedTotalSaved() | number: '1.2-2' }}
         </h2>
       </div>
+      @if (hasBreakdown() && expanded()) {
+        <div class="mt-2.5 space-y-1">
+          <div class="flex justify-between gap-3 text-[11px]">
+            <span class="text-gray-500">Monthly Saved:</span>
+            <span class="text-gray-300 font-medium">€{{ monthlySaved() | number: '1.2-2' }}</span>
+          </div>
+          <div class="flex justify-between gap-3 text-[11px]">
+            <span class="text-gray-500">One-Off Bonuses:</span>
+            <span class="text-gray-300 font-medium">€{{ oneOffBonuses() | number: '1.2-2' }}</span>
+          </div>
+        </div>
+      }
     </div>
   </div>
+
+  @if (hasBreakdown()) {
+    <div class="flex justify-center mt-3 pt-2 border-t border-gray-800/60">
+      <svg
+        class="w-4 h-4 text-gray-500 transition-transform duration-200"
+        [class.rotate-180]="expanded()"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <polyline points="6 9 12 15 18 9" />
+      </svg>
+    </div>
+  }
 
   <!-- <div class="grid grid-cols-2 gap-3 mt-6 pt-4 border-t border-gray-800/80">
     <div>

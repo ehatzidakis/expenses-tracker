@@ -1,4 +1,4 @@
-import { Component, computed, input } from '@angular/core';
+import { Component, computed, input, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { CategorySpend } from '../../services/expense-state.service';
 
@@ -12,9 +12,25 @@ import { CategorySpend } from '../../services/expense-state.service';
 export class OverviewCardComponent {
   totalSpend = input.required<number>();
   totalWage = input<number>(0);
+  totalSaved = input<number | null>(null);
   monthName = input<string>('');
   dateRangeInfo = input<{ count: number; first: string; last: string } | null>(null);
   topCategory = input<CategorySpend | null>(null);
 
-  totalSaved = computed(() => this.totalWage() - this.totalSpend());
+  monthlyExpenses = input<number | null>(null);
+  oneOffExpenses = input<number | null>(null);
+  monthlySaved = input<number | null>(null);
+  oneOffBonuses = input<number | null>(null);
+
+  computedTotalSaved = computed(() => this.totalSaved() ?? this.totalWage() - this.totalSpend());
+
+  // Breakdown rows only apply when the parent supplies the monthly/one-off split (SumUp view).
+  hasBreakdown = computed(() => this.monthlyExpenses() !== null);
+  expanded = signal(false);
+
+  toggleExpanded(): void {
+    if (this.hasBreakdown()) {
+      this.expanded.update((v) => !v);
+    }
+  }
 }
