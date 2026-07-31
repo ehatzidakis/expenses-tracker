@@ -9,67 +9,84 @@
   <div class="space-y-3.5">
     @for (cat of categories(); track cat.name) {
       <div class="space-y-1.5">
-        <div class="flex justify-between text-xs">
-          <div class="flex items-center gap-1.5">
-            <span class="font-medium text-gray-300">{{ cat.name }}</span>
-            <span
-              class="text-[10px] px-1 py-0.5 rounded bg-red-500/10 text-red-400 border border-red-500/20 font-medium"
-              [class.invisible]="!cat.isOverBudget"
-            >
-              Over Budget
-            </span>
-          </div>
-          <div class="space-x-1">
-            <span class="text-gray-400">{{ cat.percentage | number: '1.1-1' }}%</span>
-            <span class="text-white font-semibold">
-              €{{ cat.amount | number: '1.2-2' }}{{ cat.isAllTime ? '' : '' }}
-            </span>
-            @if (!cat.isAllTime) {
-              <span
-                class="text-red-400 font-semibold"
-                [class.invisible]="!cat.isOverBudget || cat.budget === null"
-              >
-                (+€{{ (cat.monthlyAverage ?? cat.amount) - (cat.budget ?? 0) | number: '1.2-2' }})
-              </span>
-            }
-          </div>
-        </div>
-        @if (cat.isAllTime && cat.monthlyAverage !== null) {
+        <div
+          class="space-y-1.5"
+          [class.cursor-pointer]="!cat.isAllTime"
+          (click)="!cat.isAllTime && toggleCategory(cat.name)"
+        >
           <div class="flex justify-between text-xs">
             <div class="flex items-center gap-1.5">
+              <span class="font-medium text-gray-300">{{ cat.name }}</span>
               <span
-                class="inline-flex items-center gap-1 text-xs font-semibold px-5 py-0.5 rounded-md bg-indigo-500/15 text-indigo-300 border border-indigo-500/30"
+                class="text-[10px] px-1 py-0.5 rounded bg-red-500/10 text-red-400 border border-red-500/20 font-medium"
+                [class.invisible]="!cat.isOverBudget"
               >
-                €{{ cat.monthlyAverage | number: '1.2-2' }} / mo avg
+                Over Budget
               </span>
             </div>
-            @if (cat.overallBudget !== null) {
-              <div class="space-x-1">
+            <div class="space-x-1">
+              <span class="text-gray-400">{{ cat.percentage | number: '1.1-1' }}%</span>
+              <span class="text-white font-semibold">
+                €{{ cat.amount | number: '1.2-2' }}{{ cat.isAllTime ? '' : '' }}
+              </span>
+              @if (!cat.isAllTime) {
                 <span
-                  class="font-semibold"
-                  [class]="cat.isOverBudget ? 'text-red-400' : 'text-green-400'"
+                  class="text-red-400 font-semibold"
+                  [class.invisible]="!cat.isOverBudget || cat.budget === null"
                 >
-                  ({{ cat.isOverBudget ? '+' : '' }}€{{
-                    cat.amount - cat.overallBudget | number: '1.2-2'
-                  }}
-                  overall)
+                  (+€{{ (cat.monthlyAverage ?? cat.amount) - (cat.budget ?? 0) | number: '1.2-2' }})
+                </span>
+              }
+            </div>
+          </div>
+          @if (cat.isAllTime && cat.monthlyAverage !== null) {
+            <div class="flex justify-between text-xs">
+              <div class="flex items-center gap-1.5">
+                <span
+                  class="inline-flex items-center gap-1 text-xs font-semibold px-5 py-0.5 rounded-md bg-indigo-500/15 text-indigo-300 border border-indigo-500/30"
+                >
+                  €{{ cat.monthlyAverage | number: '1.2-2' }} / mo avg
                 </span>
               </div>
-            }
+              @if (cat.overallBudget !== null) {
+                <div class="space-x-1">
+                  <span
+                    class="font-semibold"
+                    [class]="cat.isOverBudget ? 'text-red-400' : 'text-green-400'"
+                  >
+                    ({{ cat.isOverBudget ? '+' : '' }}€{{
+                      cat.amount - cat.overallBudget | number: '1.2-2'
+                    }}
+                    overall)
+                  </span>
+                </div>
+              }
+            </div>
+          }
+          <!-- Progress Bar -->
+          <div class="h-2 w-full bg-gray-800 rounded-full overflow-hidden mt-2.5">
+            <div
+              [class]="
+                cat.isOverBudget
+                  ? 'bg-linear-to-r from-red-500 to-rose-600'
+                  : 'bg-linear-to-r from-indigo-500 to-violet-500'
+              "
+              class="h-full rounded-full transition-all duration-300"
+              [style.width.%]="cat.percentage"
+            ></div>
           </div>
-        }
-        <!-- Progress Bar -->
-        <div class="h-2 w-full bg-gray-800 rounded-full overflow-hidden mt-2.5">
-          <div
-            [class]="
-              cat.isOverBudget
-                ? 'bg-linear-to-r from-red-500 to-rose-600'
-                : 'bg-linear-to-r from-indigo-500 to-violet-500'
-            "
-            class="h-full rounded-full transition-all duration-300"
-            [style.width.%]="cat.percentage"
-          ></div>
         </div>
+
+        @if (expandedCategory() === cat.name && !cat.isAllTime) {
+          @defer (on immediate) {
+            <app-transaction-grid
+              [monthName]="monthName()"
+              [category]="cat.name"
+            ></app-transaction-grid>
+          } @loading {
+            <div class="mt-3 h-24 bg-gray-800/40 rounded-xl animate-pulse"></div>
+          }
+        }
       </div>
     }
   </div>

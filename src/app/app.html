@@ -40,7 +40,10 @@
           >
           </app-overview-card>
 
-          <app-category-breakdown [categories]="state.categoryBreakdown()">
+          <app-category-breakdown
+            [categories]="state.categoryBreakdown()"
+            [monthName]="state.selectedExpense()?.MonthName ?? ''"
+          >
           </app-category-breakdown>
         }
         @case ('sumup') {
