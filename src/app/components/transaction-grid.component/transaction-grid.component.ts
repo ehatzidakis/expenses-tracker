@@ -1,4 +1,4 @@
-import { Component, effect, inject, input, signal } from '@angular/core';
+import { Component, effect, inject, input, output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import type { DocumentData, QueryDocumentSnapshot } from 'firebase/firestore/lite';
 import { TransactionService } from '../../services/transaction-service';
@@ -17,6 +17,13 @@ export class TransactionGridComponent {
   monthName = input.required<string>();
   category = input.required<string>();
 
+  selectTransaction = output<Transaction>();
+
+  onItemClick(item: Transaction): void {
+    console.log('Grid row clicked:', item);
+    this.selectTransaction.emit(item);
+  }
+
   readonly items = signal<Transaction[]>([]);
   readonly loading = signal(true);
   readonly error = signal(false);
@@ -33,6 +40,10 @@ export class TransactionGridComponent {
       this.cursors = [null];
       this.loadPage(1);
     });
+  }
+
+  refresh(): void {
+    this.loadPage(this.page());
   }
 
   private async loadPage(page: number): Promise<void> {

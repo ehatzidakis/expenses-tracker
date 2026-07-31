@@ -135,22 +135,88 @@ export class TransactionService {
     return transactionRef.id;
   }
 
-  async deleteTransaction(transactionId: string): Promise<void> {
-    const transactionRef = doc(db, 'transactions', transactionId);
-    const txSnap = await getDoc(transactionRef);
+  async updateTransaction(oldTx: Transaction, input: NewTransactionInput): Promise<void> {
+    const newMonthName = monthNameFromDateString(input.date);
+    const batch = writeBatch(db);
+    const expensesRef = collection(db, 'expenses');
 
-    if (!txSnap.exists()) {
-      throw new Error(`Transaction ${transactionId} not found.`);
+    // 1. Revert old amount from original month & category summary
+    const oldExpenseSnap = await getDocs(
+      query(expensesRef, where('MonthName', '==', oldTx.monthName)),
+    );
+    const oldExpenseDoc = oldExpenseSnap.docs[0] ?? null;
+
+    if (oldExpenseDoc) {
+      batch.update(oldExpenseDoc.ref, {
+        [oldTx.category]: increment(-oldTx.amount),
+      });
     }
 
-    const txData = txSnap.data();
-    const monthName = txData['monthName'] as string;
-    const category = txData['category'] as string;
-    const amount = Number(txData['amount']) || 0;
+    // 2. Apply new amount to new month & category summary
+    const newExpenseSnap = await getDocs(
+      query(expensesRef, where('MonthName', '==', newMonthName)),
+    );
+    const newExpenseDoc = newExpenseSnap.docs[0] ?? null;
+
+    if (newExpenseDoc) {
+      batch.update(newExpenseDoc.ref, {
+        [input.category]: increment(input.amount),
+      });
+    } else {
+      // If transitioning to a new month that doesn't exist yet in expenses
+      const newExpense: Record<string, string | number> = {
+        MonthName: newMonthName,
+        TotalWage: DEFAULT_TOTAL_WAGE,
+      };
+      for (const name of CATEGORY_NAMES) {
+        newExpense[name] = name === input.category ? input.amount : 0;
+      }
+      batch.set(doc(expensesRef), newExpense);
+    }
+
+    // 3. Update the transaction document itself
+    const txRef = doc(db, 'transactions', oldTx.id);
+    batch.update(txRef, {
+      date: input.date,
+      monthName: newMonthName,
+      description: input.description,
+      category: input.category,
+      amount: input.amount,
+    });
+
+    await batch.commit();
+  }
+
+  async deleteTransaction(target: string | Transaction): Promise<void> {
+    let transactionId: string;
+    let monthName: string;
+    let category: string;
+    let amount: number;
+
+    // 1. Resolve parameters whether an ID or a full object is passed
+    if (typeof target === 'string') {
+      transactionId = target;
+      const txRef = doc(db, 'transactions', transactionId);
+      const txSnap = await getDoc(txRef);
+
+      if (!txSnap.exists()) {
+        throw new Error(`Transaction ${transactionId} not found.`);
+      }
+
+      const txData = txSnap.data();
+      monthName = txData['monthName'] as string;
+      category = txData['category'] as string;
+      amount = Number(txData['amount']) || 0;
+    } else {
+      transactionId = target.id;
+      monthName = target.monthName;
+      category = target.category;
+      amount = target.amount;
+    }
 
     const batch = writeBatch(db);
 
-    // 1. Decrement summary document in expenses collection
+    // 2. Decrement amount from expenses summary document
     const expensesRef = collection(db, 'expenses');
     const existingSnapshot = await getDocs(query(expensesRef, where('MonthName', '==', monthName)));
     const existingExpenseDoc = existingSnapshot.docs[0] ?? null;
@@ -161,7 +227,8 @@ export class TransactionService {
       });
     }
 
-    // 2. Remove transaction document
+    // 3. Delete the transaction document
+    const transactionRef = doc(db, 'transactions', transactionId);
     batch.delete(transactionRef);
 
     await batch.commit();

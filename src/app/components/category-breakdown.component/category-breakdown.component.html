@@ -79,10 +79,20 @@
 
         @if (expandedCategory() === cat.name && !cat.isAllTime) {
           @defer (on immediate) {
-            <app-transaction-grid
-              [monthName]="monthName()"
-              [category]="cat.name"
-            ></app-transaction-grid>
+            @if (selectedTransaction(); as tx) {
+              <app-edit-transaction
+                [transaction]="tx"
+                (back)="selectedTransaction.set(null)"
+                (updated)="onEditFinished()"
+                (deleted)="onEditFinished()"
+              />
+            } @else {
+              <app-transaction-grid
+                [monthName]="monthName()"
+                [category]="cat.name"
+                (selectTransaction)="onSelectTransaction($event)"
+              ></app-transaction-grid>
+            }
           } @loading {
             <div class="mt-3 h-24 bg-gray-800/40 rounded-xl animate-pulse"></div>
           }
