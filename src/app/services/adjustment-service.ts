@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { injectQuery } from '@tanstack/angular-query-experimental';
-import { collection, getDocs, Timestamp } from 'firebase/firestore';
+import { collection, getDocs, Timestamp } from 'firebase/firestore/lite';
 import { Adjustment } from '../models/adjustments.model';
 import { db } from '../firebase.config';
 

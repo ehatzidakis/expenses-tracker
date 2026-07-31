@@ -1,6 +1,6 @@
 import { Component, effect, inject, input, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import type { DocumentData, QueryDocumentSnapshot } from 'firebase/firestore';
+import type { DocumentData, QueryDocumentSnapshot } from 'firebase/firestore/lite';
 import { TransactionService } from '../../services/transaction-service';
 import { Transaction } from '../../models/transaction.model';
 

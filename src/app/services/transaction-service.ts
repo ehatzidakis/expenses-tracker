@@ -10,7 +10,7 @@ import {
   type DocumentData,
   type QueryConstraint,
   type QueryDocumentSnapshot,
-} from 'firebase/firestore';
+} from 'firebase/firestore/lite';
 import { Transaction } from '../models/transaction.model';
 import { db } from '../firebase.config';
 
