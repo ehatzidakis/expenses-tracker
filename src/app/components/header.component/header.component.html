@@ -3,7 +3,26 @@
     <h1 class="text-xl font-bold tracking-tight text-white">Expenses Tracker</h1>
     <p class="text-xs text-gray-400">Monthly breakdown & analysis</p>
   </div>
-  <div class="h-9 w-9 rounded-full bg-indigo-600/20 border border-indigo-500/30 flex items-center justify-center text-indigo-400 text-xs font-semibold">
-    ME
+  <div
+    class="h-9 w-9 rounded-full bg-indigo-600/20 border border-indigo-500/30 flex items-center justify-center text-indigo-400 text-xs font-semibold"
+  >
+    <button
+      type="button"
+      (click)="toggleStealthMode()"
+      [class.ring-2]="privacyService.isPrivacyMode()"
+      [class.ring-indigo-500]="privacyService.isPrivacyMode()"
+      [class.bg-indigo-500/20]="privacyService.isPrivacyMode()"
+      class="relative flex items-center justify-center w-9 h-9 rounded-full bg-gray-800 border border-gray-700/80 text-xs font-bold text-gray-300 transition-all active:scale-95 cursor-pointer"
+      title="Toggle Stealth Mode"
+    >
+      ME
+
+      <!-- Subtle Active Badge Dot when Stealth Mode is ON -->
+      @if (privacyService.isPrivacyMode()) {
+        <span
+          class="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-indigo-500 rounded-full border-2 border-gray-900"
+        ></span>
+      }
+    </button>
   </div>
 </header>

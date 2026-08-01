@@ -1,6 +1,7 @@
-import { Component, computed, input, signal } from '@angular/core';
+import { Component, computed, inject, input, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { CategorySpend } from '../../services/expense-state.service';
+import { PrivacyService } from '../../services/privacy.service';
 
 @Component({
   selector: 'app-overview-card',
@@ -27,6 +28,8 @@ export class OverviewCardComponent {
   // Breakdown rows only apply when the parent supplies the monthly/one-off split (SumUp view).
   hasBreakdown = computed(() => this.monthlyExpenses() !== null);
   expanded = signal(false);
+
+  readonly privacyService = inject(PrivacyService);
 
   toggleExpanded(): void {
     if (this.hasBreakdown()) {

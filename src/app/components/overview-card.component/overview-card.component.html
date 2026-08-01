@@ -21,7 +21,11 @@
         >Total Actual Spend</span
       >
       <div class="flex items-baseline mt-1">
-        <h2 class="text-3xl font-extrabold text-white tracking-tight">
+        <h2
+          class="text-3xl font-extrabold text-white tracking-tight"
+          [class.blur-md]="privacyService.isPrivacyMode()"
+          [class.select-none]="privacyService.isPrivacyMode()"
+        >
           €{{ totalSpend() | number: '1.2-2' }}
         </h2>
       </div>
@@ -29,13 +33,21 @@
         <div class="mt-2.5 space-y-1">
           <div class="flex justify-between gap-3 text-[11px]">
             <span class="text-gray-500">Monthly Expenses:</span>
-            <span class="text-gray-300 font-medium"
+            <span
+              class="text-gray-300 font-medium"
+              [class.blur-md]="privacyService.isPrivacyMode()"
+              [class.select-none]="privacyService.isPrivacyMode()"
               >€{{ monthlyExpenses() | number: '1.2-2' }}</span
             >
           </div>
           <div class="flex justify-between gap-3 text-[11px]">
             <span class="text-gray-500">One-Off Expenses:</span>
-            <span class="text-gray-300 font-medium">€{{ oneOffExpenses() | number: '1.2-2' }}</span>
+            <span
+              class="text-gray-300 font-medium"
+              [class.blur-md]="privacyService.isPrivacyMode()"
+              [class.select-none]="privacyService.isPrivacyMode()"
+              >€{{ oneOffExpenses() | number: '1.2-2' }}</span
+            >
           </div>
         </div>
       }
@@ -46,6 +58,8 @@
         <h2
           class="text-3xl font-extrabold tracking-tight"
           [class]="computedTotalSaved() >= 0 ? 'text-emerald-400' : 'text-red-400'"
+          [class.blur-md]="privacyService.isPrivacyMode()"
+          [class.select-none]="privacyService.isPrivacyMode()"
         >
           €{{ computedTotalSaved() | number: '1.2-2' }}
         </h2>
@@ -54,11 +68,21 @@
         <div class="mt-2.5 space-y-1">
           <div class="flex justify-between gap-3 text-[11px]">
             <span class="text-gray-500">Monthly Saved:</span>
-            <span class="text-gray-300 font-medium">€{{ monthlySaved() | number: '1.2-2' }}</span>
+            <span
+              class="text-gray-300 font-medium"
+              [class.blur-md]="privacyService.isPrivacyMode()"
+              [class.select-none]="privacyService.isPrivacyMode()"
+              >€{{ monthlySaved() | number: '1.2-2' }}</span
+            >
           </div>
           <div class="flex justify-between gap-3 text-[11px]">
             <span class="text-gray-500">One-Off Bonuses:</span>
-            <span class="text-gray-300 font-medium">€{{ oneOffBonuses() | number: '1.2-2' }}</span>
+            <span
+              class="text-gray-300 font-medium"
+              [class.blur-md]="privacyService.isPrivacyMode()"
+              [class.select-none]="privacyService.isPrivacyMode()"
+              >€{{ oneOffBonuses() | number: '1.2-2' }}</span
+            >
           </div>
         </div>
       }
