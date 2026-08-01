@@ -19,6 +19,8 @@ export class CategoryBreakdownComponent {
 
   readonly expandedCategory = signal<string | null>(null);
 
+  protected readonly Math = Math;
+
   toggleCategory(name: string): void {
     this.expandedCategory.update((current) => (current === name ? null : name));
   }

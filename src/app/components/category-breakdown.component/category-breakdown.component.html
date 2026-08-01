@@ -45,7 +45,7 @@
                     class="text-red-400 font-semibold tabular-nums block"
                     [class.invisible]="!cat.isOverBudget || cat.budget === null"
                   >
-                    +€{{ (cat.monthlyAverage ?? cat.amount) - (cat.budget ?? 0) | number: '1.2-2' }}
+                    €{{ (cat.monthlyAverage ?? cat.amount) - (cat.budget ?? 0) | number: '1.2-2' }}
                   </span>
                 }
                 @if (cat.overallBudget !== null) {
@@ -53,8 +53,8 @@
                     class="font-semibold tabular-nums"
                     [class]="cat.isOverBudget ? 'text-red-400' : 'text-green-400'"
                   >
-                    {{ cat.isOverBudget ? '+' : '' }}€{{
-                      cat.amount - cat.overallBudget | number: '1.2-2'
+                    {{ cat.isOverBudget ? '' : '' }}€{{
+                      Math.abs(cat.amount - cat.overallBudget) | number: '1.2-2'
                     }}
                   </span>
                 }
