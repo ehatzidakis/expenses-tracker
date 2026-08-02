@@ -69,7 +69,15 @@
   }
 
   @if (state.activeTab() === 'oneoffs') {
-    @if (adjustmentsQuery.isPending()) {
+    @if (editingAdjustment(); as selectedAdj) {
+      <!-- EDIT VIEW -->
+      <app-edit-adjustment
+        [adjustment]="selectedAdj"
+        (back)="editingAdjustment.set(null)"
+        (updated)="editingAdjustment.set(null)"
+        (deleted)="editingAdjustment.set(null)"
+      />
+    } @else if (adjustmentsQuery.isPending()) {
       <div class="flex flex-col gap-3 animate-pulse">
         <div class="h-16 bg-gray-900 rounded-2xl"></div>
         <div class="h-16 bg-gray-900 rounded-2xl"></div>
@@ -82,7 +90,10 @@
     } @else if (sortedAdjustments().length) {
       <div class="flex flex-col gap-3">
         @for (adjustment of sortedAdjustments(); track adjustment.id) {
-          <app-adjustment-card [adjustment]="adjustment"></app-adjustment-card>
+          <app-adjustment-card
+            [adjustment]="adjustment"
+            (cardClick)="editingAdjustment.set(adjustment)"
+          ></app-adjustment-card>
         }
       </div>
     } @else {

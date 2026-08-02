@@ -1,4 +1,4 @@
-import { Component, computed, inject } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { ExpenseStateService } from './services/expense-state.service';
 import { AdjustmentService } from './services/adjustment-service';
 import { OverviewCardComponent } from './components/overview-card.component/overview-card.component';
@@ -8,6 +8,8 @@ import { CategoryBreakdownComponent } from './components/category-breakdown.comp
 import { TabBarComponent } from './components/tab-bar.component/tab-bar.component';
 import { AdjustmentCardComponent } from './components/adjustment-card.component/adjustment-card.component';
 import { CreateTransactionComponent } from './components/create-transaction.component/create-transaction.component';
+import { Adjustment } from './models/adjustments.model';
+import { EditAdjustmentComponent } from './components/edit-adjustment.component/edit-adjustment.component';
 
 @Component({
   selector: 'app-root',
@@ -19,6 +21,7 @@ import { CreateTransactionComponent } from './components/create-transaction.comp
     CategoryBreakdownComponent,
     TabBarComponent,
     AdjustmentCardComponent,
+    EditAdjustmentComponent,
     CreateTransactionComponent,
   ],
   templateUrl: './app.html',
@@ -26,6 +29,8 @@ import { CreateTransactionComponent } from './components/create-transaction.comp
 export class AppComponent {
   state = inject(ExpenseStateService);
   private adjustmentService = inject(AdjustmentService);
+
+  readonly editingAdjustment = signal<Adjustment | null>(null);
 
   adjustmentsQuery = this.adjustmentService.getAdjustmentsQuery();
 

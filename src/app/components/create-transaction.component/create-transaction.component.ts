@@ -4,12 +4,22 @@ import { form, FormField, maxLength, min, required } from '@angular/forms/signal
 import { QueryClient } from '@tanstack/angular-query-experimental';
 import { TransactionService } from '../../services/transaction-service';
 import { CATEGORY_NAMES } from '../../services/expense-state.service';
+import { AdjustmentService } from '../../services/adjustment-service';
+
+export type EntryType = 'transaction' | 'adjustment';
 
 interface TransactionFormModel {
   date: string;
   description: string;
   category: string;
   amount: number;
+}
+
+interface AdjustmentFormModel {
+  description: string;
+  amount: number;
+  startDate: string;
+  endDate: string;
 }
 
 function todayDateInputValue(): string {
@@ -20,8 +30,17 @@ function todayDateInputValue(): string {
   return `${year}-${month}-${day}`;
 }
 
-function defaultModel(): TransactionFormModel {
+function defaultTransactionModel(): TransactionFormModel {
   return { date: todayDateInputValue(), description: '', category: '', amount: 0 };
+}
+
+function defaultAdjustmentModel(): AdjustmentFormModel {
+  return {
+    description: '',
+    amount: 0,
+    startDate: todayDateInputValue(),
+    endDate: todayDateInputValue(),
+  };
 }
 
 @Component({
@@ -33,13 +52,19 @@ function defaultModel(): TransactionFormModel {
 })
 export class CreateTransactionComponent {
   private transactionService = inject(TransactionService);
+  private adjustmentService = inject(AdjustmentService);
   private queryClient = inject(QueryClient);
 
   readonly categories = CATEGORY_NAMES;
 
-  readonly model = signal<TransactionFormModel>(defaultModel());
+  readonly activeTab = signal<EntryType>('transaction');
 
-  readonly transactionForm = form(this.model, (schemaPath) => {
+  readonly isAddition = signal<boolean>(true);
+
+  readonly transactionModel = signal<TransactionFormModel>(defaultTransactionModel());
+  readonly adjustmentModel = signal<AdjustmentFormModel>(defaultAdjustmentModel());
+
+  readonly transactionForm = form(this.transactionModel, (schemaPath) => {
     required(schemaPath.date, { message: 'Date is required' });
     required(schemaPath.description, { message: 'Description is required' });
     maxLength(schemaPath.description, 60, {
@@ -49,13 +74,27 @@ export class CreateTransactionComponent {
     min(schemaPath.amount, 0.01, { message: 'Amount must be greater than 0' });
   });
 
+  readonly adjustmentForm = form(this.adjustmentModel, (schemaPath) => {
+    required(schemaPath.description, { message: 'Description is required' });
+    maxLength(schemaPath.description, 60, {
+      message: 'Description must be 60 characters or fewer',
+    });
+    required(schemaPath.startDate, { message: 'Start date is required' });
+    required(schemaPath.endDate, { message: 'End date is required' });
+    min(schemaPath.amount, 0.01, { message: 'Amount must be greater than 0' });
+  });
+
   readonly submitting = signal(false);
-  readonly deleting = signal(false);
   readonly successMessage = signal<string | null>(null);
   readonly errorMessage = signal<string | null>(null);
-  readonly lastAddedTransactionId = signal<string | null>(null);
 
-  async onSubmit(event: Event): Promise<void> {
+  setTab(tab: EntryType): void {
+    this.activeTab.set(tab);
+    this.successMessage.set(null);
+    this.errorMessage.set(null);
+  }
+
+  async onSubmitTransaction(event: Event): Promise<void> {
     event.preventDefault();
     if (this.transactionForm().invalid() || this.submitting()) {
       return;
@@ -66,50 +105,54 @@ export class CreateTransactionComponent {
     this.errorMessage.set(null);
 
     try {
-      const value = this.model();
-      const newTransactionId = await this.transactionService.createTransaction({
+      const value = this.transactionModel();
+      await this.transactionService.createTransaction({
         date: value.date,
         description: value.description.trim(),
         category: value.category,
         amount: value.amount,
       });
 
-      this.lastAddedTransactionId.set(newTransactionId);
-
       await this.queryClient.invalidateQueries({ queryKey: ['expenses'] });
 
-      this.model.set(defaultModel());
+      this.transactionModel.set(defaultTransactionModel());
       this.successMessage.set('Transaction added');
     } catch (err) {
-      console.error('Create transaction error:', err);
       this.errorMessage.set('Unable to add transaction. Please try again.');
     } finally {
       this.submitting.set(false);
     }
   }
 
-  async onDeleteLatest(): Promise<void> {
-    const idToDelete = this.lastAddedTransactionId();
-    if (!idToDelete || this.deleting()) return;
+  async onSubmitAdjustment(event: Event): Promise<void> {
+    event.preventDefault();
+    if (this.adjustmentForm().invalid() || this.submitting()) {
+      return;
+    }
 
-    this.deleting.set(true);
+    this.submitting.set(true);
     this.successMessage.set(null);
     this.errorMessage.set(null);
 
     try {
-      await this.transactionService.deleteTransaction(idToDelete);
-
-      // Clear the ID so they can't click delete again
-      this.lastAddedTransactionId.set(null);
+      const value = this.adjustmentModel();
+      await this.adjustmentService.createAdjustment({
+        description: value.description.trim(),
+        amount: value.amount,
+        startDate: value.startDate,
+        endDate: value.endDate,
+        isAddition: this.isAddition(),
+      });
 
       await this.queryClient.invalidateQueries({ queryKey: ['expenses'] });
+      await this.queryClient.invalidateQueries({ queryKey: ['adjustments'] });
 
-      this.successMessage.set('Previous transaction deleted successfully.');
+      this.adjustmentModel.set(defaultAdjustmentModel());
+      this.successMessage.set('One-Off adjustment added successfully');
     } catch (err) {
-      console.error('Delete transaction error:', err);
-      this.errorMessage.set('Unable to delete transaction. Please try again.');
+      this.errorMessage.set('Unable to add adjustment. Please try again.');
     } finally {
-      this.deleting.set(false);
+      this.submitting.set(false);
     }
   }
 }

@@ -1,76 +1,231 @@
-<form
-  (submit)="onSubmit($event)"
-  class="bg-gray-900/60 border border-gray-800/80 rounded-2xl p-5 space-y-4 backdrop-blur-sm"
->
-  <h3 class="text-sm font-semibold text-gray-200">Add Transaction</h3>
-
-  <div class="space-y-1.5">
-    <label for="tx-date" class="text-xs font-medium text-gray-400">Date</label>
-    <input
-      id="tx-date"
-      type="date"
-      [formField]="transactionForm.date"
-      class="w-full min-w-0 appearance-none scheme-dark bg-gray-800/60 border border-gray-800 rounded-xl px-3 py-2.5 text-sm text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/60"
-    />
-    @if (transactionForm.date().touched() && transactionForm.date().invalid()) {
-      <span class="text-[11px] text-red-400">{{
-        transactionForm.date().errors()[0]?.message
-      }}</span>
-    }
-  </div>
-
-  <div class="space-y-1.5">
-    <label for="tx-description" class="text-xs font-medium text-gray-400">Description</label>
-    <input
-      id="tx-description"
-      type="text"
-      placeholder="Placeholder"
-      [formField]="transactionForm.description"
-      class="w-full bg-gray-800/60 border border-gray-800 rounded-xl px-3 py-2.5 text-sm text-gray-100 placeholder:text-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/60"
-    />
-    @if (transactionForm.description().touched() && transactionForm.description().invalid()) {
-      <span class="text-[11px] text-red-400">{{
-        transactionForm.description().errors()[0]?.message
-      }}</span>
-    }
-  </div>
-
-  <div class="space-y-1.5">
-    <label for="tx-category" class="text-xs font-medium text-gray-400">Category</label>
-    <select
-      id="tx-category"
-      [formField]="transactionForm.category"
-      class="w-full bg-gray-800/60 border border-gray-800 rounded-xl px-3 py-2.5 text-sm text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/60"
+<div class="bg-gray-900/60 border border-gray-800/80 rounded-2xl p-5 space-y-4 backdrop-blur-sm">
+  <!-- TOP SLIDER / TAB SWITCHER -->
+  <div class="relative flex bg-gray-950/80 p-1 rounded-xl border border-gray-800/80">
+    <button
+      type="button"
+      (click)="setTab('transaction')"
+      class="relative z-10 flex-1 py-1.5 text-xs font-semibold transition-colors duration-200 text-center rounded-lg cursor-pointer"
+      [class.text-white]="activeTab() === 'transaction'"
+      [class.text-gray-400]="activeTab() !== 'transaction'"
     >
-      <option value="">Select a category</option>
-      @for (cat of categories; track cat) {
-        <option [value]="cat">{{ cat }}</option>
-      }
-    </select>
-    @if (transactionForm.category().touched() && transactionForm.category().invalid()) {
-      <span class="text-[11px] text-red-400">{{
-        transactionForm.category().errors()[0]?.message
-      }}</span>
-    }
+      Add Transaction
+    </button>
+    <button
+      type="button"
+      (click)="setTab('adjustment')"
+      class="relative z-10 flex-1 py-1.5 text-xs font-semibold transition-colors duration-200 text-center rounded-lg cursor-pointer"
+      [class.text-white]="activeTab() === 'adjustment'"
+      [class.text-gray-400]="activeTab() !== 'adjustment'"
+    >
+      Add One-Off
+    </button>
+
+    <!-- Animated Sliding Indicator -->
+    <div
+      class="absolute top-1 bottom-1 w-[calc(50%-4px)] bg-indigo-600/90 rounded-lg transition-transform duration-200 ease-out"
+      [class.translate-x-0]="activeTab() === 'transaction'"
+      [class.translate-x-full]="activeTab() === 'adjustment'"
+    ></div>
   </div>
 
-  <div class="space-y-1.5">
-    <label for="tx-amount" class="text-xs font-medium text-gray-400">Amount</label>
-    <input
-      id="tx-amount"
-      type="number"
-      step="0.01"
-      placeholder="0.00"
-      [formField]="transactionForm.amount"
-      class="w-full bg-gray-800/60 border border-gray-800 rounded-xl px-3 py-2.5 text-sm text-gray-100 placeholder:text-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/60"
-    />
-    @if (transactionForm.amount().touched() && transactionForm.amount().invalid()) {
-      <span class="text-[11px] text-red-400">{{
-        transactionForm.amount().errors()[0]?.message
-      }}</span>
-    }
-  </div>
+  <!-- ================= FORM 1: STANDARD TRANSACTION ================= -->
+  @if (activeTab() === 'transaction') {
+    <form (submit)="onSubmitTransaction($event)" class="space-y-4">
+      <!-- Date Input -->
+      <div class="space-y-1.5">
+        <label for="tx-date" class="text-xs font-medium text-gray-400">Date</label>
+        <input
+          id="tx-date"
+          type="date"
+          [formField]="transactionForm.date"
+          class="w-full min-w-0 appearance-none scheme-dark bg-gray-800/60 border border-gray-800 rounded-xl px-3 py-2.5 text-sm text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/60"
+        />
+        @if (transactionForm.date().touched() && transactionForm.date().invalid()) {
+          <span class="text-[11px] text-red-400">
+            {{ transactionForm.date().errors()[0]?.message }}
+          </span>
+        }
+      </div>
 
+      <!-- Description Input -->
+      <div class="space-y-1.5">
+        <label for="tx-description" class="text-xs font-medium text-gray-400">Description</label>
+        <input
+          id="tx-description"
+          type="text"
+          placeholder="e.g. Supermarket"
+          [formField]="transactionForm.description"
+          class="w-full bg-gray-800/60 border border-gray-800 rounded-xl px-3 py-2.5 text-sm text-gray-100 placeholder:text-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/60"
+        />
+        @if (transactionForm.description().touched() && transactionForm.description().invalid()) {
+          <span class="text-[11px] text-red-400">
+            {{ transactionForm.description().errors()[0]?.message }}
+          </span>
+        }
+      </div>
+
+      <!-- Category Select -->
+      <div class="space-y-1.5">
+        <label for="tx-category" class="text-xs font-medium text-gray-400">Category</label>
+        <select
+          id="tx-category"
+          [formField]="transactionForm.category"
+          class="w-full bg-gray-800/60 border border-gray-800 rounded-xl px-3 py-2.5 text-sm text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/60"
+        >
+          <option value="">Select a category</option>
+          @for (cat of categories; track cat) {
+            <option [value]="cat">{{ cat }}</option>
+          }
+        </select>
+        @if (transactionForm.category().touched() && transactionForm.category().invalid()) {
+          <span class="text-[11px] text-red-400">
+            {{ transactionForm.category().errors()[0]?.message }}
+          </span>
+        }
+      </div>
+
+      <!-- Amount Input -->
+      <div class="space-y-1.5">
+        <label for="tx-amount" class="text-xs font-medium text-gray-400">Amount</label>
+        <input
+          id="tx-amount"
+          type="number"
+          step="0.01"
+          placeholder="0.00"
+          [formField]="transactionForm.amount"
+          class="w-full bg-gray-800/60 border border-gray-800 rounded-xl px-3 py-2.5 text-sm text-gray-100 placeholder:text-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/60 tabular-nums"
+        />
+        @if (transactionForm.amount().touched() && transactionForm.amount().invalid()) {
+          <span class="text-[11px] text-red-400">
+            {{ transactionForm.amount().errors()[0]?.message }}
+          </span>
+        }
+      </div>
+
+      <button
+        type="submit"
+        [disabled]="transactionForm().invalid() || submitting()"
+        class="w-full py-3 rounded-xl text-sm font-semibold text-white bg-linear-to-br from-indigo-500 to-violet-600 shadow-lg disabled:opacity-40 disabled:cursor-not-allowed active:scale-[0.99] transition-all cursor-pointer"
+      >
+        {{ submitting() ? 'Adding…' : 'Add Transaction' }}
+      </button>
+    </form>
+  }
+
+  <!-- ================= FORM 2: ONE-OFF ADJUSTMENT ================= -->
+  @if (activeTab() === 'adjustment') {
+    <form (submit)="onSubmitAdjustment($event)" class="space-y-4">
+      <!-- Description Input -->
+      <div class="space-y-1.5">
+        <label for="adj-description" class="text-xs font-medium text-gray-400">Description</label>
+        <input
+          id="adj-description"
+          type="text"
+          placeholder="Placeholder"
+          [formField]="adjustmentForm.description"
+          class="w-full bg-gray-800/60 border border-gray-800 rounded-xl px-3 py-2.5 text-sm text-gray-100 placeholder:text-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/60"
+        />
+        @if (adjustmentForm.description().touched() && adjustmentForm.description().invalid()) {
+          <span class="text-[11px] text-red-400">
+            {{ adjustmentForm.description().errors()[0]?.message }}
+          </span>
+        }
+      </div>
+
+      <!-- Amount Input -->
+      <div class="space-y-1.5">
+        <label for="adj-amount" class="text-xs font-medium text-gray-400">Amount</label>
+        <input
+          id="adj-amount"
+          type="number"
+          step="0.01"
+          placeholder="0.00"
+          [formField]="adjustmentForm.amount"
+          class="w-full bg-gray-800/60 border border-gray-800 rounded-xl px-3 py-2.5 text-sm text-gray-100 placeholder:text-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/60 tabular-nums"
+        />
+        @if (adjustmentForm.amount().touched() && adjustmentForm.amount().invalid()) {
+          <span class="text-[11px] text-red-400">
+            {{ adjustmentForm.amount().errors()[0]?.message }}
+          </span>
+        }
+      </div>
+
+      <!-- Date Range (Start & End Date Grid) -->
+      <div class="grid grid-cols-2 gap-3">
+        <div class="space-y-1.5">
+          <label for="adj-start-date" class="text-xs font-medium text-gray-400">Start Date</label>
+          <input
+            id="adj-start-date"
+            type="date"
+            [formField]="adjustmentForm.startDate"
+            class="w-full min-w-0 appearance-none scheme-dark bg-gray-800/60 border border-gray-800 rounded-xl px-3 py-2 text-xs text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/60"
+          />
+          @if (adjustmentForm.startDate().touched() && adjustmentForm.startDate().invalid()) {
+            <span class="text-[11px] text-red-400">
+              {{ adjustmentForm.startDate().errors()[0]?.message }}
+            </span>
+          }
+        </div>
+
+        <div class="space-y-1.5">
+          <label for="adj-end-date" class="text-xs font-medium text-gray-400">End Date</label>
+          <input
+            id="adj-end-date"
+            type="date"
+            [formField]="adjustmentForm.endDate"
+            class="w-full min-w-0 appearance-none scheme-dark bg-gray-800/60 border border-gray-800 rounded-xl px-3 py-2 text-xs text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/60"
+          />
+          @if (adjustmentForm.endDate().touched() && adjustmentForm.endDate().invalid()) {
+            <span class="text-[11px] text-red-400">
+              {{ adjustmentForm.endDate().errors()[0]?.message }}
+            </span>
+          }
+        </div>
+      </div>
+
+      <!-- Type Toggle Slider (Addition vs Subtraction) -->
+      <div class="space-y-1.5">
+        <label class="text-xs font-medium text-gray-400">Adjustment Type</label>
+        <div class="grid grid-cols-2 gap-2 p-1 bg-gray-950/80 rounded-xl border border-gray-800">
+          <button
+            type="button"
+            (click)="isAddition.set(true)"
+            class="py-2 rounded-lg text-xs font-semibold transition-all duration-150 flex items-center justify-center gap-1 cursor-pointer"
+            [class.bg-emerald-500/20]="isAddition()"
+            [class.text-emerald-400]="isAddition()"
+            [class.border]="isAddition()"
+            [class.border-emerald-500/30]="isAddition()"
+            [class.text-gray-400]="!isAddition()"
+          >
+            <span>+</span> Addition
+          </button>
+
+          <button
+            type="button"
+            (click)="isAddition.set(false)"
+            class="py-2 rounded-lg text-xs font-semibold transition-all duration-150 flex items-center justify-center gap-1 cursor-pointer"
+            [class.bg-red-500/20]="!isAddition()"
+            [class.text-red-400]="!isAddition()"
+            [class.border]="!isAddition()"
+            [class.border-red-500/30]="!isAddition()"
+            [class.text-gray-400]="isAddition()"
+          >
+            <span>-</span> Subtraction
+          </button>
+        </div>
+      </div>
+
+      <button
+        type="submit"
+        [disabled]="adjustmentForm().invalid() || submitting()"
+        class="w-full py-3 rounded-xl text-sm font-semibold text-white bg-linear-to-br from-indigo-500 to-violet-600 shadow-lg disabled:opacity-40 disabled:cursor-not-allowed active:scale-[0.99] transition-all cursor-pointer"
+      >
+        {{ submitting() ? 'Adding…' : 'Add One-Off' }}
+      </button>
+    </form>
+  }
+
+  <!-- Feedback Messages -->
   @if (successMessage()) {
     <div
       class="p-3 bg-emerald-950/40 border border-emerald-800/60 text-emerald-300 rounded-xl text-xs"
@@ -83,22 +238,4 @@
       {{ errorMessage() }}
     </div>
   }
-
-  <button
-    type="submit"
-    [disabled]="transactionForm().invalid() || submitting()"
-    class="w-full py-3 rounded-xl text-sm font-semibold text-white bg-linear-to-br from-indigo-500 to-violet-600 shadow-lg disabled:opacity-40 disabled:cursor-not-allowed active:scale-[0.99] transition-all"
-  >
-    {{ submitting() ? 'Adding…' : 'Add Transaction' }}
-  </button>
-  @if (lastAddedTransactionId()) {
-    <button
-      type="button"
-      (click)="onDeleteLatest()"
-      [disabled]="deleting()"
-      class="shrink-0 px-2.5 py-1 text-[11px] font-medium rounded-lg bg-red-950/50 hover:bg-red-900/60 text-red-300 border border-red-800/60 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-    >
-      {{ deleting() ? 'Deleting…' : 'Undo' }}
-    </button>
-  }
-</form>
+</div>

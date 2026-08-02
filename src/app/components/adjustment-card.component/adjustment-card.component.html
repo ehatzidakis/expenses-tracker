@@ -1,12 +1,13 @@
 <div
-  class="flex items-start justify-between gap-3 bg-gray-900/60 border border-gray-800/80 rounded-2xl px-4 py-3.5"
+  class="flex items-start justify-between gap-3 bg-gray-900/60 border border-gray-800/80 rounded-2xl px-4 py-3.5 hover:border-gray-700/80 active:scale-[0.99] transition-all duration-200 cursor-pointer"
+  (click)="cardClick.emit()"
 >
   <div class="flex items-start gap-3 min-w-0">
     <div
       class="h-9 w-9 shrink-0 rounded-full flex items-center justify-center text-base font-bold"
       [class]="isAddition() ? 'bg-emerald-500/15 text-emerald-400' : 'bg-red-500/15 text-red-400'"
     >
-      {{ isAddition() ? '+' : '−' }}
+      {{ isAddition() ? '↑' : '↓' }}
     </div>
     <div class="min-w-0">
       <span class="text-sm font-medium text-gray-200 truncate block">{{ adjustment().title }}</span>
@@ -28,7 +29,6 @@
     [class.blur-md]="privacyService.isPrivacyMode()"
     [class.select-none]="privacyService.isPrivacyMode()"
   >
-    <!-- {{ isAddition() ? '+' : '−' }} -->
     €{{ adjustment().amount | number: '1.2-2' }}
   </span>
 </div>
