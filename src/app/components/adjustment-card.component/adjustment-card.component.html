@@ -25,7 +25,10 @@
   <span
     class="text-sm font-semibold shrink-0"
     [class]="isAddition() ? 'text-emerald-400' : 'text-red-400'"
+    [class.blur-md]="privacyService.isPrivacyMode()"
+    [class.select-none]="privacyService.isPrivacyMode()"
   >
-    {{ isAddition() ? '+' : '−' }}€{{ adjustment().amount | number: '1.2-2' }}
+    <!-- {{ isAddition() ? '+' : '−' }} -->
+    €{{ adjustment().amount | number: '1.2-2' }}
   </span>
 </div>

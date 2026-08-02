@@ -1,6 +1,7 @@
-import { Component, computed, input } from '@angular/core';
+import { Component, computed, inject, input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Adjustment } from '../../models/adjustments.model';
+import { PrivacyService } from '../../services/privacy.service';
 
 @Component({
   selector: 'app-adjustment-card',
@@ -11,6 +12,8 @@ import { Adjustment } from '../../models/adjustments.model';
 })
 export class AdjustmentCardComponent {
   adjustment = input.required<Adjustment>();
+
+  privacyService = inject(PrivacyService);
 
   isAddition = computed(() => this.adjustment().adjType);
 
