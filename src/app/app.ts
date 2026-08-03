@@ -10,6 +10,7 @@ import { AdjustmentCardComponent } from './components/adjustment-card.component/
 import { CreateTransactionComponent } from './components/create-transaction.component/create-transaction.component';
 import { Adjustment } from './models/adjustments.model';
 import { EditAdjustmentComponent } from './components/edit-adjustment.component/edit-adjustment.component';
+import { CategoryBudgetsGrid } from './components/category-budgets-grid/category-budgets-grid';
 
 @Component({
   selector: 'app-root',
@@ -23,6 +24,7 @@ import { EditAdjustmentComponent } from './components/edit-adjustment.component/
     AdjustmentCardComponent,
     EditAdjustmentComponent,
     CreateTransactionComponent,
+    CategoryBudgetsGrid,
   ],
   templateUrl: './app.html',
 })

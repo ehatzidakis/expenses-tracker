@@ -19,15 +19,15 @@ export const CATEGORY_BUDGETS: Record<string, number | null> = {
   Supermarket: 280,
   Medical: 200,
   Personal: 200,
-  EatingOut: 140,
-  Utilities: 100,
+  EatingOut: 130,
+  Utilities: 110,
   Takeaway: 100,
   Tickets: 75,
   Gaming: 75,
   Cats: 50,
   Travel: 30,
   Subscriptions: 15,
-  Gym: 70,
+  Gym: 65,
 };
 
 export const CATEGORY_NAMES = Object.keys(CATEGORY_BUDGETS);

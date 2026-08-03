@@ -33,11 +33,6 @@
               <span class="w-14 text-right text-gray-400 tabular-nums"
                 >{{ cat.percentage | number: '1.1-1' }}%</span
               >
-              <!-- Amount -->
-              <span class="w-14 text-right text-white font-semibold tabular-nums">
-                €{{ cat.amount | number: '1.2-2' }}{{ cat.isAllTime ? '' : '' }}
-              </span>
-
               <!-- Over Budget Amount -->
               <div class="w-18 text-right">
                 @if (!cat.isAllTime) {
@@ -51,7 +46,7 @@
                 @if (cat.overallBudget !== null) {
                   <span
                     class="font-semibold tabular-nums"
-                    [class]="cat.isOverBudget ? 'text-red-400' : 'text-green-400'"
+                    [class]="cat.isOverBudget ? 'text-red-500' : 'text-green-500'"
                   >
                     {{ cat.isOverBudget ? '' : '' }}€{{
                       Math.abs(cat.amount - cat.overallBudget) | number: '1.2-2'
@@ -59,36 +54,44 @@
                   </span>
                 }
               </div>
+
+              <!-- Amount -->
+              <span class="w-14 text-right text-white font-semibold tabular-nums">
+                €{{ cat.amount | number: '1.2-2' }}{{ cat.isAllTime ? '' : '' }}
+              </span>
             </div>
           </div>
 
           <!-- All-Time average Row -->
           @if (cat.isAllTime && cat.monthlyAverage !== null) {
-            <div class="flex items-center justify-between text-xs py-0.5">
+            <div class="flex items-center justify-between text-xs w-full gap-2 py-0.5">
               <!-- Left Group: Average Label -->
-              <div class="flex items-center gap-1.5">
-                <span
-                  class="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-0.5 rounded-md bg-indigo-500/15 text-indigo-300 border border-indigo-500/30 tabular-nums"
-                >
-                  €{{ cat.monthlyAverage | number: '1.2-2' }} / mo avg
-                </span>
-              </div>
-
-              <!-- Right Group: Over Budget Amount -->
+              <span
+                class="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-0.5 rounded-md bg-indigo-500/15 text-indigo-300 border border-indigo-500/30 tabular-nums"
+              >
+                €{{ cat.monthlyAverage | number: '1.2-2' }} / mo average
+              </span>
+              <span
+                class="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-0.5 rounded-md bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 tabular-nums"
+              >
+                €{{ cat.budget | number: '1.2-2' }} / mo budget
+              </span>
             </div>
           }
           <!-- Progress Bar -->
-          <div class="h-2 w-full bg-gray-800 rounded-full overflow-hidden mt-2.5">
-            <div
-              [class]="
-                cat.isOverBudget
-                  ? 'bg-linear-to-r from-red-500 to-rose-600'
-                  : 'bg-linear-to-r from-indigo-500 to-violet-500'
-              "
-              class="h-full rounded-full transition-all duration-300"
-              [style.width.%]="cat.percentage"
-            ></div>
-          </div>
+          @if (!cat.isAllTime) {
+            <div class="h-2 w-full bg-gray-800 rounded-full overflow-hidden mt-2.5">
+              <div
+                [class]="
+                  cat.isOverBudget
+                    ? 'bg-linear-to-r from-red-600 to-rose-800'
+                    : 'bg-linear-to-r from-indigo-500 to-violet-500'
+                "
+                class="h-full rounded-full transition-all duration-300"
+                [style.width.%]="(cat.amount / (cat.budget ?? cat.amount)) * 100"
+              ></div>
+            </div>
+          }
         </div>
 
         @if (expandedCategory() === cat.name && !cat.isAllTime) {

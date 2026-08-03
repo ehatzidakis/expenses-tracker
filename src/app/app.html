@@ -114,11 +114,11 @@
   }
 
   @if (state.activeTab() === 'charts') {
-    <div
-      class="flex flex-col items-center justify-center gap-2 text-center py-16 px-4 bg-gray-900/60 border border-gray-800/80 rounded-2xl text-gray-500 text-sm"
-    >
-      Coming soon
-    </div>
+    @defer (on immediate) {
+      <app-category-budgets-grid></app-category-budgets-grid>
+    } @loading {
+      <div class="h-96 bg-gray-900/60 rounded-2xl animate-pulse"></div>
+    }
   }
 </main>
 

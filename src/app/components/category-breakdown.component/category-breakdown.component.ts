@@ -1,7 +1,7 @@
 import { Component, input, signal } from '@angular/core';
 import { EditTransactionComponent } from '../edit-transaction.component/edit-transaction.component';
 import { CommonModule } from '@angular/common';
-import { CategorySpend } from '../../services/expense-state.service';
+import { CATEGORY_BUDGETS, CategorySpend } from '../../services/expense-state.service';
 import { TransactionGridComponent } from '../transaction-grid.component/transaction-grid.component';
 import { Transaction } from '../../models/transaction.model';
 
