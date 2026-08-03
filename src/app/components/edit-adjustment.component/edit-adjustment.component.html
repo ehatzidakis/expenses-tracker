@@ -46,6 +46,8 @@
         placeholder="0.00"
         [formField]="adjustmentForm.amount"
         class="w-full bg-gray-800/60 border border-gray-800 rounded-xl px-3 py-2.5 text-sm text-gray-100 placeholder:text-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/60"
+        [class.blur-md]="privacyService.isPrivacyMode()"
+        [class.select-none]="privacyService.isPrivacyMode()"
       />
       @if (adjustmentForm.amount().touched() && adjustmentForm.amount().invalid()) {
         <span class="text-[11px] text-red-400">
@@ -131,7 +133,9 @@
     <div class="pt-2 space-y-2">
       <button
         type="submit"
-        [disabled]="adjustmentForm().invalid() || submitting() || deleting()"
+        [disabled]="
+          adjustmentForm().invalid() || submitting() || deleting() || privacyService.isPrivacyMode()
+        "
         class="w-full py-3 rounded-xl text-sm font-semibold text-white bg-linear-to-br from-indigo-500 to-violet-600 shadow-lg disabled:opacity-40 disabled:cursor-not-allowed active:scale-[0.99] transition-all cursor-pointer"
       >
         {{ submitting() ? 'Saving…' : 'Save Changes' }}
@@ -140,7 +144,7 @@
       <button
         type="button"
         (click)="onDelete()"
-        [disabled]="submitting() || deleting()"
+        [disabled]="submitting() || deleting() || privacyService.isPrivacyMode()"
         class="w-full py-3 rounded-xl text-sm font-semibold text-red-400 bg-red-950/30 hover:bg-red-900/40 border border-red-800/50 disabled:opacity-40 disabled:cursor-not-allowed active:scale-[0.99] transition-all cursor-pointer"
       >
         {{ deleting() ? 'Deleting…' : 'Delete Adjustment' }}

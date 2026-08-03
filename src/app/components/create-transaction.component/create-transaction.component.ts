@@ -5,6 +5,7 @@ import { QueryClient } from '@tanstack/angular-query-experimental';
 import { TransactionService } from '../../services/transaction-service';
 import { CATEGORY_NAMES } from '../../services/expense-state.service';
 import { AdjustmentService } from '../../services/adjustment-service';
+import { PrivacyService } from '../../services/privacy.service';
 
 export type EntryType = 'transaction' | 'adjustment';
 
@@ -54,6 +55,7 @@ export class CreateTransactionComponent {
   private transactionService = inject(TransactionService);
   private adjustmentService = inject(AdjustmentService);
   private queryClient = inject(QueryClient);
+  readonly privacyService = inject(PrivacyService);
 
   readonly categories = CATEGORY_NAMES;
 

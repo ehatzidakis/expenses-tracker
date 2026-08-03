@@ -93,7 +93,12 @@
     <div class="pt-2 space-y-2">
       <button
         type="submit"
-        [disabled]="transactionForm().invalid() || submitting() || deleting()"
+        [disabled]="
+          transactionForm().invalid() ||
+          submitting() ||
+          deleting() ||
+          privacyService.isPrivacyMode()
+        "
         class="w-full py-3 rounded-xl text-sm font-semibold text-white bg-linear-to-br from-indigo-500 to-violet-600 shadow-lg disabled:opacity-40 disabled:cursor-not-allowed active:scale-[0.99] transition-all"
       >
         {{ submitting() ? 'Saving…' : 'Save Changes' }}
@@ -102,7 +107,7 @@
       <button
         type="button"
         (click)="onDelete()"
-        [disabled]="submitting() || deleting()"
+        [disabled]="submitting() || deleting() || privacyService.isPrivacyMode()"
         class="w-full py-3 rounded-xl text-sm font-semibold text-red-400 bg-red-950/30 hover:bg-red-900/40 border border-red-800/50 disabled:opacity-40 disabled:cursor-not-allowed active:scale-[0.99] transition-all"
       >
         {{ deleting() ? 'Deleting…' : 'Delete Transaction' }}

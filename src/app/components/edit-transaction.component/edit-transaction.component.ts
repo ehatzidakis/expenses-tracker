@@ -5,6 +5,7 @@ import { QueryClient } from '@tanstack/angular-query-experimental';
 import { TransactionService } from '../../services/transaction-service';
 import { CATEGORY_NAMES } from '../../services/expense-state.service';
 import { Transaction } from '../../models/transaction.model';
+import { PrivacyService } from '../../services/privacy.service';
 
 interface TransactionFormModel {
   date: string;
@@ -22,6 +23,7 @@ interface TransactionFormModel {
 })
 export class EditTransactionComponent {
   private transactionService = inject(TransactionService);
+  readonly privacyService = inject(PrivacyService);
   private queryClient = inject(QueryClient);
 
   readonly transaction = input.required<Transaction>();

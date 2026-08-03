@@ -4,6 +4,7 @@ import { AdjustmentService } from '../../services/adjustment-service';
 import { QueryClient } from '@tanstack/angular-query-experimental';
 import { Adjustment } from '../../models/adjustments.model';
 import { form, FormField, maxLength, min, required } from '@angular/forms/signals';
+import { PrivacyService } from '../../services/privacy.service';
 
 interface AdjustmentFormModel {
   description: string;
@@ -32,6 +33,7 @@ function formatDateForInput(dateVal: Date | string): string {
 })
 export class EditAdjustmentComponent {
   private adjustmentService = inject(AdjustmentService);
+  readonly privacyService = inject(PrivacyService);
   private queryClient = inject(QueryClient);
 
   readonly adjustment = input.required<Adjustment>();

@@ -6,4 +6,5 @@ export interface Transaction {
   amount: number;
   category: string;
   createdAt: string;
+  adjustmentId?: string;
 }
