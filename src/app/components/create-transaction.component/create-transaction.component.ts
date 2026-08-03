@@ -116,6 +116,7 @@ export class CreateTransactionComponent {
       await this.queryClient.invalidateQueries({ queryKey: ['expenses'] });
 
       this.transactionModel.set(defaultTransactionModel());
+      this.transactionForm().reset();
       this.successMessage.set('Transaction added');
     } catch (err) {
       this.errorMessage.set('Unable to add transaction. Please try again.');
@@ -148,6 +149,7 @@ export class CreateTransactionComponent {
       await this.queryClient.invalidateQueries({ queryKey: ['adjustments'] });
 
       this.adjustmentModel.set(defaultAdjustmentModel());
+      this.adjustmentForm().reset();
       this.successMessage.set('One-Off adjustment added successfully');
     } catch (err) {
       this.errorMessage.set('Unable to add adjustment. Please try again.');
