@@ -1,0 +1,179 @@
+<div
+  class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fadeIn"
+  (click)="close.emit()"
+>
+  <div
+    class="bg-gray-900 border border-gray-800 rounded-3xl p-6 w-full max-w-sm shadow-2xl space-y-6 text-gray-100"
+    (click)="$event.stopPropagation()"
+  >
+    <!-- Header -->
+    <div class="flex items-center justify-between pb-3 border-b border-gray-800">
+      <div class="flex items-center gap-2">
+        <span class="text-lg">⚙️</span>
+        <h2 class="text-base font-semibold">Settings</h2>
+      </div>
+      <button
+        (click)="close.emit()"
+        class="h-8 w-8 rounded-full bg-gray-800 hover:bg-gray-700 text-gray-400 hover:text-white flex items-center justify-center text-sm cursor-pointer transition-colors"
+      >
+        ✕
+      </button>
+    </div>
+
+    <!-- Feedback Banner -->
+    @if (feedbackMessage(); as msg) {
+      <div
+        class="p-3 rounded-xl text-xs font-medium text-center"
+        [class]="
+          msg.type === 'error'
+            ? 'bg-red-950/50 border border-red-800/60 text-red-300'
+            : 'bg-emerald-950/50 border border-emerald-800/60 text-emerald-300'
+        "
+      >
+        {{ msg.text }}
+      </div>
+    }
+
+    <!-- Stealth Mode Toggle Row -->
+    <div
+      class="flex items-center justify-between bg-gray-800/40 p-3.5 rounded-2xl border border-gray-800/80"
+    >
+      <div class="space-y-0.5">
+        <span class="text-sm font-medium text-gray-200 block">Stealth Mode</span>
+        <span class="text-[11px] text-gray-400 block">Hide monetary values on screen</span>
+      </div>
+
+      <button
+        type="button"
+        (click)="handleToggleStealth()"
+        class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none"
+        [class]="privacyService.isPrivacyMode() ? 'bg-indigo-600' : 'bg-gray-700'"
+      >
+        <span
+          class="pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"
+          [class]="privacyService.isPrivacyMode() ? 'translate-x-5' : 'translate-x-0'"
+        ></span>
+      </button>
+    </div>
+
+    <!-- Inline Form: Unlock to Disable Stealth Mode -->
+    @if (activeAction() === 'unlock-to-disable') {
+      <div class="bg-gray-800/60 border border-gray-700 p-4 rounded-2xl space-y-3">
+        <span class="text-xs font-medium text-gray-300 block text-center"
+          >Enter Passcode to Exit Stealth</span
+        >
+        <input
+          type="password"
+          [(ngModel)]="pinInput"
+          placeholder="••••"
+          autofocus
+          class="w-full bg-gray-900 border border-gray-700 rounded-xl px-3 py-2 text-center text-sm text-gray-100 placeholder:text-gray-600 tracking-widest focus:outline-none focus:border-indigo-500"
+        />
+        <div class="flex gap-2">
+          <button
+            (click)="resetForm()"
+            class="flex-1 py-2 text-xs text-gray-400 bg-gray-800 rounded-xl hover:text-white"
+          >
+            Cancel
+          </button>
+          <button
+            (click)="handleUnlockDisable()"
+            class="flex-1 py-2 text-xs font-semibold text-white bg-indigo-600 rounded-xl hover:bg-indigo-500"
+          >
+            Confirm
+          </button>
+        </div>
+      </div>
+    }
+
+    <!-- Passcode Management Section -->
+    <div class="space-y-3">
+      <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider block px-1"
+        >Security</span
+      >
+
+      @if (activeAction() === 'none') {
+        <div
+          class="flex items-center justify-between bg-gray-800/40 p-3.5 rounded-2xl border border-gray-800/80"
+        >
+          <div>
+            <span class="text-sm font-medium text-gray-200 block">Stealth Passcode</span>
+            <span class="text-[11px] text-gray-400 block">
+              {{ privacyService.hasPassword() ? 'Protected with PIN' : 'No PIN set' }}
+            </span>
+          </div>
+
+          @if (!privacyService.hasPassword()) {
+            <button
+              (click)="activeAction.set('set'); clearFeedback()"
+              class="px-3 py-1.5 text-xs font-semibold text-indigo-400 bg-indigo-500/10 hover:bg-indigo-500/20 border border-indigo-500/20 rounded-xl transition-all cursor-pointer"
+            >
+              Set PIN
+            </button>
+          } @else {
+            <button
+              (click)="activeAction.set('remove'); clearFeedback()"
+              class="px-3 py-1.5 text-xs font-semibold text-red-400 bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 rounded-xl transition-all cursor-pointer"
+            >
+              Remove
+            </button>
+          }
+        </div>
+      }
+
+      <!-- Form: Set New PIN -->
+      @if (activeAction() === 'set') {
+        <div class="bg-gray-800/60 border border-gray-700 p-4 rounded-2xl space-y-3">
+          <span class="text-xs font-medium text-gray-300 block">Create New Passcode</span>
+          <input
+            type="password"
+            [(ngModel)]="pinInput"
+            placeholder="Enter PIN (e.g. 1234)"
+            class="w-full bg-gray-900 border border-gray-700 rounded-xl px-3.5 py-2 text-sm text-gray-100 placeholder:text-gray-600 tracking-widest focus:outline-none focus:border-indigo-500"
+          />
+          <div class="flex gap-2">
+            <button
+              (click)="resetForm()"
+              class="flex-1 py-2 text-xs text-gray-400 bg-gray-800 rounded-xl hover:text-white cursor-pointer"
+            >
+              Cancel
+            </button>
+            <button
+              (click)="handleSetPin()"
+              class="flex-1 py-2 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-500 rounded-xl cursor-pointer"
+            >
+              Save PIN
+            </button>
+          </div>
+        </div>
+      }
+
+      <!-- Form: Remove Existing PIN -->
+      @if (activeAction() === 'remove') {
+        <div class="bg-gray-800/60 border border-gray-700 p-4 rounded-2xl space-y-3">
+          <span class="text-xs font-medium text-gray-300 block">Confirm Current Passcode</span>
+          <input
+            type="password"
+            [(ngModel)]="currentPinInput"
+            placeholder="Current PIN"
+            class="w-full bg-gray-900 border border-gray-700 rounded-xl px-3.5 py-2 text-sm text-gray-100 placeholder:text-gray-600 tracking-widest focus:outline-none focus:border-indigo-500"
+          />
+          <div class="flex gap-2">
+            <button
+              (click)="resetForm()"
+              class="flex-1 py-2 text-xs text-gray-400 bg-gray-800 rounded-xl hover:text-white cursor-pointer"
+            >
+              Cancel
+            </button>
+            <button
+              (click)="handleRemovePin()"
+              class="flex-1 py-2 text-xs font-semibold text-white bg-red-600 hover:bg-red-500 rounded-xl cursor-pointer"
+            >
+              Remove PIN
+            </button>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+</div>
