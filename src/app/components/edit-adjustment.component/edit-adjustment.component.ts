@@ -1,4 +1,5 @@
 import { Component, effect, inject, signal, input, output } from '@angular/core';
+import { ConfirmModal } from '../confirm-modal/confirm-modal';
 import { CommonModule } from '@angular/common';
 import { AdjustmentService } from '../../services/adjustment-service';
 import { QueryClient } from '@tanstack/angular-query-experimental';
@@ -27,7 +28,7 @@ function formatDateForInput(dateVal: Date | string): string {
 @Component({
   selector: 'app-edit-adjustment',
   standalone: true,
-  imports: [CommonModule, FormField],
+  imports: [CommonModule, FormField, ConfirmModal],
   host: { class: 'block' },
   templateUrl: './edit-adjustment.component.html',
 })
@@ -35,6 +36,8 @@ export class EditAdjustmentComponent {
   private adjustmentService = inject(AdjustmentService);
   readonly privacyService = inject(PrivacyService);
   private queryClient = inject(QueryClient);
+
+  readonly showDeleteConfirm = signal(false);
 
   readonly adjustment = input.required<Adjustment>();
 
@@ -81,6 +84,10 @@ export class EditAdjustmentComponent {
     this.adjustmentModel.update((m) => ({ ...m, isAddition }));
   }
 
+  requestDelete(): void {
+    this.showDeleteConfirm.set(true);
+  }
+
   async onSubmit(event: Event): Promise<void> {
     event.preventDefault();
     if (this.adjustmentForm().invalid() || this.submitting()) {
@@ -114,9 +121,7 @@ export class EditAdjustmentComponent {
       return;
     }
 
-    if (!confirm('Are you sure you want to delete this adjustment?')) {
-      return;
-    }
+    this.showDeleteConfirm.set(false);
 
     this.deleting.set(true);
     this.errorMessage.set(null);
