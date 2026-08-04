@@ -158,8 +158,14 @@ export class ExpenseStateService {
 
     return entries.map(([name, val]) => {
       const amount = Number(val) || 0;
+      const lastMonthExpense = this.latestMonthExpense();
+      const currentMonthValue = Number(lastMonthExpense?.[name as keyof Expense] ?? 0);
+      const amountExcludingCurrent = isAllTime ? Math.max(0, amount - currentMonthValue) : amount;
+      const monthsExcludingCurrent = Math.max(0, totalMonthsCount - 1);
       const monthlyAverage =
-        isAllTime && totalMonthsCount > 0 ? Math.ceil(amount / totalMonthsCount / 5) * 5 : null;
+        isAllTime && monthsExcludingCurrent > 0
+          ? Math.ceil(amountExcludingCurrent / monthsExcludingCurrent / 5) * 5
+          : null;
       const budget = CATEGORY_BUDGETS[name] ?? null;
       // For All Time, compare the normalized monthly average against the budget
       // instead of scaling the budget up, so it stays intuitive as a target.
