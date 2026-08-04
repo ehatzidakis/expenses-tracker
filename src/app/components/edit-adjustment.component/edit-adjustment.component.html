@@ -123,6 +123,70 @@
       </div>
     </div>
 
+    <!-- Is Trip Toggle -->
+    <div class="space-y-1.5">
+      <label class="text-xs font-medium text-gray-400">Trip</label>
+      <div class="grid grid-cols-2 gap-2 p-1 bg-gray-950/80 rounded-xl border border-gray-800">
+        <button
+          type="button"
+          (click)="toggleTrip(true)"
+          class="py-2 rounded-lg text-xs font-semibold transition-all duration-150 flex items-center justify-center gap-1 cursor-pointer"
+          [class.bg-sky-500/20]="adjustmentModel().isTrip"
+          [class.text-sky-400]="adjustmentModel().isTrip"
+          [class.border]="adjustmentModel().isTrip"
+          [class.border-sky-500/30]="adjustmentModel().isTrip"
+          [class.text-gray-400]="!adjustmentModel().isTrip"
+        >
+          🛫 Yes
+        </button>
+        <button
+          type="button"
+          (click)="toggleTrip(false)"
+          class="py-2 rounded-lg text-xs font-semibold transition-all duration-150 flex items-center justify-center gap-1 cursor-pointer"
+          [class.bg-gray-700/60]="!adjustmentModel().isTrip"
+          [class.text-gray-200]="!adjustmentModel().isTrip"
+          [class.border]="!adjustmentModel().isTrip"
+          [class.border-gray-600/40]="!adjustmentModel().isTrip"
+          [class.text-gray-400]="adjustmentModel().isTrip"
+        >
+          No
+        </button>
+      </div>
+    </div>
+
+    <!-- Is Selectable Toggle (only when isTrip = true) -->
+    @if (adjustmentModel().isTrip) {
+      <div class="space-y-1.5">
+        <label class="text-xs font-medium text-gray-400">Accept New Transactions</label>
+        <div class="grid grid-cols-2 gap-2 p-1 bg-gray-950/80 rounded-xl border border-gray-800">
+          <button
+            type="button"
+            (click)="toggleSelectable(true)"
+            class="py-2 rounded-lg text-xs font-semibold transition-all duration-150 flex items-center justify-center gap-1 cursor-pointer"
+            [class.bg-emerald-500/20]="adjustmentModel().isSelectable"
+            [class.text-emerald-400]="adjustmentModel().isSelectable"
+            [class.border]="adjustmentModel().isSelectable"
+            [class.border-emerald-500/30]="adjustmentModel().isSelectable"
+            [class.text-gray-400]="!adjustmentModel().isSelectable"
+          >
+            🔓 Open
+          </button>
+          <button
+            type="button"
+            (click)="toggleSelectable(false)"
+            class="py-2 rounded-lg text-xs font-semibold transition-all duration-150 flex items-center justify-center gap-1 cursor-pointer"
+            [class.bg-gray-700/60]="!adjustmentModel().isSelectable"
+            [class.text-gray-200]="!adjustmentModel().isSelectable"
+            [class.border]="!adjustmentModel().isSelectable"
+            [class.border-gray-600/40]="!adjustmentModel().isSelectable"
+            [class.text-gray-400]="adjustmentModel().isSelectable"
+          >
+            🔒 Closed
+          </button>
+        </div>
+      </div>
+    }
+
     @if (errorMessage()) {
       <div class="p-3 bg-red-950/40 border border-red-800/60 text-red-300 rounded-xl text-xs">
         {{ errorMessage() }}

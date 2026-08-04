@@ -30,6 +30,7 @@ export interface NewTransactionInput {
   description: string;
   category: string;
   amount: number;
+  adjustmentId?: string; // Optional: ID of the associated adjustment, if any
 }
 
 const PAGE_SIZE = 10;
@@ -90,6 +91,7 @@ export class TransactionService {
           amount: Number(data['amount']) || 0,
           category: data['category'],
           createdAt: data['createdAt'],
+          adjustmentId: data['adjustmentId'] ?? undefined,
         } as Transaction;
       }),
       lastDoc: docs.length ? docs[docs.length - 1] : null,
@@ -101,34 +103,47 @@ export class TransactionService {
     const monthName = monthNameFromDateString(input.date);
     const createdAt = new Date().toISOString();
 
-    const expensesRef = collection(db, 'expenses');
-    const existingSnapshot = await getDocs(query(expensesRef, where('MonthName', '==', monthName)));
-    const existingExpenseDoc = existingSnapshot.docs[0] ?? null;
+    const isTripTransaction = Boolean(input.adjustmentId); // Determine if this is a trip transaction based on the presence of an adjustmentId
 
     const batch = writeBatch(db);
 
-    if (existingExpenseDoc) {
-      batch.update(existingExpenseDoc.ref, { [input.category]: increment(input.amount) });
-    } else {
-      const newExpense: Record<string, string | number> = {
-        MonthName: monthName,
-        TotalWage: DEFAULT_TOTAL_WAGE,
-      };
-      for (const name of CATEGORY_NAMES) {
-        newExpense[name] = name === input.category ? input.amount : 0;
+    if (!isTripTransaction) {
+      const expensesRef = collection(db, 'expenses');
+      const existingSnapshot = await getDocs(
+        query(expensesRef, where('MonthName', '==', monthName)),
+      );
+      const existingExpenseDoc = existingSnapshot.docs[0] ?? null;
+
+      if (existingExpenseDoc) {
+        batch.update(existingExpenseDoc.ref, { [input.category]: increment(input.amount) });
+      } else {
+        const newExpense: Record<string, string | number> = {
+          MonthName: monthName,
+          TotalWage: DEFAULT_TOTAL_WAGE,
+        };
+        for (const name of CATEGORY_NAMES) {
+          newExpense[name] = name === input.category ? input.amount : 0;
+        }
+        batch.set(doc(collection(db, 'expenses')), newExpense);
       }
-      batch.set(doc(expensesRef), newExpense);
+    } else if (input.adjustmentId) {
+      const adjustmentRef = doc(db, 'adjustments', input.adjustmentId);
+      batch.update(adjustmentRef, { amount: increment(input.amount) });
     }
 
     const transactionRef = doc(collection(db, 'transactions'));
-    batch.set(transactionRef, {
+    const txData: Record<string, string | number> = {
       monthName,
       date: input.date,
       description: input.description,
       amount: input.amount,
       category: input.category,
       createdAt,
-    });
+    };
+    if (input.adjustmentId) {
+      txData['adjustmentId'] = input.adjustmentId;
+    }
+    batch.set(transactionRef, txData);
 
     await batch.commit();
 
@@ -137,52 +152,66 @@ export class TransactionService {
 
   async updateTransaction(oldTx: Transaction, input: NewTransactionInput): Promise<void> {
     const newMonthName = monthNameFromDateString(input.date);
+    const isTripTransaction = Boolean(oldTx.adjustmentId); // Determine if this is a trip transaction based on the presence of an adjustmentId
     const batch = writeBatch(db);
     const expensesRef = collection(db, 'expenses');
 
-    // 1. Revert old amount from original month & category summary
-    const oldExpenseSnap = await getDocs(
-      query(expensesRef, where('MonthName', '==', oldTx.monthName)),
-    );
-    const oldExpenseDoc = oldExpenseSnap.docs[0] ?? null;
+    if (!isTripTransaction) {
+      // 1. Revert old amount from original month & category summary
+      const oldExpenseSnap = await getDocs(
+        query(expensesRef, where('MonthName', '==', oldTx.monthName)),
+      );
+      const oldExpenseDoc = oldExpenseSnap.docs[0] ?? null;
 
-    if (oldExpenseDoc) {
-      batch.update(oldExpenseDoc.ref, {
-        [oldTx.category]: increment(-oldTx.amount),
-      });
-    }
-
-    // 2. Apply new amount to new month & category summary
-    const newExpenseSnap = await getDocs(
-      query(expensesRef, where('MonthName', '==', newMonthName)),
-    );
-    const newExpenseDoc = newExpenseSnap.docs[0] ?? null;
-
-    if (newExpenseDoc) {
-      batch.update(newExpenseDoc.ref, {
-        [input.category]: increment(input.amount),
-      });
-    } else {
-      // If transitioning to a new month that doesn't exist yet in expenses
-      const newExpense: Record<string, string | number> = {
-        MonthName: newMonthName,
-        TotalWage: DEFAULT_TOTAL_WAGE,
-      };
-      for (const name of CATEGORY_NAMES) {
-        newExpense[name] = name === input.category ? input.amount : 0;
+      if (oldExpenseDoc) {
+        batch.update(oldExpenseDoc.ref, {
+          [oldTx.category]: increment(-oldTx.amount),
+        });
       }
-      batch.set(doc(expensesRef), newExpense);
+
+      // 2. Apply new amount to new month & category summary
+      const newExpenseSnap = await getDocs(
+        query(expensesRef, where('MonthName', '==', newMonthName)),
+      );
+      const newExpenseDoc = newExpenseSnap.docs[0] ?? null;
+
+      if (newExpenseDoc) {
+        batch.update(newExpenseDoc.ref, {
+          [input.category]: increment(input.amount),
+        });
+      } else {
+        // If transitioning to a new month that doesn't exist yet in expenses
+        const newExpense: Record<string, string | number> = {
+          MonthName: newMonthName,
+          TotalWage: DEFAULT_TOTAL_WAGE,
+        };
+        for (const name of CATEGORY_NAMES) {
+          newExpense[name] = name === input.category ? input.amount : 0;
+        }
+        batch.set(doc(expensesRef), newExpense);
+      }
+    } else if (oldTx.adjustmentId) {
+      // Keep linked trip total in sync with transaction edits
+      const delta = input.amount - oldTx.amount;
+      if (delta !== 0) {
+        const adjustmentRef = doc(db, 'adjustments', oldTx.adjustmentId);
+        batch.update(adjustmentRef, { amount: increment(delta) });
+      }
     }
 
     // 3. Update the transaction document itself
     const txRef = doc(db, 'transactions', oldTx.id);
-    batch.update(txRef, {
+    const updateData: Record<string, string | number> = {
       date: input.date,
       monthName: newMonthName,
       description: input.description,
       category: input.category,
       amount: input.amount,
-    });
+    };
+    if (oldTx.adjustmentId) {
+      updateData['adjustmentId'] = oldTx.adjustmentId;
+    }
+    batch.update(txRef, updateData);
 
     await batch.commit();
   }
@@ -192,6 +221,7 @@ export class TransactionService {
     let monthName: string;
     let category: string;
     let amount: number;
+    let adjustmentId: string | undefined;
 
     // 1. Resolve parameters whether an ID or a full object is passed
     if (typeof target === 'string') {
@@ -207,24 +237,34 @@ export class TransactionService {
       monthName = txData['monthName'] as string;
       category = txData['category'] as string;
       amount = Number(txData['amount']) || 0;
+      adjustmentId = (txData['adjustmentId'] as string) ?? undefined;
     } else {
       transactionId = target.id;
       monthName = target.monthName;
       category = target.category;
       amount = target.amount;
+      adjustmentId = target.adjustmentId;
     }
 
+    const isTripTransaction = Boolean(adjustmentId); // Determine if this is a trip transaction based on the presence of an adjustmentId
     const batch = writeBatch(db);
 
-    // 2. Decrement amount from expenses summary document
-    const expensesRef = collection(db, 'expenses');
-    const existingSnapshot = await getDocs(query(expensesRef, where('MonthName', '==', monthName)));
-    const existingExpenseDoc = existingSnapshot.docs[0] ?? null;
-
-    if (existingExpenseDoc) {
-      batch.update(existingExpenseDoc.ref, {
-        [category]: increment(-amount),
-      });
+    if (!isTripTransaction) {
+      // 2. Decrement amount from expenses summary document
+      const expensesRef = collection(db, 'expenses');
+      const existingSnapshot = await getDocs(
+        query(expensesRef, where('MonthName', '==', monthName)),
+      );
+      const existingExpenseDoc = existingSnapshot.docs[0] ?? null;
+      if (existingExpenseDoc) {
+        batch.update(existingExpenseDoc.ref, {
+          [category]: increment(-amount),
+        });
+      }
+    } else if (adjustmentId) {
+      // Remove this transaction's contribution from the linked trip total
+      const adjustmentRef = doc(db, 'adjustments', adjustmentId);
+      batch.update(adjustmentRef, { amount: increment(-amount) });
     }
 
     // 3. Delete the transaction document
@@ -232,5 +272,24 @@ export class TransactionService {
     batch.delete(transactionRef);
 
     await batch.commit();
+  }
+
+  async fetchAllByAdjustmentId(adjustmentId: string): Promise<Transaction[]> {
+    const transactionsRef = collection(db, 'transactions');
+    const snapshot = await getDocs(
+      query(transactionsRef, where('adjustmentId', '==', adjustmentId)),
+    );
+    return snapshot.docs.map((doc) => {
+      const data = doc.data();
+      return {
+        id: doc.id,
+        monthName: data['monthName'] as string,
+        date: data['date'] as string,
+        description: data['description'] as string,
+        category: data['category'] as string,
+        amount: Number(data['amount']) || 0,
+        adjustmentId: (data['adjustmentId'] as string) ?? undefined,
+      } as Transaction;
+    });
   }
 }

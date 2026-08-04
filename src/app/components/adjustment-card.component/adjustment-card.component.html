@@ -5,12 +5,32 @@
   <div class="flex items-start gap-3 min-w-0">
     <div
       class="h-9 w-9 shrink-0 rounded-full flex items-center justify-center text-base font-bold"
-      [class]="isAddition() ? 'bg-emerald-500/15 text-emerald-400' : 'bg-red-500/15 text-red-400'"
+      [class]="
+        adjustment().isTrip
+          ? 'bg-emerald-500/15 text-emerald-400'
+          : isAddition()
+            ? 'bg-emerald-500/15 text-emerald-400'
+            : 'bg-red-500/15 text-red-400'
+      "
     >
-      {{ isAddition() ? '↑' : '↓' }}
+      {{ adjustment().isTrip ? '🛫' : isAddition() ? '↑' : '↓' }}
     </div>
     <div class="min-w-0">
-      <span class="text-sm font-medium text-gray-200 truncate block">{{ adjustment().title }}</span>
+      <div class="flex items-center gap-1.5 flex-wrap">
+        @if (adjustment().isTrip) {
+          <span
+            class="text-[10px] px-1.5 py-0.5 rounded-md font-semibold shrink-0"
+            [class]="
+              adjustment().isSelectable
+                ? 'bg-sky-500/15 text-sky-400 border border-sky-500/30'
+                : 'bg-gray-700/60 text-gray-400 border border-gray-600/40'
+            "
+          >
+            {{ adjustment().isSelectable ? '🔓' : '🔒' }}
+          </span>
+        }
+        <span class="text-sm font-medium text-gray-200 truncate">{{ adjustment().title }}</span>
+      </div>
       @if (isSameDay()) {
         <span class="text-[11px] text-gray-500 block mt-0.5">
           Date: {{ adjustment().startDate | date: 'dd/MM/yyyy' }}
@@ -25,7 +45,7 @@
   </div>
   <span
     class="text-sm font-semibold shrink-0"
-    [class]="isAddition() ? 'text-emerald-400' : 'text-red-400'"
+    [class]="adjustment().isTrip || isAddition() ? 'text-emerald-400' : 'text-red-400'"
     [class.blur-md]="privacyService.isPrivacyMode()"
     [class.select-none]="privacyService.isPrivacyMode()"
   >

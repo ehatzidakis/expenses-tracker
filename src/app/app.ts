@@ -1,4 +1,6 @@
 import { Component, computed, inject, signal } from '@angular/core';
+import { AdjustmentSelectorComponent } from './components/adjustment-selector/adjustment-selector';
+import { TripBreakdownComponent } from './components/trip-breakdown/trip-breakdown';
 import { ExpenseStateService } from './services/expense-state.service';
 import { AdjustmentService } from './services/adjustment-service';
 import { OverviewCardComponent } from './components/overview-card.component/overview-card.component';
@@ -11,7 +13,6 @@ import { CreateTransactionComponent } from './components/create-transaction.comp
 import { Adjustment } from './models/adjustments.model';
 import { EditAdjustmentComponent } from './components/edit-adjustment.component/edit-adjustment.component';
 import { CategoryBudgetsGrid } from './components/category-budgets-grid/category-budgets-grid';
-
 @Component({
   selector: 'app-root',
   standalone: true,
@@ -25,6 +26,8 @@ import { CategoryBudgetsGrid } from './components/category-budgets-grid/category
     EditAdjustmentComponent,
     CreateTransactionComponent,
     CategoryBudgetsGrid,
+    AdjustmentSelectorComponent,
+    TripBreakdownComponent,
   ],
   templateUrl: './app.html',
 })
@@ -33,6 +36,7 @@ export class AppComponent {
   private adjustmentService = inject(AdjustmentService);
 
   readonly editingAdjustment = signal<Adjustment | null>(null);
+  readonly selectedTripId = signal<string | null>(null);
 
   adjustmentsQuery = this.adjustmentService.getAdjustmentsQuery();
 
@@ -40,6 +44,12 @@ export class AppComponent {
     [...(this.adjustmentsQuery.data() ?? [])].sort(
       (a, b) => b.startDate.getTime() - a.startDate.getTime(),
     ),
+  );
+
+  readonly singleAdjustments = computed(() => this.sortedAdjustments().filter((a) => !a.isTrip));
+
+  readonly selectedTrip = computed(
+    () => this.sortedAdjustments().find((a) => a.id === this.selectedTripId()) ?? null,
   );
 
   readonly oneOffExpenses = computed(() =>

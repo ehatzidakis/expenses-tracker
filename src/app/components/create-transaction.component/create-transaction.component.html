@@ -31,6 +31,36 @@
   <!-- ================= FORM 1: STANDARD TRANSACTION ================= -->
   @if (activeTab() === 'transaction') {
     <form (submit)="onSubmitTransaction($event)" class="space-y-4">
+      <!-- Link with Trip Toggle -->
+      <div class="space-y-1.5">
+        <label class="text-xs font-medium text-gray-400">Link with Trip</label>
+        <div class="grid grid-cols-2 gap-2 p-1 bg-gray-950/80 rounded-xl border border-gray-800">
+          <button
+            type="button"
+            (click)="toggleLinkWithAdjustment(true)"
+            class="py-2 rounded-lg text-xs font-semibold transition-all duration-150 flex items-center justify-center gap-1 cursor-pointer"
+            [class.bg-sky-500/20]="linkWithAdjustment()"
+            [class.text-sky-400]="linkWithAdjustment()"
+            [class.border]="linkWithAdjustment()"
+            [class.border-sky-500/30]="linkWithAdjustment()"
+            [class.text-gray-400]="!linkWithAdjustment()"
+          >
+            🛫 Yes
+          </button>
+          <button
+            type="button"
+            (click)="toggleLinkWithAdjustment(false)"
+            class="py-2 rounded-lg text-xs font-semibold transition-all duration-150 flex items-center justify-center gap-1 cursor-pointer"
+            [class.bg-gray-700/60]="!linkWithAdjustment()"
+            [class.text-gray-200]="!linkWithAdjustment()"
+            [class.border]="!linkWithAdjustment()"
+            [class.border-gray-600/40]="!linkWithAdjustment()"
+            [class.text-gray-400]="linkWithAdjustment()"
+          >
+            No
+          </button>
+        </div>
+      </div>
       <!-- Date Input -->
       <div class="space-y-1.5">
         <label for="tx-date" class="text-xs font-medium text-gray-400">Date</label>
@@ -73,7 +103,7 @@
           class="w-full bg-gray-800/60 border border-gray-800 rounded-xl px-3 py-2.5 text-sm text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/60"
         >
           <option value="">Select a category</option>
-          @for (cat of categories; track cat) {
+          @for (cat of activeCategories(); track cat) {
             <option [value]="cat">{{ cat }}</option>
           }
         </select>
@@ -83,15 +113,14 @@
           </span>
         }
       </div>
-
       <!-- Amount Input -->
+
       <div class="space-y-1.5">
         <label for="tx-amount" class="text-xs font-medium text-gray-400">Amount</label>
         <input
           id="tx-amount"
           type="number"
           step="0.01"
-          /* placeholder="0.00" */
           [formField]="transactionForm.amount"
           class="w-full bg-gray-800/60 border border-gray-800 rounded-xl px-3 py-2.5 text-sm text-gray-100 placeholder:text-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/60 tabular-nums"
         />
@@ -101,6 +130,28 @@
           </span>
         }
       </div>
+
+      <!-- Trip Selector (shown only when linkWithAdjustment = true) -->
+      @if (linkWithAdjustment()) {
+        <div class="space-y-1.5">
+          <label for="tx-trip" class="text-xs font-medium text-gray-400">Select Trip</label>
+          @if (selectableTrips().length === 0) {
+            <p class="text-xs text-gray-500 py-1">No open trips available.</p>
+          } @else {
+            <select
+              id="tx-trip"
+              [value]="selectedAdjustmentId()"
+              (change)="selectedAdjustmentId.set($any($event.target).value)"
+              class="w-full bg-gray-800/60 border border-gray-800 rounded-xl px-3 py-2.5 text-sm text-gray-100 focus:outline-none focus:ring-2 focus:ring-sky-500/60"
+            >
+              <option value="">Select a trip</option>
+              @for (trip of selectableTrips(); track trip.id) {
+                <option [value]="trip.id">{{ trip.title }}</option>
+              }
+            </select>
+          }
+        </div>
+      }
 
       <button
         type="submit"
@@ -115,6 +166,69 @@
   <!-- ================= FORM 2: ONE-OFF ADJUSTMENT ================= -->
   @if (activeTab() === 'adjustment') {
     <form (submit)="onSubmitAdjustment($event)" class="space-y-4">
+      <!-- Is Trip Toggle -->
+      <div class="space-y-1.5">
+        <label class="text-xs font-medium text-gray-400">Trip</label>
+        <div class="grid grid-cols-2 gap-2 p-1 bg-gray-950/80 rounded-xl border border-gray-800">
+          <button
+            type="button"
+            (click)="setIsTrip(true)"
+            class="py-2 rounded-lg text-xs font-semibold transition-all duration-150 flex items-center justify-center gap-1 cursor-pointer"
+            [class.bg-sky-500/20]="adjustmentModel().isTrip"
+            [class.text-sky-400]="adjustmentModel().isTrip"
+            [class.border]="adjustmentModel().isTrip"
+            [class.border-sky-500/30]="adjustmentModel().isTrip"
+            [class.text-gray-400]="!adjustmentModel().isTrip"
+          >
+            🛫 Yes
+          </button>
+          <button
+            type="button"
+            (click)="setIsTrip(false)"
+            class="py-2 rounded-lg text-xs font-semibold transition-all duration-150 flex items-center justify-center gap-1 cursor-pointer"
+            [class.bg-gray-700/60]="!adjustmentModel().isTrip"
+            [class.text-gray-200]="!adjustmentModel().isTrip"
+            [class.border]="!adjustmentModel().isTrip"
+            [class.border-gray-600/40]="!adjustmentModel().isTrip"
+            [class.text-gray-400]="adjustmentModel().isTrip"
+          >
+            No
+          </button>
+        </div>
+      </div>
+
+      <!-- Is Selectable Toggle (only when isTrip = true) -->
+      @if (adjustmentModel().isTrip) {
+        <div class="space-y-1.5">
+          <label class="text-xs font-medium text-gray-400">Accept New Transactions</label>
+          <div class="grid grid-cols-2 gap-2 p-1 bg-gray-950/80 rounded-xl border border-gray-800">
+            <button
+              type="button"
+              (click)="setIsSelectable(true)"
+              class="py-2 rounded-lg text-xs font-semibold transition-all duration-150 flex items-center justify-center gap-1 cursor-pointer"
+              [class.bg-emerald-500/20]="adjustmentModel().isSelectable"
+              [class.text-emerald-400]="adjustmentModel().isSelectable"
+              [class.border]="adjustmentModel().isSelectable"
+              [class.border-emerald-500/30]="adjustmentModel().isSelectable"
+              [class.text-gray-400]="!adjustmentModel().isSelectable"
+            >
+              🔓 Open
+            </button>
+            <button
+              type="button"
+              (click)="setIsSelectable(false)"
+              class="py-2 rounded-lg text-xs font-semibold transition-all duration-150 flex items-center justify-center gap-1 cursor-pointer"
+              [class.bg-gray-700/60]="!adjustmentModel().isSelectable"
+              [class.text-gray-200]="!adjustmentModel().isSelectable"
+              [class.border]="!adjustmentModel().isSelectable"
+              [class.border-gray-600/40]="!adjustmentModel().isSelectable"
+              [class.text-gray-400]="adjustmentModel().isSelectable"
+            >
+              🔒 Closed
+            </button>
+          </div>
+        </div>
+      }
       <!-- Description Input -->
       <div class="space-y-1.5">
         <label for="adj-description" class="text-xs font-medium text-gray-400">Description</label>
@@ -133,22 +247,24 @@
       </div>
 
       <!-- Amount Input -->
-      <div class="space-y-1.5">
-        <label for="adj-amount" class="text-xs font-medium text-gray-400">Amount</label>
-        <input
-          id="adj-amount"
-          type="number"
-          step="0.01"
-          placeholder="0.00"
-          [formField]="adjustmentForm.amount"
-          class="w-full bg-gray-800/60 border border-gray-800 rounded-xl px-3 py-2.5 text-sm text-gray-100 placeholder:text-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/60 tabular-nums"
-        />
-        @if (adjustmentForm.amount().touched() && adjustmentForm.amount().invalid()) {
-          <span class="text-[11px] text-red-400">
-            {{ adjustmentForm.amount().errors()[0]?.message }}
-          </span>
-        }
-      </div>
+      @if (!adjustmentModel().isTrip) {
+        <div class="space-y-1.5">
+          <label for="adj-amount" class="text-xs font-medium text-gray-400">Amount</label>
+          <input
+            id="adj-amount"
+            type="number"
+            step="0.01"
+            placeholder="0.00"
+            [formField]="adjustmentForm.amount"
+            class="w-full bg-gray-800/60 border border-gray-800 rounded-xl px-3 py-2.5 text-sm text-gray-100 placeholder:text-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/60 tabular-nums"
+          />
+          @if (adjustmentForm.amount().touched() && adjustmentForm.amount().invalid()) {
+            <span class="text-[11px] text-red-400">
+              {{ adjustmentForm.amount().errors()[0]?.message }}
+            </span>
+          }
+        </div>
+      }
 
       <!-- Date Range (Start & End Date Grid) -->
       <div class="grid grid-cols-2 gap-3">

@@ -32,6 +32,18 @@ export const CATEGORY_BUDGETS: Record<string, number | null> = {
 
 export const CATEGORY_NAMES = Object.keys(CATEGORY_BUDGETS);
 
+export const TRIP_CATEGORY_NAMES = [
+  'Plane Tickets',
+  'Accommodation',
+  'Food',
+  'Transportation',
+  'Gifts',
+  'Activities',
+  'Attractions',
+  'Splurge',
+  'Miscellaneous',
+];
+
 export const DEFAULT_TOTAL_WAGE = 1600;
 
 @Injectable({
