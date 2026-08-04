@@ -81,7 +81,7 @@ export class CreateTransactionComponent {
       message: 'Description must be 60 characters or fewer',
     });
     required(schemaPath.category, { message: 'Category is required' });
-    min(schemaPath.amount, 0.01, { message: 'Amount must be greater than 0' });
+    // min(schemaPath.amount, 0.01, { message: 'Amount must be greater than 0' });
   });
 
   readonly adjustmentForm = form(this.adjustmentModel, (schemaPath) => {
@@ -91,7 +91,7 @@ export class CreateTransactionComponent {
     });
     required(schemaPath.startDate, { message: 'Start date is required' });
     required(schemaPath.endDate, { message: 'End date is required' });
-    min(schemaPath.amount, 0.01, { message: 'Amount must be greater than 0' });
+    // min(schemaPath.amount, 0.01, { message: 'Amount must be greater than 0' });
   });
 
   readonly submitting = signal(false);
@@ -127,7 +127,11 @@ export class CreateTransactionComponent {
       ...m,
       isTrip: value,
       isSelectable: value ? m.isSelectable : false,
+      amount: value ? 0 : m.amount,
     }));
+    if (value) {
+      this.isAddition.set(false);
+    }
   }
 
   setIsSelectable(value: boolean): void {
@@ -184,10 +188,10 @@ export class CreateTransactionComponent {
       const value = this.adjustmentModel();
       await this.adjustmentService.createAdjustment({
         description: value.description.trim(),
-        amount: value.amount,
+        amount: value.isTrip ? 0 : value.amount,
         startDate: value.startDate,
         endDate: value.endDate,
-        isAddition: this.isAddition(),
+        isAddition: value.isTrip ? false : this.isAddition(),
         isTrip: value.isTrip,
         isSelectable: value.isSelectable,
       });

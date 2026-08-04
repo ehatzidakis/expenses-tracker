@@ -24,7 +24,7 @@ interface TripCategoryRow {
         <div class="flex items-start justify-between gap-3">
           <div>
             <div class="flex items-center gap-2">
-              <span class="text-lg">✈</span>
+              <!-- <span class="text-lg">🛫</span> -->
               <h2 class="text-base font-semibold text-gray-100">{{ trip().title }}</h2>
             </div>
             <span class="text-[11px] text-gray-500 mt-0.5 block">
