@@ -40,7 +40,7 @@ function defaultTransactionModel(): TransactionFormModel {
 function defaultAdjustmentModel(): AdjustmentFormModel {
   return {
     description: '',
-    amount: 0,
+    amount: 0.0,
     startDate: todayDateInputValue(),
     endDate: todayDateInputValue(),
     isTrip: false,
@@ -127,7 +127,7 @@ export class CreateTransactionComponent {
       ...m,
       isTrip: value,
       isSelectable: value ? m.isSelectable : false,
-      amount: value ? 0 : m.amount,
+      amount: value ? 0.0 : m.amount,
     }));
     if (value) {
       this.isAddition.set(false);
@@ -154,6 +154,7 @@ export class CreateTransactionComponent {
 
     try {
       const value = this.transactionModel();
+
       await this.transactionService.createTransaction({
         date: value.date,
         description: value.description.trim(),
@@ -163,6 +164,7 @@ export class CreateTransactionComponent {
       });
 
       await this.queryClient.invalidateQueries({ queryKey: ['expenses'] });
+      await this.queryClient.invalidateQueries({ queryKey: ['adjustments'] });
 
       this.transactionModel.set(defaultTransactionModel());
       this.transactionForm().reset();
@@ -188,7 +190,7 @@ export class CreateTransactionComponent {
       const value = this.adjustmentModel();
       await this.adjustmentService.createAdjustment({
         description: value.description.trim(),
-        amount: value.isTrip ? 0 : value.amount,
+        amount: value.isTrip ? 0.0 : value.amount,
         startDate: value.startDate,
         endDate: value.endDate,
         isAddition: value.isTrip ? false : this.isAddition(),

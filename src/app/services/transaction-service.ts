@@ -126,6 +126,9 @@ export class TransactionService {
         }
         batch.set(doc(collection(db, 'expenses')), newExpense);
       }
+    } else if (input.adjustmentId) {
+      const adjustmentRef = doc(db, 'adjustments', input.adjustmentId);
+      batch.update(adjustmentRef, { amount: increment(input.amount) });
     }
 
     const transactionRef = doc(collection(db, 'transactions'));
@@ -186,6 +189,13 @@ export class TransactionService {
           newExpense[name] = name === input.category ? input.amount : 0;
         }
         batch.set(doc(expensesRef), newExpense);
+      }
+    } else if (oldTx.adjustmentId) {
+      // Keep linked trip total in sync with transaction edits
+      const delta = input.amount - oldTx.amount;
+      if (delta !== 0) {
+        const adjustmentRef = doc(db, 'adjustments', oldTx.adjustmentId);
+        batch.update(adjustmentRef, { amount: increment(delta) });
       }
     }
 
@@ -251,6 +261,10 @@ export class TransactionService {
           [category]: increment(-amount),
         });
       }
+    } else if (adjustmentId) {
+      // Remove this transaction's contribution from the linked trip total
+      const adjustmentRef = doc(db, 'adjustments', adjustmentId);
+      batch.update(adjustmentRef, { amount: increment(-amount) });
     }
 
     // 3. Delete the transaction document

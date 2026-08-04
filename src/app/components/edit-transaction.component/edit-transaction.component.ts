@@ -97,6 +97,7 @@ export class EditTransactionComponent {
       });
 
       await this.queryClient.invalidateQueries({ queryKey: ['expenses'] });
+      await this.queryClient.invalidateQueries({ queryKey: ['adjustments'] });
       this.updated.emit();
     } catch (err) {
       console.error('Update transaction error:', err);
@@ -117,6 +118,7 @@ export class EditTransactionComponent {
     try {
       await this.transactionService.deleteTransaction(this.transaction());
       await this.queryClient.invalidateQueries({ queryKey: ['expenses'] });
+      await this.queryClient.invalidateQueries({ queryKey: ['adjustments'] });
       this.deleted.emit();
     } catch (err) {
       console.error('Delete transaction error:', err);
