@@ -18,23 +18,26 @@
           <div class="flex items-center justify-between text-xs py-0.5">
             <!-- Left Group: Category Name and Over Budget Badge -->
             <div class="flex items-center gap-1.5 min-w-0 pr-2">
-              <span class="font-medium text-gray-300 truncate">{{ cat.name }}</span>
-              <span
-                class="text-[10px] px-1 py-0.5 rounded bg-red-500/10 text-red-400 border border-red-500/20 font-medium shrink-0"
-                [class.invisible]="!cat.isOverBudget"
+              <!-- @if (cat.isOverBudget) {
+                <span
+                  class="text-xs px-1 py-0.5 rounded bg-red-500/10 text-red-400 border border-red-500/20 font-medium shrink-0"
+                >
+                  !
+                </span>
+              } -->
+
+              <span class="w-20 font-medium text-gray-300">{{ cat.name }}</span
+              ><span class="w-10 text-right text-gray-400 tabular-nums"
+                >{{ cat.percentage | number: '1.1-1' }}%</span
               >
-                O.B.
-              </span>
             </div>
 
             <!-- Right Group: Percentage and Amount -->
-            <div class="flex items-center gap-2 shrink-0 justify-end">
+            <div class="flex items-center gap-2 shrink-0 justify-end pr-1">
               <!-- Percentage -->
-              <span class="w-14 text-right text-gray-400 tabular-nums"
-                >{{ cat.percentage | number: '1.1-1' }}%</span
-              >
+
               <!-- Over Budget Amount -->
-              <div class="w-18 text-right">
+              <div class="w-14 text-right">
                 @if (!cat.isAllTime) {
                   <span
                     class="text-red-400 font-semibold tabular-nums block"
@@ -56,7 +59,7 @@
               </div>
 
               <!-- Amount -->
-              <span class="w-14 text-right text-white font-semibold tabular-nums">
+              <span class="w-18 text-right text-white font-semibold tabular-nums">
                 €{{ cat.amount | number: '1.2-2' }}{{ cat.isAllTime ? '' : '' }}
               </span>
             </div>
@@ -67,14 +70,14 @@
             <div class="flex items-center justify-between text-xs w-full gap-2 py-0.5">
               <!-- Left Group: Average Label -->
               <span
-                class="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-0.5 rounded-md bg-indigo-500/15 text-indigo-300 border border-indigo-500/30 tabular-nums"
-              >
-                €{{ cat.monthlyAverage | number: '1.2-2' }} / mo average
-              </span>
-              <span
                 class="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-0.5 rounded-md bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 tabular-nums"
               >
                 €{{ cat.budget | number: '1.2-2' }} / mo budget
+              </span>
+              <span
+                class="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-0.5 rounded-md bg-indigo-500/15 text-indigo-300 border border-indigo-500/30 tabular-nums"
+              >
+                €{{ cat.monthlyAverage | number: '1.2-2' }} / mo average
               </span>
             </div>
           }
