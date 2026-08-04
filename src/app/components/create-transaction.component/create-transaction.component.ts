@@ -1,9 +1,9 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { form, FormField, maxLength, min, required } from '@angular/forms/signals';
 import { QueryClient } from '@tanstack/angular-query-experimental';
 import { TransactionService } from '../../services/transaction-service';
-import { CATEGORY_NAMES } from '../../services/expense-state.service';
+import { CATEGORY_NAMES, TRIP_CATEGORY_NAMES } from '../../services/expense-state.service';
 import { AdjustmentService } from '../../services/adjustment-service';
 import { PrivacyService } from '../../services/privacy.service';
 
@@ -21,6 +21,8 @@ interface AdjustmentFormModel {
   amount: number;
   startDate: string;
   endDate: string;
+  isTrip?: boolean;
+  isSelectable?: boolean;
 }
 
 function todayDateInputValue(): string {
@@ -41,6 +43,8 @@ function defaultAdjustmentModel(): AdjustmentFormModel {
     amount: 0,
     startDate: todayDateInputValue(),
     endDate: todayDateInputValue(),
+    isTrip: false,
+    isSelectable: false,
   };
 }
 
@@ -57,11 +61,15 @@ export class CreateTransactionComponent {
   private queryClient = inject(QueryClient);
   readonly privacyService = inject(PrivacyService);
 
-  readonly categories = CATEGORY_NAMES;
+  readonly regularCategories = CATEGORY_NAMES;
+  readonly tripCategories = TRIP_CATEGORY_NAMES;
 
   readonly activeTab = signal<EntryType>('transaction');
 
   readonly isAddition = signal<boolean>(true);
+
+  readonly linkWithAdjustment = signal<boolean>(false);
+  readonly selectedAdjustmentId = signal<string>('');
 
   readonly transactionModel = signal<TransactionFormModel>(defaultTransactionModel());
   readonly adjustmentModel = signal<AdjustmentFormModel>(defaultAdjustmentModel());
@@ -90,15 +98,49 @@ export class CreateTransactionComponent {
   readonly successMessage = signal<string | null>(null);
   readonly errorMessage = signal<string | null>(null);
 
+  private adjustmentsQuery = this.adjustmentService.getAdjustmentsQuery();
+
+  readonly selectableTrips = computed(() =>
+    (this.adjustmentsQuery.data() ?? []).filter((a) => a.isTrip && a.isSelectable),
+  );
+
+  readonly activeCategories = computed(() =>
+    this.linkWithAdjustment() ? this.tripCategories : this.regularCategories,
+  );
+
   setTab(tab: EntryType): void {
     this.activeTab.set(tab);
     this.successMessage.set(null);
     this.errorMessage.set(null);
   }
 
+  toggleLinkWithAdjustment(value: boolean): void {
+    this.linkWithAdjustment.set(value);
+    this.transactionModel.update((m) => ({ ...m, category: '' }));
+    if (!value) {
+      this.selectedAdjustmentId.set('');
+    }
+  }
+
+  setIsTrip(value: boolean): void {
+    this.adjustmentModel.update((m) => ({
+      ...m,
+      isTrip: value,
+      isSelectable: value ? m.isSelectable : false,
+    }));
+  }
+
+  setIsSelectable(value: boolean): void {
+    this.adjustmentModel.update((m) => ({ ...m, isSelectable: value }));
+  }
+
   async onSubmitTransaction(event: Event): Promise<void> {
     event.preventDefault();
     if (this.transactionForm().invalid() || this.submitting()) {
+      return;
+    }
+    if (this.linkWithAdjustment() && !this.selectedAdjustmentId()) {
+      this.errorMessage.set('Please select a trip to link with.');
       return;
     }
 
@@ -113,6 +155,7 @@ export class CreateTransactionComponent {
         description: value.description.trim(),
         category: value.category,
         amount: value.amount,
+        adjustmentId: this.linkWithAdjustment() ? this.selectedAdjustmentId() : undefined,
       });
 
       await this.queryClient.invalidateQueries({ queryKey: ['expenses'] });
@@ -145,6 +188,8 @@ export class CreateTransactionComponent {
         startDate: value.startDate,
         endDate: value.endDate,
         isAddition: this.isAddition(),
+        isTrip: value.isTrip,
+        isSelectable: value.isSelectable,
       });
 
       await this.queryClient.invalidateQueries({ queryKey: ['expenses'] });

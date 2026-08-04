@@ -1,4 +1,4 @@
-import { Component, inject, input, output, signal, effect } from '@angular/core';
+import { Component, inject, input, output, signal, effect, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { form, FormField, maxLength, min, required } from '@angular/forms/signals';
 import { QueryClient } from '@tanstack/angular-query-experimental';
@@ -29,12 +29,14 @@ export class EditTransactionComponent {
   private queryClient = inject(QueryClient);
 
   readonly transaction = input.required<Transaction>();
+  readonly categoryOverride = input<string[] | null>(null);
 
   readonly back = output<void>();
   readonly updated = output<void>();
   readonly deleted = output<void>();
 
-  readonly categories = CATEGORY_NAMES;
+  // readonly categories = CATEGORY_NAMES;
+  readonly categories = computed(() => this.categoryOverride() ?? CATEGORY_NAMES);
 
   readonly model = signal<TransactionFormModel>({
     date: '',

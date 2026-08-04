@@ -5,4 +5,6 @@ export interface Adjustment {
   amount: number;
   startDate: Date;
   endDate: Date;
+  isTrip?: boolean;
+  isSelectable?: boolean;
 }

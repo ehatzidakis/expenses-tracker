@@ -18,6 +18,8 @@ export interface NewAdjustmentInput {
   startDate: string; // 'YYYY-MM-DD'
   endDate: string; // 'YYYY-MM-DD'
   isAddition: boolean; // true for addition, false for deduction
+  isTrip?: boolean; // Optional: true if it's a trip-related adjustment
+  isSelectable?: boolean; // Optional: true if the adjustment can be selected
 }
 
 @Injectable({
@@ -47,6 +49,8 @@ export class AdjustmentService {
               startDate:
                 rawStartDate instanceof Timestamp ? rawStartDate.toDate() : new Date(rawStartDate),
               endDate: rawEndDate instanceof Timestamp ? rawEndDate.toDate() : new Date(rawEndDate),
+              isTrip: Boolean(data['isTrip']),
+              isSelectable: Boolean(data['isSelectable']),
             } as Adjustment;
           });
         } catch (err) {
@@ -66,6 +70,8 @@ export class AdjustmentService {
       amount: input.amount,
       startDate: input.startDate,
       endDate: input.endDate,
+      isTrip: input.isTrip ?? false,
+      isSelectable: input.isSelectable ?? false,
     });
     return adjustmentRef.id;
   }
@@ -79,6 +85,8 @@ export class AdjustmentService {
       amount: input.amount,
       startDate: input.startDate,
       endDate: input.endDate,
+      isTrip: input.isTrip ?? false,
+      isSelectable: input.isSelectable ?? false,
     });
   }
 

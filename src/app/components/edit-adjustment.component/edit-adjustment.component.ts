@@ -13,6 +13,8 @@ interface AdjustmentFormModel {
   startDate: string;
   endDate: string;
   isAddition: boolean;
+  isTrip?: boolean;
+  isSelectable?: boolean;
 }
 
 function formatDateForInput(dateVal: Date | string): string {
@@ -51,6 +53,8 @@ export class EditAdjustmentComponent {
     startDate: '',
     endDate: '',
     isAddition: true,
+    isTrip: false,
+    isSelectable: false,
   });
 
   constructor() {
@@ -63,6 +67,8 @@ export class EditAdjustmentComponent {
           startDate: formatDateForInput(adj.startDate),
           endDate: formatDateForInput(adj.endDate),
           isAddition: adj.adjType,
+          isTrip: adj.isTrip ?? false,
+          isSelectable: adj.isSelectable ?? false,
         });
       }
     });
@@ -82,6 +88,18 @@ export class EditAdjustmentComponent {
 
   toggleType(isAddition: boolean): void {
     this.adjustmentModel.update((m) => ({ ...m, isAddition }));
+  }
+
+  toggleTrip(isTrip: boolean): void {
+    this.adjustmentModel.update((m) => ({
+      ...m,
+      isTrip,
+      isSelectable: isTrip ? m.isSelectable : false,
+    }));
+  }
+
+  toggleSelectable(isSelectable: boolean): void {
+    this.adjustmentModel.update((m) => ({ ...m, isSelectable }));
   }
 
   requestDelete(): void {
@@ -105,6 +123,8 @@ export class EditAdjustmentComponent {
         startDate: value.startDate,
         endDate: value.endDate,
         isAddition: value.isAddition,
+        isTrip: value.isTrip,
+        isSelectable: value.isSelectable,
       });
 
       await this.queryClient.invalidateQueries({ queryKey: ['adjustments'] });
