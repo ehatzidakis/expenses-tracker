@@ -5,6 +5,8 @@ import { TransactionService } from '../../services/transaction-service';
 import { Adjustment } from '../../models/adjustments.model';
 import { TRIP_CATEGORY_NAMES } from '../../services/expense-state.service';
 import { Transaction } from '../../models/transaction.model';
+import { AdjustmentCardComponent } from '../adjustment-card.component/adjustment-card.component';
+import { EditAdjustmentComponent } from '../edit-adjustment.component/edit-adjustment.component';
 
 interface TripCategoryRow {
   name: string;
@@ -15,31 +17,29 @@ interface TripCategoryRow {
 @Component({
   selector: 'app-trip-breakdown',
   standalone: true,
-  imports: [CommonModule, EditTransactionComponent],
+  imports: [
+    CommonModule,
+    EditTransactionComponent,
+    AdjustmentCardComponent,
+    EditAdjustmentComponent,
+  ],
   host: { class: 'block' },
   template: `
     <div class="space-y-4">
       <!-- Trip header card -->
-      <div class="bg-gray-900/60 border border-gray-800/80 rounded-2xl p-5 backdrop-blur-sm">
-        <div class="flex items-start justify-between gap-3">
-          <div>
-            <div class="flex items-center gap-2">
-              <!-- <span class="text-lg">🛫</span> -->
-              <h2 class="text-base font-semibold text-gray-100">{{ trip().title }}</h2>
-            </div>
-            <span class="text-[11px] text-gray-500 mt-0.5 block">
-              {{ trip().startDate | date: 'dd/MM/yyyy' }}
-              @if (!isSameDay()) {
-                &ndash; {{ trip().endDate | date: 'dd/MM/yyyy' }}
-              }
-            </span>
-          </div>
-          <div class="text-right">
-            <span class="text-xs text-gray-400 block mb-0.5">Total spent</span>
-            <span class="text-lg font-bold text-white">€{{ totalSpent() | number: '1.2-2' }}</span>
-          </div>
-        </div>
-      </div>
+      <app-adjustment-card
+        [adjustment]="trip()"
+        (cardClick)="editingAdjustment.set(trip())"
+      ></app-adjustment-card>
+      @if (editingAdjustment(); as selectedAdj) {
+        <!-- EDIT VIEW -->
+        <app-edit-adjustment
+          [adjustment]="selectedAdj"
+          (back)="editingAdjustment.set(null)"
+          (updated)="editingAdjustment.set(null)"
+          (deleted)="editingAdjustment.set(null)"
+        />
+      }
 
       <!-- Loading / error states -->
       @if (loading()) {
@@ -136,6 +136,8 @@ interface TripCategoryRow {
 })
 export class TripBreakdownComponent {
   private transactionService = inject(TransactionService);
+
+  readonly editingAdjustment = signal<Adjustment | null>(null);
 
   trip = input.required<Adjustment>();
 
