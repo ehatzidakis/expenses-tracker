@@ -6,6 +6,7 @@ import { TransactionService } from '../../services/transaction-service';
 import { CATEGORY_NAMES } from '../../services/expense-state.service';
 import { Transaction } from '../../models/transaction.model';
 import { PrivacyService } from '../../services/privacy.service';
+import { ConfirmModal } from '../confirm-modal/confirm-modal';
 
 interface TransactionFormModel {
   date: string;
@@ -17,11 +18,12 @@ interface TransactionFormModel {
 @Component({
   selector: 'app-edit-transaction',
   standalone: true,
-  imports: [CommonModule, FormField],
+  imports: [CommonModule, FormField, ConfirmModal],
   host: { class: 'block' },
   templateUrl: './edit-transaction.component.html',
 })
 export class EditTransactionComponent {
+  readonly showDeleteConfirm = signal(false);
   private transactionService = inject(TransactionService);
   readonly privacyService = inject(PrivacyService);
   private queryClient = inject(QueryClient);
@@ -70,6 +72,10 @@ export class EditTransactionComponent {
   readonly deleting = signal(false);
   readonly errorMessage = signal<string | null>(null);
 
+  requestDelete(): void {
+    this.showDeleteConfirm.set(true);
+  }
+
   async onSubmit(event: Event): Promise<void> {
     event.preventDefault();
     if (this.transactionForm().invalid() || this.submitting()) {
@@ -101,9 +107,7 @@ export class EditTransactionComponent {
   async onDelete(): Promise<void> {
     if (this.deleting()) return;
 
-    if (!confirm('Are you sure you want to delete this transaction?')) {
-      return;
-    }
+    this.showDeleteConfirm.set(false);
 
     this.deleting.set(true);
     this.errorMessage.set(null);
