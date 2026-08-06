@@ -1,0 +1,103 @@
+<!-- Backdrop -->
+<div
+  class="modal-backdrop fixed inset-0 z-100 bg-black/60 backdrop-blur-sm flex items-end justify-center sm:items-center"
+  (click)="onBackdropClick($event)"
+>
+  <!-- Panel -->
+  <div
+    class="w-full max-w-md bg-gray-900 border border-gray-800/80 rounded-t-3xl sm:rounded-2xl p-6 space-y-5 shadow-2xl"
+  >
+    <!-- Header -->
+    <div class="flex items-center justify-between">
+      <div>
+        <h2 class="text-base font-bold text-white">Splitzes</h2>
+        <p class="text-xs text-gray-400 mt-0.5">Running balances with your crew</p>
+      </div>
+      <button
+        type="button"
+        (click)="close.emit()"
+        class="w-8 h-8 flex items-center justify-center rounded-full bg-gray-800 text-gray-400 hover:text-white hover:bg-gray-700 transition-colors cursor-pointer"
+      >
+        ✕
+      </button>
+    </div>
+
+    <!-- Loading -->
+    @if (isLoading()) {
+      <div class="flex flex-col gap-3 animate-pulse">
+        <div class="h-16 bg-gray-800 rounded-xl"></div>
+        <div class="h-16 bg-gray-800 rounded-xl"></div>
+        <div class="h-16 bg-gray-800 rounded-xl"></div>
+      </div>
+    }
+
+    <!-- Error -->
+    @if (isError()) {
+      <div class="p-3 bg-red-950/40 border border-red-800/60 text-red-300 rounded-xl text-xs">
+        Unable to load split data.
+      </div>
+    }
+
+    <!-- Person Cards -->
+    @if (!isLoading() && !isError()) {
+      <div class="flex flex-col gap-3">
+        @for (summary of personSummaries(); track summary.person.id) {
+          <div
+            class="flex items-center justify-between bg-gray-800/60 border border-gray-700/50 rounded-xl px-4 py-3"
+          >
+            <!-- Avatar + Name -->
+            <div class="flex items-center gap-3">
+              <div
+                class="w-9 h-9 rounded-full bg-teal-600/20 border border-teal-500/30 flex items-center justify-center text-xs font-bold text-teal-400"
+              >
+                {{ summary.person.name.slice(0, 2).toUpperCase() }}
+              </div>
+              <div>
+                <p class="text-sm font-semibold text-gray-100">{{ summary.person.name }}</p>
+                <p class="text-xs text-gray-500">
+                  Total split: €{{ summary.totalSplitAmount.toFixed(2) }}
+                </p>
+              </div>
+            </div>
+
+            <!-- Balance Chip -->
+            <span
+              class="px-3 py-1 rounded-full text-xs font-semibold"
+              [class.bg-emerald-500/15]="summary.netOwed < 0"
+              [class.text-emerald-400]="summary.netOwed < 0"
+              [class.bg-amber-500/15]="summary.netOwed > 0"
+              [class.text-amber-400]="summary.netOwed > 0"
+              [class.bg-gray-700/60]="summary.netOwed === 0"
+              [class.text-gray-400]="summary.netOwed === 0"
+            >
+              {{ owedLabel(summary.netOwed) }}
+            </span>
+          </div>
+        }
+      </div>
+
+      <!-- Overall Balance -->
+      <!-- @if (personSummaries().length > 0) {
+        <div class="pt-1 border-t border-gray-800">
+          <div class="flex items-center justify-between text-xs text-gray-400">
+            <span>Overall balance</span>
+            <span
+              class="font-semibold"
+              [class.text-emerald-400]="totalNetOwed() < 0"
+              [class.text-amber-400]="totalNetOwed() > 0"
+              [class.text-gray-400]="totalNetOwed() === 0"
+            >
+              @if (totalNetOwed() < 0) {
+                They owe me €{{ (totalNetOwed() * -1).toFixed(2) }}
+              } @else if (totalNetOwed() > 0) {
+                I owe €{{ totalNetOwed().toFixed(2) }}
+              } @else {
+                Settled
+              }
+            </span>
+          </div>
+        </div>
+      }-->
+    }
+  </div>
+</div>
