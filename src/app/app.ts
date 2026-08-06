@@ -13,6 +13,7 @@ import { CreateTransactionComponent } from './components/create-transaction.comp
 import { Adjustment } from './models/adjustments.model';
 import { EditAdjustmentComponent } from './components/edit-adjustment.component/edit-adjustment.component';
 import { CategoryBudgetsGrid } from './components/category-budgets-grid/category-budgets-grid';
+import { CategoryBudgetsChartComponent } from './components/category-budgets-chart/category-budgets-chart';
 @Component({
   selector: 'app-root',
   standalone: true,
@@ -26,6 +27,7 @@ import { CategoryBudgetsGrid } from './components/category-budgets-grid/category
     EditAdjustmentComponent,
     CreateTransactionComponent,
     CategoryBudgetsGrid,
+    CategoryBudgetsChartComponent,
     AdjustmentSelectorComponent,
     TripBreakdownComponent,
   ],
