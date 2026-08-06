@@ -31,8 +31,8 @@
               "budgets": [
                 {
                   "type": "initial",
-                  "maximumWarning": "500kB",
-                  "maximumError": "1MB"
+                  "maximumWarning": "800kB",
+                  "maximumError": "1.2MB"
                 },
                 {
                   "type": "anyComponentStyle",
@@ -40,6 +40,12 @@
                   "maximumError": "8kB"
                 }
               ],
+              "sourceMap": {
+                "scripts": true,
+                "styles": true,
+                "vendor": true,
+                "hidden": false
+              },
               "outputHashing": "all",
               "serviceWorker": "ngsw-config.json"
             },

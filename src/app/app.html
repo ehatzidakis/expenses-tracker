@@ -16,7 +16,7 @@
     <!-- Error State -->
     @if (state.expensesQuery.isError()) {
       <div class="p-4 bg-red-950/40 border border-red-800/60 text-red-300 rounded-xl text-sm">
-        Unable to load expenses data from MockAPI.
+        Unable to load expenses data.
       </div>
     }
 
@@ -47,75 +47,79 @@
           </app-category-breakdown>
         }
         @case ('sumup') {
-          <app-overview-card
-            [totalSpend]="totalOutgoing()"
-            [totalWage]="state.selectedTotalWage()"
-            [totalSaved]="totalSaved()"
-            [monthlyExpenses]="state.totalMonthlySpend()"
-            [oneOffExpenses]="oneOffExpenses()"
-            [monthlySaved]="monthlySaved()"
-            [oneOffBonuses]="oneOffBonuses()"
-            [monthName]="state.selectedExpense()?.MonthName ?? ''"
-            [dateRangeInfo]="state.dateRangeInfo()"
-            [topCategory]="state.topCategory()"
-          >
-          </app-overview-card>
+          @defer (on immediate) {
+            <app-overview-card
+              [totalSpend]="totalOutgoing()"
+              [totalWage]="state.selectedTotalWage()"
+              [totalSaved]="totalSaved()"
+              [monthlyExpenses]="state.totalMonthlySpend()"
+              [oneOffExpenses]="oneOffExpenses()"
+              [monthlySaved]="monthlySaved()"
+              [oneOffBonuses]="oneOffBonuses()"
+              [monthName]="state.selectedExpense()?.MonthName ?? ''"
+              [dateRangeInfo]="state.dateRangeInfo()"
+              [topCategory]="state.topCategory()"
+            >
+            </app-overview-card>
 
-          <app-category-breakdown [categories]="state.categoryBreakdown()">
-          </app-category-breakdown>
+            <app-category-breakdown [categories]="state.categoryBreakdown()">
+            </app-category-breakdown>
+          }
         }
       }
     }
   }
 
   @if (state.activeTab() === 'oneoffs') {
-    @if (editingAdjustment(); as selectedAdj) {
-      <!-- EDIT VIEW -->
-      <app-edit-adjustment
-        [adjustment]="selectedAdj"
-        (back)="editingAdjustment.set(null)"
-        (updated)="editingAdjustment.set(null)"
-        (deleted)="editingAdjustment.set(null)"
-      />
-    } @else if (adjustmentsQuery.isPending()) {
-      <div class="flex flex-col gap-3 animate-pulse">
-        <div class="h-16 bg-gray-900 rounded-2xl"></div>
-        <div class="h-16 bg-gray-900 rounded-2xl"></div>
-        <div class="h-16 bg-gray-900 rounded-2xl"></div>
-      </div>
-    } @else if (adjustmentsQuery.isError()) {
-      <div class="p-4 bg-red-950/40 border border-red-800/60 text-red-300 rounded-xl text-sm">
-        Unable to load one-offs data.
-      </div>
-    } @else {
-      <!-- Adjustment Selector (Singles + Trip pills) -->
-      <app-adjustment-selector
-        [adjustments]="sortedAdjustments()"
-        [selectedId]="selectedTripId()"
-        (selectionChanged)="selectedTripId.set($event)"
-      />
+    @defer (on immediate) {
+      @if (editingAdjustment(); as selectedAdj) {
+        <!-- EDIT VIEW -->
+        <app-edit-adjustment
+          [adjustment]="selectedAdj"
+          (back)="editingAdjustment.set(null)"
+          (updated)="editingAdjustment.set(null)"
+          (deleted)="editingAdjustment.set(null)"
+        />
+      } @else if (adjustmentsQuery.isPending()) {
+        <div class="flex flex-col gap-3 animate-pulse">
+          <div class="h-16 bg-gray-900 rounded-2xl"></div>
+          <div class="h-16 bg-gray-900 rounded-2xl"></div>
+          <div class="h-16 bg-gray-900 rounded-2xl"></div>
+        </div>
+      } @else if (adjustmentsQuery.isError()) {
+        <div class="p-4 bg-red-950/40 border border-red-800/60 text-red-300 rounded-xl text-sm">
+          Unable to load one-offs data.
+        </div>
+      } @else {
+        <!-- Adjustment Selector (Singles + Trip pills) -->
+        <app-adjustment-selector
+          [adjustments]="sortedAdjustments()"
+          [selectedId]="selectedTripId()"
+          (selectionChanged)="selectedTripId.set($event)"
+        />
 
-      @if (selectedTripId() === null) {
-        <!-- SINGLES VIEW -->
-        @if (singleAdjustments().length) {
-          <div class="flex flex-col gap-3">
-            @for (adjustment of singleAdjustments(); track adjustment.id) {
-              <app-adjustment-card
-                [adjustment]="adjustment"
-                (cardClick)="editingAdjustment.set(adjustment)"
-              ></app-adjustment-card>
-            }
-          </div>
-        } @else {
-          <div
-            class="flex flex-col items-center justify-center gap-2 text-center py-16 px-4 bg-gray-900/60 border border-gray-800/80 rounded-2xl text-gray-500 text-sm"
-          >
-            No singles yet
-          </div>
+        @if (selectedTripId() === null) {
+          <!-- SINGLES VIEW -->
+          @if (singleAdjustments().length) {
+            <div class="flex flex-col gap-3">
+              @for (adjustment of singleAdjustments(); track adjustment.id) {
+                <app-adjustment-card
+                  [adjustment]="adjustment"
+                  (cardClick)="editingAdjustment.set(adjustment)"
+                ></app-adjustment-card>
+              }
+            </div>
+          } @else {
+            <div
+              class="flex flex-col items-center justify-center gap-2 text-center py-16 px-4 bg-gray-900/60 border border-gray-800/80 rounded-2xl text-gray-500 text-sm"
+            >
+              No singles yet
+            </div>
+          }
+        } @else if (selectedTrip()) {
+          <!-- TRIP BREAKDOWN VIEW -->
+          <app-trip-breakdown [trip]="selectedTrip()!" />
         }
-      } @else if (selectedTrip()) {
-        <!-- TRIP BREAKDOWN VIEW -->
-        <app-trip-breakdown [trip]="selectedTrip()!" />
       }
     }
   }
