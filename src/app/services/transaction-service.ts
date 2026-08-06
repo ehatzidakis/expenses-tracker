@@ -279,7 +279,12 @@ export class TransactionService {
     const snapshot = await getDocs(
       query(transactionsRef, where('adjustmentId', '==', adjustmentId)),
     );
-    return snapshot.docs.map((doc) => {
+
+    const sortedTransactions = snapshot.docs.sort(
+      (a, b) => new Date(b.data()['date']).getTime() - new Date(a.data()['date']).getTime(),
+    );
+
+    return sortedTransactions.map((doc) => {
       const data = doc.data();
       return {
         id: doc.id,
