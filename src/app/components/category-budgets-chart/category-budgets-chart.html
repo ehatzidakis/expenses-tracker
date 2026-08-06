@@ -82,7 +82,7 @@
           @for (item of monthlyTrends(); track item.id) {
             <div
               (click)="selectMonth(item.id)"
-              class="flex-none w-12 flex flex-col items-center h-full justify-end relative snap-center cursor-pointer group"
+              class="flex-none w-8 flex flex-col items-center h-full justify-end relative snap-center cursor-pointer group"
             >
               <!-- Per-Bar Specific Wage Tick -->
               <div
@@ -92,7 +92,7 @@
 
               <!-- Animated Column Bar -->
               <div
-                class="w-full max-w-7 rounded-t-lg transition-all duration-200 relative z-10 active:scale-95 min-h-1 bg-linear-to-t"
+                class="w-full max-w-5 rounded-t-lg transition-all duration-200 relative z-10 active:scale-95 min-h-1 bg-linear-to-t"
                 [class.from-red-600]="item.total > item.wage"
                 [class.to-rose-400]="item.total > item.wage"
                 [class.from-indigo-600]="item.total <= item.wage"
