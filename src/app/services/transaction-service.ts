@@ -9,6 +9,7 @@ import {
   orderBy,
   query,
   startAfter,
+  updateDoc,
   where,
   writeBatch,
   type DocumentData,
@@ -31,6 +32,11 @@ export interface NewTransactionInput {
   category: string;
   amount: number;
   adjustmentId?: string; // Optional: ID of the associated adjustment, if any
+  // Optional split metadata
+  isSplit?: boolean;
+  paidBy?: 'me' | number;
+  splitBy?: number[];
+  totalAmount?: number;
 }
 
 const PAGE_SIZE = 10;
@@ -83,7 +89,7 @@ export class TransactionService {
     return {
       items: docs.map((doc) => {
         const data = doc.data();
-        return {
+        const tx: Transaction = {
           id: doc.id,
           monthName: data['monthName'],
           date: data['date'],
@@ -92,7 +98,15 @@ export class TransactionService {
           category: data['category'],
           createdAt: data['createdAt'],
           adjustmentId: data['adjustmentId'] ?? undefined,
-        } as Transaction;
+        };
+        if (data['isSplit']) {
+          tx.isSplit = true;
+          tx.paidBy = data['paidBy'] as 'me' | number;
+          tx.splitBy = (data['splitBy'] as number[]) ?? [];
+          tx.totalAmount = Number(data['totalAmount']) || 0;
+          tx.splitPaidPersonIds = (data['splitPaidPersonIds'] as number[]) ?? [];
+        }
+        return tx;
       }),
       lastDoc: docs.length ? docs[docs.length - 1] : null,
       hasMore,
@@ -132,7 +146,7 @@ export class TransactionService {
     }
 
     const transactionRef = doc(collection(db, 'transactions'));
-    const txData: Record<string, string | number> = {
+    const txData: Record<string, unknown> = {
       monthName,
       date: input.date,
       description: input.description,
@@ -142,6 +156,13 @@ export class TransactionService {
     };
     if (input.adjustmentId) {
       txData['adjustmentId'] = input.adjustmentId;
+    }
+    if (input.isSplit) {
+      txData['isSplit'] = true;
+      txData['paidBy'] = input.paidBy;
+      txData['splitBy'] = input.splitBy ?? [];
+      txData['totalAmount'] = input.totalAmount ?? input.amount;
+      txData['splitPaidPersonIds'] = [];
     }
     batch.set(transactionRef, txData);
 
@@ -279,10 +300,10 @@ export class TransactionService {
     const snapshot = await getDocs(
       query(transactionsRef, where('adjustmentId', '==', adjustmentId)),
     );
-    return snapshot.docs.map((doc) => {
-      const data = doc.data();
+    return snapshot.docs.map((d) => {
+      const data = d.data();
       return {
-        id: doc.id,
+        id: d.id,
         monthName: data['monthName'] as string,
         date: data['date'] as string,
         description: data['description'] as string,
@@ -291,5 +312,33 @@ export class TransactionService {
         adjustmentId: (data['adjustmentId'] as string) ?? undefined,
       } as Transaction;
     });
+  }
+
+  async fetchAllSplitTransactions(): Promise<Transaction[]> {
+    const transactionsRef = collection(db, 'transactions');
+    const snapshot = await getDocs(query(transactionsRef, where('isSplit', '==', true)));
+    return snapshot.docs.map((d) => {
+      const data = d.data();
+      return {
+        id: d.id,
+        monthName: data['monthName'] as string,
+        date: data['date'] as string,
+        description: data['description'] as string,
+        category: data['category'] as string,
+        amount: Number(data['amount']) || 0,
+        createdAt: data['createdAt'] as string,
+        adjustmentId: (data['adjustmentId'] as string) ?? undefined,
+        isSplit: true,
+        paidBy: data['paidBy'] as 'me' | number,
+        splitBy: (data['splitBy'] as number[]) ?? [],
+        totalAmount: Number(data['totalAmount']) || 0,
+        splitPaidPersonIds: (data['splitPaidPersonIds'] as number[]) ?? [],
+      } satisfies Transaction;
+    });
+  }
+
+  async updateSplitPaidPersons(transactionId: string, paidPersonIds: number[]): Promise<void> {
+    const txRef = doc(db, 'transactions', transactionId);
+    await updateDoc(txRef, { splitPaidPersonIds: paidPersonIds });
   }
 }

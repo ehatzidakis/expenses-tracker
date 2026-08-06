@@ -6,7 +6,7 @@ import { TransactionService } from '../../services/transaction-service';
 import { CATEGORY_NAMES, TRIP_CATEGORY_NAMES } from '../../services/expense-state.service';
 import { AdjustmentService } from '../../services/adjustment-service';
 import { PrivacyService } from '../../services/privacy.service';
-import { SplitzService, computeSplit } from '../../services/splitz.service';
+import { computeSplit } from '../../services/splitz.service';
 import { PEOPLE, Person } from '../../models/splitz.model';
 
 export type EntryType = 'transaction' | 'adjustment';
@@ -60,7 +60,6 @@ function defaultAdjustmentModel(): AdjustmentFormModel {
 export class CreateTransactionComponent {
   private transactionService = inject(TransactionService);
   private adjustmentService = inject(AdjustmentService);
-  private splitzService = inject(SplitzService);
   private queryClient = inject(QueryClient);
   readonly privacyService = inject(PrivacyService);
 
@@ -196,23 +195,8 @@ export class CreateTransactionComponent {
       let finalAmount = value.amount;
 
       if (this.goesSplitzes() && this.splitWith().length > 0) {
-        const { myShare, personAmounts } = computeSplit(
-          value.amount,
-          this.paidById(),
-          this.splitWith(),
-        );
+        const { myShare } = computeSplit(value.amount, this.paidById(), this.splitWith());
         finalAmount = myShare;
-
-        await this.splitzService.createSplitzRecord({
-          date: value.date,
-          description: value.description.trim(),
-          totalAmount: value.amount,
-          paidById: this.paidById(),
-          splitWith: this.splitWith(),
-          myShare,
-          personAmounts,
-        });
-        await this.queryClient.invalidateQueries({ queryKey: ['splitzes'] });
       }
 
       await this.transactionService.createTransaction({
@@ -221,10 +205,19 @@ export class CreateTransactionComponent {
         category: value.category,
         amount: finalAmount,
         adjustmentId: this.linkWithAdjustment() ? this.selectedAdjustmentId() : undefined,
+        ...(this.goesSplitzes() && this.splitWith().length > 0
+          ? {
+              isSplit: true,
+              paidBy: this.paidById(),
+              splitBy: this.splitWith(),
+              totalAmount: value.amount,
+            }
+          : {}),
       });
 
       await this.queryClient.invalidateQueries({ queryKey: ['expenses'] });
       await this.queryClient.invalidateQueries({ queryKey: ['adjustments'] });
+      await this.queryClient.invalidateQueries({ queryKey: ['splitTransactions'] });
 
       this.transactionModel.set(defaultTransactionModel());
       this.transactionForm().reset();
@@ -252,23 +245,8 @@ export class CreateTransactionComponent {
       let finalAmount = value.isTrip ? 0.0 : value.amount;
 
       if (this.goesSplitzes() && this.splitWith().length > 0 && !value.isTrip) {
-        const { myShare, personAmounts } = computeSplit(
-          value.amount,
-          this.paidById(),
-          this.splitWith(),
-        );
+        const { myShare } = computeSplit(value.amount, this.paidById(), this.splitWith());
         finalAmount = myShare;
-
-        await this.splitzService.createSplitzRecord({
-          date: value.startDate,
-          description: value.description.trim(),
-          totalAmount: value.amount,
-          paidById: this.paidById(),
-          splitWith: this.splitWith(),
-          myShare,
-          personAmounts,
-        });
-        await this.queryClient.invalidateQueries({ queryKey: ['splitzes'] });
       }
 
       await this.adjustmentService.createAdjustment({
@@ -283,6 +261,7 @@ export class CreateTransactionComponent {
 
       await this.queryClient.invalidateQueries({ queryKey: ['expenses'] });
       await this.queryClient.invalidateQueries({ queryKey: ['adjustments'] });
+      await this.queryClient.invalidateQueries({ queryKey: ['splitTransactions'] });
 
       this.adjustmentModel.set(defaultAdjustmentModel());
       this.adjustmentForm().reset();

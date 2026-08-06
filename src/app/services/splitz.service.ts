@@ -1,121 +1,181 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { injectQuery } from '@tanstack/angular-query-experimental';
-import { collection, getDocs, doc, setDoc } from 'firebase/firestore/lite';
-import { db } from '../firebase.config';
-import {
-  PEOPLE,
-  PersonAmountEntry,
-  PersonOwedEntry,
-  PersonSummary,
-  SplitzRecord,
-} from '../models/splitz.model';
-
-export interface NewSplitzInput {
-  date: string;
-  description: string;
-  totalAmount: number;
-  paidById: 'me' | number;
-  splitWith: number[];
-  myShare: number;
-  personAmounts: PersonAmountEntry[];
-}
+import { PEOPLE, DebtEntry, PersonSummary, PeerBalance } from '../models/splitz.model';
+import { Transaction } from '../models/transaction.model';
+import { TransactionService } from './transaction-service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class SplitzService {
-  getSplitzesQuery() {
+  private transactionService = inject(TransactionService);
+
+  getSplitTransactionsQuery() {
     return injectQuery(() => ({
-      queryKey: ['splitzes'],
-      queryFn: async (): Promise<SplitzRecord[]> => {
-        const ref = collection(db, 'splitzes');
-        const snapshot = await getDocs(ref);
-        return snapshot.docs.map((d) => {
-          const data = d.data();
-          return {
-            id: d.id,
-            date: data['date'] as string,
-            description: data['description'] as string,
-            totalAmount: Number(data['totalAmount']) || 0,
-            paidById: data['paidById'] as 'me' | number,
-            splitWith: (data['splitWith'] as number[]) ?? [],
-            myShare: Number(data['myShare']) || 0,
-            personAmounts: (data['personAmounts'] as PersonAmountEntry[]) ?? [],
-            createdAt: data['createdAt'] as string,
-          } satisfies SplitzRecord;
-        });
-      },
+      queryKey: ['splitTransactions'],
+      queryFn: (): Promise<Transaction[]> => this.transactionService.fetchAllSplitTransactions(),
     }));
   }
 
-  async createSplitzRecord(input: NewSplitzInput): Promise<string> {
-    const ref = doc(collection(db, 'splitzes'));
-    await setDoc(ref, {
-      date: input.date,
-      description: input.description,
-      totalAmount: input.totalAmount,
-      paidById: input.paidById,
-      splitWith: input.splitWith,
-      myShare: input.myShare,
-      personAmounts: input.personAmounts,
-      createdAt: new Date().toISOString(),
-    });
-    return ref.id;
+  /** Derives all individual debt entries from enriched split transactions. */
+  computeAllDebts(transactions: Transaction[]): DebtEntry[] {
+    const debts: DebtEntry[] = [];
+
+    for (const tx of transactions) {
+      if (!tx.isSplit || !tx.splitBy || tx.paidBy === undefined || !tx.totalAmount) continue;
+
+      const allParticipants: ('me' | number)[] = ['me', ...tx.splitBy];
+      const totalPeople = allParticipants.length;
+      const baseShare = Math.floor((tx.totalAmount / totalPeople) * 100) / 100;
+      const myShare = Math.round((tx.totalAmount - baseShare * (totalPeople - 1)) * 100) / 100;
+      const paidPersonIds = tx.splitPaidPersonIds ?? [];
+
+      for (const participant of allParticipants) {
+        if (participant === tx.paidBy) continue; // payer owes nothing
+
+        const numericId = participant === 'me' ? 0 : (participant as number);
+        const share = participant === 'me' ? myShare : baseShare;
+        const paid = paidPersonIds.includes(numericId);
+
+        debts.push({
+          transactionId: tx.id,
+          description: tx.description,
+          date: tx.date,
+          debtorId: participant,
+          creditorId: tx.paidBy,
+          amount: share,
+          paid,
+        });
+      }
+    }
+
+    return debts;
   }
 
-  computePersonSummaries(records: SplitzRecord[]): PersonSummary[] {
-    return PEOPLE.map((person) => {
-      const personOwed: PersonOwedEntry[] = [];
-      let totalSplitAmount = 0;
+  computePersonSummaries(transactions: Transaction[]): PersonSummary[] {
+    const debts = this.computeAllDebts(transactions);
 
-      for (const record of records) {
-        if (!record.splitWith.includes(person.id)) continue;
+    return PEOPLE.map((person): PersonSummary => {
+      // --- balance with me ---
+      let netWithMe = 0;
+      let hasUnsettledDebts = false;
+      let iOweThisPerson = false;
 
-        const entry = record.personAmounts.find((e) => e.personId === person.id);
-        if (!entry) continue;
-
-        personOwed.push({ id: record.id, amount: entry.amount });
-        totalSplitAmount += Math.abs(entry.amount);
+      for (const d of debts) {
+        // Person owes me (person is debtor, I am creditor)
+        if (d.debtorId === person.id && d.creditorId === 'me') {
+          if (!d.paid) {
+            netWithMe += d.amount; // positive = they owe me
+            hasUnsettledDebts = true;
+          }
+        }
+        // I owe person (I am debtor, person is creditor)
+        if (d.debtorId === 'me' && d.creditorId === person.id) {
+          if (!d.paid) {
+            netWithMe -= d.amount; // negative = I owe them
+            iOweThisPerson = true;
+          }
+        }
       }
 
-      const netOwed = personOwed.reduce((sum, e) => sum + e.amount, 0);
+      // --- peer balances (person ↔ other persons, not involving me) ---
+      const peerMap = new Map<number, number>(); // otherPersonId → netOwed (positive = person owes other)
+
+      for (const d of debts) {
+        if (d.paid) continue;
+
+        // Person is debtor to another person
+        if (d.debtorId === person.id && d.creditorId !== 'me' && d.creditorId !== person.id) {
+          const otherId = d.creditorId as number;
+          peerMap.set(otherId, (peerMap.get(otherId) ?? 0) + d.amount);
+          hasUnsettledDebts = true;
+        }
+        // Person is creditor to another person (other person owes this person)
+        // — we show this as a negative net for "other owes person"
+        if (d.creditorId === person.id && d.debtorId !== 'me' && d.debtorId !== person.id) {
+          // Skip: we show peer debts from the debtor's perspective, not creditor's
+        }
+      }
+
+      const peerDebts: PeerBalance[] = [];
+      for (const [otherId, net] of peerMap.entries()) {
+        const other = PEOPLE.find((p) => p.id === otherId);
+        if (other && Math.abs(Math.round(net * 100)) > 0) {
+          peerDebts.push({ debtor: person, creditor: other, netOwed: Math.round(net * 100) / 100 });
+        }
+      }
 
       return {
         person,
-        totalSplitAmount: Math.round(totalSplitAmount * 100) / 100,
-        netOwed: Math.round(netOwed * 100) / 100,
-        personOwed,
-      } satisfies PersonSummary;
+        netWithMe: Math.round(netWithMe * 100) / 100,
+        peerDebts,
+        hasUnsettledDebts,
+        iOweThisPerson,
+      };
     });
+  }
+
+  /**
+   * Marks all of Person X's outstanding debts as settled.
+   * Covers debts to 'me' and to peer persons.
+   */
+  async markPersonSettled(personId: number, transactions: Transaction[]): Promise<void> {
+    const updates: Promise<void>[] = [];
+
+    for (const tx of transactions) {
+      if (!tx.isSplit || !tx.splitBy || tx.paidBy === undefined) continue;
+
+      const paidIds = [...(tx.splitPaidPersonIds ?? [])];
+      let changed = false;
+
+      // Person is a debtor (person in splitBy, didn't pay)
+      if (tx.splitBy.includes(personId) && tx.paidBy !== personId && !paidIds.includes(personId)) {
+        paidIds.push(personId);
+        changed = true;
+      }
+
+      if (changed) {
+        updates.push(this.transactionService.updateSplitPaidPersons(tx.id, paidIds));
+      }
+    }
+
+    await Promise.all(updates);
+  }
+
+  /**
+   * Marks 'me' as having paid back Person X.
+   * Used when I owe this person (they paid and I split with them).
+   */
+  async markMePaid(personId: number, transactions: Transaction[]): Promise<void> {
+    const ME_ID = 0;
+    const updates: Promise<void>[] = [];
+
+    for (const tx of transactions) {
+      if (!tx.isSplit || tx.paidBy !== personId) continue;
+
+      const paidIds = [...(tx.splitPaidPersonIds ?? [])];
+      if (!paidIds.includes(ME_ID)) {
+        paidIds.push(ME_ID);
+        updates.push(this.transactionService.updateSplitPaidPersons(tx.id, paidIds));
+      }
+    }
+
+    await Promise.all(updates);
   }
 }
 
 /**
  * Computes split amounts given a total and the list of people sharing the bill.
  * Returns myShare (the amount the app user pays, absorbing any remainder cent)
- * and the personAmounts array for the split record.
+ * and the per-person base share for storage in the enriched transaction.
  */
 export function computeSplit(
   totalAmount: number,
-  paidById: 'me' | number,
+  _paidById: 'me' | number,
   splitWith: number[],
-): { myShare: number; personAmounts: PersonAmountEntry[] } {
+): { myShare: number } {
   const totalPeople = splitWith.length + 1;
   const baseShare = Math.floor((totalAmount / totalPeople) * 100) / 100;
   const myShare = Math.round((totalAmount - baseShare * (totalPeople - 1)) * 100) / 100;
-
-  const personAmounts: PersonAmountEntry[] = splitWith.map((personId) => {
-    if (paidById === 'me') {
-      // I paid → each person owes me their base share
-      return { personId, amount: -baseShare };
-    } else if (paidById === personId) {
-      // This person paid → I owe them my share
-      return { personId, amount: myShare };
-    } else {
-      // Another person paid; my balance with this person is unaffected
-      return { personId, amount: 0 };
-    }
-  });
-
-  return { myShare, personAmounts };
+  return { myShare };
 }

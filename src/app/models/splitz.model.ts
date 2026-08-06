@@ -9,53 +9,42 @@ export const PEOPLE: Person[] = [
   { id: 3, name: 'Harry' },
 ];
 
-/** One balance entry recorded against a person for a single split event. */
-export interface PersonOwedEntry {
-  /** Reference ID matching the SplitzRecord this entry came from. */
-  id: string;
-  /**
-   * Amount from MY perspective:
-   *  positive → I owe this person
-   *  negative → this person owes me
-   */
+/** A single debt derived from an enriched split transaction. */
+export interface DebtEntry {
+  transactionId: string;
+  description: string;
+  date: string;
+  /** Who owes — 'me' or a person ID. */
+  debtorId: 'me' | number;
+  /** Who is owed — 'me' or a person ID. */
+  creditorId: 'me' | number;
+  /** Amount owed (always positive). */
   amount: number;
+  /** Whether the debtor has marked this debt as settled. */
+  paid: boolean;
 }
 
-/** Aggregated summary computed from all split records for one person. */
+/** Net balance between two non-me parties. */
+export interface PeerBalance {
+  debtor: Person;
+  creditor: Person;
+  /** Net amount the debtor owes the creditor (positive = still owes). */
+  netOwed: number;
+}
+
+/** Aggregated summary for one person, shown in the Splitzes modal. */
 export interface PersonSummary {
   person: Person;
-  /** Sum of absolute amounts across all splits involving this person. */
-  totalSplitAmount: number;
-  /** Net balance: positive = I owe them, negative = they owe me. */
-  netOwed: number;
-  /** Individual per-split entries. */
-  personOwed: PersonOwedEntry[];
-}
-
-/** A single split-transaction record stored in Firebase. */
-export interface SplitzRecord {
-  id: string;
-  date: string;
-  description: string;
-  /** The full, original transaction amount before splitting. */
-  totalAmount: number;
-  /** 'me' or a person ID from PEOPLE. */
-  paidById: 'me' | number;
-  /** IDs of people (from PEOPLE) involved in the split (excluding me). */
-  splitWith: number[];
-  /** The share that was saved to my own transaction. */
-  myShare: number;
-  /** Per-person balance delta recorded for this split. */
-  personAmounts: PersonAmountEntry[];
-  createdAt: string;
-}
-
-export interface PersonAmountEntry {
-  personId: number;
   /**
-   * From MY perspective:
-   *  positive → I owe this person (they paid, I owe my share)
-   *  negative → they owe me (I paid, they owe their share)
+   * Net balance between me and this person.
+   *  positive → they owe me
+   *  negative → I owe them
    */
-  amount: number;
+  netWithMe: number;
+  /** This person's outstanding debts to other people (not me). */
+  peerDebts: PeerBalance[];
+  /** True when this person has at least one unpaid debt (to me or peers). */
+  hasUnsettledDebts: boolean;
+  /** True when I have at least one unpaid debt to this person. */
+  iOweThisPerson: boolean;
 }
