@@ -1,0 +1,125 @@
+<!-- Backdrop -->
+<div
+  class="modal-backdrop fixed inset-0 z-100 bg-black/60 backdrop-blur-sm flex items-end justify-center sm:items-center"
+  (click)="onBackdropClick($event)"
+>
+  <!-- Panel -->
+  <div
+    class="w-full max-w-md bg-gray-900 border border-gray-800/80 rounded-t-3xl sm:rounded-2xl p-6 space-y-5 shadow-2xl"
+  >
+    <!-- Header -->
+    <div class="flex items-center justify-between">
+      <div>
+        <h2 class="text-base font-bold text-white">Splitzes</h2>
+        <p class="text-xs text-gray-400 mt-0.5">Running balances with your crew</p>
+      </div>
+      <button
+        type="button"
+        (click)="close.emit()"
+        class="w-8 h-8 flex items-center justify-center rounded-full bg-gray-800 text-gray-400 hover:text-white hover:bg-gray-700 transition-colors cursor-pointer"
+      >
+        ✕
+      </button>
+    </div>
+
+    <!-- Loading -->
+    @if (isLoading()) {
+      <div class="flex flex-col gap-3 animate-pulse">
+        <div class="h-20 bg-gray-800 rounded-xl"></div>
+        <div class="h-20 bg-gray-800 rounded-xl"></div>
+        <div class="h-20 bg-gray-800 rounded-xl"></div>
+      </div>
+    }
+
+    <!-- Error -->
+    @if (isError()) {
+      <div class="p-3 bg-red-950/40 border border-red-800/60 text-red-300 rounded-xl text-xs">
+        Unable to load split data.
+      </div>
+    }
+
+    <!-- Person Cards -->
+    @if (!isLoading() && !isError()) {
+      <div class="flex flex-col gap-3">
+        @for (summary of personSummaries(); track summary.person.id) {
+          <div class="bg-gray-800/60 border border-gray-700/50 rounded-xl px-4 py-3 space-y-2">
+            <!-- Top row: avatar + name + my-balance chip -->
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <div
+                  class="w-9 h-9 rounded-full bg-teal-600/20 border border-teal-500/30 flex items-center justify-center text-xs font-bold text-teal-400"
+                >
+                  {{ summary.person.name.slice(0, 2).toUpperCase() }}
+                </div>
+                <p class="text-sm font-semibold text-gray-100">{{ summary.person.name }}</p>
+              </div>
+
+              <!-- Balance chip (me ↔ person) -->
+              <span
+                class="px-3 py-1 rounded-full text-xs font-semibold"
+                [class.bg-emerald-500/15]="summary.netWithMe > 0"
+                [class.text-emerald-400]="summary.netWithMe > 0"
+                [class.bg-amber-500/15]="summary.netWithMe < 0"
+                [class.text-amber-400]="summary.netWithMe < 0"
+                [class.bg-gray-700/60]="summary.netWithMe === 0"
+                [class.text-gray-400]="summary.netWithMe === 0"
+              >
+                {{ meOwedLabel(summary.netWithMe) }}
+              </span>
+            </div>
+
+            <!-- Peer balances (person ↔ others) -->
+            @if (summary.peerDebts.length > 0) {
+              <div class="ml-12 flex flex-col gap-1">
+                @for (peer of summary.peerDebts; track peer.creditor.id) {
+                  <div class="flex items-center justify-between">
+                    <span class="text-xs text-gray-500"> Owes {{ peer.creditor.name }} </span>
+                    <span class="text-xs font-medium text-amber-400">
+                      €{{ peer.netOwed.toFixed(2) }}
+                    </span>
+                  </div>
+                }
+              </div>
+            }
+
+            <!-- Action buttons -->
+            @if (summary.hasUnsettledDebts || summary.iOweThisPerson) {
+              <div class="ml-12 flex flex-wrap gap-2 pt-1">
+                <!-- Mark person's debts as settled (they paid what they owe) -->
+                @if (summary.hasUnsettledDebts) {
+                  <button
+                    type="button"
+                    (click)="onMarkPersonSettled(summary.person.id)"
+                    [disabled]="markingPersonId() !== null"
+                    class="text-xs px-3 py-1 rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/25 disabled:opacity-50 disabled:cursor-not-allowed transition-colors cursor-pointer"
+                  >
+                    @if (markingPersonId() === summary.person.id) {
+                      Settling…
+                    } @else {
+                      ✓ Mark {{ summary.person.name }} settled
+                    }
+                  </button>
+                }
+                <!-- Mark my debt to this person as paid -->
+                @if (summary.iOweThisPerson) {
+                  <button
+                    type="button"
+                    (click)="onMarkMePaid(summary.person.id)"
+                    [disabled]="markingPersonId() !== null"
+                    class="text-xs px-3 py-1 rounded-full bg-amber-500/15 text-amber-400 border border-amber-500/30 hover:bg-amber-500/25 disabled:opacity-50 disabled:cursor-not-allowed transition-colors cursor-pointer"
+                  >
+                    @if (markingPersonId() === summary.person.id) {
+                      Settling…
+                    } @else {
+                      ✓ Mark I paid {{ summary.person.name }}
+                    }
+                  </button>
+                }
+              </div>
+            }
+          </div>
+        }
+      </div>
+    }
+  </div>
+</div>

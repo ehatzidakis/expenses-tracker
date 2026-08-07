@@ -3,30 +3,46 @@
     <h1 class="text-xl font-bold tracking-tight text-white">Expenses Tracker</h1>
     <p class="text-xs text-gray-400">Breakdown & Analysis</p>
   </div>
-  <div
-    class="h-9 w-9 rounded-full bg-indigo-600/20 border border-indigo-500/30 flex items-center justify-center text-indigo-400 text-xs font-semibold"
-  >
+
+  <div class="flex items-center gap-2">
+    <!-- Splitzes pill button -->
     <button
       type="button"
-      (click)="showSettingsModal.set(true)"
-      [class.ring-2]="privacyService.isPrivacyMode()"
-      [class.ring-indigo-500]="privacyService.isPrivacyMode()"
-      [class.bg-indigo-500/20]="privacyService.isPrivacyMode()"
-      class="relative flex items-center justify-center w-9 h-9 rounded-full bg-gray-800 border border-gray-700/80 text-xs font-bold text-gray-300 transition-all active:scale-95 cursor-pointer"
-      title="Toggle Stealth Mode"
+      (click)="showSplitzesModal.set(true)"
+      class="flex items-center gap-1.5 px-4 py-2 rounded-full bg-teal-600/20 border border-teal-500/30 text-teal-400 text-xs font-semibold transition-all active:scale-95 hover:bg-teal-600/30 cursor-pointer"
     >
-      ME
-
-      <!-- Subtle Active Badge Dot when Stealth Mode is ON -->
-      @if (privacyService.isPrivacyMode()) {
-        <span
-          class="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-indigo-500 rounded-full border-2 border-gray-900"
-        ></span>
-      }
+      <span>✂️</span> Splitzes
     </button>
-    <!-- Settings Modal Overlay -->
-    @if (showSettingsModal()) {
-      <app-settings-modal (close)="showSettingsModal.set(false)" />
-    }
+
+    <!-- Profile / Settings button -->
+    <div class="relative">
+      <button
+        type="button"
+        (click)="showSettingsModal.set(true)"
+        [class.ring-2]="privacyService.isPrivacyMode()"
+        [class.ring-indigo-500]="privacyService.isPrivacyMode()"
+        [class.bg-indigo-500/20]="privacyService.isPrivacyMode()"
+        class="relative flex items-center justify-center w-9 h-9 rounded-full bg-gray-800 border border-gray-700/80 text-xs font-bold text-gray-300 transition-all active:scale-95 cursor-pointer"
+        title="Toggle Stealth Mode"
+      >
+        ME
+
+        @if (privacyService.isPrivacyMode()) {
+          <span
+            class="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-indigo-500 rounded-full border-2 border-gray-900"
+          ></span>
+        }
+      </button>
+
+      <!-- Settings Modal -->
+      @if (showSettingsModal()) {
+        <app-settings-modal (close)="showSettingsModal.set(false)" />
+      }
+    </div>
   </div>
 </header>
+
+<!-- Splitzes Modal -->
+@if (showSplitzesModal()) {
+  <app-splitzes-modal (close)="showSplitzesModal.set(false)" />
+}
