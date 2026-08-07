@@ -304,13 +304,12 @@ export class TransactionService {
     const snapshot = await getDocs(
       query(transactionsRef, where('adjustmentId', '==', adjustmentId)),
     );
-
     const sortedTransactions = snapshot.docs.sort(
       (a, b) => new Date(b.data()['date']).getTime() - new Date(a.data()['date']).getTime(),
     );
 
-    return sortedTransactions.map((doc) => {
-      const data = doc.data();
+    return sortedTransactions.map((d) => {
+      const data = d.data();
       return {
         id: d.id,
         monthName: data['monthName'] as string,
