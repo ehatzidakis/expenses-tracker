@@ -5,8 +5,8 @@ export interface Person {
 
 export const PEOPLE: Person[] = [
   { id: 1, name: 'Stavi' },
-  { id: 2, name: 'Alex' },
   { id: 3, name: 'Harry' },
+  { id: 2, name: 'Alex' },
 ];
 
 /** A single debt derived from an enriched split transaction. */

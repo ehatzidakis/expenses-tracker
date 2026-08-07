@@ -47,7 +47,17 @@
             <div class="flex items-center justify-between">
               <div class="flex items-center gap-3">
                 <div
-                  class="w-9 h-9 rounded-full bg-teal-600/20 border border-teal-500/30 flex items-center justify-center text-xs font-bold text-teal-400"
+                  class="w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold"
+                  // if id 1 use teal, if id 2 use amber, if id 3 use blue
+                  [class.bg-teal-600/20]="summary.person.id === 1"
+                  [class.border-teal-500/30]="summary.person.id === 1"
+                  [class.text-teal-400]="summary.person.id === 1"
+                  [class.bg-amber-600/20]="summary.person.id === 2"
+                  [class.border-amber-500/30]="summary.person.id === 2"
+                  [class.text-amber-400]="summary.person.id === 2"
+                  [class.bg-violet-600/20]="summary.person.id === 3"
+                  [class.border-violet-500/30]="summary.person.id === 3"
+                  [class.text-violet-400]="summary.person.id === 3"
                 >
                   {{ summary.person.name.slice(0, 2).toUpperCase() }}
                 </div>
@@ -101,7 +111,7 @@
                   </button>
                 }
                 <!-- Mark my debt to this person as paid -->
-                @if (summary.iOweThisPerson) {
+                <!-- @if (summary.iOweThisPerson) {
                   <button
                     type="button"
                     (click)="onMarkMePaid(summary.person.id)"
@@ -114,7 +124,7 @@
                       ✓ Mark I paid {{ summary.person.name }}
                     }
                   </button>
-                }
+                } -->
               </div>
             }
           </div>
