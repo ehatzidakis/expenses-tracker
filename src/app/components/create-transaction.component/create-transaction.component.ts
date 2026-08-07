@@ -81,14 +81,22 @@ export class CreateTransactionComponent {
   readonly goesSplitzes = signal<boolean>(false);
   readonly splitWith = signal<number[]>([]);
   readonly paidById = signal<'me' | number>('me');
+  /** When true, only 'me' owes the full amount to the payer — no other participants. */
+  readonly onlyMeOwes = signal<boolean>(false);
 
-  readonly paidByOptions = computed<Array<{ id: 'me' | number; label: string }>>(() => [
-    { id: 'me', label: 'Me' },
-    ...this.splitWith().map((personId) => {
-      const person = this.allPeople.find((p) => p.id === personId);
-      return { id: personId as 'me' | number, label: person?.name ?? `Person ${personId}` };
-    }),
-  ]);
+  readonly paidByOptions = computed<Array<{ id: 'me' | number; label: string }>>(() => {
+    if (this.onlyMeOwes()) {
+      // Only show other people (not me) — I can't be the payer if I'm the sole debtor
+      return this.allPeople.map((p) => ({ id: p.id as 'me' | number, label: p.name }));
+    }
+    return [
+      { id: 'me', label: 'Me' },
+      ...this.splitWith().map((personId) => {
+        const person = this.allPeople.find((p) => p.id === personId);
+        return { id: personId as 'me' | number, label: person?.name ?? `Person ${personId}` };
+      }),
+    ];
+  });
   // ─────────────────────────────────────────────────────────────────────────
 
   readonly transactionForm = form(this.transactionModel, (schemaPath) => {
@@ -157,6 +165,7 @@ export class CreateTransactionComponent {
   }
 
   togglePersonInSplit(personId: number): void {
+    this.onlyMeOwes.set(false); // Mutually exclusive with normal split mode
     this.splitWith.update((current) => {
       if (current.includes(personId)) {
         const updated = current.filter((id) => id !== personId);
@@ -174,6 +183,25 @@ export class CreateTransactionComponent {
     this.goesSplitzes.set(false);
     this.splitWith.set([]);
     this.paidById.set('me');
+    this.onlyMeOwes.set(false);
+  }
+
+  setOnlyMeOwes(value: boolean): void {
+    this.onlyMeOwes.set(value);
+    if (value) {
+      this.splitWith.set([]);
+      // Ensure paidBy is a real person (not 'me') in this mode
+      if (this.paidById() === 'me' && this.allPeople.length > 0) {
+        this.paidById.set(this.allPeople[0].id);
+      }
+    }
+  }
+
+  getPaidByName(): string {
+    const id = this.paidById();
+    if (id === 'me') return 'Me';
+    const person = this.allPeople.find((p) => p.id === id);
+    return person?.name ?? `Person ${id}`;
   }
 
   async onSubmitTransaction(event: Event): Promise<void> {
@@ -194,10 +222,19 @@ export class CreateTransactionComponent {
       const value = this.transactionModel();
       let finalAmount = value.amount;
 
-      if (this.goesSplitzes() && this.splitWith().length > 0) {
-        const { myShare } = computeSplit(value.amount, this.paidById(), this.splitWith());
-        finalAmount = myShare;
+      if (this.goesSplitzes()) {
+        if (this.onlyMeOwes() && this.paidById() !== 'me') {
+          // I owe the full amount — no split calculation needed
+          finalAmount = value.amount;
+        } else if (this.splitWith().length > 0) {
+          const { myShare } = computeSplit(value.amount, this.paidById(), this.splitWith());
+          finalAmount = myShare;
+        }
       }
+
+      const isSplitActive =
+        this.goesSplitzes() &&
+        (this.splitWith().length > 0 || (this.onlyMeOwes() && this.paidById() !== 'me'));
 
       await this.transactionService.createTransaction({
         date: value.date,
@@ -205,11 +242,11 @@ export class CreateTransactionComponent {
         category: value.category,
         amount: finalAmount,
         adjustmentId: this.linkWithAdjustment() ? this.selectedAdjustmentId() : undefined,
-        ...(this.goesSplitzes() && this.splitWith().length > 0
+        ...(isSplitActive
           ? {
               isSplit: true,
               paidBy: this.paidById(),
-              splitBy: this.splitWith(),
+              splitBy: this.onlyMeOwes() ? [] : this.splitWith(),
               totalAmount: value.amount,
             }
           : {}),

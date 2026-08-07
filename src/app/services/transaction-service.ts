@@ -232,6 +232,10 @@ export class TransactionService {
     if (oldTx.adjustmentId) {
       updateData['adjustmentId'] = oldTx.adjustmentId;
     }
+    if (oldTx.isSplit) {
+      const participants = (oldTx.splitBy?.length ?? 0) + 1;
+      updateData['totalAmount'] = Math.round(input.amount * participants * 100) / 100; // Round to 2 decimal places
+    }
     batch.update(txRef, updateData);
 
     await batch.commit();

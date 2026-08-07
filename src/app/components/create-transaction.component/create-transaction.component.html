@@ -186,39 +186,105 @@
       </div>
 
       @if (goesSplitzes()) {
-        <!-- Split With multi-select -->
-        <div class="space-y-2">
-          <label class="text-xs font-medium text-gray-400">Split With</label>
-          <div class="flex flex-wrap gap-2">
-            @for (person of allPeople; track person.id) {
-              <button
-                type="button"
-                (click)="togglePersonInSplit(person.id)"
-                class="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold border transition-all duration-150 cursor-pointer"
-                [class.bg-teal-500/20]="splitWith().includes(person.id)"
-                [class.border-teal-500/40]="splitWith().includes(person.id)"
-                [class.text-teal-400]="splitWith().includes(person.id)"
-                [class.bg-gray-800/60]="!splitWith().includes(person.id)"
-                [class.border-gray-700/50]="!splitWith().includes(person.id)"
-                [class.text-gray-400]="!splitWith().includes(person.id)"
-              >
-                {{ person.name }}
-              </button>
-            }
+        <!-- Split Mode toggle: split with others vs only I owe -->
+        <div class="space-y-1.5">
+          <label class="text-xs font-medium text-gray-400">Split Mode</label>
+          <div class="grid grid-cols-2 gap-2 p-1 bg-gray-950/80 rounded-xl border border-gray-800">
+            <button
+              type="button"
+              (click)="setOnlyMeOwes(false)"
+              class="py-2 rounded-lg text-xs font-semibold transition-all duration-150 flex items-center justify-center gap-1 cursor-pointer"
+              [class.bg-teal-500/20]="!onlyMeOwes()"
+              [class.text-teal-400]="!onlyMeOwes()"
+              [class.border]="!onlyMeOwes()"
+              [class.border-teal-500/30]="!onlyMeOwes()"
+              [class.text-gray-400]="onlyMeOwes()"
+            >
+              👥 Split with Others
+            </button>
+            <button
+              type="button"
+              (click)="setOnlyMeOwes(true)"
+              class="py-2 rounded-lg text-xs font-semibold transition-all duration-150 flex items-center justify-center gap-1 cursor-pointer"
+              [class.bg-amber-500/20]="onlyMeOwes()"
+              [class.text-amber-400]="onlyMeOwes()"
+              [class.border]="onlyMeOwes()"
+              [class.border-amber-500/30]="onlyMeOwes()"
+              [class.text-gray-400]="!onlyMeOwes()"
+            >
+              🙋 Only I Owe
+            </button>
           </div>
         </div>
 
-        <!-- Paid By single select (only when someone is selected) -->
-        @if (splitWith().length > 0) {
+        @if (!onlyMeOwes()) {
+          <!-- Split With multi-select -->
+          <div class="space-y-2">
+            <label class="text-xs font-medium text-gray-400">Split With</label>
+            <div class="flex flex-wrap gap-2">
+              @for (person of allPeople; track person.id) {
+                <button
+                  type="button"
+                  (click)="togglePersonInSplit(person.id)"
+                  class="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold border transition-all duration-150 cursor-pointer"
+                  [class.bg-teal-500/20]="splitWith().includes(person.id)"
+                  [class.border-teal-500/40]="splitWith().includes(person.id)"
+                  [class.text-teal-400]="splitWith().includes(person.id)"
+                  [class.bg-gray-800/60]="!splitWith().includes(person.id)"
+                  [class.border-gray-700/50]="!splitWith().includes(person.id)"
+                  [class.text-gray-400]="!splitWith().includes(person.id)"
+                >
+                  {{ person.name }}
+                </button>
+              }
+            </div>
+          </div>
+
+          <!-- Paid By single select (only when someone is selected) -->
+          @if (splitWith().length > 0) {
+            <div class="space-y-1.5">
+              <label for="tx-paid-by" class="text-xs font-medium text-gray-400">Paid By</label>
+              <select
+                id="tx-paid-by"
+                [value]="paidById()"
+                (change)="
+                  paidById.set(
+                    $any($event.target).value === 'me' ? 'me' : +$any($event.target).value
+                  )
+                "
+                class="w-full bg-gray-800/60 border border-gray-800 rounded-xl px-3 py-2.5 text-sm text-gray-100 focus:outline-none focus:ring-2 focus:ring-teal-500/60"
+              >
+                @for (opt of paidByOptions(); track opt.id) {
+                  <option [value]="opt.id">{{ opt.label }}</option>
+                }
+              </select>
+            </div>
+
+            <!-- Preview of split amounts -->
+            <div class="p-3 bg-teal-950/30 border border-teal-800/40 rounded-xl space-y-1">
+              <p class="text-xs font-medium text-teal-400">Split preview</p>
+              <p class="text-xs text-gray-400">
+                Your share:
+                <span class="text-white font-semibold">
+                  €{{ (transactionModel().amount / (splitWith().length + 1)).toFixed(2) }}
+                </span>
+                <span class="text-gray-500"> (1 of {{ splitWith().length + 1 }} people)</span>
+              </p>
+            </div>
+          }
+        }
+
+        @if (onlyMeOwes()) {
+          <!-- Paid By: all people (I owe the full amount to this person) -->
           <div class="space-y-1.5">
-            <label for="tx-paid-by" class="text-xs font-medium text-gray-400">Paid By</label>
+            <label for="tx-only-me-paid-by" class="text-xs font-medium text-gray-400">
+              Paid By
+            </label>
             <select
-              id="tx-paid-by"
+              id="tx-only-me-paid-by"
               [value]="paidById()"
-              (change)="
-                paidById.set($any($event.target).value === 'me' ? 'me' : +$any($event.target).value)
-              "
-              class="w-full bg-gray-800/60 border border-gray-800 rounded-xl px-3 py-2.5 text-sm text-gray-100 focus:outline-none focus:ring-2 focus:ring-teal-500/60"
+              (change)="paidById.set(+$any($event.target).value)"
+              class="w-full bg-gray-800/60 border border-gray-800 rounded-xl px-3 py-2.5 text-sm text-gray-100 focus:outline-none focus:ring-2 focus:ring-amber-500/60"
             >
               @for (opt of paidByOptions(); track opt.id) {
                 <option [value]="opt.id">{{ opt.label }}</option>
@@ -226,15 +292,16 @@
             </select>
           </div>
 
-          <!-- Preview of split amounts -->
-          <div class="p-3 bg-teal-950/30 border border-teal-800/40 rounded-xl space-y-1">
-            <p class="text-xs font-medium text-teal-400">Split preview</p>
+          <!-- Full-amount-owed preview -->
+          <div class="p-3 bg-amber-950/30 border border-amber-800/40 rounded-xl space-y-1">
+            <p class="text-xs font-medium text-amber-400">Full amount owed by you</p>
             <p class="text-xs text-gray-400">
-              Your share:
+              You owe
               <span class="text-white font-semibold">
-                €{{ (transactionModel().amount / (splitWith().length + 1)).toFixed(2) }}
+                €{{ transactionModel().amount.toFixed(2) }}
               </span>
-              <span class="text-gray-500"> (1 of {{ splitWith().length + 1 }} people)</span>
+              to
+              <span class="text-white font-semibold">{{ getPaidByName() }}</span>
             </p>
           </div>
         }
