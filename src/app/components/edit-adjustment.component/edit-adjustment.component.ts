@@ -6,6 +6,7 @@ import { QueryClient } from '@tanstack/angular-query-experimental';
 import { Adjustment } from '../../models/adjustments.model';
 import { form, FormField, maxLength, min, required } from '@angular/forms/signals';
 import { PrivacyService } from '../../services/privacy.service';
+import { normalizeDecimalInput, parseDecimalInput } from '../../utils/decimal-input';
 
 interface AdjustmentFormModel {
   description: string;
@@ -77,7 +78,6 @@ export class EditAdjustmentComponent {
   readonly adjustmentForm = form(this.adjustmentModel, (schemaPath) => {
     required(schemaPath.description, { message: 'Description is required' });
     maxLength(schemaPath.description, 60, { message: 'Description must be 60 characters or less' });
-    min(schemaPath.amount, 0.01, { message: 'Amount must be greater than 0' });
     required(schemaPath.startDate, { message: 'Start date is required' });
     required(schemaPath.endDate, { message: 'End date is required' });
   });
@@ -106,9 +106,27 @@ export class EditAdjustmentComponent {
     this.showDeleteConfirm.set(true);
   }
 
+  onAmountInput(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const normalized = normalizeDecimalInput(input.value);
+    const parsed = parseDecimalInput(normalized);
+
+    if (input.value.includes(',')) {
+      input.value = normalized;
+    }
+
+    this.adjustmentModel.update((value) => ({ ...value, amount: parsed }));
+  }
+
   async onSubmit(event: Event): Promise<void> {
     event.preventDefault();
     if (this.adjustmentForm().invalid() || this.submitting()) {
+      return;
+    }
+
+    const value = this.adjustmentModel();
+    if (value.amount <= 0) {
+      this.errorMessage.set('Amount must be greater than 0');
       return;
     }
 
@@ -116,7 +134,6 @@ export class EditAdjustmentComponent {
     this.errorMessage.set(null);
 
     try {
-      const value = this.adjustmentModel();
       await this.adjustmentService.updateAdjustment(this.adjustment().id, {
         description: value.description.trim(),
         amount: value.amount,

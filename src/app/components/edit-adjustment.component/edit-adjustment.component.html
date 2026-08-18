@@ -41,10 +41,12 @@
       <label for="adj-edit-amount" class="text-xs font-medium text-gray-400">Amount</label>
       <input
         id="adj-edit-amount"
-        type="number"
-        step="0.01"
+        type="text"
+        inputmode="decimal"
+        autocomplete="off"
+        [value]="adjustmentModel().amount === 0 ? '' : adjustmentModel().amount.toString()"
         placeholder="0.00"
-        [formField]="adjustmentForm.amount"
+        (input)="onAmountInput($event)"
         class="w-full bg-gray-800/60 border border-gray-800 rounded-xl px-3 py-2.5 text-sm text-gray-100 placeholder:text-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/60"
         [class.blur-md]="privacyService.isPrivacyMode()"
         [class.select-none]="privacyService.isPrivacyMode()"

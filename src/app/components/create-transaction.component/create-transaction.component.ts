@@ -8,6 +8,7 @@ import { AdjustmentService } from '../../services/adjustment-service';
 import { PrivacyService } from '../../services/privacy.service';
 import { computeSplit } from '../../services/splitz.service';
 import { PEOPLE, Person } from '../../models/splitz.model';
+import { normalizeDecimalInput, parseDecimalInput } from '../../utils/decimal-input';
 
 export type EntryType = 'transaction' | 'adjustment';
 
@@ -202,6 +203,30 @@ export class CreateTransactionComponent {
     if (id === 'me') return 'Me';
     const person = this.allPeople.find((p) => p.id === id);
     return person?.name ?? `Person ${id}`;
+  }
+
+  private normalizeAmount(rawValue: string): number {
+    const normalized = normalizeDecimalInput(rawValue);
+    const parsed = parseDecimalInput(normalized);
+
+    const input = document.activeElement as HTMLInputElement | null;
+    if (input && input.value !== normalized && (rawValue.includes(',') || rawValue.includes('.'))) {
+      input.value = normalized;
+    }
+
+    return parsed;
+  }
+
+  onTransactionAmountInput(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const amount = this.normalizeAmount(input.value);
+    this.transactionModel.update((m) => ({ ...m, amount }));
+  }
+
+  onAdjustmentAmountInput(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const amount = this.normalizeAmount(input.value);
+    this.adjustmentModel.update((m) => ({ ...m, amount }));
   }
 
   async onSubmitTransaction(event: Event): Promise<void> {

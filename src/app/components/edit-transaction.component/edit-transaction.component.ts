@@ -7,6 +7,7 @@ import { CATEGORY_NAMES } from '../../services/expense-state.service';
 import { Transaction } from '../../models/transaction.model';
 import { PrivacyService } from '../../services/privacy.service';
 import { ConfirmModal } from '../confirm-modal/confirm-modal';
+import { normalizeDecimalInput, parseDecimalInput } from '../../utils/decimal-input';
 
 interface TransactionFormModel {
   date: string;
@@ -67,7 +68,6 @@ export class EditTransactionComponent {
       message: 'Description must be 60 characters or fewer',
     });
     required(schemaPath.category, { message: 'Category is required' });
-    min(schemaPath.amount, 0.01, { message: 'Amount must be greater than 0' });
   });
 
   readonly submitting = signal(false);
@@ -78,9 +78,27 @@ export class EditTransactionComponent {
     this.showDeleteConfirm.set(true);
   }
 
+  onAmountInput(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const normalized = normalizeDecimalInput(input.value);
+    const parsed = parseDecimalInput(normalized);
+
+    if (input.value.includes(',')) {
+      input.value = normalized;
+    }
+
+    this.model.update((value) => ({ ...value, amount: parsed }));
+  }
+
   async onSubmit(event: Event): Promise<void> {
     event.preventDefault();
     if (this.transactionForm().invalid() || this.submitting()) {
+      return;
+    }
+
+    const value = this.model();
+    if (value.amount <= 0) {
+      this.errorMessage.set('Amount must be greater than 0');
       return;
     }
 
@@ -88,7 +106,6 @@ export class EditTransactionComponent {
     this.errorMessage.set(null);
 
     try {
-      const value = this.model();
       await this.transactionService.updateTransaction(this.transaction(), {
         date: value.date,
         description: value.description.trim(),
