@@ -36,6 +36,7 @@ export interface NewTransactionInput {
   isSplit?: boolean;
   paidBy?: 'me' | number;
   splitBy?: number[];
+  splitType?: 'split' | 'onlyMeOwes' | 'onlyTheyOwe';
   totalAmount?: number;
 }
 
@@ -103,6 +104,7 @@ export class TransactionService {
           tx.isSplit = true;
           tx.paidBy = data['paidBy'] as 'me' | number;
           tx.splitBy = (data['splitBy'] as number[]) ?? [];
+          tx.splitType = (data['splitType'] as 'split' | 'onlyMeOwes' | 'onlyTheyOwe') ?? 'split';
           tx.totalAmount = Number(data['totalAmount']) || 0;
           tx.splitPaidPersonIds = (data['splitPaidPersonIds'] as number[]) ?? [];
         }
@@ -161,6 +163,7 @@ export class TransactionService {
       txData['isSplit'] = true;
       txData['paidBy'] = input.paidBy;
       txData['splitBy'] = input.splitBy ?? [];
+      txData['splitType'] = input.splitType ?? 'split';
       txData['totalAmount'] = input.totalAmount ?? input.amount;
       txData['splitPaidPersonIds'] = [];
     }
@@ -339,6 +342,7 @@ export class TransactionService {
         isSplit: true,
         paidBy: data['paidBy'] as 'me' | number,
         splitBy: (data['splitBy'] as number[]) ?? [],
+        splitType: (data['splitType'] as 'split' | 'onlyMeOwes' | 'onlyTheyOwe') ?? 'split',
         totalAmount: Number(data['totalAmount']) || 0,
         splitPaidPersonIds: (data['splitPaidPersonIds'] as number[]) ?? [],
       } satisfies Transaction;

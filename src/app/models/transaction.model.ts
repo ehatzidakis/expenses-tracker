@@ -14,6 +14,8 @@ export interface Transaction {
   paidBy?: 'me' | number;
   /** Person IDs (from PEOPLE) this was split with, excluding 'me'. */
   splitBy?: number[];
+  /** Split mode used to derive the debt entries. */
+  splitType?: 'split' | 'onlyMeOwes' | 'onlyTheyOwe';
   /** Original full amount before the split. */
   totalAmount?: number;
   /** Debtors who have already settled their share. 0 = 'me', 1/2/3 = person IDs. */
