@@ -84,11 +84,16 @@ export class CreateTransactionComponent {
   readonly paidById = signal<'me' | number>('me');
   /** When true, only 'me' owes the full amount to the payer — no other participants. */
   readonly onlyMeOwes = signal<boolean>(false);
+  /** When true, selected people owe 'me' the full amount split evenly among them. */
+  readonly onlyTheyOwe = signal<boolean>(false);
 
   readonly paidByOptions = computed<Array<{ id: 'me' | number; label: string }>>(() => {
     if (this.onlyMeOwes()) {
       // Only show other people (not me) — I can't be the payer if I'm the sole debtor
       return this.allPeople.map((p) => ({ id: p.id as 'me' | number, label: p.name }));
+    }
+    if (this.onlyTheyOwe()) {
+      return [{ id: 'me', label: 'Me' }];
     }
     return [
       { id: 'me', label: 'Me' },
@@ -166,11 +171,10 @@ export class CreateTransactionComponent {
   }
 
   togglePersonInSplit(personId: number): void {
-    this.onlyMeOwes.set(false); // Mutually exclusive with normal split mode
+    this.onlyMeOwes.set(false);
     this.splitWith.update((current) => {
       if (current.includes(personId)) {
         const updated = current.filter((id) => id !== personId);
-        // If the removed person was selected as paidBy, reset to 'me'
         if (this.paidById() === personId) {
           this.paidById.set('me');
         }
@@ -185,16 +189,28 @@ export class CreateTransactionComponent {
     this.splitWith.set([]);
     this.paidById.set('me');
     this.onlyMeOwes.set(false);
+    this.onlyTheyOwe.set(false);
   }
 
   setOnlyMeOwes(value: boolean): void {
     this.onlyMeOwes.set(value);
+    this.onlyTheyOwe.set(false);
     if (value) {
       this.splitWith.set([]);
-      // Ensure paidBy is a real person (not 'me') in this mode
       if (this.paidById() === 'me' && this.allPeople.length > 0) {
         this.paidById.set(this.allPeople[0].id);
       }
+    }
+  }
+
+  setOnlyTheyOwe(value: boolean): void {
+    this.onlyTheyOwe.set(value);
+    this.onlyMeOwes.set(false);
+    if (value) {
+      this.paidById.set('me');
+      // if (this.splitWith().length === 0) {
+      //   this.splitWith.set(this.allPeople.map((person) => person.id));
+      // }
     }
   }
 
@@ -249,8 +265,9 @@ export class CreateTransactionComponent {
 
       if (this.goesSplitzes()) {
         if (this.onlyMeOwes() && this.paidById() !== 'me') {
-          // I owe the full amount — no split calculation needed
           finalAmount = value.amount;
+        } else if (this.onlyTheyOwe()) {
+          finalAmount = 0;
         } else if (this.splitWith().length > 0) {
           const { myShare } = computeSplit(value.amount, this.paidById(), this.splitWith());
           finalAmount = myShare;
@@ -259,7 +276,15 @@ export class CreateTransactionComponent {
 
       const isSplitActive =
         this.goesSplitzes() &&
-        (this.splitWith().length > 0 || (this.onlyMeOwes() && this.paidById() !== 'me'));
+        (this.splitWith().length > 0 ||
+          (this.onlyMeOwes() && this.paidById() !== 'me') ||
+          this.onlyTheyOwe());
+
+      const splitType = this.onlyMeOwes()
+        ? 'onlyMeOwes'
+        : this.onlyTheyOwe()
+          ? 'onlyTheyOwe'
+          : 'split';
 
       await this.transactionService.createTransaction({
         date: value.date,
@@ -270,8 +295,9 @@ export class CreateTransactionComponent {
         ...(isSplitActive
           ? {
               isSplit: true,
-              paidBy: this.paidById(),
+              paidBy: this.onlyTheyOwe() ? 'me' : this.paidById(),
               splitBy: this.onlyMeOwes() ? [] : this.splitWith(),
+              splitType,
               totalAmount: value.amount,
             }
           : {}),

@@ -188,21 +188,21 @@
       </div>
 
       @if (goesSplitzes()) {
-        <!-- Split Mode toggle: split with others vs only I owe -->
+        <!-- Split Mode toggle: standard split vs debtor/creditor variants -->
         <div class="space-y-1.5">
           <label class="text-xs font-medium text-gray-400">Split Mode</label>
-          <div class="grid grid-cols-2 gap-2 p-1 bg-gray-950/80 rounded-xl border border-gray-800">
+          <div class="grid grid-cols-3 gap-2 p-1 bg-gray-950/80 rounded-xl border border-gray-800">
             <button
               type="button"
-              (click)="setOnlyMeOwes(false)"
+              (click)="setOnlyMeOwes(false); onlyTheyOwe.set(false)"
               class="py-2 rounded-lg text-xs font-semibold transition-all duration-150 flex items-center justify-center gap-1 cursor-pointer"
-              [class.bg-teal-500/20]="!onlyMeOwes()"
-              [class.text-teal-400]="!onlyMeOwes()"
-              [class.border]="!onlyMeOwes()"
-              [class.border-teal-500/30]="!onlyMeOwes()"
-              [class.text-gray-400]="onlyMeOwes()"
+              [class.bg-teal-500/20]="!onlyMeOwes() && !onlyTheyOwe()"
+              [class.text-teal-400]="!onlyMeOwes() && !onlyTheyOwe()"
+              [class.border]="!onlyMeOwes() && !onlyTheyOwe()"
+              [class.border-teal-500/30]="!onlyMeOwes() && !onlyTheyOwe()"
+              [class.text-gray-400]="onlyMeOwes() || onlyTheyOwe()"
             >
-              👥 Split with Others
+              👥 Split
             </button>
             <button
               type="button"
@@ -216,13 +216,27 @@
             >
               🙋 Only I Owe
             </button>
+            <button
+              type="button"
+              (click)="setOnlyTheyOwe(true)"
+              class="py-2 rounded-lg text-xs font-semibold transition-all duration-150 flex items-center justify-center gap-1 cursor-pointer"
+              [class.bg-violet-500/20]="onlyTheyOwe()"
+              [class.text-violet-400]="onlyTheyOwe()"
+              [class.border]="onlyTheyOwe()"
+              [class.border-violet-500/30]="onlyTheyOwe()"
+              [class.text-gray-400]="!onlyTheyOwe()"
+            >
+              💸 Only They Owe
+            </button>
           </div>
         </div>
 
         @if (!onlyMeOwes()) {
           <!-- Split With multi-select -->
           <div class="space-y-2">
-            <label class="text-xs font-medium text-gray-400">Split With</label>
+            <label class="text-xs font-medium text-gray-400">
+              {{ onlyTheyOwe() ? 'People who owe you' : 'Split With' }}
+            </label>
             <div class="flex flex-wrap gap-2">
               @for (person of allPeople; track person.id) {
                 <button
@@ -243,7 +257,7 @@
           </div>
 
           <!-- Paid By single select (only when someone is selected) -->
-          @if (splitWith().length > 0) {
+          @if (splitWith().length > 0 && !onlyTheyOwe()) {
             <div class="space-y-1.5">
               <label for="tx-paid-by" class="text-xs font-medium text-gray-400">Paid By</label>
               <select
@@ -304,6 +318,18 @@
               </span>
               to
               <span class="text-white font-semibold">{{ getPaidByName() }}</span>
+            </p>
+          </div>
+        }
+
+        @if (onlyTheyOwe()) {
+          <div class="p-3 bg-violet-950/30 border border-violet-800/40 rounded-xl space-y-1">
+            <p class="text-xs font-medium text-violet-400">Only they owe</p>
+            <p class="text-xs text-gray-400">
+              Selected people each owe you
+              <span class="text-white font-semibold">
+                €{{ (transactionModel().amount / splitWith().length).toFixed(2) }}
+              </span>
             </p>
           </div>
         }
