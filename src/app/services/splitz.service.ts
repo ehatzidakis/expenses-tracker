@@ -19,37 +19,7 @@ export class SplitzService {
 
   /** Derives all individual debt entries from enriched split transactions. */
   computeAllDebts(transactions: Transaction[]): DebtEntry[] {
-    const debts: DebtEntry[] = [];
-
-    for (const tx of transactions) {
-      if (!tx.isSplit || !tx.splitBy || tx.paidBy === undefined || !tx.totalAmount) continue;
-
-      const allParticipants: ('me' | number)[] = ['me', ...tx.splitBy];
-      const totalPeople = allParticipants.length;
-      const baseShare = Math.floor((tx.totalAmount / totalPeople) * 100) / 100;
-      const myShare = Math.round((tx.totalAmount - baseShare * (totalPeople - 1)) * 100) / 100;
-      const paidPersonIds = tx.splitPaidPersonIds ?? [];
-
-      for (const participant of allParticipants) {
-        if (participant === tx.paidBy) continue; // payer owes nothing
-
-        const numericId = participant === 'me' ? 0 : (participant as number);
-        const share = participant === 'me' ? myShare : baseShare;
-        const paid = paidPersonIds.includes(numericId);
-
-        debts.push({
-          transactionId: tx.id,
-          description: tx.description,
-          date: tx.date,
-          debtorId: participant,
-          creditorId: tx.paidBy,
-          amount: share,
-          paid,
-        });
-      }
-    }
-
-    return debts;
+    return transactions.flatMap((tx) => computeSplitDebtEntries(tx));
   }
 
   computePersonSummaries(transactions: Transaction[]): PersonSummary[] {
@@ -178,4 +148,67 @@ export function computeSplit(
   const baseShare = Math.floor((totalAmount / totalPeople) * 100) / 100;
   const myShare = Math.round((totalAmount - baseShare * (totalPeople - 1)) * 100) / 100;
   return { myShare };
+}
+
+export function computeSplitDebtEntries(tx: Transaction): DebtEntry[] {
+  if (
+    !tx.isSplit ||
+    tx.paidBy === undefined ||
+    tx.totalAmount === undefined ||
+    tx.totalAmount === null
+  ) {
+    return [];
+  }
+
+  const paidPersonIds = tx.splitPaidPersonIds ?? [];
+  const splitType =
+    tx.splitType ??
+    (tx.paidBy === 'me' && tx.amount === 0 && (tx.splitBy?.length ?? 0) > 0
+      ? 'onlyTheyOwe'
+      : 'split');
+
+  if (splitType === 'onlyTheyOwe') {
+    const people = tx.splitBy ?? [];
+    if (people.length === 0) {
+      return [];
+    }
+
+    const share = Math.round((tx.totalAmount / people.length) * 100) / 100;
+
+    return people.map((personId): DebtEntry => ({
+      transactionId: tx.id,
+      description: tx.description,
+      date: tx.date,
+      debtorId: personId,
+      creditorId: 'me',
+      amount: share,
+      paid: paidPersonIds.includes(personId),
+    }));
+  }
+
+  const allParticipants: ('me' | number)[] = ['me', ...(tx.splitBy ?? [])];
+  const totalPeople = allParticipants.length;
+  const baseShare = Math.floor((tx.totalAmount / totalPeople) * 100) / 100;
+  const myShare = Math.round((tx.totalAmount - baseShare * (totalPeople - 1)) * 100) / 100;
+
+  const debts: DebtEntry[] = [];
+  for (const participant of allParticipants) {
+    if (participant === tx.paidBy) {
+      continue;
+    }
+
+    const numericId = participant === 'me' ? 0 : participant;
+    const share = participant === 'me' ? myShare : baseShare;
+    debts.push({
+      transactionId: tx.id,
+      description: tx.description,
+      date: tx.date,
+      debtorId: participant,
+      creditorId: tx.paidBy,
+      amount: share,
+      paid: paidPersonIds.includes(numericId),
+    });
+  }
+
+  return debts;
 }
