@@ -44,6 +44,7 @@ export class SplitzesModalComponent {
     try {
       const txs = this.splitTxQuery.data() ?? [];
       await this.splitzService.markPersonSettled(personId, txs);
+      await this.splitzService.markMePaid(personId, txs);
       await this.queryClient.invalidateQueries({ queryKey: ['splitTransactions'] });
     } finally {
       this.markingPersonId.set(null);

@@ -96,7 +96,7 @@
             @if (summary.hasUnsettledDebts || summary.iOweThisPerson) {
               <div class="ml-12 flex flex-wrap gap-2 pt-1">
                 <!-- Mark person's debts as settled (they paid what they owe) -->
-                @if (summary.hasUnsettledDebts) {
+                @if (summary.hasUnsettledDebts || summary.iOweThisPerson) {
                   <button
                     type="button"
                     (click)="onMarkPersonSettled(summary.person.id)"
@@ -106,7 +106,7 @@
                     @if (markingPersonId() === summary.person.id) {
                       Settling…
                     } @else {
-                      ✓ Mark {{ summary.person.name }} settled
+                      ✓ Mark debt settled
                     }
                   </button>
                 }
