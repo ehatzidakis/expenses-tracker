@@ -349,6 +349,37 @@ export class TransactionService {
     });
   }
 
+  async fetchAllUtilityTransactions(): Promise<Transaction[]> {
+    const transactionsRef = collection(db, 'transactions');
+    const snapshot = await getDocs(query(transactionsRef, where('category', '==', 'Utilities')));
+
+    return snapshot.docs.map((d) => {
+      const data = d.data();
+      const tx: Transaction = {
+        id: d.id,
+        monthName: data['monthName'] as string,
+        date: data['date'] as string,
+        description: data['description'] as string,
+        category: data['category'] as string,
+        amount: Number(data['amount']) || 0,
+        createdAt: data['createdAt'] as string,
+        adjustmentId: (data['adjustmentId'] as string) ?? undefined,
+      };
+
+      // Only apply split properties if the transaction actually is a split
+      if (data['isSplit']) {
+        tx.isSplit = true;
+        tx.paidBy = data['paidBy'] as 'me' | number;
+        tx.splitBy = (data['splitBy'] as number[]) ?? [];
+        tx.splitType = (data['splitType'] as 'split' | 'onlyMeOwes' | 'onlyTheyOwe') ?? 'split';
+        tx.totalAmount = Number(data['totalAmount']) || 0;
+        tx.splitPaidPersonIds = (data['splitPaidPersonIds'] as number[]) ?? [];
+      }
+
+      return tx;
+    });
+  }
+
   async updateSplitPaidPersons(transactionId: string, paidPersonIds: number[]): Promise<void> {
     const txRef = doc(db, 'transactions', transactionId);
     await updateDoc(txRef, { splitPaidPersonIds: paidPersonIds });
