@@ -5,6 +5,7 @@ import { QueryClient } from '@tanstack/angular-query-experimental';
 import { TransactionService } from '../../services/transaction-service';
 import { CATEGORY_NAMES } from '../../services/expense-state.service';
 import { Transaction } from '../../models/transaction.model';
+import { PEOPLE } from '../../models/splitz.model';
 import { PrivacyService } from '../../services/privacy.service';
 import { ConfirmModal } from '../confirm-modal/confirm-modal';
 import { normalizeDecimalInput, parseDecimalInput } from '../../utils/decimal-input';
@@ -14,6 +15,12 @@ interface TransactionFormModel {
   description: string;
   category: string;
   amount: number;
+  isSplit?: boolean;
+  paidBy?: 'me' | number;
+  splitBy?: number[];
+  splitPaidPersonIds?: number[];
+  splitType?: 'split' | 'onlyMeOwes' | 'onlyTheyOwe';
+  totalAmount?: number;
 }
 
 @Component({
@@ -46,6 +53,22 @@ export class EditTransactionComponent {
     amount: 0,
   });
 
+  readonly splitMeta = computed(() => {
+    const tx = this.transaction();
+    if (!tx?.isSplit) {
+      return null;
+    }
+
+    return {
+      isSplit: tx.isSplit,
+      paidBy: tx.paidBy,
+      splitBy: tx.splitBy ?? [],
+      splitType: tx.splitType ?? 'split',
+      totalAmount: tx.totalAmount ?? tx.amount,
+      splitPaidPersonIds: tx.splitPaidPersonIds ?? [],
+    };
+  });
+
   constructor() {
     // Populate form model when input transaction signal resolves
     effect(() => {
@@ -56,6 +79,12 @@ export class EditTransactionComponent {
           description: tx.description,
           category: tx.category,
           amount: tx.amount,
+          isSplit: tx.isSplit,
+          paidBy: tx.paidBy,
+          splitBy: tx.splitBy,
+          splitPaidPersonIds: tx.splitPaidPersonIds,
+          splitType: tx.splitType,
+          totalAmount: tx.totalAmount,
         });
       }
     });
@@ -73,6 +102,35 @@ export class EditTransactionComponent {
   readonly submitting = signal(false);
   readonly deleting = signal(false);
   readonly errorMessage = signal<string | null>(null);
+
+  getPersonName(id: 'me' | number | undefined): string {
+    if (id === 'me' || id === undefined) {
+      return id === 'me' ? 'me' : 'Unknown';
+    }
+
+    const person = PEOPLE.find((entry) => entry.id === id);
+    return person?.name ?? `Person ${id}`;
+  }
+
+  getSplitWithNames(ids: number[] = []): string {
+    if (!ids.length) {
+      return 'None';
+    }
+
+    return ids.map((id) => this.getPersonName(id)).join(', ');
+  }
+
+  getSplitTypeLabel(type?: 'split' | 'onlyMeOwes' | 'onlyTheyOwe'): string {
+    switch (type) {
+      case 'onlyMeOwes':
+        return 'Borrowed 💸';
+      case 'onlyTheyOwe':
+        return 'Lent 💸';
+      case 'split':
+      default:
+        return 'Splitz';
+    }
+  }
 
   requestDelete(): void {
     this.showDeleteConfirm.set(true);
