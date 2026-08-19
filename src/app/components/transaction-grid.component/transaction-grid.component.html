@@ -19,7 +19,18 @@
         class="w-full text-left p-3.5 border-none bg-gray-900/60 hover:bg-gray-800/80 border border-gray-800/80 rounded-xl flex items-center justify-between transition-colors cursor-pointer group"
       >
         <div class="min-w-0">
-          <span class="text-xs font-medium text-gray-200 truncate block">{{ tx.description }}</span>
+          <span class="text-xs font-medium text-gray-200 truncate flex items-center gap-1.5">
+            <span class="truncate">{{ tx.description }}</span>
+            @if (tx.isSplit) {
+              <span
+                aria-label="Split transaction"
+                title="Split transaction"
+                class="text-[11px] leading-none"
+                >✂️</span
+              >
+            }
+            <!-- <span class="truncate">{{ tx.description }}</span> -->
+          </span>
           <span class="text-[10px] text-gray-500 block mt-0.5">{{
             tx.date | date: 'dd/MM/yyyy'
           }}</span>
