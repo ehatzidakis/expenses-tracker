@@ -35,26 +35,57 @@
 
       <!-- SumUp Breakdown -->
       @if (hasBreakdown() && expanded()) {
-        <div class="mt-2.5 space-y-1">
-          <div class="flex justify-baseline gap-2 text-[11px]">
-            <span class="text-gray-500">Monthly Expenses:</span>
-            <span
-              class="text-gray-300 font-medium tabular-nums"
-              [class.blur-md]="privacyService.isPrivacyMode()"
-              [class.select-none]="privacyService.isPrivacyMode()"
-              >€{{ monthlyExpenses() | number: '1.2-2' }}</span
-            >
+        @if (yearlyBreakdown().length) {
+          <div class="mt-2.5 space-y-2">
+            @for (yearSummary of yearlyBreakdown(); track yearSummary.year) {
+              <div class="space-y-1">
+                <div class="text-[10px] font-semibold uppercase tracking-[0.18em] text-violet-500">
+                  {{ yearSummary.year }}
+                </div>
+
+                <div class="flex justify-baseline gap-2 text-[11px]">
+                  <span class="text-gray-500">Monthly Expenses:</span>
+                  <span
+                    class="text-gray-300 font-medium tabular-nums"
+                    [class.blur-md]="privacyService.isPrivacyMode()"
+                    [class.select-none]="privacyService.isPrivacyMode()"
+                    >€{{ yearSummary.monthlyExpenses | number: '1.2-2' }}</span
+                  >
+                </div>
+                <div class="flex justify-baseline gap-2 text-[11px]">
+                  <span class="text-gray-500">One-Off Expenses:</span>
+                  <span
+                    class="text-gray-300 font-medium tabular-nums"
+                    [class.blur-md]="privacyService.isPrivacyMode()"
+                    [class.select-none]="privacyService.isPrivacyMode()"
+                    >€{{ yearSummary.oneOffExpenses | number: '1.2-2' }}</span
+                  >
+                </div>
+              </div>
+            }
           </div>
-          <div class="flex justify-baseline gap-2 text-[11px]">
-            <span class="text-gray-500">One-Off Expenses:</span>
-            <span
-              class="text-gray-300 font-medium tabular-nums"
-              [class.blur-md]="privacyService.isPrivacyMode()"
-              [class.select-none]="privacyService.isPrivacyMode()"
-              >€{{ oneOffExpenses() | number: '1.2-2' }}</span
-            >
+        } @else {
+          <div class="mt-2.5 space-y-1">
+            <div class="flex justify-baseline gap-2 text-[11px]">
+              <span class="text-gray-500">Monthly Expenses:</span>
+              <span
+                class="text-gray-300 font-medium tabular-nums"
+                [class.blur-md]="privacyService.isPrivacyMode()"
+                [class.select-none]="privacyService.isPrivacyMode()"
+                >€{{ monthlyExpenses() | number: '1.2-2' }}</span
+              >
+            </div>
+            <div class="flex justify-baseline gap-2 text-[11px]">
+              <span class="text-gray-500">One-Off Expenses:</span>
+              <span
+                class="text-gray-300 font-medium tabular-nums"
+                [class.blur-md]="privacyService.isPrivacyMode()"
+                [class.select-none]="privacyService.isPrivacyMode()"
+                >€{{ oneOffExpenses() | number: '1.2-2' }}</span
+              >
+            </div>
           </div>
-        </div>
+        }
       }
     </div>
 
@@ -76,26 +107,57 @@
 
       <!-- Right Column Breakdown -->
       @if (hasBreakdown() && expanded()) {
-        <div class="mt-2.5 space-y-1 text-right">
-          <div class="flex justify-end gap-2 text-[11px]">
-            <span class="text-gray-500">Monthly Saved:</span>
-            <span
-              class="text-gray-300 font-medium tabular-nums"
-              [class.blur-md]="privacyService.isPrivacyMode()"
-              [class.select-none]="privacyService.isPrivacyMode()"
-              >€{{ monthlySaved() | number: '1.2-2' }}</span
-            >
+        @if (yearlyBreakdown().length) {
+          <div class="mt-2.5 space-y-2 text-right">
+            @for (yearSummary of yearlyBreakdown(); track yearSummary.year) {
+              <div class="space-y-1">
+                <div class="text-[10px] font-semibold uppercase tracking-[0.18em] text-violet-500">
+                  {{ yearSummary.year }}
+                </div>
+
+                <div class="flex justify-end gap-2 text-[11px]">
+                  <span class="text-gray-500">Monthly Saved:</span>
+                  <span
+                    class="text-gray-300 font-medium tabular-nums"
+                    [class.blur-md]="privacyService.isPrivacyMode()"
+                    [class.select-none]="privacyService.isPrivacyMode()"
+                    >€{{ yearSummary.monthlySaved | number: '1.2-2' }}</span
+                  >
+                </div>
+                <div class="flex justify-end gap-2 text-[11px]">
+                  <span class="text-gray-500">One-Off Bonuses:</span>
+                  <span
+                    class="text-gray-300 font-medium tabular-nums"
+                    [class.blur-md]="privacyService.isPrivacyMode()"
+                    [class.select-none]="privacyService.isPrivacyMode()"
+                    >€{{ yearSummary.oneOffBonuses | number: '1.2-2' }}</span
+                  >
+                </div>
+              </div>
+            }
           </div>
-          <div class="flex justify-end gap-2 text-[11px]">
-            <span class="text-gray-500">One-Off Bonuses:</span>
-            <span
-              class="text-gray-300 font-medium tabular-nums"
-              [class.blur-md]="privacyService.isPrivacyMode()"
-              [class.select-none]="privacyService.isPrivacyMode()"
-              >€{{ oneOffBonuses() | number: '1.2-2' }}</span
-            >
+        } @else {
+          <div class="mt-2.5 space-y-1 text-right">
+            <div class="flex justify-end gap-2 text-[11px]">
+              <span class="text-gray-500">Monthly Saved:</span>
+              <span
+                class="text-gray-300 font-medium tabular-nums"
+                [class.blur-md]="privacyService.isPrivacyMode()"
+                [class.select-none]="privacyService.isPrivacyMode()"
+                >€{{ monthlySaved() | number: '1.2-2' }}</span
+              >
+            </div>
+            <div class="flex justify-end gap-2 text-[11px]">
+              <span class="text-gray-500">One-Off Bonuses:</span>
+              <span
+                class="text-gray-300 font-medium tabular-nums"
+                [class.blur-md]="privacyService.isPrivacyMode()"
+                [class.select-none]="privacyService.isPrivacyMode()"
+                >€{{ oneOffBonuses() | number: '1.2-2' }}</span
+              >
+            </div>
           </div>
-        </div>
+        }
       }
     </div>
   </div>

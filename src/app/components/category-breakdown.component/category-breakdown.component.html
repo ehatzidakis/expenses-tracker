@@ -10,9 +10,12 @@
     @for (cat of categories(); track cat.name) {
       <div class="space-y-1.5">
         <div
-          class="space-y-1.5"
-          [class.cursor-pointer]="!cat.isAllTime"
-          (click)="!cat.isAllTime && toggleCategory(cat.name)"
+          class="space-y-1.5 cursor-pointer"
+          role="button"
+          tabindex="0"
+          (click)="toggleCategory(cat.name)"
+          (keydown.enter)="toggleCategory(cat.name)"
+          (keydown.space)="toggleCategory(cat.name)"
         >
           <!-- Category Header -->
           <div class="flex items-center justify-between text-xs py-0.5">
@@ -100,9 +103,11 @@
           }
         </div>
 
-        @if (expandedCategory() === cat.name && !cat.isAllTime) {
+        @if (expandedCategory() === cat.name) {
           @defer (on immediate) {
-            @if (selectedTransaction(); as tx) {
+            @if (cat.isAllTime) {
+              <app-yearly-category-sums [category]="cat.name" />
+            } @else if (selectedTransaction(); as tx) {
               <app-edit-transaction
                 [transaction]="tx"
                 (back)="selectedTransaction.set(null)"

@@ -3,6 +3,14 @@ import { CommonModule } from '@angular/common';
 import { CategorySpend } from '../../services/expense-state.service';
 import { PrivacyService } from '../../services/privacy.service';
 
+export interface YearlyBreakdownEntry {
+  year: number;
+  monthlyExpenses: number;
+  oneOffExpenses: number;
+  monthlySaved: number;
+  oneOffBonuses: number;
+}
+
 @Component({
   selector: 'app-overview-card',
   standalone: true,
@@ -22,11 +30,14 @@ export class OverviewCardComponent {
   oneOffExpenses = input<number | null>(null);
   monthlySaved = input<number | null>(null);
   oneOffBonuses = input<number | null>(null);
+  yearlyBreakdown = input<YearlyBreakdownEntry[]>([]);
 
   computedTotalSaved = computed(() => this.totalSaved() ?? this.totalWage() - this.totalSpend());
 
   // Breakdown rows only apply when the parent supplies the monthly/one-off split (SumUp view).
-  hasBreakdown = computed(() => this.monthlyExpenses() !== null);
+  hasBreakdown = computed(
+    () => this.monthlyExpenses() !== null || this.yearlyBreakdown().length > 0,
+  );
   expanded = signal(false);
 
   readonly privacyService = inject(PrivacyService);
