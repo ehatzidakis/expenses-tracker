@@ -1,13 +1,13 @@
 <div class="bg-gray-900/60 border border-gray-800/80 rounded-2xl p-5 backdrop-blur-sm select-none">
   <!-- Header -->
   <div class="mb-5">
-    <h3 class="text-sm font-semibold text-gray-100">Utility Averages</h3>
-    <p class="text-xs text-gray-400 mt-0.5">Monthly average per utility bill</p>
+    <h3 class="text-sm font-semibold text-gray-100">Transaction Averages</h3>
+    <p class="text-xs text-gray-400 mt-0.5">Average cost per entry or visit</p>
   </div>
 
   <!-- List Container -->
   <div class="space-y-3">
-    @for (item of utilityAverages(); track item.id) {
+    @for (item of averages(); track item.category) {
       <div
         class="flex items-center justify-between p-3 rounded-xl bg-gray-800/40 border border-gray-800/60 transition-colors hover:bg-gray-800/60"
       >
@@ -34,7 +34,7 @@
           <div>
             <span class="block text-sm font-medium text-gray-200">{{ item.label }}</span>
             <span class="block text-[10px] text-gray-500 mt-0.5">
-              Based on {{ item.count }} {{ item.count === 1 ? 'record' : 'records' }}
+              Based on {{ item.count }} {{ item.count === 1 ? 'entry' : 'entries' }}
             </span>
           </div>
         </div>
@@ -45,7 +45,7 @@
             <span class="block text-sm font-bold text-gray-100">
               €{{ item.average | number: '1.2-2' }}
             </span>
-            <span class="block text-[10px] text-gray-400 font-medium">/mo</span>
+            <span class="block text-[10px] text-gray-400 font-medium">/avg</span>
           } @else {
             <span class="block text-xs font-medium text-gray-500 italic">No data</span>
           }

@@ -15,6 +15,7 @@ import { EditAdjustmentComponent } from './components/edit-adjustment.component/
 import { CategoryBudgetsGrid } from './components/category-budgets-grid/category-budgets-grid';
 import { CategoryBudgetsChartComponent } from './components/category-budgets-chart/category-budgets-chart';
 import { UtilitySumComponent } from './components/utility-sum-component/utility-sum-component';
+import { CategoryAverageComponent } from './components/category-average/category-average';
 @Component({
   selector: 'app-root',
   standalone: true,
@@ -32,6 +33,7 @@ import { UtilitySumComponent } from './components/utility-sum-component/utility-
     AdjustmentSelectorComponent,
     TripBreakdownComponent,
     UtilitySumComponent,
+    CategoryAverageComponent,
   ],
   templateUrl: './app.html',
 })

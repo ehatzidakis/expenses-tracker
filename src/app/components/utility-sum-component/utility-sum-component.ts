@@ -43,18 +43,18 @@ export class UtilitySumComponent {
 
     const targets = [
       {
-        id: 'Internet',
-        label: 'Internet',
-        iconColor: 'text-indigo-400',
-        bgColor: 'bg-indigo-500/15 border-indigo-500/30',
-        svg: 'M8.288 15.038a5.25 5.25 0 017.424 0M5.106 11.856c3.807-3.808 9.98-3.808 13.788 0M1.924 8.674c5.565-5.565 14.587-5.565 20.152 0M12.53 18.22l-.53.53-.53-.53a.75.75 0 011.06 0z',
-      },
-      {
         id: 'Electric',
         label: 'Electricity',
         iconColor: 'text-amber-400',
         bgColor: 'bg-amber-500/15 border-amber-500/30',
         svg: 'M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z',
+      },
+      {
+        id: 'Internet',
+        label: 'Internet',
+        iconColor: 'text-indigo-400',
+        bgColor: 'bg-indigo-500/15 border-indigo-500/30',
+        svg: 'M8.288 15.038a5.25 5.25 0 017.424 0M5.106 11.856c3.807-3.808 9.98-3.808 13.788 0M1.924 8.674c5.565-5.565 14.587-5.565 20.152 0M12.53 18.22l-.53.53-.53-.53a.75.75 0 011.06 0z',
       },
       {
         id: 'Mobile',
