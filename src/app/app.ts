@@ -16,6 +16,15 @@ import { CategoryBudgetsGrid } from './components/category-budgets-grid/category
 import { CategoryBudgetsChartComponent } from './components/category-budgets-chart/category-budgets-chart';
 import { UtilitySumComponent } from './components/utility-sum-component/utility-sum-component';
 import { CategoryAverageComponent } from './components/category-average/category-average';
+
+export interface YearlyBreakdownEntry {
+  year: number;
+  monthlyExpenses: number;
+  oneOffExpenses: number;
+  monthlySaved: number;
+  oneOffBonuses: number;
+}
+
 @Component({
   selector: 'app-root',
   standalone: true,
@@ -73,6 +82,58 @@ export class AppComponent {
   readonly monthlySaved = computed(
     () => this.state.selectedTotalWage() - this.state.totalMonthlySpend(),
   );
+
+  readonly yearlyBreakdown = computed<YearlyBreakdownEntry[]>(() => {
+    const byYear = new Map<number, YearlyBreakdownEntry>();
+
+    for (const expense of this.state.processedExpenses().filter((item) => item.id !== 'ALL')) {
+      const yearMatch = expense.MonthName.match(/(\d{4})$/);
+      const year = yearMatch ? Number(yearMatch[1]) : null;
+      if (!year) continue;
+
+      const existing = byYear.get(year) ?? {
+        year,
+        monthlyExpenses: 0,
+        oneOffExpenses: 0,
+        monthlySaved: 0,
+        oneOffBonuses: 0,
+      };
+
+      const monthlySpend = Object.entries(expense).reduce((sum, [key, value]) => {
+        if (key === 'id' || key === 'MonthName' || key === 'TotalWage') {
+          return sum;
+        }
+        return sum + (Number(value) || 0);
+      }, 0);
+
+      const wage = Number(expense.TotalWage) || 0;
+
+      existing.monthlyExpenses += monthlySpend;
+      existing.monthlySaved += wage - monthlySpend;
+      byYear.set(year, existing);
+    }
+
+    for (const adjustment of this.adjustmentsQuery.data() ?? []) {
+      const year = adjustment.startDate.getFullYear();
+      const existing = byYear.get(year) ?? {
+        year,
+        monthlyExpenses: 0,
+        oneOffExpenses: 0,
+        monthlySaved: 0,
+        oneOffBonuses: 0,
+      };
+
+      if (adjustment.adjType) {
+        existing.oneOffBonuses += adjustment.amount;
+      } else {
+        existing.oneOffExpenses += adjustment.amount;
+      }
+
+      byYear.set(year, existing);
+    }
+
+    return [...byYear.values()].sort((a, b) => a.year - b.year);
+  });
 
   // Total incoming (wage + one-off bonuses) minus total outgoing (monthly + one-off expenses)
   readonly totalOutgoing = computed(() => this.state.totalMonthlySpend() + this.oneOffExpenses());
