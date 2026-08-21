@@ -380,6 +380,25 @@ export class TransactionService {
     });
   }
 
+  async fetchTransactionsByCategories(categories: string[]): Promise<Transaction[]> {
+    const transactionsRef = collection(db, 'transactions');
+    const snapshot = await getDocs(query(transactionsRef, where('category', 'in', categories)));
+
+    return snapshot.docs.map((d) => {
+      const data = d.data();
+      return {
+        id: d.id,
+        monthName: data['monthName'] as string,
+        date: data['date'] as string,
+        description: data['description'] as string,
+        category: data['category'] as string,
+        amount: Number(data['amount']) || 0,
+        createdAt: data['createdAt'] as string,
+        adjustmentId: (data['adjustmentId'] as string) ?? undefined,
+      } as Transaction;
+    });
+  }
+
   async updateSplitPaidPersons(transactionId: string, paidPersonIds: number[]): Promise<void> {
     const txRef = doc(db, 'transactions', transactionId);
     await updateDoc(txRef, { splitPaidPersonIds: paidPersonIds });
