@@ -8,48 +8,59 @@
   <!-- List Container -->
   <div class="space-y-3">
     @for (item of utilityAverages(); track item.id) {
-      <div
-        class="flex items-center justify-between p-3 rounded-xl bg-gray-800/40 border border-gray-800/60 transition-colors hover:bg-gray-800/60"
-      >
-        <div class="flex items-center gap-3.5">
-          <!-- Icon Wrapper -->
-          <div
-            class="flex items-center justify-center w-10 h-10 rounded-full border"
-            [ngClass]="item.bgColorClass"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke-width="1.5"
-              stroke="currentColor"
-              class="w-5 h-5"
-              [ngClass]="item.iconColorClass"
+      <div class="space-y-2">
+        <div
+          class="flex items-center justify-between p-3 rounded-xl bg-gray-800/40 border border-gray-800/60 transition-colors hover:bg-gray-800/60 cursor-pointer"
+          (click)="toggleUtility(item.label)"
+        >
+          <div class="flex items-center gap-3.5">
+            <!-- Icon Wrapper -->
+            <div
+              class="flex items-center justify-center w-10 h-10 rounded-full border"
+              [ngClass]="item.bgColorClass"
             >
-              <path stroke-linecap="round" stroke-linejoin="round" [attr.d]="item.svgPath" />
-            </svg>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="currentColor"
+                class="w-5 h-5"
+                [ngClass]="item.iconColorClass"
+              >
+                <path stroke-linecap="round" stroke-linejoin="round" [attr.d]="item.svgPath" />
+              </svg>
+            </div>
+
+            <!-- Labels -->
+            <div>
+              <span class="block text-sm font-medium text-gray-200">{{ item.label }}</span>
+              <span class="block text-[10px] text-gray-500 mt-0.5">
+                Based on {{ item.count }} {{ item.count === 1 ? 'record' : 'records' }}
+              </span>
+            </div>
           </div>
 
-          <!-- Labels -->
-          <div>
-            <span class="block text-sm font-medium text-gray-200">{{ item.label }}</span>
-            <span class="block text-[10px] text-gray-500 mt-0.5">
-              Based on {{ item.count }} {{ item.count === 1 ? 'record' : 'records' }}
-            </span>
+          <!-- Average Amount -->
+          <div class="text-right">
+            @if (item.count > 0) {
+              <span class="block text-sm font-bold text-gray-100">
+                €{{ item.average | number: '1.2-2' }}
+              </span>
+              <span class="block text-[10px] text-gray-400 font-medium">/mo</span>
+            } @else {
+              <span class="block text-xs font-medium text-gray-500 italic">No data</span>
+            }
           </div>
         </div>
 
-        <!-- Average Amount -->
-        <div class="text-right">
-          @if (item.count > 0) {
-            <span class="block text-sm font-bold text-gray-100">
-              €{{ item.average | number: '1.2-2' }}
-            </span>
-            <span class="block text-[10px] text-gray-400 font-medium">/mo</span>
-          } @else {
-            <span class="block text-xs font-medium text-gray-500 italic">No data</span>
-          }
-        </div>
+        @if (expandedUtility() === item.label) {
+          <app-paged-entries-list
+            [title]="item.label"
+            mode="description"
+            [filterValue]="item.label"
+          />
+        }
       </div>
     }
   </div>

@@ -2,6 +2,7 @@ import { Component, inject, computed, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TransactionService } from '../../services/transaction-service';
 import { Transaction } from '../../models/transaction.model';
+import { PagedEntriesListComponent } from '../paged-entries-list/paged-entries-list';
 
 interface UtilityAverage {
   id: string;
@@ -16,7 +17,7 @@ interface UtilityAverage {
 @Component({
   selector: 'app-utility-sum',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, PagedEntriesListComponent],
   templateUrl: './utility-sum-component.html',
 })
 export class UtilitySumComponent {
@@ -24,6 +25,7 @@ export class UtilitySumComponent {
 
   // Local signal to hold the fetched utilities
   private readonly utilityTxs = signal<Transaction[]>([]);
+  readonly expandedUtility = signal<string | null>(null);
 
   ngOnInit() {
     this.loadUtilities();
@@ -38,13 +40,17 @@ export class UtilitySumComponent {
     }
   }
 
+  toggleUtility(label: string): void {
+    this.expandedUtility.update((current) => (current === label ? null : label));
+  }
+
   readonly utilityAverages = computed<UtilityAverage[]>(() => {
     const transactions = this.utilityTxs();
 
     const targets = [
       {
         id: 'Electric',
-        label: 'Electricity',
+        label: 'Electric',
         iconColor: 'text-amber-400',
         bgColor: 'bg-amber-500/15 border-amber-500/30',
         svg: 'M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z',
