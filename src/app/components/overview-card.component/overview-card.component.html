@@ -15,7 +15,7 @@
       }
     </span>
   }
-  <div class="grid items-start justify-between grid-cols-2 gap-2">
+  <div class="grid items-start justify-between grid-cols-2 gap-12">
     <!-- LEFT COLUMN: Everything sticks left -->
     <div class="text-left">
       <span class="text-xs font-medium text-gray-400 uppercase tracking-wider block"
@@ -43,7 +43,7 @@
                   {{ yearSummary.year }}
                 </div>
 
-                <div class="flex justify-baseline gap-2 text-[11px]">
+                <div class="flex items-center justify-between gap-0.5 text-[11px]">
                   <span class="text-gray-500">Monthly Expenses:</span>
                   <span
                     class="text-gray-300 font-medium tabular-nums"
@@ -52,13 +52,24 @@
                     >€{{ yearSummary.monthlyExpenses | number: '1.2-2' }}</span
                   >
                 </div>
-                <div class="flex justify-baseline gap-2 text-[11px]">
+                <div class="flex items-center justify-between gap-2 text-[11px]">
                   <span class="text-gray-500">One-Off Expenses:</span>
                   <span
                     class="text-gray-300 font-medium tabular-nums"
                     [class.blur-md]="privacyService.isPrivacyMode()"
                     [class.select-none]="privacyService.isPrivacyMode()"
                     >€{{ yearSummary.oneOffExpenses | number: '1.2-2' }}</span
+                  >
+                </div>
+                <div class="flex items-center justify-between gap-2 text-[11px]">
+                  <span class="text-gray-500">{{ yearSummary.year }} Expenses:</span>
+                  <span
+                    class="text-gray-300 font-medium tabular-nums"
+                    [class.blur-md]="privacyService.isPrivacyMode()"
+                    [class.select-none]="privacyService.isPrivacyMode()"
+                    >€{{
+                      yearSummary.monthlyExpenses + yearSummary.oneOffExpenses | number: '1.2-2'
+                    }}</span
                   >
                 </div>
               </div>
@@ -115,7 +126,7 @@
                   {{ yearSummary.year }}
                 </div>
 
-                <div class="flex justify-end gap-2 text-[11px]">
+                <div class="flex items-center justify-between gap-1 text-[11px] pl-4.5">
                   <span class="text-gray-500">Monthly Saved:</span>
                   <span
                     class="text-gray-300 font-medium tabular-nums"
@@ -124,13 +135,26 @@
                     >€{{ yearSummary.monthlySaved | number: '1.2-2' }}</span
                   >
                 </div>
-                <div class="flex justify-end gap-2 text-[11px]">
+                <div class="flex items-center justify-between gap-0.5 text-[11px] pl-2">
                   <span class="text-gray-500">One-Off Bonuses:</span>
                   <span
                     class="text-gray-300 font-medium tabular-nums"
                     [class.blur-md]="privacyService.isPrivacyMode()"
                     [class.select-none]="privacyService.isPrivacyMode()"
                     >€{{ yearSummary.oneOffBonuses | number: '1.2-2' }}</span
+                  >
+                </div>
+                <div class="flex items-center justify-between gap-0.5 text-[11px] pl-9">
+                  <span class="text-gray-500">{{ yearSummary.year }} Saved:</span>
+                  <span
+                    class="text-emerald-400 font-medium tabular-nums"
+                    [class.blur-md]="privacyService.isPrivacyMode()"
+                    [class.select-none]="privacyService.isPrivacyMode()"
+                    >€{{
+                      yearSummary.oneOffBonuses +
+                        yearSummary.monthlySaved -
+                        yearSummary.oneOffExpenses | number: '1.2-2'
+                    }}</span
                   >
                 </div>
               </div>
