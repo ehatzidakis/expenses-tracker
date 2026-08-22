@@ -2,6 +2,7 @@ import { Component, inject, computed, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TransactionService } from '../../services/transaction-service';
 import { Transaction } from '../../models/transaction.model';
+import { PagedEntriesListComponent } from '../paged-entries-list/paged-entries-list';
 
 interface CategoryAverage {
   category: string;
@@ -16,13 +17,14 @@ interface CategoryAverage {
 @Component({
   selector: 'app-category-average',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, PagedEntriesListComponent],
   templateUrl: './category-average.html',
 })
 export class CategoryAverageComponent implements OnInit {
   private readonly transactionService = inject(TransactionService);
 
   private readonly categoryTxs = signal<Transaction[]>([]);
+  readonly expandedCategory = signal<string | null>(null);
   readonly targetCategories = ['Supermarket', 'EatingOut', 'Takeaway', 'Tickets', 'Gaming'];
 
   ngOnInit() {
@@ -38,6 +40,10 @@ export class CategoryAverageComponent implements OnInit {
     } catch (error) {
       console.error('Failed to load category averages:', error);
     }
+  }
+
+  toggleCategory(category: string): void {
+    this.expandedCategory.update((current) => (current === category ? null : category));
   }
 
   readonly averages = computed<CategoryAverage[]>(() => {

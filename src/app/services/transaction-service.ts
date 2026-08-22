@@ -71,14 +71,37 @@ export class TransactionService {
     category: string,
     cursor: QueryDocumentSnapshot<DocumentData> | null,
   ): Promise<TransactionPage> {
+    return this.fetchPagedTransactions(
+      [where('monthName', '==', monthName), where('category', '==', category)],
+      cursor,
+    );
+  }
+
+  async fetchPageByCategory(
+    category: string,
+    cursor: QueryDocumentSnapshot<DocumentData> | null,
+  ): Promise<TransactionPage> {
+    return this.fetchPagedTransactions([where('category', '==', category)], cursor);
+  }
+
+  async fetchPageByDescription(
+    description: string,
+    cursor: QueryDocumentSnapshot<DocumentData> | null,
+  ): Promise<TransactionPage> {
+    return this.fetchPagedTransactions([where('description', '==', description)], cursor);
+  }
+
+  private async fetchPagedTransactions(
+    filters: QueryConstraint[],
+    cursor: QueryDocumentSnapshot<DocumentData> | null,
+  ): Promise<TransactionPage> {
     const transactionsRef = collection(db, 'transactions');
     const constraints: QueryConstraint[] = [
-      where('monthName', '==', monthName),
-      where('category', '==', category),
+      ...filters,
       orderBy('date', 'desc'),
-      // Fetch one extra doc so we know whether a next page exists without a separate count query
       limit(PAGE_SIZE + 1),
     ];
+
     if (cursor) {
       constraints.push(startAfter(cursor));
     }
