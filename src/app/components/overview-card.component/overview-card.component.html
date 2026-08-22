@@ -43,7 +43,7 @@
                   {{ yearSummary.year }}
                 </div>
 
-                <div class="flex justify-baseline gap-2 text-[11px]">
+                <div class="flex items-center justify-between gap-2 text-[11px]">
                   <span class="text-gray-500">Monthly Expenses:</span>
                   <span
                     class="text-gray-300 font-medium tabular-nums"
@@ -52,7 +52,7 @@
                     >€{{ yearSummary.monthlyExpenses | number: '1.2-2' }}</span
                   >
                 </div>
-                <div class="flex justify-baseline gap-2 text-[11px]">
+                <div class="flex items-center justify-between gap-2 text-[11px]">
                   <span class="text-gray-500">One-Off Expenses:</span>
                   <span
                     class="text-gray-300 font-medium tabular-nums"
@@ -61,7 +61,7 @@
                     >€{{ yearSummary.oneOffExpenses | number: '1.2-2' }}</span
                   >
                 </div>
-                <div class="flex justify-baseline gap-2 text-[11px]">
+                <div class="flex items-center justify-between gap-2 text-[11px]">
                   <span class="text-gray-500">{{ yearSummary.year }} Expenses:</span>
                   <span
                     class="text-gray-300 font-medium tabular-nums"
@@ -126,7 +126,7 @@
                   {{ yearSummary.year }}
                 </div>
 
-                <div class="flex justify-end gap-2 text-[11px]">
+                <div class="flex items-center justify-between gap-2 text-[11px] pl-6">
                   <span class="text-gray-500">Monthly Saved:</span>
                   <span
                     class="text-gray-300 font-medium tabular-nums"
@@ -135,7 +135,7 @@
                     >€{{ yearSummary.monthlySaved | number: '1.2-2' }}</span
                   >
                 </div>
-                <div class="flex justify-end gap-2 text-[11px]">
+                <div class="flex items-center justify-between gap-2 text-[11px] pl-3">
                   <span class="text-gray-500">One-Off Bonuses:</span>
                   <span
                     class="text-gray-300 font-medium tabular-nums"
@@ -144,7 +144,7 @@
                     >€{{ yearSummary.oneOffBonuses | number: '1.2-2' }}</span
                   >
                 </div>
-                <div class="flex justify-end gap-2 text-[11px]">
+                <div class="flex items-center justify-between gap-2 text-[11px] pl-10">
                   <span class="text-gray-500">{{ yearSummary.year }} Saved:</span>
                   <span
                     class="text-emerald-400 font-medium tabular-nums"
