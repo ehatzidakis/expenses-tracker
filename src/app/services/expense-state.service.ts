@@ -5,7 +5,10 @@ import { Expense } from '../models/expenses.model';
 export interface CategorySpend {
   name: string;
   amount: number;
-  monthlyAverage: number | null;
+  monthlyAverageExcl: number | null;
+  monthlyAverageIncl: number | null;
+  monthsExcludingCurrent: number;
+  monthsIncludingCurrent: number;
   isAllTime: boolean;
   percentage: number;
   budget: number | null;
@@ -174,21 +177,29 @@ export class ExpenseStateService {
       const currentMonthValue = Number(lastMonthExpense?.[name as keyof Expense] ?? 0);
       const amountExcludingCurrent = isAllTime ? Math.max(0, amount - currentMonthValue) : amount;
       const monthsExcludingCurrent = Math.max(0, totalMonthsCount - 1);
-      const monthlyAverage =
+      const monthsIncludingCurrent = totalMonthsCount;
+      const monthlyAverageExcl =
         isAllTime && monthsExcludingCurrent > 0
           ? Math.ceil(amountExcludingCurrent / monthsExcludingCurrent / 5) * 5
+          : null;
+      const monthlyAverageIncl =
+        isAllTime && monthsIncludingCurrent > 0
+          ? Math.ceil(amount / monthsIncludingCurrent / 5) * 5
           : null;
       const budget = CATEGORY_BUDGETS[name] ?? null;
       // For All Time, compare the normalized monthly average against the budget
       // instead of scaling the budget up, so it stays intuitive as a target.
-      const comparisonAmount = monthlyAverage ?? amount;
+      const comparisonAmount = monthlyAverageExcl ?? amount;
       const isOverBudget = budget !== null && comparisonAmount > budget;
       const overallBudget = isAllTime && budget !== null ? budget * totalMonthsCount : null;
 
       return {
         name,
         amount,
-        monthlyAverage,
+        monthlyAverageExcl,
+        monthlyAverageIncl,
+        monthsExcludingCurrent,
+        monthsIncludingCurrent,
         isAllTime,
         percentage: total > 0 ? (amount / total) * 100 : 0,
         budget,

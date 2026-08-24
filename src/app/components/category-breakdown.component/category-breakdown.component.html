@@ -8,14 +8,59 @@
 
   <div class="space-y-2">
     @for (cat of categories(); track cat.name) {
-      <div class="space-y-1.5 border border-gray-800/60 px-3 py-1.5 rounded-xl bg-amber-50/5">
+      <div class="relative overflow-hidden rounded-xl border border-gray-800/60 bg-amber-50/5">
+        <div class="absolute inset-y-0 right-0 flex items-center pr-3">
+          <button
+            type="button"
+            class="flex h-8 w-8 items-center justify-center rounded-lg border border-red-500/30 bg-red-500/15 text-red-200 shadow-lg shadow-red-950/20 transition hover:bg-red-500/25"
+            [class.opacity-0]="actionVisibleCategory() !== cat.name"
+            [class.pointer-events-none]="actionVisibleCategory() !== cat.name"
+            [attr.aria-label]="
+              isIncludingCurrentMonth(cat.name)
+                ? 'Include current month in monthly average'
+                : 'Exclude current month from monthly average'
+            "
+            [attr.title]="
+              isIncludingCurrentMonth(cat.name)
+                ? 'Include current month in monthly average'
+                : 'Exclude current month from monthly average'
+            "
+            (click)="toggleAverageMode(cat.name); $event.stopPropagation()"
+          >
+            <svg
+              viewBox="0 0 24 24"
+              class="h-4 w-4 transition-transform duration-200"
+              [class.line-through]="!isIncludingCurrentMonth(cat.name)"
+              [class.text-red-100]="!isIncludingCurrentMonth(cat.name)"
+              [class.text-emerald-200]="isIncludingCurrentMonth(cat.name)"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M3 12h18" />
+              <path d="M7 7.5c1.8-1.7 4.2-2.5 7.2-2.5 3 0 5.3 1.1 6.8 3.2" />
+              <path d="M17 16.5c-1.8 1.7-4.2 2.5-7.2 2.5-3 0-5.3-1.1-6.8-3.2" />
+            </svg>
+          </button>
+        </div>
+
         <div
-          class="space-y-1.5 cursor-pointer"
+          class="relative z-10 space-y-1.5 px-3 py-1.5 transition-transform duration-200 ease-out"
           role="button"
           tabindex="0"
-          (click)="toggleCategory(cat.name)"
-          (keydown.enter)="toggleCategory(cat.name)"
-          (keydown.space)="toggleCategory(cat.name)"
+          [style.transform]="'translateX(' + getCardOffset(cat.name) + 'px)'"
+          [style.transition]="draggingCategory() === cat.name ? 'none' : 'transform 200ms ease-out'"
+          (click)="onCategoryCardClick(cat.name)"
+          (keydown.enter)="onCategoryCardKeydown(cat.name, $event)"
+          (keydown.space)="onCategoryCardKeydown(cat.name, $event)"
+          (pointerdown)="handleCardPointerDown(cat.name, $event)"
+          (pointermove)="handleCardPointerMove(cat.name, $event)"
+          (pointerup)="handleCardPointerUp(cat.name)"
+          (pointercancel)="handleCardPointerUp(cat.name)"
+          (pointerleave)="handleCardPointerUp(cat.name)"
         >
           <!-- Category Header -->
           <div class="flex items-center justify-between text-xs py-0.5">
@@ -46,7 +91,10 @@
                     class="text-red-400 font-semibold tabular-nums block"
                     [class.invisible]="!cat.isOverBudget || cat.budget === null"
                   >
-                    €{{ (cat.monthlyAverage ?? cat.amount) - (cat.budget ?? 0) | number: '1.2-2' }}
+                    €{{
+                      (cat.monthlyAverageExcl ?? cat.monthlyAverageIncl ?? cat.amount) -
+                        (cat.budget ?? 0) | number: '1.2-2'
+                    }}
                   </span>
                 }
                 <!-- @if (cat.overallBudget !== null) {
@@ -72,7 +120,9 @@
           </div>
 
           <!-- All-Time average Row -->
-          @if (cat.isAllTime && cat.monthlyAverage !== null) {
+          @if (
+            cat.isAllTime && (cat.monthlyAverageExcl !== null || cat.monthlyAverageIncl !== null)
+          ) {
             <div class="flex items-center justify-between text-xs w-full gap-2 py-0.5">
               <!-- Left Group: Average Label -->
               <span
@@ -83,7 +133,7 @@
               <span
                 class="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-0.5 rounded-md bg-indigo-500/15 text-indigo-300 border border-indigo-500/30 tabular-nums"
               >
-                €{{ cat.monthlyAverage | number: '1.2-2' }} / mo average
+                €{{ getAverageDisplay(cat) | number: '1.2-2' }} / mo average
               </span>
             </div>
           }
