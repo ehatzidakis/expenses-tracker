@@ -1,48 +1,63 @@
-<div class="space-y-3">
-  <!-- 2-column grid for categories -->
-  <div class="grid grid-cols-4 gap-1">
-    @for (item of budgets; track item.category) {
-      <div
-        class="bg-gray-900/60 border border-gray-800/80 rounded-2xl p-3.5 flex flex-col justify-between"
-      >
-        <span class="text-xs font-medium text-gray-400 truncate">{{ item.category }}</span>
-        <span class="text-base font-semibold text-gray-100 mt-1">
-          @if (item.budget !== null) {
-            €{{ item.budget }}
-          } @else {
-            —
-          }
-        </span>
+<div class="space-y-6">
+  <div
+    class="bg-gray-900/60 border border-gray-800/80 rounded-2xl p-5 space-y-4 backdrop-blur-sm overflow-hidden select-none"
+  >
+    <div class="flex items-center justify-between">
+      <div>
+        <h3 class="text-sm font-semibold text-gray-100">Monthly Allocated Budget Per Category</h3>
+        <!-- <p class="text-xs text-gray-400 mt-0.5">Tap a bar to inspect details</p> -->
       </div>
-    }
-  </div>
+    </div>
+    <!-- 2-column grid for categories -->
+    <div class="grid grid-cols-4 gap-1">
+      @for (item of budgets; track item.category) {
+        <div
+          class="bg-gray-800/40 border border-gray-800/60 rounded-2xl p-3.5 flex flex-col justify-between"
+        >
+          <span
+            class="font-medium text-gray-400 block whitespace-nowrap"
+            [class]="getCategoryTextSize(item.category)"
+          >
+            {{ item.category }}
+          </span>
+          <span class="text-base font-semibold text-gray-100 mt-1">
+            @if (item.budget !== null) {
+              €{{ item.budget }}
+            } @else {
+              —
+            }
+          </span>
+        </div>
+      }
+    </div>
 
-  <!-- Full-width Budget Sum Card -->
-  <div class="space-y-3">
-    <div class="grid grid-cols-2 gap-3">
-      <div
-        class="bg-indigo-950/30 border border-indigo-800/50 rounded-2xl p-2 flex items-center justify-between"
-      >
-        <span class="text-xs font-semibold uppercase tracking-wider text-indigo-300"
-          >Budget Sum</span
+    <!-- Full-width Budget Sum Card -->
+    <div class="space-y-3">
+      <div class="grid grid-cols-2 gap-3">
+        <div
+          class="bg-indigo-950/30 border border-indigo-800/50 rounded-2xl p-2 flex items-center justify-between"
         >
-        <span class="text-lg font-bold text-indigo-200">
-          €{{ totalBudget | number: '1.0-0' }}
-        </span>
-      </div>
-      <div
-        class="bg-indigo-950/30 border border-indigo-800/50 rounded-2xl p-2 flex items-center justify-between"
-      >
-        <span class="text-xs font-semibold uppercase tracking-wider text-indigo-300"
-          >Projected Saved</span
+          <span class="text-xs font-semibold uppercase tracking-wider text-indigo-300"
+            >Total Budgeted Sum</span
+          >
+          <span class="text-lg font-bold text-indigo-200">
+            €{{ totalBudget | number: '1.0-0' }}
+          </span>
+        </div>
+        <div
+          class="bg-indigo-950/30 border border-indigo-800/50 rounded-2xl p-2 flex items-center justify-between"
         >
-        <span
-          class="text-lg font-bold text-indigo-200"
-          [class.blur-md]="privacyService.isPrivacyMode()"
-          [class.select-none]="privacyService.isPrivacyMode()"
-        >
-          €{{ projectedSave | number: '1.0-0' }}
-        </span>
+          <span class="text-xs font-semibold uppercase tracking-wider text-indigo-300"
+            >Monthly Savings</span
+          >
+          <span
+            class="text-lg font-bold text-indigo-200"
+            [class.blur-md]="privacyService.isPrivacyMode()"
+            [class.select-none]="privacyService.isPrivacyMode()"
+          >
+            €{{ projectedSave | number: '1.0-0' }}
+          </span>
+        </div>
       </div>
     </div>
   </div>

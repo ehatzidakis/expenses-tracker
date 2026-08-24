@@ -23,4 +23,12 @@ export class CategoryBudgetsGrid {
   );
 
   readonly projectedSave = DEFAULT_TOTAL_WAGE - (this.totalBudget ?? 0);
+  readonly wage = DEFAULT_TOTAL_WAGE;
+
+  getCategoryTextSize(category: string): string {
+    // Customize logic based on character count
+    if (category.length > 9) return 'text-[8.5px]';
+    // if (category.length > 8) return 'text-[9px]';
+    return 'text-[11px]';
+  }
 }
