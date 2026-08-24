@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject, output, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { AuthService } from '../../services/auth.service';
 import { PrivacyService } from '../../services/privacy.service';
 
 type PinAction = 'none' | 'set' | 'remove' | 'unlock-to-disable';
@@ -13,6 +14,7 @@ type PinAction = 'none' | 'set' | 'remove' | 'unlock-to-disable';
 })
 export class SettingsModalComponent {
   readonly privacyService = inject(PrivacyService);
+  readonly authService = inject(AuthService);
   readonly close = output<void>();
 
   readonly activeAction = signal<PinAction>('none');
@@ -70,6 +72,16 @@ export class SettingsModalComponent {
       this.resetForm();
     } else {
       this.setFeedback('error', 'Incorrect PIN. Please try again.');
+    }
+  }
+
+  async handleSignOut(): Promise<void> {
+    try {
+      await this.authService.signOut();
+      this.close.emit();
+    } catch (error) {
+      console.error('Sign out failed:', error);
+      this.setFeedback('error', 'Unable to sign out right now.');
     }
   }
 
