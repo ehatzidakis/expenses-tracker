@@ -13,11 +13,13 @@ import { auth } from '../firebase.config';
 })
 export class AuthService {
   readonly user = signal<User | null>(null);
-  readonly isAuthenticated = computed(() => this.user() !== null);
+  readonly authReady = signal(false);
+  readonly isAuthenticated = computed(() => this.authReady() && this.user() !== null);
 
   constructor() {
     onAuthStateChanged(auth, (nextUser) => {
       this.user.set(nextUser);
+      this.authReady.set(true);
     });
   }
 

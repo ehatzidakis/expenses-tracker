@@ -61,6 +61,7 @@ export class AppComponent {
   readonly authError = signal<string | null>(null);
   readonly isSigningIn = signal(false);
   readonly user = this.authService.user;
+  readonly authReady = this.authService.authReady;
   readonly isAuthenticated = this.authService.isAuthenticated;
 
   adjustmentsQuery = this.adjustmentService.getAdjustmentsQuery();

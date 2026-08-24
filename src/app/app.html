@@ -1,4 +1,15 @@
-@if (!isAuthenticated()) {
+@if (!authReady()) {
+  <main class="min-h-screen bg-gray-950 text-gray-100 p-4 flex items-center justify-center">
+    <div
+      class="flex items-center gap-3 rounded-xl border border-gray-800 bg-gray-900/80 px-4 py-3 text-sm text-gray-300"
+    >
+      <div
+        class="h-4 w-4 animate-spin rounded-full border-2 border-cyan-400 border-t-transparent"
+      ></div>
+      Loading your session...
+    </div>
+  </main>
+} @else if (!isAuthenticated()) {
   <main class="min-h-screen bg-gray-950 text-gray-100 p-4 flex items-center justify-center">
     <div class="w-full max-w-md rounded-2xl border border-gray-800 bg-gray-900/80 p-6 shadow-2xl">
       <div class="mb-6">
