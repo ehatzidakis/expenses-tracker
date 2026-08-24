@@ -1,4 +1,5 @@
 import { Component, computed, inject, signal } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { AdjustmentSelectorComponent } from './components/adjustment-selector/adjustment-selector';
 import { TripBreakdownComponent } from './components/trip-breakdown/trip-breakdown';
 import { ExpenseStateService } from './services/expense-state.service';
@@ -16,6 +17,7 @@ import { CategoryBudgetsGrid } from './components/category-budgets-grid/category
 import { CategoryBudgetsChartComponent } from './components/category-budgets-chart/category-budgets-chart';
 import { UtilitySumComponent } from './components/utility-sum-component/utility-sum-component';
 import { CategoryAverageComponent } from './components/category-average/category-average';
+import { AuthService } from './services/auth.service';
 
 export interface YearlyBreakdownEntry {
   year: number;
@@ -29,6 +31,7 @@ export interface YearlyBreakdownEntry {
   selector: 'app-root',
   standalone: true,
   imports: [
+    FormsModule,
     HeaderComponent,
     OverviewCardComponent,
     MonthSelectorComponent,
@@ -49,9 +52,16 @@ export interface YearlyBreakdownEntry {
 export class AppComponent {
   state = inject(ExpenseStateService);
   private adjustmentService = inject(AdjustmentService);
+  private authService = inject(AuthService);
 
   readonly editingAdjustment = signal<Adjustment | null>(null);
   readonly selectedTripId = signal<string | null>(null);
+  readonly email = signal('');
+  readonly password = signal('');
+  readonly authError = signal<string | null>(null);
+  readonly isSigningIn = signal(false);
+  readonly user = this.authService.user;
+  readonly isAuthenticated = this.authService.isAuthenticated;
 
   adjustmentsQuery = this.adjustmentService.getAdjustmentsQuery();
 
@@ -139,4 +149,34 @@ export class AppComponent {
   readonly totalOutgoing = computed(() => this.state.totalMonthlySpend() + this.oneOffExpenses());
   readonly totalIncoming = computed(() => this.state.selectedTotalWage() + this.oneOffBonuses());
   readonly totalSaved = computed(() => this.totalIncoming() - this.totalOutgoing());
+
+  async signIn(): Promise<void> {
+    const email = this.email().trim();
+    const password = this.password();
+
+    if (!email || !password) {
+      this.authError.set('Enter both email and password.');
+      return;
+    }
+
+    this.isSigningIn.set(true);
+    this.authError.set(null);
+
+    try {
+      await this.authService.signIn(email, password);
+      this.email.set('');
+      this.password.set('');
+    } catch (error) {
+      console.error('Sign in failed:', error);
+      this.authError.set(
+        'Unable to sign in. Check your email and password, or enable Email/Password auth in Firebase.',
+      );
+    } finally {
+      this.isSigningIn.set(false);
+    }
+  }
+
+  async signOut(): Promise<void> {
+    await this.authService.signOut();
+  }
 }

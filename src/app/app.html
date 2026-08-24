@@ -1,148 +1,202 @@
-<main
-  class="min-h-screen bg-gray-950 text-gray-100 p-4 pb-28 max-w-md mx-auto md:max-w-3xl md:p-8 md:pb-28 flex flex-col gap-6"
->
-  <app-header></app-header>
-
-  @if (state.activeTab() === 'monthly' || state.activeTab() === 'sumup') {
-    <!-- Loading State -->
-    @if (state.expensesQuery.isPending()) {
-      <div class="flex flex-col gap-4 animate-pulse">
-        <div class="h-12 bg-gray-900 rounded-xl"></div>
-        <div class="h-32 bg-gray-900 rounded-2xl"></div>
-        <div class="h-64 bg-gray-900 rounded-2xl"></div>
+@if (!isAuthenticated()) {
+  <main class="min-h-screen bg-gray-950 text-gray-100 p-4 flex items-center justify-center">
+    <div class="w-full max-w-md rounded-2xl border border-gray-800 bg-gray-900/80 p-6 shadow-2xl">
+      <div class="mb-6">
+        <p class="text-xs uppercase tracking-[0.2em] text-cyan-400">Expenses Tracker</p>
+        <h1 class="mt-3 text-2xl font-semibold text-white">Sign in to continue</h1>
       </div>
-    }
 
-    <!-- Error State -->
-    @if (state.expensesQuery.isError()) {
-      <div class="p-4 bg-red-950/40 border border-red-800/60 text-red-300 rounded-xl text-sm">
-        Unable to load expenses data.
-      </div>
-    }
+      <form class="flex flex-col gap-4" (ngSubmit)="signIn()">
+        <label class="flex flex-col gap-2 text-sm text-gray-300">
+          Email
+          <input
+            type="email"
+            [(ngModel)]="email"
+            name="email"
+            class="rounded-xl border border-gray-700 bg-gray-950 px-3 py-2 text-white outline-none ring-0 placeholder:text-gray-500"
+            placeholder="you@example.com"
+          />
+        </label>
 
-    <!-- Success State -->
-    @if (state.expensesQuery.isSuccess() && state.selectedExpense()) {
-      @switch (state.activeTab()) {
-        @case ('monthly') {
-          <app-month-selector
-            [months]="state.processedExpenses()"
-            [selectedId]="state.selectedExpense()?.id ?? null"
-            (monthSelected)="state.selectMonth($event)"
+        <label class="flex flex-col gap-2 text-sm text-gray-300">
+          Password
+          <input
+            type="password"
+            [(ngModel)]="password"
+            name="password"
+            class="rounded-xl border border-gray-700 bg-gray-950 px-3 py-2 text-white outline-none ring-0 placeholder:text-gray-500"
+            placeholder="••••••••"
+          />
+        </label>
+
+        @if (authError(); as error) {
+          <p
+            class="rounded-xl border border-red-800/70 bg-red-950/30 px-3 py-2 text-sm text-red-300"
           >
-          </app-month-selector>
-
-          <app-overview-card
-            [totalSpend]="state.totalMonthlySpend()"
-            [totalWage]="state.selectedTotalWage()"
-            [monthName]="state.selectedExpense()?.MonthName ?? ''"
-            [dateRangeInfo]="null"
-            [topCategory]="state.topCategory()"
-          >
-          </app-overview-card>
-
-          <app-category-breakdown
-            [categories]="state.categoryBreakdown()"
-            [monthName]="state.selectedExpense()?.MonthName ?? ''"
-          >
-          </app-category-breakdown>
+            {{ error }}
+          </p>
         }
-        @case ('sumup') {
-          @defer (on immediate) {
+
+        <button
+          type="submit"
+          class="rounded-xl bg-cyan-500 px-4 py-2.5 font-medium text-slate-950 transition hover:bg-cyan-400 disabled:cursor-not-allowed disabled:opacity-60"
+          [disabled]="isSigningIn()"
+        >
+          {{ isSigningIn() ? 'Signing in...' : 'Sign In' }}
+        </button>
+      </form>
+    </div>
+  </main>
+} @else {
+  <main
+    class="min-h-screen bg-gray-950 text-gray-100 p-4 pb-28 max-w-md mx-auto md:max-w-3xl md:p-8 md:pb-28 flex flex-col gap-6"
+  >
+    <app-header></app-header>
+
+    @if (state.activeTab() === 'monthly' || state.activeTab() === 'sumup') {
+      <!-- Loading State -->
+      @if (state.expensesQuery.isPending()) {
+        <div class="flex flex-col gap-4 animate-pulse">
+          <div class="h-12 bg-gray-900 rounded-xl"></div>
+          <div class="h-32 bg-gray-900 rounded-2xl"></div>
+          <div class="h-64 bg-gray-900 rounded-2xl"></div>
+        </div>
+      }
+
+      <!-- Error State -->
+      @if (state.expensesQuery.isError()) {
+        <div class="p-4 bg-red-950/40 border border-red-800/60 text-red-300 rounded-xl text-sm">
+          Unable to load expenses data.
+        </div>
+      }
+
+      <!-- Success State -->
+      @if (state.expensesQuery.isSuccess() && state.selectedExpense()) {
+        @switch (state.activeTab()) {
+          @case ('monthly') {
+            <app-month-selector
+              [months]="state.processedExpenses()"
+              [selectedId]="state.selectedExpense()?.id ?? null"
+              (monthSelected)="state.selectMonth($event)"
+            >
+            </app-month-selector>
+
             <app-overview-card
-              [totalSpend]="totalOutgoing()"
+              [totalSpend]="state.totalMonthlySpend()"
               [totalWage]="state.selectedTotalWage()"
-              [totalSaved]="totalSaved()"
-              [monthlyExpenses]="state.totalMonthlySpend()"
-              [oneOffExpenses]="oneOffExpenses()"
-              [monthlySaved]="monthlySaved()"
-              [oneOffBonuses]="oneOffBonuses()"
-              [yearlyBreakdown]="yearlyBreakdown()"
               [monthName]="state.selectedExpense()?.MonthName ?? ''"
-              [dateRangeInfo]="state.dateRangeInfo()"
+              [dateRangeInfo]="null"
               [topCategory]="state.topCategory()"
             >
             </app-overview-card>
 
-            <app-category-breakdown [categories]="state.categoryBreakdown()">
+            <app-category-breakdown
+              [categories]="state.categoryBreakdown()"
+              [monthName]="state.selectedExpense()?.MonthName ?? ''"
+            >
             </app-category-breakdown>
           }
-        }
-      }
-    }
-  }
+          @case ('sumup') {
+            @defer (on immediate) {
+              <app-overview-card
+                [totalSpend]="totalOutgoing()"
+                [totalWage]="state.selectedTotalWage()"
+                [totalSaved]="totalSaved()"
+                [monthlyExpenses]="state.totalMonthlySpend()"
+                [oneOffExpenses]="oneOffExpenses()"
+                [monthlySaved]="monthlySaved()"
+                [oneOffBonuses]="oneOffBonuses()"
+                [yearlyBreakdown]="yearlyBreakdown()"
+                [monthName]="state.selectedExpense()?.MonthName ?? ''"
+                [dateRangeInfo]="state.dateRangeInfo()"
+                [topCategory]="state.topCategory()"
+              >
+              </app-overview-card>
 
-  @if (state.activeTab() === 'oneoffs') {
-    @defer (on immediate) {
-      @if (editingAdjustment(); as selectedAdj) {
-        <!-- EDIT VIEW -->
-        <app-edit-adjustment
-          [adjustment]="selectedAdj"
-          (back)="editingAdjustment.set(null)"
-          (updated)="editingAdjustment.set(null)"
-          (deleted)="editingAdjustment.set(null)"
-        />
-      } @else if (adjustmentsQuery.isPending()) {
-        <div class="flex flex-col gap-3 animate-pulse">
-          <div class="h-16 bg-gray-900 rounded-2xl"></div>
-          <div class="h-16 bg-gray-900 rounded-2xl"></div>
-          <div class="h-16 bg-gray-900 rounded-2xl"></div>
-        </div>
-      } @else if (adjustmentsQuery.isError()) {
-        <div class="p-4 bg-red-950/40 border border-red-800/60 text-red-300 rounded-xl text-sm">
-          Unable to load one-offs data.
-        </div>
-      } @else {
-        <!-- Adjustment Selector (Singles + Trip pills) -->
-        <app-adjustment-selector
-          [adjustments]="sortedAdjustments()"
-          [selectedId]="selectedTripId()"
-          (selectionChanged)="selectedTripId.set($event)"
-        />
-
-        @if (selectedTripId() === null) {
-          <!-- SINGLES VIEW -->
-          @if (singleAdjustments().length) {
-            <div class="flex flex-col gap-3">
-              @for (adjustment of singleAdjustments(); track adjustment.id) {
-                <app-adjustment-card
-                  [adjustment]="adjustment"
-                  (cardClick)="editingAdjustment.set(adjustment)"
-                ></app-adjustment-card>
-              }
-            </div>
-          } @else {
-            <div
-              class="flex flex-col items-center justify-center gap-2 text-center py-16 px-4 bg-gray-900/60 border border-gray-800/80 rounded-2xl text-gray-500 text-sm"
-            >
-              No singles yet
-            </div>
+              <app-category-breakdown [categories]="state.categoryBreakdown()">
+              </app-category-breakdown>
+            }
           }
-        } @else if (selectedTrip()) {
-          <!-- TRIP BREAKDOWN VIEW -->
-          <app-trip-breakdown [trip]="selectedTrip()!" />
         }
       }
     }
-  }
 
-  @if (state.activeTab() === 'create') {
-    @defer (on immediate) {
-      <app-create-transaction></app-create-transaction>
-    } @loading {
-      <div class="h-96 bg-gray-900/60 rounded-2xl animate-pulse"></div>
+    @if (state.activeTab() === 'oneoffs') {
+      @defer (on immediate) {
+        @if (editingAdjustment(); as selectedAdj) {
+          <!-- EDIT VIEW -->
+          <app-edit-adjustment
+            [adjustment]="selectedAdj"
+            (back)="editingAdjustment.set(null)"
+            (updated)="editingAdjustment.set(null)"
+            (deleted)="editingAdjustment.set(null)"
+          />
+        } @else if (adjustmentsQuery.isPending()) {
+          <div class="flex flex-col gap-3 animate-pulse">
+            <div class="h-16 bg-gray-900 rounded-2xl"></div>
+            <div class="h-16 bg-gray-900 rounded-2xl"></div>
+            <div class="h-16 bg-gray-900 rounded-2xl"></div>
+          </div>
+        } @else if (adjustmentsQuery.isError()) {
+          <div class="p-4 bg-red-950/40 border border-red-800/60 text-red-300 rounded-xl text-sm">
+            Unable to load one-offs data.
+          </div>
+        } @else {
+          <!-- Adjustment Selector (Singles + Trip pills) -->
+          <app-adjustment-selector
+            [adjustments]="sortedAdjustments()"
+            [selectedId]="selectedTripId()"
+            (selectionChanged)="selectedTripId.set($event)"
+          />
+
+          @if (selectedTripId() === null) {
+            <!-- SINGLES VIEW -->
+            @if (singleAdjustments().length) {
+              <div class="flex flex-col gap-3">
+                @for (adjustment of singleAdjustments(); track adjustment.id) {
+                  <app-adjustment-card
+                    [adjustment]="adjustment"
+                    (cardClick)="editingAdjustment.set(adjustment)"
+                  ></app-adjustment-card>
+                }
+              </div>
+            } @else {
+              <div
+                class="flex flex-col items-center justify-center gap-2 text-center py-16 px-4 bg-gray-900/60 border border-gray-800/80 rounded-2xl text-gray-500 text-sm"
+              >
+                No singles yet
+              </div>
+            }
+          } @else if (selectedTrip()) {
+            <!-- TRIP BREAKDOWN VIEW -->
+            <app-trip-breakdown [trip]="selectedTrip()!" />
+          }
+        }
+      }
     }
-  }
 
-  @if (state.activeTab() === 'charts') {
-    @defer (on immediate) {
-      <app-category-budgets-grid></app-category-budgets-grid>
-      <app-category-budgets-chart></app-category-budgets-chart>
-      <app-utility-sum></app-utility-sum>
-      <app-category-average></app-category-average>
-    } @loading {
-      <div class="h-96 bg-gray-900/60 rounded-2xl animate-pulse"></div>
+    @if (state.activeTab() === 'create') {
+      @defer (on immediate) {
+        <app-create-transaction></app-create-transaction>
+      } @loading {
+        <div class="h-96 bg-gray-900/60 rounded-2xl animate-pulse"></div>
+      }
     }
-  }
-</main>
 
-<app-tab-bar [activeTab]="state.activeTab()" (tabChange)="state.setActiveTab($event)"></app-tab-bar>
+    @if (state.activeTab() === 'charts') {
+      @defer (on immediate) {
+        <app-category-budgets-grid></app-category-budgets-grid>
+        <app-category-budgets-chart></app-category-budgets-chart>
+        <app-utility-sum></app-utility-sum>
+        <app-category-average></app-category-average>
+      } @loading {
+        <div class="h-96 bg-gray-900/60 rounded-2xl animate-pulse"></div>
+      }
+    }
+  </main>
+
+  <app-tab-bar
+    [activeTab]="state.activeTab()"
+    (tabChange)="state.setActiveTab($event)"
+  ></app-tab-bar>
+}
