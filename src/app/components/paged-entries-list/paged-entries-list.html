@@ -38,22 +38,34 @@
       </button>
     }
 
-    <div class="flex items-center justify-between pt-1">
+    <div class="flex items-center justify-between pt-1 gap-2">
       <button
-        (click)="back()"
-        [disabled]="page() === 1"
-        class="px-3 py-1.5 rounded-lg text-xs font-medium border border-gray-800 text-gray-300 disabled:opacity-30 disabled:cursor-not-allowed hover:border-gray-700 transition-colors"
+        type="button"
+        (click)="toggleSortByAmount()"
+        class="px-2.5 py-1.5 rounded-lg text-[10px] font-medium border border-gray-800 text-gray-300 hover:border-gray-700 transition-colors"
       >
-        ← Back
+        {{ sortByAmount() ? 'Sort: high → low' : 'Sort: newest' }}
       </button>
-      <span class="text-[11px] text-gray-500">Page {{ page() }}</span>
-      <button
-        (click)="next()"
-        [disabled]="!hasMore()"
-        class="px-3 py-1.5 rounded-lg text-xs font-medium border border-gray-800 text-gray-300 disabled:opacity-30 disabled:cursor-not-allowed hover:border-gray-700 transition-colors"
-      >
-        Next →
-      </button>
+
+      <div class="flex items-center gap-2">
+        <button
+          type="button"
+          (click)="back()"
+          [disabled]="page() === 1"
+          class="px-3 py-1.5 rounded-lg text-xs font-medium border border-gray-800 text-gray-300 disabled:opacity-30 disabled:cursor-not-allowed hover:border-gray-700 transition-colors"
+        >
+          ← Back
+        </button>
+        <span class="text-[11px] text-gray-500">Page {{ page() }}</span>
+        <button
+          type="button"
+          (click)="next()"
+          [disabled]="!hasMore()"
+          class="px-3 py-1.5 rounded-lg text-xs font-medium border border-gray-800 text-gray-300 disabled:opacity-30 disabled:cursor-not-allowed hover:border-gray-700 transition-colors"
+        >
+          Next →
+        </button>
+      </div>
     </div>
   } @else {
     <div class="text-center text-xs text-gray-500 py-4">No entries found.</div>

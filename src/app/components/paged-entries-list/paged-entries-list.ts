@@ -19,6 +19,7 @@ export class PagedEntriesListComponent {
   title = input.required<string>();
   mode = input<EntryListMode>('category');
   filterValue = input.required<string>();
+  readonly sortByAmount = signal(false);
 
   selectEntry = output<Transaction>();
 
@@ -35,6 +36,7 @@ export class PagedEntriesListComponent {
       this.title();
       this.mode();
       this.filterValue();
+      this.sortByAmount();
       this.cursors = [null];
       this.loadPage(1);
     });
@@ -52,8 +54,16 @@ export class PagedEntriesListComponent {
       const cursor = this.cursors[page - 1] ?? null;
       const result =
         this.mode() === 'description'
-          ? await this.transactionService.fetchPageByDescription(this.filterValue(), cursor)
-          : await this.transactionService.fetchPageByCategory(this.filterValue(), cursor);
+          ? await this.transactionService.fetchPageByDescription(
+              this.filterValue(),
+              cursor,
+              this.sortByAmount(),
+            )
+          : await this.transactionService.fetchPageByCategory(
+              this.filterValue(),
+              cursor,
+              this.sortByAmount(),
+            );
 
       this.items.set(result.items);
       this.hasMore.set(result.hasMore);
@@ -65,6 +75,10 @@ export class PagedEntriesListComponent {
     } finally {
       this.loading.set(false);
     }
+  }
+
+  toggleSortByAmount(): void {
+    this.sortByAmount.set(!this.sortByAmount());
   }
 
   next(): void {

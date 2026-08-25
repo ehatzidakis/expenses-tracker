@@ -80,25 +80,30 @@ export class TransactionService {
   async fetchPageByCategory(
     category: string,
     cursor: QueryDocumentSnapshot<DocumentData> | null,
+    sortByAmount = false,
   ): Promise<TransactionPage> {
-    return this.fetchPagedTransactions([where('category', '==', category)], cursor);
+    return this.fetchPagedTransactions([where('category', '==', category)], cursor, sortByAmount);
   }
 
   async fetchPageByDescription(
     description: string,
     cursor: QueryDocumentSnapshot<DocumentData> | null,
+    sortByAmount = false,
   ): Promise<TransactionPage> {
-    return this.fetchPagedTransactions([where('description', '==', description)], cursor);
+    return this.fetchPagedTransactions([where('description', '==', description)], cursor, sortByAmount);
   }
 
   private async fetchPagedTransactions(
     filters: QueryConstraint[],
     cursor: QueryDocumentSnapshot<DocumentData> | null,
+    sortByAmount = false,
   ): Promise<TransactionPage> {
     const transactionsRef = collection(db, 'transactions');
     const constraints: QueryConstraint[] = [
       ...filters,
-      orderBy('date', 'desc'),
+      ...(sortByAmount
+        ? [orderBy('amount', 'desc'), orderBy('date', 'desc')]
+        : [orderBy('date', 'desc')]),
       limit(PAGE_SIZE + 1),
     ];
 
