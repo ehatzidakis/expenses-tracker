@@ -90,7 +90,11 @@ export class TransactionService {
     cursor: QueryDocumentSnapshot<DocumentData> | null,
     sortByAmount = false,
   ): Promise<TransactionPage> {
-    return this.fetchPagedTransactions([where('description', '==', description)], cursor, sortByAmount);
+    return this.fetchPagedTransactions(
+      [where('description', '==', description)],
+      cursor,
+      sortByAmount,
+    );
   }
 
   private async fetchPagedTransactions(
