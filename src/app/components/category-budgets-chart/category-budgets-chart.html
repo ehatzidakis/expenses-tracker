@@ -9,10 +9,6 @@
         <h3 class="text-sm font-semibold text-gray-100">Monthly Spend Trend</h3>
         <p class="text-xs text-gray-400 mt-0.5">Tap a bar to inspect details</p>
       </div>
-      <div class="flex items-center gap-2 text-[11px] text-gray-400">
-        <span class="w-2.5 h-2.5 rounded-full bg-indigo-500 inline-block"></span> Spend
-        <span class="w-3 border-b-2 border-dashed border-emerald-400 inline-block ml-1"></span> Wage
-      </div>
     </div>
 
     @if (monthlyTrends().length === 0) {
@@ -32,7 +28,7 @@
 
           <div class="flex items-center gap-4 text-right">
             <div>
-              <span class="text-[10px] text-gray-400 block">Spent</span>
+              <span class="text-[10px] text-gray-400 block">Spend</span>
               <span
                 class="text-xs font-bold"
                 [class.text-red-400]="active.total > active.wage"
@@ -54,14 +50,19 @@
             </div>
           </div>
         </div>
+        <!-- <div class="flex items-center gap-2 text-[11px] text-gray-400">
+          <span class="w-2.5 h-2.5 rounded-full bg-indigo-500 inline-block"></span> Spend
+          <span class="w-3 border-b-2 border-dashed border-emerald-400 inline-block ml-1"></span>
+          Wage
+        </div> -->
       }
 
       <!-- HORIZONTAL SWIPE CONTAINER -->
       <div
-        class="relative pt-6 pb-2 -mx-5 px-5 overflow-x-auto scroll-smooth snap-x snap-mandatory scrollbar-none"
+        class="relative pt-1 pb-2 overflow-x-auto scroll-smooth snap-x snap-mandatory scrollbar-none"
       >
         <div
-          class="inline-flex min-w-full items-end gap-3 h-44 border-b border-gray-800/80 pb-6 relative pr-2"
+          class="inline-flex min-w-full items-end gap-3 h-44 border-b border-gray-800/80 pb-6 relative pl-2"
         >
           <!-- Active Month Dynamic Wage Baseline -->
           @if (activeMonth(); as active) {
