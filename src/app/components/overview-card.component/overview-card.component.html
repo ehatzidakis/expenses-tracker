@@ -32,6 +32,28 @@
           €{{ totalSpend() | number: '1.2-2' }}
         </h2>
       </div>
+      @if (hasBreakdown()) {
+        <div class="mt-2.5 space-y-2">
+          <div class="flex items-center justify-between gap-2 text-[11px]">
+            <span class="text-gray-500 text-[10px]">Monthly Expenses:</span>
+            <span
+              class="text-gray-300 font-medium tabular-nums"
+              [class.blur-md]="privacyService.isPrivacyMode()"
+              [class.select-none]="privacyService.isPrivacyMode()"
+              >€{{ monthlyExpenses() | number: '1.2-2' }}</span
+            >
+          </div>
+          <div class="flex items-center justify-between gap-2 text-[11px]">
+            <span class="text-gray-500 text-[10px]">One-Off Expenses:</span>
+            <span
+              class="text-gray-300 font-medium tabular-nums"
+              [class.blur-md]="privacyService.isPrivacyMode()"
+              [class.select-none]="privacyService.isPrivacyMode()"
+              >€{{ oneOffExpenses() | number: '1.2-2' }}</span
+            >
+          </div>
+        </div>
+      }
 
       <!-- SumUp Breakdown -->
       <div
@@ -151,6 +173,29 @@
           €{{ computedTotalSaved() | number: '1.2-2' }}
         </h2>
       </div>
+
+      @if (hasBreakdown()) {
+        <div class="mt-2.5 space-y-2">
+          <div class="flex items-center justify-between gap-2 text-[11px]">
+            <span class="text-gray-500 text-[10px]">Monthly Saved:</span>
+            <span
+              class="text-gray-300 font-medium tabular-nums"
+              [class.blur-md]="privacyService.isPrivacyMode()"
+              [class.select-none]="privacyService.isPrivacyMode()"
+              >€{{ monthlySaved() | number: '1.2-2' }}</span
+            >
+          </div>
+          <div class="flex items-center justify-between gap-2 text-[11px]">
+            <span class="text-gray-500 text-[10px]">One-Off Bonuses:</span>
+            <span
+              class="text-gray-300 font-medium tabular-nums"
+              [class.blur-md]="privacyService.isPrivacyMode()"
+              [class.select-none]="privacyService.isPrivacyMode()"
+              >€{{ oneOffBonuses() | number: '1.2-2' }}</span
+            >
+          </div>
+        </div>
+      }
 
       <!-- Right Column Breakdown -->
       <div
