@@ -41,13 +41,18 @@
 
               <!-- Over Budget Amount -->
               <div class="w-14 text-right">
-                @if (!cat.isAllTime) {
-                  <span
-                    class="text-red-400 font-semibold tabular-nums block"
-                    [class.invisible]="!cat.isOverBudget || cat.budget === null"
-                  >
-                    €{{ (cat.monthlyAverage ?? cat.amount) - (cat.budget ?? 0) | number: '1.2-2' }}
-                  </span>
+                @if (!cat.isAllTime && cat.budget !== null) {
+                  @if (cat.isOverBudget) {
+                    <span class="text-red-400 font-semibold tabular-nums block">
+                      €{{
+                        (cat.monthlyAverage ?? cat.amount) - (cat.budget ?? 0) | number: '1.2-2'
+                      }}
+                    </span>
+                  } @else {
+                    <span class="text-blue-400 font-semibold tabular-nums block">
+                      €{{ cat.budget - (cat.monthlyAverage ?? cat.amount) | number: '1.2-2' }}
+                    </span>
+                  }
                 }
                 <!-- @if (cat.overallBudget !== null) {
                   <span
