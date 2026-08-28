@@ -1,4 +1,4 @@
-import { Component, effect, inject, input, signal } from '@angular/core';
+import { Component, computed, effect, inject, input, signal } from '@angular/core';
 import { EditTransactionComponent } from '../edit-transaction.component/edit-transaction.component';
 import { CommonModule } from '@angular/common';
 import { CategorySpend, getCategoryMeta } from '../../services/expense-state.service';
@@ -25,6 +25,17 @@ export class CategoryBreakdownComponent {
   categories = input.required<CategorySpend[]>();
   monthName = input<string>('');
   selectedTransaction = signal<Transaction | null>(null);
+
+  readonly budgetTitle = computed(() => {
+    const month = this.monthName().trim();
+
+    if (!month || month.toLowerCase() === 'all time') {
+      return 'All-Time Budget';
+    }
+
+    const monthOnly = month.replace(/\s+\d{4}\s*$/, '').trim();
+    return `${monthOnly}'s Budget`;
+  });
 
   readonly expandedCategory = signal<string | null>(null);
   readonly transactionCounts = signal<Record<string, number>>({});

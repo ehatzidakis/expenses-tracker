@@ -66,7 +66,7 @@ interface TripCategoryRow {
         <div
           class="bg-gray-900/60 border border-gray-800/80 rounded-2xl p-5 space-y-3 backdrop-blur-sm"
         >
-          <h3 class="text-sm font-semibold text-gray-200">Spend by Category</h3>
+          <h3 class="text-sm font-semibold text-gray-200">Trip Budget</h3>
 
           @if (categoryRows().length === 0) {
             <div class="text-center text-xs text-gray-500 py-4">No transactions yet.</div>
