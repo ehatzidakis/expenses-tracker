@@ -32,6 +32,102 @@ export const CATEGORY_BUDGETS: Record<string, number | null> = {
 
 export const CATEGORY_NAMES = Object.keys(CATEGORY_BUDGETS);
 
+export const CATEGORY_META: Record<string, { emoji: string; classes: string }> = {
+  Supermarket: {
+    emoji: '🛒',
+    classes: 'bg-emerald-500/15 text-emerald-200 border border-emerald-400/20',
+  },
+  Medical: {
+    emoji: '❤️‍🩹',
+    classes: 'bg-rose-500/15 text-rose-200 border border-rose-400/20',
+  },
+  Personal: {
+    emoji: '👤',
+    classes: 'bg-violet-500/15 text-violet-200 border border-violet-400/20',
+  },
+  EatingOut: {
+    emoji: '🍽️',
+    classes: 'bg-amber-500/15 text-amber-200 border border-amber-400/20',
+  },
+  Utilities: {
+    emoji: '💡',
+    classes: 'bg-yellow-500/15 text-yellow-200 border border-yellow-400/20',
+  },
+  Takeaway: {
+    emoji: '🥡',
+    classes: 'bg-orange-500/15 text-orange-200 border border-orange-400/20',
+  },
+  Tickets: {
+    emoji: '🎟️',
+    classes: 'bg-sky-500/15 text-sky-200 border border-sky-400/20',
+  },
+  Gaming: {
+    emoji: '🎮',
+    classes: 'bg-cyan-500/15 text-cyan-200 border border-cyan-400/20',
+  },
+  Cats: {
+    emoji: '🐱',
+    classes: 'bg-pink-500/15 text-pink-200 border border-pink-400/20',
+  },
+  Travel: {
+    emoji: '🚅',
+    classes: 'bg-indigo-500/15 text-indigo-200 border border-indigo-400/20',
+  },
+  Subscriptions: {
+    emoji: '📺',
+    classes: 'bg-fuchsia-500/15 text-fuchsia-200 border border-fuchsia-400/20',
+  },
+  Gym: {
+    emoji: '🏋️',
+    classes: 'bg-teal-500/15 text-teal-200 border border-teal-400/20',
+  },
+  'Plane Tickets': {
+    emoji: '🎫',
+    classes: 'bg-sky-500/15 text-sky-200 border border-sky-400/20',
+  },
+  Accommodation: {
+    emoji: '🏨',
+    classes: 'bg-violet-500/15 text-violet-200 border border-violet-400/20',
+  },
+  Food: {
+    emoji: '🍽️',
+    classes: 'bg-amber-500/15 text-amber-200 border border-amber-400/20',
+  },
+  Transportation: {
+    emoji: '🚅',
+    classes: 'bg-indigo-500/15 text-indigo-200 border border-indigo-400/20',
+  },
+  Gifts: {
+    emoji: '🎁',
+    classes: 'bg-pink-500/15 text-pink-200 border border-pink-400/20',
+  },
+  Activities: {
+    emoji: '🎉',
+    classes: 'bg-teal-500/15 text-teal-200 border border-teal-400/20',
+  },
+  Attractions: {
+    emoji: '🏛️',
+    classes: 'bg-yellow-500/15 text-yellow-200 border border-yellow-400/20',
+  },
+  Splurge: {
+    emoji: '🤑',
+    classes: 'bg-fuchsia-500/15 text-fuchsia-200 border border-fuchsia-400/20',
+  },
+  Miscellaneous: {
+    emoji: '✨',
+    classes: 'bg-slate-500/15 text-slate-200 border border-slate-400/20',
+  },
+};
+
+export function getCategoryMeta(name: string): { emoji: string; classes: string } {
+  return (
+    CATEGORY_META[name] ?? {
+      emoji: '•',
+      classes: 'bg-slate-500/15 text-slate-200 border border-slate-400/20',
+    }
+  );
+}
+
 export const TRIP_CATEGORY_NAMES = [
   'Plane Tickets',
   'Accommodation',

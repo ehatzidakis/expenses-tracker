@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { form, FormField, maxLength, min, required } from '@angular/forms/signals';
 import { QueryClient } from '@tanstack/angular-query-experimental';
 import { TransactionService } from '../../services/transaction-service';
-import { CATEGORY_NAMES } from '../../services/expense-state.service';
+import { CATEGORY_NAMES, getCategoryMeta } from '../../services/expense-state.service';
 import { Transaction } from '../../models/transaction.model';
 import { PEOPLE } from '../../models/splitz.model';
 import { PrivacyService } from '../../services/privacy.service';
@@ -98,6 +98,10 @@ export class EditTransactionComponent {
     });
     required(schemaPath.category, { message: 'Category is required' });
   });
+
+  getCategoryOptionLabel(category: string): string {
+    return `${getCategoryMeta(category).emoji} ${category}`;
+  }
 
   readonly submitting = signal(false);
   readonly deleting = signal(false);
