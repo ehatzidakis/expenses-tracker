@@ -104,6 +104,23 @@ export class TransactionService {
     return this.fetchPagedTransactions([where('category', '==', category)], cursor, sortByAmount);
   }
 
+  async countTransactions(monthName: string, category: string): Promise<number> {
+    if (!monthName || !category) {
+      return 0;
+    }
+
+    const transactionsRef = collection(db, 'transactions');
+    const snapshot = await getDocs(
+      query(
+        transactionsRef,
+        where('monthName', '==', monthName),
+        where('category', '==', category),
+      ),
+    );
+
+    return snapshot.size;
+  }
+
   async fetchPageByDescription(
     description: string,
     cursor: QueryDocumentSnapshot<DocumentData> | null,

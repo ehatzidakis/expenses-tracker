@@ -38,6 +38,55 @@ export class OverviewCardComponent {
   hasBreakdown = computed(
     () => this.monthlyExpenses() !== null || this.yearlyBreakdown().length > 0,
   );
+
+  isCurrentMonthView = computed(() => {
+    const monthName = this.monthName().trim();
+    if (!monthName) return false;
+
+    const [monthLabel, yearLabel] = monthName.split(/\s+/);
+    if (!monthLabel || !yearLabel) return false;
+
+    const monthIndex = [
+      'January',
+      'February',
+      'March',
+      'April',
+      'May',
+      'June',
+      'July',
+      'August',
+      'September',
+      'October',
+      'November',
+      'December',
+    ].findIndex((month) => month.toLowerCase() === monthLabel.toLowerCase());
+
+    if (monthIndex === -1) return false;
+
+    const selectedMonth = new Date(Number(yearLabel), monthIndex, 1);
+    const today = new Date();
+    const currentMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+
+    return (
+      selectedMonth.getFullYear() === currentMonth.getFullYear() &&
+      selectedMonth.getMonth() === currentMonth.getMonth()
+    );
+  });
+
+  daysLeftInMonth = computed(() => {
+    if (!this.isCurrentMonthView()) return 0;
+
+    const today = new Date();
+    const lastDayOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0).getDate();
+    return Math.max(1, lastDayOfMonth - today.getDate() + 1);
+  });
+
+  monthCountdownLabel = computed(() => {
+    const remainingDays = this.daysLeftInMonth();
+    if (!this.isCurrentMonthView()) return '';
+    return `${remainingDays} day${remainingDays === 1 ? '' : 's'} left in this month`;
+  });
+
   expanded = signal(false);
 
   readonly privacyService = inject(PrivacyService);

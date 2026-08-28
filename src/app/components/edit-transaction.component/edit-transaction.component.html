@@ -118,7 +118,9 @@
           </div>
           <div>
             <p class="text-gray-400">Settled</p>
-            <p class="mt-1 font-medium text-white">{{ split.splitPaidPersonIds.length }}</p>
+            <p class="mt-1 font-medium text-white">
+              {{ split.splitPaidPersonIds.length > 0 ? 'Yes' : 'No' }}
+            </p>
           </div>
         </div>
       </div>

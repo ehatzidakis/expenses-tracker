@@ -20,14 +20,14 @@
           <!-- Category Header -->
           <div class="flex items-center justify-between text-xs py-0.5">
             <!-- Left Group: Category Name and Over Budget Badge -->
-            <div class="flex items-center gap-1.5 min-w-0 pr-2">
-              <!-- @if (cat.isOverBudget) {
-                <span
-                  class="text-xs px-1 py-0.5 rounded bg-red-500/10 text-red-400 border border-red-500/20 font-medium shrink-0"
-                >
-                  !
-                </span>
-              } -->
+            <div class="flex items-center gap-2 min-w-0 pr-2">
+              <span
+                class="flex h-6 w-6 items-center justify-center rounded-full text-[10px] leading-none shadow-inner"
+                [ngClass]="categoryMeta(cat.name).classes"
+                aria-hidden="true"
+              >
+                {{ categoryMeta(cat.name).emoji }}
+              </span>
 
               <span class="w-20 font-medium text-gray-300">{{ cat.name }}</span
               ><span class="w-10 text-right text-gray-400 tabular-nums"
@@ -35,44 +35,34 @@
               >
             </div>
 
-            <!-- Right Group: Percentage and Amount -->
-            <div class="flex items-center gap-2 shrink-0 justify-end pr-1">
-              <!-- Percentage -->
+            <!-- Right Group: Amount + Budget + Remaining -->
+            <div class="flex items-end gap-2 shrink-0 justify-end pr-1">
+              <div class="text-right">
+                <div class="text-[13px] text-white-40 tabular-nums">
+                  @if (!cat.isAllTime && cat.budget !== null) {
+                    <span>
+                      €{{ cat.amount | number: '1.2-2' }}
+                      <span class="text-gray-500">/ €{{ cat.budget | number: '1.2-2' }}</span>
+                    </span>
+                  } @else {
+                    <span>€{{ cat.amount | number: '1.2-2' }}</span>
+                  }
+                </div>
 
-              <!-- Over Budget Amount -->
-              <div class="w-14 text-right">
                 @if (!cat.isAllTime && cat.budget !== null) {
                   @if (cat.isOverBudget) {
-                    <span class="text-red-400 font-semibold tabular-nums block">
+                    <div class="mt-1 text-[10px] font-medium text-red-400 tabular-nums">
                       €{{
                         (cat.monthlyAverage ?? cat.amount) - (cat.budget ?? 0) | number: '1.2-2'
                       }}
-                    </span>
+                    </div>
                   } @else {
-                    <span class="text-blue-400 font-semibold tabular-nums block">
-                      €{{ cat.budget - (cat.monthlyAverage ?? cat.amount) | number: '1.2-2' }}
-                    </span>
+                    <div class="mt-1 text-[11px] font-medium text-teal-300/90 tabular-nums">
+                      €{{ cat.budget - (cat.monthlyAverage ?? cat.amount) | number: '1.2-2' }} left
+                    </div>
                   }
                 }
-                <!-- @if (cat.overallBudget !== null) {
-                  <span
-                    class="font-semibold tabular-nums"
-                    [class]="cat.isOverBudget ? 'text-red-500' : 'text-green-500'"
-                  >
-                    {{ cat.isOverBudget ? '' : '' }}€{{
-                      Math.abs(cat.amount - cat.overallBudget) | number: '1.2-2'
-                    }}
-                  </span>
-                } -->
               </div>
-
-              <!-- Amount -->
-              <span
-                class="w-18 text-right font-semibold tabular-nums"
-                [class]="cat.isOverBudget ? 'text-red-500' : 'text-white'"
-              >
-                €{{ cat.amount | number: '1.2-2' }}{{ cat.isAllTime ? '' : '' }}
-              </span>
             </div>
           </div>
 
@@ -94,16 +84,23 @@
           }
           <!-- Progress Bar -->
           @if (!cat.isAllTime) {
-            <div class="h-2 w-full bg-gray-800 rounded-full overflow-hidden mt-2.5">
-              <div
-                [class]="
-                  cat.isOverBudget
-                    ? 'bg-linear-to-r from-red-600 to-rose-800'
-                    : 'bg-linear-to-r from-indigo-500 to-violet-500'
-                "
-                class="h-full rounded-full transition-all duration-300"
-                [style.width.%]="(cat.amount / (cat.budget ?? cat.amount)) * 100"
-              ></div>
+            <div class="mt-2.5">
+              <div class="h-2 w-full bg-gray-800 rounded-full overflow-hidden">
+                <div
+                  [class]="
+                    cat.isOverBudget
+                      ? 'bg-linear-to-r from-red-600 to-rose-800'
+                      : 'bg-linear-to-r from-indigo-500 to-violet-500'
+                  "
+                  class="h-full rounded-full transition-all duration-300"
+                  [style.width.%]="(cat.amount / (cat.budget ?? cat.amount)) * 100"
+                ></div>
+              </div>
+              <div class="mt-1.5 text-[10px] text-gray-400">
+                {{ transactionCounts()[cat.name] ?? 0 }} transaction{{
+                  (transactionCounts()[cat.name] ?? 0) === 1 ? '' : 's'
+                }}
+              </div>
             </div>
           }
         </div>
