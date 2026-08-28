@@ -303,6 +303,14 @@
     </div>
   </div>
 
+  @if (!hasBreakdown() && monthCountdownLabel()) {
+    <div class="mt-3 text-center">
+      <span class="text-[10px] font-medium uppercase tracking-[0.14em] text-gray-400">
+        {{ monthCountdownLabel() }}
+      </span>
+    </div>
+  }
+
   @if (hasBreakdown()) {
     <div class="flex justify-center mt-3 pt-2 border-t border-gray-800/60">
       <svg
