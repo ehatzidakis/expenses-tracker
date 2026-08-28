@@ -1,39 +1,41 @@
-import { Component, inject, computed, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ExpenseStateService } from '../../services/expense-state.service';
-import { PrivacyService } from '../../services/privacy.service';
 import { AuthService } from '../../services/auth.service';
-
-interface MonthlyTrendItem {
-  id: string;
-  monthName: string;
-  shortLabel: string;
-  total: number;
-  wage: number;
-}
+import {
+  CategoryBudgetsBarChartComponent,
+  MonthlyTrendItem,
+} from '../category-budgets-bar-chart/category-budgets-bar-chart';
+import { CategoryBudgetsPieChartComponent } from '../category-budgets-pie-chart/category-budgets-pie-chart';
 
 @Component({
   selector: 'app-category-budgets-chart',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, CategoryBudgetsBarChartComponent, CategoryBudgetsPieChartComponent],
   templateUrl: './category-budgets-chart.html',
 })
 export class CategoryBudgetsChartComponent {
   readonly state = inject(ExpenseStateService);
-  readonly privacyService = inject(PrivacyService);
   readonly authService = inject(AuthService);
+
+  readonly selectedChart = signal<'bar' | 'pie'>('bar');
+
+  readonly chartHeader = computed(() =>
+    this.selectedChart() === 'bar' ? 'Monthly spend trend' : 'All-time category split',
+  );
+
+  readonly chartSubheader = computed(() =>
+    this.selectedChart() === 'bar'
+      ? 'Tap a month to inspect the details'
+      : 'Spend vs saved across all months',
+  );
 
   // Selected month ID for tap interaction on iOS
   readonly selectedMonthId = signal<string | null>(null);
 
-  // ================= MONTH-OVER-MONTH TREND CALCULATIONS =================
   readonly monthlyTrends = computed<MonthlyTrendItem[]>(() => {
     const raw = this.state.processedExpenses().filter((e) => e.id !== 'ALL');
-
-    // Reverse-chronological order: Current (newest) month first -> Oldest month last
-    const sorted = [...raw];
-
-    return sorted.map((e) => {
+    return [...raw].map((e) => {
       const total =
         (Number(e.Supermarket) || 0) +
         (Number(e.Medical) || 0) +
@@ -64,7 +66,6 @@ export class CategoryBudgetsChartComponent {
     });
   });
 
-  // Selected month object (defaults to current/newest month at index 0)
   readonly activeMonth = computed<MonthlyTrendItem | null>(() => {
     const trends = this.monthlyTrends();
     if (!trends.length) return null;
@@ -75,11 +76,9 @@ export class CategoryBudgetsChartComponent {
       if (found) return found;
     }
 
-    // Default to the current/newest month (first item)
     return trends[0];
   });
 
-  // Highest point in chart scale + 15% ceiling headroom
   readonly maxTrendSpend = computed(() => {
     const trends = this.monthlyTrends();
     if (!trends.length) return 2000;
@@ -91,21 +90,9 @@ export class CategoryBudgetsChartComponent {
 
   selectMonth(id: string): void {
     this.selectedMonthId.set(id);
+    this.state.selectMonth(id);
     console.log('Is Kiosk --> ', this.authService.isKiosk());
     console.log('Is Admin --> ', this.authService.isAdmin());
     console.log('Current Role --> ', this.authService.currentRole());
-  }
-
-  getBarHeightPercent(amount: number): number {
-    const max = this.maxTrendSpend();
-    if (max <= 0) return 0;
-    return Math.min(Math.round((amount / max) * 100), 100);
-  }
-
-  getWageLinePercent(wage?: number): number {
-    const targetWage = wage ?? this.activeMonth()?.wage ?? 1600;
-    const max = this.maxTrendSpend();
-    if (max <= 0) return 0;
-    return Math.min(Math.round((targetWage / max) * 100), 100);
   }
 }
