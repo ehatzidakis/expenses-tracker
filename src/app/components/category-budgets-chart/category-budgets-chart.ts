@@ -2,6 +2,7 @@ import { Component, inject, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ExpenseStateService } from '../../services/expense-state.service';
 import { PrivacyService } from '../../services/privacy.service';
+import { AuthService } from '../../services/auth.service';
 
 interface MonthlyTrendItem {
   id: string;
@@ -20,6 +21,7 @@ interface MonthlyTrendItem {
 export class CategoryBudgetsChartComponent {
   readonly state = inject(ExpenseStateService);
   readonly privacyService = inject(PrivacyService);
+  readonly authService = inject(AuthService);
 
   // Selected month ID for tap interaction on iOS
   readonly selectedMonthId = signal<string | null>(null);
@@ -89,6 +91,9 @@ export class CategoryBudgetsChartComponent {
 
   selectMonth(id: string): void {
     this.selectedMonthId.set(id);
+    console.log('Is Kiosk --> ', this.authService.isKiosk());
+    console.log('Is Admin --> ', this.authService.isAdmin());
+    console.log('Current Role --> ', this.authService.currentRole());
   }
 
   getBarHeightPercent(amount: number): number {

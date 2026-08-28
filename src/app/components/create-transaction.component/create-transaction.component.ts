@@ -1,4 +1,4 @@
-import { Component, inject, signal, computed } from '@angular/core';
+import { Component, computed, effect, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { form, FormField, maxLength, min, required } from '@angular/forms/signals';
 import { QueryClient } from '@tanstack/angular-query-experimental';
@@ -6,9 +6,10 @@ import { TransactionService } from '../../services/transaction-service';
 import { CATEGORY_NAMES, TRIP_CATEGORY_NAMES } from '../../services/expense-state.service';
 import { AdjustmentService } from '../../services/adjustment-service';
 import { PrivacyService } from '../../services/privacy.service';
-import { computeSplit } from '../../services/splitz.service';
+import { computeSplit, SplitzService } from '../../services/splitz.service';
 import { PEOPLE, Person } from '../../models/splitz.model';
 import { normalizeDecimalInput, parseDecimalInput } from '../../utils/decimal-input';
+import { AuthService } from '../../services/auth.service';
 
 export type EntryType = 'transaction' | 'adjustment';
 
@@ -61,13 +62,35 @@ function defaultAdjustmentModel(): AdjustmentFormModel {
 export class CreateTransactionComponent {
   private transactionService = inject(TransactionService);
   private adjustmentService = inject(AdjustmentService);
+  private splitzService = inject(SplitzService);
   private queryClient = inject(QueryClient);
+  private authService = inject(AuthService);
   readonly privacyService = inject(PrivacyService);
+  readonly isKioskMode = this.authService.isKiosk;
 
   readonly regularCategories = CATEGORY_NAMES;
   readonly tripCategories = TRIP_CATEGORY_NAMES;
 
   readonly activeTab = signal<EntryType>('transaction');
+
+  constructor() {
+    effect(() => {
+      if (this.authService.isKiosk()) {
+        this.applyKioskDefaults();
+      }
+    });
+  }
+
+  private applyKioskDefaults(): void {
+    this.activeTab.set('transaction');
+    this.goesSplitzes.set(false);
+    this.splitWith.set([]);
+    this.paidById.set('me');
+    this.onlyMeOwes.set(false);
+    this.onlyTheyOwe.set(false);
+    this.linkWithAdjustment.set(false);
+    this.selectedAdjustmentId.set('');
+  }
 
   readonly isAddition = signal<boolean>(true);
 
@@ -130,6 +153,16 @@ export class CreateTransactionComponent {
   readonly errorMessage = signal<string | null>(null);
 
   private adjustmentsQuery = this.adjustmentService.getAdjustmentsQuery();
+  private splitTransactionsQuery = this.splitzService.getSplitTransactionsQuery();
+
+  readonly kioskNetBalance = computed(() => {
+    const stavi = this.allPeople.find((person) => person.name === 'Stavi') ?? this.allPeople[0];
+    const summaries = this.splitzService.computePersonSummaries(
+      this.splitTransactionsQuery.data() ?? [],
+    );
+    const summary = summaries.find((entry) => entry.person.id === stavi.id);
+    return -(summary?.netWithMe ?? 0);
+  });
 
   readonly selectableTrips = computed(() =>
     (this.adjustmentsQuery.data() ?? []).filter((a) => a.isTrip && a.isSelectable),
@@ -140,6 +173,11 @@ export class CreateTransactionComponent {
   );
 
   setTab(tab: EntryType): void {
+    if (this.isKioskMode() && tab === 'adjustment') {
+      this.activeTab.set('transaction');
+      return;
+    }
+
     this.activeTab.set(tab);
     this.resetSplitFields();
     this.successMessage.set(null);
@@ -171,6 +209,10 @@ export class CreateTransactionComponent {
   }
 
   togglePersonInSplit(personId: number): void {
+    if (this.isKioskMode()) {
+      return;
+    }
+
     this.onlyMeOwes.set(false);
     this.splitWith.update((current) => {
       if (current.includes(personId)) {
@@ -185,6 +227,15 @@ export class CreateTransactionComponent {
   }
 
   resetSplitFields(): void {
+    if (this.isKioskMode()) {
+      this.goesSplitzes.set(false);
+      this.splitWith.set([]);
+      this.paidById.set('me');
+      this.onlyMeOwes.set(false);
+      this.onlyTheyOwe.set(false);
+      return;
+    }
+
     this.goesSplitzes.set(false);
     this.splitWith.set([]);
     this.paidById.set('me');
@@ -193,6 +244,10 @@ export class CreateTransactionComponent {
   }
 
   setOnlyMeOwes(value: boolean): void {
+    if (this.isKioskMode()) {
+      return;
+    }
+
     this.onlyMeOwes.set(value);
     this.onlyTheyOwe.set(false);
     if (value) {
@@ -204,6 +259,10 @@ export class CreateTransactionComponent {
   }
 
   setOnlyTheyOwe(value: boolean): void {
+    if (this.isKioskMode()) {
+      return;
+    }
+
     this.onlyTheyOwe.set(value);
     this.onlyMeOwes.set(false);
     if (value) {
@@ -252,6 +311,10 @@ export class CreateTransactionComponent {
     }
     if (this.linkWithAdjustment() && !this.selectedAdjustmentId()) {
       this.errorMessage.set('Please select a trip to link with.');
+      return;
+    }
+    if (this.isKioskMode()) {
+      this.submitKioskTransaction();
       return;
     }
 
@@ -318,8 +381,48 @@ export class CreateTransactionComponent {
     }
   }
 
+  private async submitKioskTransaction(): Promise<void> {
+    this.submitting.set(true);
+    this.successMessage.set(null);
+    this.errorMessage.set(null);
+
+    try {
+      const value = this.transactionModel();
+      const paymentBy = 1 as const;
+
+      await this.transactionService.createPendingTransaction({
+        date: value.date,
+        description: value.description.trim(),
+        category: value.category,
+        amount: value.amount,
+        adjustmentId: this.linkWithAdjustment() ? this.selectedAdjustmentId() : undefined,
+        isSplit: false,
+        splitBy: [],
+        totalAmount: value.amount,
+      });
+
+      await this.queryClient.invalidateQueries({ queryKey: ['pendingTransactions'] });
+
+      this.transactionModel.set(defaultTransactionModel());
+      this.transactionForm().reset();
+      this.resetSplitFields();
+      this.successMessage.set('Transaction sent for approval');
+    } catch (err) {
+      console.error('Kiosk approval submission failed:', err);
+      const message =
+        err instanceof Error ? err.message : 'Unable to submit kiosk transaction for approval.';
+      this.errorMessage.set(message);
+    } finally {
+      this.submitting.set(false);
+    }
+  }
+
   async onSubmitAdjustment(event: Event): Promise<void> {
     event.preventDefault();
+    if (this.isKioskMode()) {
+      this.errorMessage.set('One-off adjustments are unavailable for kiosk users.');
+      return;
+    }
     if (this.adjustmentForm().invalid() || this.submitting()) {
       return;
     }

@@ -1,6 +1,7 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import {
   collection,
+  deleteDoc,
   doc,
   getDocs,
   getDoc,
@@ -8,6 +9,7 @@ import {
   limit,
   orderBy,
   query,
+  setDoc,
   startAfter,
   updateDoc,
   where,
@@ -19,6 +21,7 @@ import {
 import { Transaction } from '../models/transaction.model';
 import { db } from '../firebase.config';
 import { CATEGORY_NAMES, DEFAULT_TOTAL_WAGE } from './expense-state.service';
+import { AuthService } from './auth.service';
 
 export interface TransactionPage {
   items: Transaction[];
@@ -40,7 +43,21 @@ export interface NewTransactionInput {
   totalAmount?: number;
 }
 
+export interface PendingTransaction extends NewTransactionInput {
+  id: string;
+  createdAt: string;
+  createdByUid?: string;
+  sourceRole: 'kiosk';
+  status: 'pending';
+}
+
 const PAGE_SIZE = 10;
+
+function stripUndefinedFields<T extends Record<string, unknown>>(value: T): T {
+  return Object.fromEntries(
+    Object.entries(value).filter(([, entryValue]) => entryValue !== undefined),
+  ) as T;
+}
 
 const MONTH_NAMES = [
   'January',
@@ -66,6 +83,8 @@ function monthNameFromDateString(date: string): string {
   providedIn: 'root',
 })
 export class TransactionService {
+  private readonly authService = inject(AuthService);
+
   async fetchPage(
     monthName: string,
     category: string,
@@ -145,6 +164,99 @@ export class TransactionService {
       lastDoc: docs.length ? docs[docs.length - 1] : null,
       hasMore,
     };
+  }
+
+  async fetchPendingTransactions(): Promise<PendingTransaction[]> {
+    const snapshot = await getDocs(collection(db, 'adjustments-temp'));
+
+    return snapshot.docs.map((docSnap) => {
+      const data = docSnap.data();
+      return {
+        id: docSnap.id,
+        date: data['date'] as string,
+        description: data['description'] as string,
+        category: data['category'] as string,
+        amount: Number(data['amount']) || 0,
+        adjustmentId: (data['adjustmentId'] as string | undefined) ?? undefined,
+        isSplit: Boolean(data['isSplit']),
+        paidBy: data['paidBy'] as 'me' | number | undefined,
+        splitBy: (data['splitBy'] as number[]) ?? [],
+        splitType: (data['splitType'] as 'split' | 'onlyMeOwes' | 'onlyTheyOwe') ?? 'split',
+        totalAmount: Number(data['totalAmount']) || 0,
+        createdAt: (data['createdAt'] as string) ?? new Date().toISOString(),
+        createdByUid: (data['createdByUid'] as string | undefined) ?? undefined,
+        sourceRole: (data['sourceRole'] as 'kiosk') ?? 'kiosk',
+        status: (data['status'] as 'pending') ?? 'pending',
+      } satisfies PendingTransaction;
+    });
+  }
+
+  async createPendingTransaction(input: NewTransactionInput): Promise<string> {
+    const currentUser = this.authService.user();
+    if (!currentUser?.uid) {
+      throw new Error('Kiosk user is not authenticated. Please sign in again.');
+    }
+
+    const pendingRef = doc(collection(db, 'adjustments-temp'));
+    const pendingData = stripUndefinedFields({
+      ...input,
+      isSplit: false,
+      splitBy: [],
+      totalAmount: input.amount,
+      createdAt: new Date().toISOString(),
+      createdByUid: currentUser.uid,
+      sourceRole: 'kiosk' as const,
+      status: 'pending' as const,
+    });
+
+    await setDoc(pendingRef, pendingData);
+    return pendingRef.id;
+  }
+
+  async updatePendingTransaction(id: string, input: Partial<NewTransactionInput>): Promise<void> {
+    const pendingRef = doc(db, 'adjustments-temp', id);
+    const sanitized = stripUndefinedFields({
+      ...input,
+      totalAmount: input.totalAmount ?? input.amount,
+    });
+
+    await updateDoc(pendingRef, sanitized);
+  }
+
+  async acceptPendingTransaction(
+    id: string,
+    overrides?: Partial<NewTransactionInput>,
+  ): Promise<void> {
+    const pendingRef = doc(db, 'adjustments-temp', id);
+    const pendingSnap = await getDoc(pendingRef);
+
+    if (!pendingSnap.exists()) {
+      return;
+    }
+
+    const data = pendingSnap.data();
+    const input: NewTransactionInput = {
+      date: (overrides?.date ?? data['date'] ?? new Date().toISOString().slice(0, 10)) as string,
+      description: (overrides?.description ??
+        data['description'] ??
+        'Pending transaction') as string,
+      category: (overrides?.category ?? data['category'] ?? 'Utilities') as string,
+      amount: Number(overrides?.amount ?? data['amount'] ?? 0),
+      adjustmentId: (overrides?.adjustmentId ?? data['adjustmentId']) as string | undefined,
+      isSplit: overrides?.isSplit ?? Boolean(data['isSplit']),
+      paidBy: (overrides?.paidBy ?? data['paidBy']) as 'me' | number | undefined,
+      splitBy: overrides?.splitBy ?? (data['splitBy'] as number[]) ?? [],
+      splitType: (overrides?.splitType ?? data['splitType']) as
+        'split' | 'onlyMeOwes' | 'onlyTheyOwe' | undefined,
+      totalAmount: Number(overrides?.totalAmount ?? data['totalAmount'] ?? data['amount'] ?? 0),
+    };
+
+    await this.createTransaction(input);
+    await deleteDoc(pendingRef);
+  }
+
+  async declinePendingTransaction(id: string): Promise<void> {
+    await deleteDoc(doc(db, 'adjustments-temp', id));
   }
 
   async createTransaction(input: NewTransactionInput): Promise<string> {

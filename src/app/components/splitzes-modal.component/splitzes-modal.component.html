@@ -38,6 +38,259 @@
       </div>
     }
 
+    @if (isAdmin()) {
+      <div class="rounded-xl border border-amber-500/30 bg-amber-950/20 p-3 space-y-3">
+        <div class="flex items-center justify-between gap-2">
+          <button
+            type="button"
+            (click)="showPendingReview.set(!showPendingReview())"
+            class="flex flex-1 items-center justify-between text-left text-xs font-semibold text-amber-200"
+          >
+            <span>Pending review ({{ pendingTransactions().length }})</span>
+            <span>{{ showPendingReview() ? 'Hide' : 'Show' }}</span>
+          </button>
+
+          <button
+            type="button"
+            (click)="refreshPendingTransactions()"
+            [disabled]="isRefreshingPending()"
+            class="inline-flex items-center justify-center rounded-full border border-amber-500/30 bg-amber-500/10 px-2 py-1 text-[10px] font-medium text-amber-200 transition-colors hover:bg-amber-500/15 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            {{ isRefreshingPending() ? 'Refreshing…' : 'Refresh' }}
+          </button>
+        </div>
+
+        @if (showPendingReview()) {
+          @if (pendingTransactions().length === 0) {
+            <p class="text-[10px] text-gray-400">No pending items right now.</p>
+          } @else {
+            <div class="space-y-3">
+              @for (pending of pendingTransactions(); track pending.id) {
+                <div class="rounded-xl border border-amber-500/25 bg-gray-950/40 p-3 space-y-2">
+                  <div class="flex items-center justify-between gap-2">
+                    <span class="text-[10px] uppercase tracking-[0.14em] text-amber-300">Temp</span>
+                    <span class="text-[10px] text-gray-400">{{ pending.date }}</span>
+                  </div>
+
+                  @if (editingPendingId() === pending.id) {
+                    <div class="space-y-3 rounded-xl border border-gray-700/80 bg-gray-900/50 p-3">
+                      <div class="space-y-2">
+                        <div>
+                          <label
+                            class="mb-1 block text-[10px] uppercase tracking-[0.12em] text-gray-400"
+                            >Description</label
+                          >
+                          <input
+                            type="text"
+                            [value]="pending.description"
+                            (input)="
+                              updatePendingDraft(
+                                pending.id,
+                                'description',
+                                $any($event.target).value
+                              )
+                            "
+                            class="w-full bg-gray-800/70 border border-gray-700 rounded-lg px-2 py-1.5 text-xs text-white"
+                          />
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-2">
+                          <div class="min-w-0">
+                            <label
+                              class="mb-1 block text-[10px] uppercase tracking-[0.12em] text-gray-400"
+                              >Category</label
+                            >
+                            <input
+                              type="text"
+                              [value]="pending.category"
+                              (input)="
+                                updatePendingDraft(
+                                  pending.id,
+                                  'category',
+                                  $any($event.target).value
+                                )
+                              "
+                              class="w-full min-w-0 bg-gray-800/70 border border-gray-700 rounded-lg px-2 py-1.5 text-xs text-white"
+                            />
+                          </div>
+                          <div class="min-w-0">
+                            <label
+                              class="mb-1 block text-[10px] uppercase tracking-[0.12em] text-gray-400"
+                              >Date</label
+                            >
+                            <input
+                              type="date"
+                              [value]="pending.date"
+                              (input)="
+                                updatePendingDraft(pending.id, 'date', $any($event.target).value)
+                              "
+                              class="w-full min-w-0 appearance-none bg-gray-800/70 border border-gray-700 rounded-lg px-2 py-1.5 text-xs text-white"
+                            />
+                          </div>
+                        </div>
+
+                        <div>
+                          <label
+                            class="mb-1 block text-[10px] uppercase tracking-[0.12em] text-gray-400"
+                            >Amount</label
+                          >
+                          <input
+                            type="number"
+                            [value]="pending.amount"
+                            (input)="
+                              updatePendingDraft(
+                                pending.id,
+                                'amount',
+                                +($any($event.target).value || 0)
+                              );
+                              updatePendingDraft(
+                                pending.id,
+                                'totalAmount',
+                                +($any($event.target).value || 0)
+                              )
+                            "
+                            class="w-full bg-gray-800/70 border border-gray-700 rounded-lg px-2 py-1.5 text-xs text-white"
+                          />
+                        </div>
+                      </div>
+
+                      <div
+                        class="rounded-xl border border-amber-500/25 bg-amber-950/10 p-3 space-y-2"
+                      >
+                        <div class="flex items-center justify-between">
+                          <p class="text-[10px] uppercase tracking-[0.12em] text-amber-300">
+                            Split settings
+                          </p>
+                          <label class="inline-flex items-center gap-2 text-[10px] text-gray-200">
+                            <input
+                              type="checkbox"
+                              [checked]="pending.isSplit"
+                              (change)="
+                                updatePendingDraft(
+                                  pending.id,
+                                  'isSplit',
+                                  $any($event.target).checked
+                                )
+                              "
+                            />
+                            Enabled
+                          </label>
+                        </div>
+
+                        @if (pending.isSplit) {
+                          <div class="space-y-2">
+                            <div>
+                              <label
+                                class="mb-1 block text-[10px] uppercase tracking-[0.12em] text-gray-400"
+                                >Who paid</label
+                              >
+                              <select
+                                [value]="pending.paidBy ?? 'me'"
+                                (change)="
+                                  updatePendingDraft(
+                                    pending.id,
+                                    'paidBy',
+                                    $any($event.target).value === 'me'
+                                      ? 'me'
+                                      : +$any($event.target).value
+                                  )
+                                "
+                                class="w-full bg-gray-800/70 border border-gray-700 rounded-lg px-2 py-1.5 text-xs text-white"
+                              >
+                                <option value="me">Me</option>
+                                @for (person of allPeople; track person.id) {
+                                  <option [value]="person.id">{{ person.name }}</option>
+                                }
+                              </select>
+                            </div>
+
+                            <div>
+                              <label
+                                class="mb-1 block text-[10px] uppercase tracking-[0.12em] text-gray-400"
+                                >Mode</label
+                              >
+                              <select
+                                [value]="pending.splitType ?? 'split'"
+                                (change)="
+                                  updatePendingDraft(
+                                    pending.id,
+                                    'splitType',
+                                    $any($event.target).value
+                                  )
+                                "
+                                class="w-full bg-gray-800/70 border border-gray-700 rounded-lg px-2 py-1.5 text-xs text-white"
+                              >
+                                <option value="split">Split evenly</option>
+                                <option value="onlyMeOwes">Only me owes</option>
+                                <option value="onlyTheyOwe">Only they owe</option>
+                              </select>
+                            </div>
+
+                            <div>
+                              <label
+                                class="mb-1 block text-[10px] uppercase tracking-[0.12em] text-gray-400"
+                                >Split with</label
+                              >
+                              <div class="flex flex-wrap gap-2">
+                                @for (person of allPeople; track person.id) {
+                                  <label
+                                    class="inline-flex items-center gap-1.5 rounded-full border border-gray-700 bg-gray-800/60 px-2 py-1 text-[10px] text-gray-200"
+                                  >
+                                    <input
+                                      type="checkbox"
+                                      [checked]="(pending.splitBy ?? []).includes(person.id)"
+                                      (change)="toggleSplitParticipant(pending.id, person.id)"
+                                    />
+                                    {{ person.name }}
+                                  </label>
+                                }
+                              </div>
+                            </div>
+                          </div>
+                        }
+                      </div>
+                    </div>
+                  } @else {
+                    <div class="space-y-1">
+                      <p class="text-xs font-semibold text-white">{{ pending.description }}</p>
+                      <p class="text-[10px] text-gray-400">
+                        {{ pending.category }} • €{{ pending.amount.toFixed(2) }}
+                      </p>
+                    </div>
+                  }
+
+                  <div class="flex flex-wrap gap-2">
+                    <button
+                      type="button"
+                      (click)="
+                        editingPendingId() === pending.id
+                          ? onAcceptPending(pending.id)
+                          : startEditingPending(pending.id)
+                      "
+                      class="text-[10px] px-2.5 py-1.5 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 hover:bg-emerald-500/20 transition-colors cursor-pointer"
+                    >
+                      {{ editingPendingId() === pending.id ? 'Accept' : 'Edit / Accept' }}
+                    </button>
+                    <button
+                      type="button"
+                      (click)="
+                        editingPendingId() === pending.id
+                          ? cancelEditingPending()
+                          : onDeclinePending(pending.id)
+                      "
+                      class="text-[10px] px-2.5 py-1.5 rounded-full bg-red-500/15 text-red-300 border border-red-500/30 hover:bg-red-500/20 transition-colors cursor-pointer"
+                    >
+                      {{ editingPendingId() === pending.id ? 'Cancel' : 'Decline' }}
+                    </button>
+                  </div>
+                </div>
+              }
+            </div>
+          }
+        }
+      </div>
+    }
+
     <!-- Person Cards -->
     @if (!isLoading() && !isError()) {
       <div class="flex flex-col gap-3">
