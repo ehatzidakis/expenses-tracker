@@ -3,7 +3,11 @@ import { CommonModule } from '@angular/common';
 import { form, FormField, maxLength, min, required } from '@angular/forms/signals';
 import { QueryClient } from '@tanstack/angular-query-experimental';
 import { TransactionService } from '../../services/transaction-service';
-import { CATEGORY_NAMES, TRIP_CATEGORY_NAMES } from '../../services/expense-state.service';
+import {
+  CATEGORY_NAMES,
+  TRIP_CATEGORY_NAMES,
+  getCategoryMeta,
+} from '../../services/expense-state.service';
 import { AdjustmentService } from '../../services/adjustment-service';
 import { PrivacyService } from '../../services/privacy.service';
 import { computeSplit, SplitzService } from '../../services/splitz.service';
@@ -171,6 +175,10 @@ export class CreateTransactionComponent {
   readonly activeCategories = computed(() =>
     this.linkWithAdjustment() ? this.tripCategories : this.regularCategories,
   );
+
+  getCategoryOptionLabel(category: string): string {
+    return `${getCategoryMeta(category).emoji} ${category}`;
+  }
 
   setTab(tab: EntryType): void {
     if (this.isKioskMode() && tab === 'adjustment') {

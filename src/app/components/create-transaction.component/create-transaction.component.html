@@ -155,7 +155,7 @@
         >
           <option value="">Select a category</option>
           @for (cat of activeCategories(); track cat) {
-            <option [value]="cat">{{ cat }}</option>
+            <option [value]="cat">{{ getCategoryOptionLabel(cat) }}</option>
           }
         </select>
         @if (transactionForm.category().touched() && transactionForm.category().invalid()) {
