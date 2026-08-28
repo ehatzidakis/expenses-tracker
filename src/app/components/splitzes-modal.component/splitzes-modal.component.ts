@@ -1,7 +1,9 @@
-import { Component, inject, output, computed, signal } from '@angular/core';
-import { SplitzService } from '../../services/splitz.service';
-import { PersonSummary } from '../../models/splitz.model';
-import { QueryClient } from '@tanstack/angular-query-experimental';
+import { Component, computed, inject, output, signal } from '@angular/core';
+import { QueryClient, injectQuery } from '@tanstack/angular-query-experimental';
+import { AuthService } from '../../services/auth.service';
+import { computeSplit, SplitzService } from '../../services/splitz.service';
+import { PendingTransaction, TransactionService } from '../../services/transaction-service';
+import { PEOPLE, PersonSummary } from '../../models/splitz.model';
 
 @Component({
   selector: 'app-splitzes-modal',
@@ -11,12 +13,27 @@ import { QueryClient } from '@tanstack/angular-query-experimental';
 export class SplitzesModalComponent {
   close = output<void>();
 
+  private authService = inject(AuthService);
   private splitzService = inject(SplitzService);
+  private transactionService = inject(TransactionService);
   private queryClient = inject(QueryClient);
   private splitTxQuery = this.splitzService.getSplitTransactionsQuery();
+  private pendingTxQuery = injectQuery(() => ({
+    queryKey: ['pendingTransactions'],
+    queryFn: () => this.transactionService.fetchPendingTransactions(),
+  }));
 
+  readonly isAdmin = this.authService.isAdmin;
   readonly isLoading = computed(() => this.splitTxQuery.isPending());
   readonly isError = computed(() => this.splitTxQuery.isError());
+  readonly pendingDrafts = signal<Record<string, PendingTransaction>>({});
+  readonly pendingTransactions = computed<PendingTransaction[]>(() => {
+    const base = this.pendingTxQuery.data() ?? [];
+    const drafts = this.pendingDrafts();
+
+    return base.map((entry) => drafts[entry.id] ?? entry);
+  });
+  readonly hasPendingTransactions = computed(() => this.pendingTransactions().length > 0);
 
   readonly personSummaries = computed<PersonSummary[]>(() => {
     const txs = this.splitTxQuery.data() ?? [];
@@ -24,6 +41,10 @@ export class SplitzesModalComponent {
   });
 
   readonly markingPersonId = signal<number | null>(null);
+  readonly showPendingReview = signal(false);
+  readonly isRefreshingPending = signal(false);
+  readonly editingPendingId = signal<string | null>(null);
+  readonly allPeople = PEOPLE;
 
   onBackdropClick(event: MouseEvent): void {
     if ((event.target as HTMLElement).classList.contains('modal-backdrop')) {
@@ -36,6 +57,136 @@ export class SplitzesModalComponent {
     return netWithMe > 0
       ? `Owes me €${netWithMe.toFixed(2)}`
       : `I owe €${Math.abs(netWithMe).toFixed(2)}`;
+  }
+
+  startEditingPending(id: string): void {
+    const pending = this.pendingTransactions().find((entry) => entry.id === id);
+    if (!pending) {
+      return;
+    }
+
+    this.editingPendingId.set(id);
+  }
+
+  cancelEditingPending(): void {
+    this.editingPendingId.set(null);
+  }
+
+  updatePendingDraft(
+    id: string,
+    field:
+      | 'description'
+      | 'category'
+      | 'amount'
+      | 'date'
+      | 'isSplit'
+      | 'paidBy'
+      | 'splitBy'
+      | 'splitType'
+      | 'totalAmount',
+    value: string | number | boolean | number[],
+  ): void {
+    const current = this.pendingTransactions().find((entry) => entry.id === id);
+    if (!current) {
+      return;
+    }
+
+    const nextValue = value as never;
+    this.pendingDrafts.update((drafts) => ({
+      ...drafts,
+      [id]: {
+        ...current,
+        ...(field === 'splitBy' && Array.isArray(nextValue) ? { splitBy: nextValue } : {}),
+        ...(field !== 'splitBy' ? { [field]: nextValue } : {}),
+      },
+    }));
+  }
+
+  toggleSplitParticipant(id: string, personId: number): void {
+    const current = this.pendingTransactions().find((entry) => entry.id === id);
+    if (!current) {
+      return;
+    }
+
+    const nextSplitBy = current.splitBy ?? [];
+    const updatedSplitBy = nextSplitBy.includes(personId)
+      ? nextSplitBy.filter((value) => value !== personId)
+      : [...nextSplitBy, personId];
+
+    this.updatePendingDraft(id, 'splitBy', updatedSplitBy);
+    this.updatePendingDraft(id, 'isSplit', true);
+  }
+
+  async onAcceptPending(id: string): Promise<void> {
+    const current = this.pendingTransactions().find((entry) => entry.id === id);
+    if (!current) {
+      return;
+    }
+
+    const draft = this.pendingDrafts()[id] ?? current;
+    const totalAmount = Number(draft.totalAmount ?? draft.amount ?? 0);
+    let finalAmount = Number(draft.amount ?? 0);
+
+    if (draft.isSplit) {
+      const splitType = draft.splitType ?? 'split';
+      const splitBy = draft.splitBy ?? [];
+      const paidBy = draft.paidBy ?? 'me';
+
+      if (splitType === 'onlyMeOwes') {
+        finalAmount = totalAmount;
+      } else if (splitType === 'onlyTheyOwe') {
+        finalAmount = 0;
+      } else if (splitBy.length > 0) {
+        const { myShare } = computeSplit(totalAmount, paidBy, splitBy);
+        finalAmount = myShare;
+      } else {
+        finalAmount = totalAmount;
+      }
+    }
+
+    try {
+      await this.transactionService.acceptPendingTransaction(id, {
+        date: draft.date,
+        description: draft.description,
+        category: draft.category,
+        amount: finalAmount,
+        adjustmentId: draft.adjustmentId,
+        isSplit: draft.isSplit,
+        paidBy: draft.paidBy,
+        splitBy: draft.splitBy,
+        splitType: draft.splitType,
+        totalAmount: totalAmount,
+      });
+      await this.queryClient.invalidateQueries({ queryKey: ['pendingTransactions'] });
+      await this.queryClient.invalidateQueries({ queryKey: ['expenses'] });
+      await this.queryClient.invalidateQueries({ queryKey: ['adjustments'] });
+      await this.queryClient.invalidateQueries({ queryKey: ['splitTransactions'] });
+      this.editingPendingId.set(null);
+    } catch (error) {
+      console.error('Unable to accept pending transaction:', error);
+    }
+  }
+
+  async refreshPendingTransactions(): Promise<void> {
+    if (this.isRefreshingPending()) {
+      return;
+    }
+
+    this.isRefreshingPending.set(true);
+    try {
+      await this.pendingTxQuery.refetch();
+    } finally {
+      this.isRefreshingPending.set(false);
+    }
+  }
+
+  async onDeclinePending(id: string): Promise<void> {
+    try {
+      await this.transactionService.declinePendingTransaction(id);
+      await this.queryClient.invalidateQueries({ queryKey: ['pendingTransactions'] });
+    } catch (error) {
+      console.error('Unable to decline pending transaction:', error);
+    }
   }
 
   async onMarkPersonSettled(personId: number): Promise<void> {

@@ -1,32 +1,83 @@
 <div class="bg-gray-900/60 border border-gray-800/80 rounded-2xl p-5 space-y-4 backdrop-blur-sm">
-  <!-- TOP SLIDER / TAB SWITCHER -->
-  <div class="relative flex bg-gray-950/80 p-1 rounded-xl border border-gray-800/80">
-    <button
-      type="button"
-      (click)="setTab('transaction')"
-      class="relative z-10 flex-1 py-1.5 text-xs font-semibold transition-colors duration-200 text-center rounded-lg cursor-pointer"
-      [class.text-white]="activeTab() === 'transaction'"
-      [class.text-gray-400]="activeTab() !== 'transaction'"
-    >
-      Add Transaction
-    </button>
-    <button
-      type="button"
-      (click)="setTab('adjustment')"
-      class="relative z-10 flex-1 py-1.5 text-xs font-semibold transition-colors duration-200 text-center rounded-lg cursor-pointer"
-      [class.text-white]="activeTab() === 'adjustment'"
-      [class.text-gray-400]="activeTab() !== 'adjustment'"
-    >
-      Add One-Off
-    </button>
-
-    <!-- Animated Sliding Indicator -->
+  @if (isKioskMode()) {
     <div
-      class="absolute top-1 bottom-1 w-[calc(50%-4px)] bg-indigo-600/90 rounded-lg transition-transform duration-200 ease-out"
-      [class.translate-x-0]="activeTab() === 'transaction'"
-      [class.translate-x-full]="activeTab() === 'adjustment'"
-    ></div>
-  </div>
+      class="rounded-xl border bg-amber-950/20 p-3"
+      [class.border-emerald-500/30]="kioskNetBalance() > 0"
+      [class.bg-emerald-500/10]="kioskNetBalance() > 0"
+      [class.border-amber-500/30]="kioskNetBalance() < 0"
+      [class.bg-amber-500/10]="kioskNetBalance() < 0"
+      [class.border-white/30]="kioskNetBalance() === 0"
+      [class.bg-white/5]="kioskNetBalance() === 0"
+    >
+      <div class="flex items-center justify-between gap-3">
+        <div>
+          <p class="text-[10px] uppercase font-bold tracking-[0.12em] text-violet-300">
+            Stavi balance
+          </p>
+          <p class="mt-1 text-sm font-semibold text-white">
+            @if (kioskNetBalance() > 0) {
+              You are owed €{{ kioskNetBalance().toFixed(2) }}
+            } @else if (kioskNetBalance() < 0) {
+              You owe €{{ (-kioskNetBalance()).toFixed(2) }}
+            } @else {
+              All settled — €0.00
+            }
+          </p>
+        </div>
+        <span
+          class="rounded-full border px-2.5 py-1 text-[10px] font-semibold"
+          [class.border-emerald-500/30]="kioskNetBalance() > 0"
+          [class.bg-emerald-500/10]="kioskNetBalance() > 0"
+          [class.text-emerald-300]="kioskNetBalance() > 0"
+          [class.border-amber-500/30]="kioskNetBalance() < 0"
+          [class.bg-amber-500/10]="kioskNetBalance() < 0"
+          [class.text-amber-300]="kioskNetBalance() < 0"
+          [class.border-white/30]="kioskNetBalance() === 0"
+          [class.bg-white/5]="kioskNetBalance() === 0"
+          [class.text-gray-200]="kioskNetBalance() === 0"
+        >
+          @if (kioskNetBalance() > 0) {
+            Owed
+          } @else if (kioskNetBalance() < 0) {
+            Due
+          } @else {
+            Settled
+          }
+        </span>
+      </div>
+    </div>
+  }
+
+  @if (!isKioskMode()) {
+    <!-- TOP SLIDER / TAB SWITCHER -->
+    <div class="relative flex bg-gray-950/80 p-1 rounded-xl border border-gray-800/80">
+      <button
+        type="button"
+        (click)="setTab('transaction')"
+        class="relative z-10 flex-1 py-1.5 text-xs font-semibold transition-colors duration-200 text-center rounded-lg cursor-pointer"
+        [class.text-white]="activeTab() === 'transaction'"
+        [class.text-gray-400]="activeTab() !== 'transaction'"
+      >
+        Add Transaction
+      </button>
+      <button
+        type="button"
+        (click)="setTab('adjustment')"
+        class="relative z-10 flex-1 py-1.5 text-xs font-semibold transition-colors duration-200 text-center rounded-lg cursor-pointer"
+        [class.text-white]="activeTab() === 'adjustment'"
+        [class.text-gray-400]="activeTab() !== 'adjustment'"
+      >
+        Add One-Off
+      </button>
+
+      <!-- Animated Sliding Indicator -->
+      <div
+        class="absolute top-1 bottom-1 w-[calc(50%-4px)] bg-indigo-600/90 rounded-lg transition-transform duration-200 ease-out"
+        [class.translate-x-0]="activeTab() === 'transaction'"
+        [class.translate-x-full]="activeTab() === 'adjustment'"
+      ></div>
+    </div>
+  }
 
   <!-- ================= FORM 1: STANDARD TRANSACTION ================= -->
   @if (activeTab() === 'transaction') {
@@ -155,120 +206,155 @@
         </div>
       }
 
-      <!-- ── Split Fields ──────────────────────────────────────────────── -->
-      <!-- Goes Splitzes toggle -->
-      <div class="space-y-1.5">
-        <label class="text-xs font-medium text-gray-400">Go Splitzes</label>
-        <div class="grid grid-cols-2 gap-2 p-1 bg-gray-950/80 rounded-xl border border-gray-800">
-          <button
-            type="button"
-            (click)="goesSplitzes.set(true)"
-            class="py-2 rounded-lg text-xs font-semibold transition-all duration-150 flex items-center justify-center gap-1 cursor-pointer"
-            [class.bg-teal-500/20]="goesSplitzes()"
-            [class.text-teal-400]="goesSplitzes()"
-            [class.border]="goesSplitzes()"
-            [class.border-teal-500/30]="goesSplitzes()"
-            [class.text-gray-400]="!goesSplitzes()"
-          >
-            ✂️ Yes
-          </button>
-          <button
-            type="button"
-            (click)="resetSplitFields()"
-            class="py-2 rounded-lg text-xs font-semibold transition-all duration-150 flex items-center justify-center gap-1 cursor-pointer"
-            [class.bg-gray-700/60]="!goesSplitzes()"
-            [class.text-gray-200]="!goesSplitzes()"
-            [class.border]="!goesSplitzes()"
-            [class.border-gray-600/40]="!goesSplitzes()"
-            [class.text-gray-400]="goesSplitzes()"
-          >
-            No
-          </button>
-        </div>
-      </div>
-
-      @if (goesSplitzes()) {
-        <!-- Split Mode toggle: standard split vs debtor/creditor variants -->
+      @if (!isKioskMode()) {
+        <!-- ── Split Fields ──────────────────────────────────────────────── -->
+        <!-- Goes Splitzes toggle -->
         <div class="space-y-1.5">
-          <label class="text-xs font-medium text-gray-400">Split Mode</label>
-          <div class="grid grid-cols-3 gap-2 p-1 bg-gray-950/80 rounded-xl border border-gray-800">
+          <label class="text-xs font-medium text-gray-400">Go Splitzes</label>
+          <div class="grid grid-cols-2 gap-2 p-1 bg-gray-950/80 rounded-xl border border-gray-800">
             <button
               type="button"
-              (click)="setOnlyMeOwes(false); onlyTheyOwe.set(false)"
+              (click)="goesSplitzes.set(true)"
               class="py-2 rounded-lg text-xs font-semibold transition-all duration-150 flex items-center justify-center gap-1 cursor-pointer"
-              [class.bg-teal-500/20]="!onlyMeOwes() && !onlyTheyOwe()"
-              [class.text-teal-400]="!onlyMeOwes() && !onlyTheyOwe()"
-              [class.border]="!onlyMeOwes() && !onlyTheyOwe()"
-              [class.border-teal-500/30]="!onlyMeOwes() && !onlyTheyOwe()"
-              [class.text-gray-400]="onlyMeOwes() || onlyTheyOwe()"
+              [class.bg-teal-500/20]="goesSplitzes()"
+              [class.text-teal-400]="goesSplitzes()"
+              [class.border]="goesSplitzes()"
+              [class.border-teal-500/30]="goesSplitzes()"
+              [class.text-gray-400]="!goesSplitzes()"
             >
-              👥 Split
+              ✂️ Yes
             </button>
             <button
               type="button"
-              (click)="setOnlyMeOwes(true)"
+              (click)="resetSplitFields()"
               class="py-2 rounded-lg text-xs font-semibold transition-all duration-150 flex items-center justify-center gap-1 cursor-pointer"
-              [class.bg-amber-500/20]="onlyMeOwes()"
-              [class.text-amber-400]="onlyMeOwes()"
-              [class.border]="onlyMeOwes()"
-              [class.border-amber-500/30]="onlyMeOwes()"
-              [class.text-gray-400]="!onlyMeOwes()"
+              [class.bg-gray-700/60]="!goesSplitzes()"
+              [class.text-gray-200]="!goesSplitzes()"
+              [class.border]="!goesSplitzes()"
+              [class.border-gray-600/40]="!goesSplitzes()"
+              [class.text-gray-400]="goesSplitzes()"
             >
-              🫴 Borrow
-            </button>
-            <button
-              type="button"
-              (click)="setOnlyTheyOwe(true)"
-              class="py-2 rounded-lg text-xs font-semibold transition-all duration-150 flex items-center justify-center gap-1 cursor-pointer"
-              [class.bg-violet-500/20]="onlyTheyOwe()"
-              [class.text-violet-400]="onlyTheyOwe()"
-              [class.border]="onlyTheyOwe()"
-              [class.border-violet-500/30]="onlyTheyOwe()"
-              [class.text-gray-400]="!onlyTheyOwe()"
-            >
-              💸 Collect
+              No
             </button>
           </div>
         </div>
 
-        @if (!onlyMeOwes()) {
-          <!-- Split With multi-select -->
-          <div class="space-y-2">
-            <label class="text-xs font-medium text-gray-400">
-              {{ onlyTheyOwe() ? 'People who owe you' : 'Split With' }}
-            </label>
-            <div class="flex flex-wrap gap-2">
-              @for (person of allPeople; track person.id) {
-                <button
-                  type="button"
-                  (click)="togglePersonInSplit(person.id)"
-                  class="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold border transition-all duration-150 cursor-pointer"
-                  [class.bg-teal-500/20]="splitWith().includes(person.id)"
-                  [class.border-teal-500/40]="splitWith().includes(person.id)"
-                  [class.text-teal-400]="splitWith().includes(person.id)"
-                  [class.bg-gray-800/60]="!splitWith().includes(person.id)"
-                  [class.border-gray-700/50]="!splitWith().includes(person.id)"
-                  [class.text-gray-400]="!splitWith().includes(person.id)"
-                >
-                  {{ person.name }}
-                </button>
-              }
+        @if (goesSplitzes()) {
+          <!-- Split Mode toggle: standard split vs debtor/creditor variants -->
+          <div class="space-y-1.5">
+            <label class="text-xs font-medium text-gray-400">Split Mode</label>
+            <div
+              class="grid grid-cols-3 gap-2 p-1 bg-gray-950/80 rounded-xl border border-gray-800"
+            >
+              <button
+                type="button"
+                (click)="setOnlyMeOwes(false); onlyTheyOwe.set(false)"
+                class="py-2 rounded-lg text-xs font-semibold transition-all duration-150 flex items-center justify-center gap-1 cursor-pointer"
+                [class.bg-teal-500/20]="!onlyMeOwes() && !onlyTheyOwe()"
+                [class.text-teal-400]="!onlyMeOwes() && !onlyTheyOwe()"
+                [class.border]="!onlyMeOwes() && !onlyTheyOwe()"
+                [class.border-teal-500/30]="!onlyMeOwes() && !onlyTheyOwe()"
+                [class.text-gray-400]="onlyMeOwes() || onlyTheyOwe()"
+              >
+                👥 Split
+              </button>
+              <button
+                type="button"
+                (click)="setOnlyMeOwes(true)"
+                class="py-2 rounded-lg text-xs font-semibold transition-all duration-150 flex items-center justify-center gap-1 cursor-pointer"
+                [class.bg-amber-500/20]="onlyMeOwes()"
+                [class.text-amber-400]="onlyMeOwes()"
+                [class.border]="onlyMeOwes()"
+                [class.border-amber-500/30]="onlyMeOwes()"
+                [class.text-gray-400]="!onlyMeOwes()"
+              >
+                🫴 Borrow
+              </button>
+              <button
+                type="button"
+                (click)="setOnlyTheyOwe(true)"
+                class="py-2 rounded-lg text-xs font-semibold transition-all duration-150 flex items-center justify-center gap-1 cursor-pointer"
+                [class.bg-violet-500/20]="onlyTheyOwe()"
+                [class.text-violet-400]="onlyTheyOwe()"
+                [class.border]="onlyTheyOwe()"
+                [class.border-violet-500/30]="onlyTheyOwe()"
+                [class.text-gray-400]="!onlyTheyOwe()"
+              >
+                💸 Collect
+              </button>
             </div>
           </div>
 
-          <!-- Paid By single select (only when someone is selected) -->
-          @if (splitWith().length > 0 && !onlyTheyOwe()) {
+          @if (!onlyMeOwes()) {
+            <!-- Split With multi-select -->
+            <div class="space-y-2">
+              <label class="text-xs font-medium text-gray-400">
+                {{ onlyTheyOwe() ? 'People who owe you' : 'Split With' }}
+              </label>
+              <div class="flex flex-wrap gap-2">
+                @for (person of allPeople; track person.id) {
+                  <button
+                    type="button"
+                    (click)="togglePersonInSplit(person.id)"
+                    class="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold border transition-all duration-150 cursor-pointer"
+                    [class.bg-teal-500/20]="splitWith().includes(person.id)"
+                    [class.border-teal-500/40]="splitWith().includes(person.id)"
+                    [class.text-teal-400]="splitWith().includes(person.id)"
+                    [class.bg-gray-800/60]="!splitWith().includes(person.id)"
+                    [class.border-gray-700/50]="!splitWith().includes(person.id)"
+                    [class.text-gray-400]="!splitWith().includes(person.id)"
+                  >
+                    {{ person.name }}
+                  </button>
+                }
+              </div>
+            </div>
+
+            <!-- Paid By single select (only when someone is selected) -->
+            @if (splitWith().length > 0 && !onlyTheyOwe()) {
+              <div class="space-y-1.5">
+                <label for="tx-paid-by" class="text-xs font-medium text-gray-400">Paid By</label>
+                <select
+                  id="tx-paid-by"
+                  [value]="paidById()"
+                  (change)="
+                    paidById.set(
+                      $any($event.target).value === 'me' ? 'me' : +$any($event.target).value
+                    )
+                  "
+                  class="w-full bg-gray-800/60 border border-gray-800 rounded-xl px-3 py-2.5 text-sm text-gray-100 focus:outline-none focus:ring-2 focus:ring-teal-500/60"
+                >
+                  @for (opt of paidByOptions(); track opt.id) {
+                    <option [value]="opt.id">{{ opt.label }}</option>
+                  }
+                </select>
+              </div>
+
+              <!-- Preview of split amounts -->
+              <div class="p-3 bg-teal-950/30 border border-teal-800/40 rounded-xl space-y-1">
+                <p class="text-xs font-medium text-teal-400">Split preview</p>
+                <p class="text-xs text-gray-400">
+                  Your share:
+                  <span class="text-white font-semibold">
+                    €{{ (transactionModel().amount / (splitWith().length + 1)).toFixed(2) }}
+                  </span>
+                  <span class="text-gray-500"> (1 of {{ splitWith().length + 1 }} people)</span>
+                </p>
+              </div>
+            }
+          }
+
+          @if (onlyMeOwes()) {
+            <!-- Paid By: all people (I owe the full amount to this person) -->
             <div class="space-y-1.5">
-              <label for="tx-paid-by" class="text-xs font-medium text-gray-400">Paid By</label>
+              <label for="tx-only-me-paid-by" class="text-xs font-medium text-gray-400">
+                Paid By
+              </label>
               <select
-                id="tx-paid-by"
+                id="tx-only-me-paid-by"
                 [value]="paidById()"
-                (change)="
-                  paidById.set(
-                    $any($event.target).value === 'me' ? 'me' : +$any($event.target).value
-                  )
-                "
-                class="w-full bg-gray-800/60 border border-gray-800 rounded-xl px-3 py-2.5 text-sm text-gray-100 focus:outline-none focus:ring-2 focus:ring-teal-500/60"
+                (change)="paidById.set(+$any($event.target).value)"
+                class="w-full bg-gray-800/60 border border-gray-800 rounded-xl px-3 py-2.5 text-sm text-gray-100 focus:outline-none focus:ring-2 focus:ring-amber-500/60"
               >
                 @for (opt of paidByOptions(); track opt.id) {
                   <option [value]="opt.id">{{ opt.label }}</option>
@@ -276,62 +362,31 @@
               </select>
             </div>
 
-            <!-- Preview of split amounts -->
-            <div class="p-3 bg-teal-950/30 border border-teal-800/40 rounded-xl space-y-1">
-              <p class="text-xs font-medium text-teal-400">Split preview</p>
+            <!-- Full-amount-owed preview -->
+            <div class="p-3 bg-amber-950/30 border border-amber-800/40 rounded-xl space-y-1">
+              <p class="text-xs font-medium text-amber-400">Full amount owed by you</p>
               <p class="text-xs text-gray-400">
-                Your share:
+                You owe
                 <span class="text-white font-semibold">
-                  €{{ (transactionModel().amount / (splitWith().length + 1)).toFixed(2) }}
+                  €{{ transactionModel().amount.toFixed(2) }}
                 </span>
-                <span class="text-gray-500"> (1 of {{ splitWith().length + 1 }} people)</span>
+                to
+                <span class="text-white font-semibold">{{ getPaidByName() }}</span>
               </p>
             </div>
           }
-        }
 
-        @if (onlyMeOwes()) {
-          <!-- Paid By: all people (I owe the full amount to this person) -->
-          <div class="space-y-1.5">
-            <label for="tx-only-me-paid-by" class="text-xs font-medium text-gray-400">
-              Paid By
-            </label>
-            <select
-              id="tx-only-me-paid-by"
-              [value]="paidById()"
-              (change)="paidById.set(+$any($event.target).value)"
-              class="w-full bg-gray-800/60 border border-gray-800 rounded-xl px-3 py-2.5 text-sm text-gray-100 focus:outline-none focus:ring-2 focus:ring-amber-500/60"
-            >
-              @for (opt of paidByOptions(); track opt.id) {
-                <option [value]="opt.id">{{ opt.label }}</option>
-              }
-            </select>
-          </div>
-
-          <!-- Full-amount-owed preview -->
-          <div class="p-3 bg-amber-950/30 border border-amber-800/40 rounded-xl space-y-1">
-            <p class="text-xs font-medium text-amber-400">Full amount owed by you</p>
-            <p class="text-xs text-gray-400">
-              You owe
-              <span class="text-white font-semibold">
-                €{{ transactionModel().amount.toFixed(2) }}
-              </span>
-              to
-              <span class="text-white font-semibold">{{ getPaidByName() }}</span>
-            </p>
-          </div>
-        }
-
-        @if (onlyTheyOwe()) {
-          <div class="p-3 bg-violet-950/30 border border-violet-800/40 rounded-xl space-y-1">
-            <p class="text-xs font-medium text-violet-400">Only they owe</p>
-            <p class="text-xs text-gray-400">
-              Selected people each owe you
-              <span class="text-white font-semibold">
-                €{{ (transactionModel().amount / splitWith().length).toFixed(2) }}
-              </span>
-            </p>
-          </div>
+          @if (onlyTheyOwe()) {
+            <div class="p-3 bg-violet-950/30 border border-violet-800/40 rounded-xl space-y-1">
+              <p class="text-xs font-medium text-violet-400">Only they owe</p>
+              <p class="text-xs text-gray-400">
+                Selected people each owe you
+                <span class="text-white font-semibold">
+                  €{{ (transactionModel().amount / splitWith().length).toFixed(2) }}
+                </span>
+              </p>
+            </div>
+          }
         }
       }
       <!-- ─────────────────────────────────────────────────────────────── -->
