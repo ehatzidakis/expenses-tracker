@@ -37,8 +37,8 @@
 
             <!-- Right Group: Amount + Budget + Remaining -->
             <div class="flex items-end gap-2 shrink-0 justify-end pr-1">
-              <div class="text-right leading-none">
-                <div class="text-[12px] text-gray-400 tabular-nums">
+              <div class="text-right">
+                <div class="text-[13px] text-white-40 tabular-nums">
                   @if (!cat.isAllTime && cat.budget !== null) {
                     <span>
                       €{{ cat.amount | number: '1.2-2' }}
@@ -51,13 +51,13 @@
 
                 @if (!cat.isAllTime && cat.budget !== null) {
                   @if (cat.isOverBudget) {
-                    <div class="mt-1 text-[9px] font-medium text-red-400 tabular-nums">
+                    <div class="mt-1 text-[10px] font-medium text-red-400 tabular-nums">
                       €{{
                         (cat.monthlyAverage ?? cat.amount) - (cat.budget ?? 0) | number: '1.2-2'
                       }}
                     </div>
                   } @else {
-                    <div class="mt-1 text-[10px] font-medium text-blue-400 tabular-nums">
+                    <div class="mt-1 text-[11px] font-medium text-teal-300/90 tabular-nums">
                       €{{ cat.budget - (cat.monthlyAverage ?? cat.amount) | number: '1.2-2' }} left
                     </div>
                   }
