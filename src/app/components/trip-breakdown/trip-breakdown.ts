@@ -64,9 +64,9 @@ interface TripCategoryRow {
       } @else {
         <!-- Category breakdown -->
         <div
-          class="bg-gray-900/60 border border-gray-800/80 rounded-2xl p-5 space-y-3 backdrop-blur-sm"
+          class="bg-gray-900/60 border border-gray-800/80 rounded-2xl p-2 space-y-3 backdrop-blur-sm"
         >
-          <h3 class="text-sm font-semibold text-gray-200">Trip Budget</h3>
+          <!-- <h3 class="text-sm font-semibold text-gray-200">Trip Budget</h3> -->
 
           @if (categoryRows().length === 0) {
             <div class="text-center text-xs text-gray-500 py-4">No transactions yet.</div>
@@ -74,7 +74,7 @@ interface TripCategoryRow {
 
           <div class="space-y-3.5">
             @for (row of categoryRows(); track row.name) {
-              <div class="space-y-1.5">
+              <div class="space-y-1.5 border border-gray-800/80 rounded-2xl bg-gray-950/20 p-3">
                 <!-- Category header row -->
                 <div
                   class="flex items-center justify-between text-xs py-0.5 cursor-pointer"
@@ -87,7 +87,11 @@ interface TripCategoryRow {
                       >▶</span
                     > -->
                     <span class="font-medium text-gray-300">{{ row.name }}</span>
-                    <span class="text-gray-500">({{ row.transactions.length }})</span>
+                    <span class="text-gray-400 tabular-nums font-medium">
+                      ({{
+                        formatPercent(totalSpent() > 0 ? (row.amount / totalSpent()) * 100 : 0)
+                      }}%)
+                    </span>
                   </div>
                   <span class="font-semibold text-white tabular-nums">
                     €{{ row.amount | number: '1.2-2' }}
@@ -100,6 +104,10 @@ interface TripCategoryRow {
                     class="h-full rounded-full bg-linear-to-r from-sky-500 to-indigo-500 transition-all duration-300"
                     [style.width.%]="totalSpent() > 0 ? (row.amount / totalSpent()) * 100 : 0"
                   ></div>
+                </div>
+
+                <div class="text-[10px] text-gray-500 pt-1">
+                  {{ row.transactions.length }} transactions
                 </div>
 
                 <!-- Expanded transactions -->
@@ -199,6 +207,11 @@ export class TripBreakdownComponent {
     } finally {
       this.loading.set(false);
     }
+  }
+
+  formatPercent(value: number): string {
+    const rounded = value.toFixed(1);
+    return rounded.endsWith('.0') ? rounded.slice(0, -2) : rounded;
   }
 
   toggleCategory(name: string): void {

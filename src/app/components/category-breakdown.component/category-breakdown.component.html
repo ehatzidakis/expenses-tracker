@@ -1,10 +1,10 @@
 <section
   class="bg-gray-900/60 border border-gray-800/80 rounded-2xl p-2 space-y-4 backdrop-blur-sm"
 >
-  <div class="flex justify-between items-center px-3 py-1">
+  <!-- <div class="flex justify-between items-center px-3 py-1">
     <h3 class="text-sm font-semibold text-gray-200">{{ budgetTitle() }}</h3>
-    <!-- <span class="text-xs text-gray-400">{{ categories().length }} items</span> -->
-  </div>
+    <span class="text-xs text-gray-400">{{ categories().length }} items</span>
+  </div> -->
 
   <div class="space-y-2">
     @for (cat of categories(); track cat.name) {
@@ -22,16 +22,16 @@
             <!-- Left Group: Category Name and Over Budget Badge -->
             <div class="flex items-center gap-2 min-w-0 pr-2">
               <span
-                class="flex h-8 w-8 items-center justify-center rounded-full text-[12px] leading-none shadow-inner"
+                class="flex h-8 w-8 items-center justify-center rounded-full text-[14px] leading-none shadow-inner"
                 [ngClass]="categoryMeta(cat.name).classes"
                 aria-hidden="true"
               >
                 {{ categoryMeta(cat.name).emoji }}
               </span>
 
-              <span class="w-20 font-medium text-gray-300">{{ cat.name }}</span
-              ><span class="w-10 text-right text-gray-400 tabular-nums"
-                >{{ cat.percentage | number: '1.1-1' }}%</span
+              <span class="font-medium text-gray-300 text-sm">{{ cat.name }}</span
+              ><span class="text-gray-400 tabular-nums text-[10px]"
+                >({{ cat.percentage | number: '1.1-1' }}%)</span
               >
             </div>
 
