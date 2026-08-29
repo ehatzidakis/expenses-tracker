@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject, output, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { APP_VERSION } from '../../../environments/version';
 import { AuthService } from '../../services/auth.service';
 import { PrivacyService } from '../../services/privacy.service';
 
@@ -16,6 +17,7 @@ export class SettingsModalComponent {
   readonly privacyService = inject(PrivacyService);
   readonly authService = inject(AuthService);
   readonly close = output<void>();
+  readonly appVersion = APP_VERSION;
 
   readonly activeAction = signal<PinAction>('none');
   readonly pinInput = signal<string>('');

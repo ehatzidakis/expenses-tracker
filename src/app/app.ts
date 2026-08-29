@@ -1,5 +1,7 @@
 import { Component, computed, inject, signal } from '@angular/core';
+import { SwUpdate } from '@angular/service-worker';
 import { FormsModule } from '@angular/forms';
+import { filter } from 'rxjs';
 import { AdjustmentSelectorComponent } from './components/adjustment-selector/adjustment-selector';
 import { TripBreakdownComponent } from './components/trip-breakdown/trip-breakdown';
 import { ExpenseStateService } from './services/expense-state.service';
@@ -53,6 +55,7 @@ export class AppComponent {
   state = inject(ExpenseStateService);
   private adjustmentService = inject(AdjustmentService);
   private authService = inject(AuthService);
+  private swUpdate = inject(SwUpdate);
 
   readonly editingAdjustment = signal<Adjustment | null>(null);
   readonly selectedTripId = signal<string | null>(null);
@@ -66,6 +69,20 @@ export class AppComponent {
   readonly isAuthenticated = this.authService.isAuthenticated;
   readonly isAdmin = this.authService.isAdmin;
   readonly isKiosk = this.authService.isKiosk;
+  readonly isUpdating = signal(false);
+
+  constructor() {
+    if (this.swUpdate.isEnabled) {
+      this.swUpdate.versionUpdates
+        .pipe(filter((event) => event.type === 'VERSION_READY'))
+        .subscribe(() => {
+          this.isUpdating.set(true);
+          this.swUpdate.activateUpdate().then(() => window.location.reload());
+        });
+
+      this.swUpdate.checkForUpdate();
+    }
+  }
 
   adjustmentsQuery = this.adjustmentService.getAdjustmentsQuery();
 
