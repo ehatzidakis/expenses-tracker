@@ -18,12 +18,12 @@ describe('ticket subcategories', () => {
       'misc',
     ]);
     expect(TICKET_SUBCATEGORY_OPTIONS.map((option) => option.label)).toEqual([
-      '🎭 Theatre',
-      '🎬 Movies',
-      '🎤 Concert',
-      '🤣 Stand Up',
-      '🎃 Escape Room',
-      '❓ Misc',
+      'Theatre',
+      'Movies',
+      'Concert',
+      'Stand Up',
+      'Escape Room',
+      'Misc',
     ]);
   });
 

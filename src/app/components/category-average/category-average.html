@@ -1,11 +1,34 @@
 <div class="bg-gray-900/60 border border-gray-800/80 rounded-2xl p-5 backdrop-blur-sm select-none">
-  <!-- Header -->
-  <div class="mb-5">
-    <h3 class="text-sm font-semibold text-gray-100">Transaction Averages</h3>
-    <p class="text-xs text-gray-400 mt-0.5">Average cost per entry or visit</p>
+  <div class="mb-4 flex items-center justify-between gap-3">
+    <div>
+      <h3 class="text-sm font-semibold text-gray-100">Transaction Averages</h3>
+      <p class="text-xs text-gray-400 mt-0.5">Average cost per entry or visit</p>
+    </div>
+
+    <div class="inline-flex rounded-full border border-gray-700 bg-gray-950/80 p-1">
+      <button
+        type="button"
+        class="rounded-full px-3 py-1.5 text-[11px] font-semibold transition-colors"
+        [class.bg-indigo-500]="viewMode() === 'various'"
+        [class.text-white]="viewMode() === 'various'"
+        [class.text-gray-400]="viewMode() !== 'various'"
+        (click)="viewMode.set('various')"
+      >
+        Various
+      </button>
+      <button
+        type="button"
+        class="rounded-full px-3 py-1.5 text-[11px] font-semibold transition-colors"
+        [class.bg-indigo-500]="viewMode() === 'tickets'"
+        [class.text-white]="viewMode() === 'tickets'"
+        [class.text-gray-400]="viewMode() !== 'tickets'"
+        (click)="viewMode.set('tickets')"
+      >
+        Tickets
+      </button>
+    </div>
   </div>
 
-  <!-- List Container -->
   <div class="space-y-3">
     @for (item of averages(); track item.key) {
       <div class="space-y-2">
@@ -14,25 +37,13 @@
           (click)="toggleCategory(item.key)"
         >
           <div class="flex items-center gap-3.5">
-            <!-- Icon Wrapper -->
             <div
-              class="flex items-center justify-center w-10 h-10 rounded-full border"
+              class="flex items-center justify-center w-10 h-10 rounded-full border text-lg"
               [ngClass]="item.bgColorClass"
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke-width="1.5"
-                stroke="currentColor"
-                class="w-5 h-5"
-                [ngClass]="item.iconColorClass"
-              >
-                <path stroke-linecap="round" stroke-linejoin="round" [attr.d]="item.svgPath" />
-              </svg>
+              <span>{{ item.emoji }}</span>
             </div>
 
-            <!-- Labels -->
             <div>
               <span class="block text-sm font-medium text-gray-200">{{ item.label }}</span>
               <span class="block text-[10px] text-gray-500 mt-0.5">
@@ -41,7 +52,6 @@
             </div>
           </div>
 
-          <!-- Average Amount -->
           <div class="text-right">
             @if (item.count > 0) {
               <span class="block text-sm font-bold text-gray-100">
