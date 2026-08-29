@@ -4,6 +4,10 @@ import { AuthService } from '../../services/auth.service';
 import { computeSplit, SplitzService } from '../../services/splitz.service';
 import { PendingTransaction, TransactionService } from '../../services/transaction-service';
 import { PEOPLE, PersonSummary } from '../../models/splitz.model';
+import {
+  categoryRequiresSubcategory,
+  getSubcategoryOptions,
+} from '../../services/expense-state.service';
 
 @Component({
   selector: 'app-splitzes-modal',
@@ -77,6 +81,8 @@ export class SplitzesModalComponent {
     field:
       | 'description'
       | 'category'
+      | 'subCategoryId'
+      | 'subCategory'
       | 'amount'
       | 'date'
       | 'isSplit'
@@ -84,7 +90,7 @@ export class SplitzesModalComponent {
       | 'splitBy'
       | 'splitType'
       | 'totalAmount',
-    value: string | number | boolean | number[],
+    value: string | number | boolean | number[] | null,
   ): void {
     const current = this.pendingTransactions().find((entry) => entry.id === id);
     if (!current) {
@@ -117,6 +123,8 @@ export class SplitzesModalComponent {
     this.updatePendingDraft(id, 'isSplit', true);
   }
 
+  readonly getPendingSubcategories = (category: string) => getSubcategoryOptions(category);
+
   async onAcceptPending(id: string): Promise<void> {
     const current = this.pendingTransactions().find((entry) => entry.id === id);
     if (!current) {
@@ -124,6 +132,9 @@ export class SplitzesModalComponent {
     }
 
     const draft = this.pendingDrafts()[id] ?? current;
+    if (categoryRequiresSubcategory(draft.category) && !draft.subCategoryId) {
+      return;
+    }
     const totalAmount = Number(draft.totalAmount ?? draft.amount ?? 0);
     let finalAmount = Number(draft.amount ?? 0);
 
@@ -149,6 +160,8 @@ export class SplitzesModalComponent {
         date: draft.date,
         description: draft.description,
         category: draft.category,
+        subCategoryId: draft.subCategoryId,
+        subCategory: draft.subCategory,
         amount: finalAmount,
         adjustmentId: draft.adjustmentId,
         isSplit: draft.isSplit,

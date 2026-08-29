@@ -33,6 +33,8 @@ export interface NewTransactionInput {
   date: string; // 'YYYY-MM-DD'
   description: string;
   category: string;
+  subCategoryId?: number;
+  subCategory?: string;
   amount: number;
   adjustmentId?: string; // Optional: ID of the associated adjustment, if any
   // Optional split metadata
@@ -100,8 +102,14 @@ export class TransactionService {
     category: string,
     cursor: QueryDocumentSnapshot<DocumentData> | null,
     sortByAmount = false,
+    subCategoryId?: number | null,
   ): Promise<TransactionPage> {
-    return this.fetchPagedTransactions([where('category', '==', category)], cursor, sortByAmount);
+    const filters = [where('category', '==', category)];
+    if (subCategoryId != null && subCategoryId !== 0) {
+      filters.push(where('subCategoryId', '==', subCategoryId));
+    }
+
+    return this.fetchPagedTransactions(filters, cursor, sortByAmount);
   }
 
   async countTransactions(monthName: string, category: string): Promise<number> {
@@ -165,6 +173,8 @@ export class TransactionService {
           description: data['description'],
           amount: Number(data['amount']) || 0,
           category: data['category'],
+          subCategoryId: data['subCategoryId'] != null ? Number(data['subCategoryId']) : undefined,
+          subCategory: (data['subCategory'] as string | undefined) ?? undefined,
           createdAt: data['createdAt'],
           adjustmentId: data['adjustmentId'] ?? undefined,
         };
@@ -193,6 +203,8 @@ export class TransactionService {
         date: data['date'] as string,
         description: data['description'] as string,
         category: data['category'] as string,
+        subCategoryId: data['subCategoryId'] != null ? Number(data['subCategoryId']) : undefined,
+        subCategory: (data['subCategory'] as string | undefined) ?? undefined,
         amount: Number(data['amount']) || 0,
         adjustmentId: (data['adjustmentId'] as string | undefined) ?? undefined,
         isSplit: Boolean(data['isSplit']),
@@ -258,6 +270,11 @@ export class TransactionService {
         data['description'] ??
         'Pending transaction') as string,
       category: (overrides?.category ?? data['category'] ?? 'Utilities') as string,
+      subCategoryId:
+        overrides?.subCategoryId ??
+        (data['subCategoryId'] != null ? Number(data['subCategoryId']) : undefined),
+      subCategory:
+        overrides?.subCategory ?? (data['subCategory'] as string | undefined) ?? undefined,
       amount: Number(overrides?.amount ?? data['amount'] ?? 0),
       adjustmentId: (overrides?.adjustmentId ?? data['adjustmentId']) as string | undefined,
       isSplit: overrides?.isSplit ?? Boolean(data['isSplit']),
@@ -317,6 +334,10 @@ export class TransactionService {
       category: input.category,
       createdAt,
     };
+    if (input.subCategoryId != null) {
+      txData['subCategoryId'] = input.subCategoryId;
+      txData['subCategory'] = input.subCategory ?? '';
+    }
     if (input.adjustmentId) {
       txData['adjustmentId'] = input.adjustmentId;
     }
@@ -393,6 +414,13 @@ export class TransactionService {
       category: input.category,
       amount: input.amount,
     };
+    if (input.subCategoryId != null) {
+      updateData['subCategoryId'] = input.subCategoryId;
+      updateData['subCategory'] = input.subCategory ?? '';
+    } else if (oldTx.subCategoryId != null) {
+      updateData['subCategoryId'] = -1;
+      updateData['subCategory'] = '';
+    }
     if (oldTx.adjustmentId) {
       updateData['adjustmentId'] = oldTx.adjustmentId;
     }
@@ -480,6 +508,8 @@ export class TransactionService {
         date: data['date'] as string,
         description: data['description'] as string,
         category: data['category'] as string,
+        subCategoryId: data['subCategoryId'] != null ? Number(data['subCategoryId']) : undefined,
+        subCategory: (data['subCategory'] as string | undefined) ?? undefined,
         amount: Number(data['amount']) || 0,
         adjustmentId: (data['adjustmentId'] as string) ?? undefined,
       } as Transaction;
@@ -497,6 +527,8 @@ export class TransactionService {
         date: data['date'] as string,
         description: data['description'] as string,
         category: data['category'] as string,
+        subCategoryId: data['subCategoryId'] != null ? Number(data['subCategoryId']) : undefined,
+        subCategory: (data['subCategory'] as string | undefined) ?? undefined,
         amount: Number(data['amount']) || 0,
         createdAt: data['createdAt'] as string,
         adjustmentId: (data['adjustmentId'] as string) ?? undefined,
@@ -522,6 +554,8 @@ export class TransactionService {
         date: data['date'] as string,
         description: data['description'] as string,
         category: data['category'] as string,
+        subCategoryId: data['subCategoryId'] != null ? Number(data['subCategoryId']) : undefined,
+        subCategory: (data['subCategory'] as string | undefined) ?? undefined,
         amount: Number(data['amount']) || 0,
         createdAt: data['createdAt'] as string,
         adjustmentId: (data['adjustmentId'] as string) ?? undefined,
@@ -553,6 +587,8 @@ export class TransactionService {
         date: data['date'] as string,
         description: data['description'] as string,
         category: data['category'] as string,
+        subCategoryId: data['subCategoryId'] != null ? Number(data['subCategoryId']) : undefined,
+        subCategory: (data['subCategory'] as string | undefined) ?? undefined,
         amount: Number(data['amount']) || 0,
         createdAt: data['createdAt'] as string,
         adjustmentId: (data['adjustmentId'] as string) ?? undefined,

@@ -19,6 +19,7 @@ export class PagedEntriesListComponent {
   title = input.required<string>();
   mode = input<EntryListMode>('category');
   filterValue = input.required<string>();
+  subCategoryId = input<number | null>(null);
   readonly sortByAmount = signal(false);
 
   selectEntry = output<Transaction>();
@@ -63,6 +64,7 @@ export class PagedEntriesListComponent {
               this.filterValue(),
               cursor,
               this.sortByAmount(),
+              this.subCategoryId(),
             );
 
       this.items.set(result.items);

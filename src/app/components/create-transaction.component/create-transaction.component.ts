@@ -6,7 +6,9 @@ import { TransactionService } from '../../services/transaction-service';
 import {
   CATEGORY_NAMES,
   TRIP_CATEGORY_NAMES,
+  categoryRequiresSubcategory,
   getCategoryMeta,
+  getSubcategoryOptions,
 } from '../../services/expense-state.service';
 import { AdjustmentService } from '../../services/adjustment-service';
 import { PrivacyService } from '../../services/privacy.service';
@@ -21,6 +23,8 @@ interface TransactionFormModel {
   date: string;
   description: string;
   category: string;
+  subCategoryId: number | null;
+  subCategory: string;
   amount: number;
 }
 
@@ -42,7 +46,14 @@ function todayDateInputValue(): string {
 }
 
 function defaultTransactionModel(): TransactionFormModel {
-  return { date: todayDateInputValue(), description: '', category: '', amount: 0 };
+  return {
+    date: todayDateInputValue(),
+    description: '',
+    category: '',
+    subCategoryId: null,
+    subCategory: '',
+    amount: 0,
+  };
 }
 
 function defaultAdjustmentModel(): AdjustmentFormModel {
@@ -176,8 +187,62 @@ export class CreateTransactionComponent {
     this.linkWithAdjustment() ? this.tripCategories : this.regularCategories,
   );
 
+  readonly availableSubcategories = computed(() => {
+    const category = this.transactionModel().category;
+    return category ? getSubcategoryOptions(category) : [];
+  });
+
+  private syncSubcategorySelection(category: string): void {
+    const hasSubcategories = categoryRequiresSubcategory(category);
+    if (!hasSubcategories) {
+      this.transactionModel.update((model) => ({
+        ...model,
+        category,
+        subCategoryId: null,
+        subCategory: '',
+      }));
+      return;
+    }
+
+    const current = this.transactionModel();
+    if (
+      current.subCategoryId == null ||
+      !this.availableSubcategories().some((opt) => opt.id === current.subCategoryId)
+    ) {
+      const firstOption = this.availableSubcategories()[0];
+      this.transactionModel.update((model) => ({
+        ...model,
+        category,
+        subCategoryId: firstOption?.id ?? null,
+        subCategory: firstOption?.name ?? '',
+      }));
+      return;
+    }
+
+    this.transactionModel.update((model) => ({
+      ...model,
+      category,
+      subCategory:
+        this.availableSubcategories().find((opt) => opt.id === model.subCategoryId)?.name ?? '',
+    }));
+  }
+
   getCategoryOptionLabel(category: string): string {
     return `${getCategoryMeta(category).emoji} ${category}`;
+  }
+
+  setCategory(category: string): void {
+    this.transactionModel.update((model) => ({ ...model, category }));
+    this.syncSubcategorySelection(category);
+  }
+
+  setSubcategory(subCategoryId: number | null): void {
+    const option = this.availableSubcategories().find((item) => item.id === subCategoryId) ?? null;
+    this.transactionModel.update((model) => ({
+      ...model,
+      subCategoryId: option?.id ?? null,
+      subCategory: option?.name ?? '',
+    }));
   }
 
   setTab(tab: EntryType): void {
@@ -357,10 +422,18 @@ export class CreateTransactionComponent {
           ? 'onlyTheyOwe'
           : 'split';
 
+      if (categoryRequiresSubcategory(value.category) && !value.subCategoryId) {
+        this.errorMessage.set('Please select a subcategory for this ticket transaction.');
+        this.submitting.set(false);
+        return;
+      }
+
       await this.transactionService.createTransaction({
         date: value.date,
         description: value.description.trim(),
         category: value.category,
+        subCategoryId: value.subCategoryId ?? undefined,
+        subCategory: value.subCategory,
         amount: finalAmount,
         adjustmentId: this.linkWithAdjustment() ? this.selectedAdjustmentId() : undefined,
         ...(isSplitActive
@@ -398,10 +471,18 @@ export class CreateTransactionComponent {
       const value = this.transactionModel();
       const paymentBy = 1 as const;
 
+      if (categoryRequiresSubcategory(value.category) && !value.subCategoryId) {
+        this.errorMessage.set('Please select a subcategory for this ticket transaction.');
+        this.submitting.set(false);
+        return;
+      }
+
       await this.transactionService.createPendingTransaction({
         date: value.date,
         description: value.description.trim(),
         category: value.category,
+        subCategoryId: value.subCategoryId ?? undefined,
+        subCategory: value.subCategory,
         amount: value.amount,
         adjustmentId: this.linkWithAdjustment() ? this.selectedAdjustmentId() : undefined,
         isSplit: false,

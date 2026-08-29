@@ -7,11 +7,11 @@
 
   <!-- List Container -->
   <div class="space-y-3">
-    @for (item of averages(); track item.category) {
+    @for (item of averages(); track item.key) {
       <div class="space-y-2">
         <div
           class="flex items-center justify-between p-3 rounded-xl bg-gray-800/40 border border-gray-800/60 transition-colors hover:bg-gray-800/60 cursor-pointer"
-          (click)="toggleCategory(item.category)"
+          (click)="toggleCategory(item.key)"
         >
           <div class="flex items-center gap-3.5">
             <!-- Icon Wrapper -->
@@ -54,11 +54,12 @@
           </div>
         </div>
 
-        @if (expandedCategory() === item.category && expandedCategory() !== 'Supermarket') {
+        @if (expandedCategory() === item.key && item.category !== 'Supermarket') {
           <app-paged-entries-list
             [title]="item.label"
             mode="category"
             [filterValue]="item.category"
+            [subCategoryId]="item.subCategoryId ?? null"
           />
         }
       </div>

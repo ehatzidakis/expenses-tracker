@@ -15,6 +15,57 @@ export interface CategorySpend {
 
 export type AppTab = 'monthly' | 'sumup' | 'create' | 'oneoffs' | 'charts';
 
+export interface CategorySubcategoryOption {
+  id: number;
+  name: string;
+  label: string;
+}
+
+export const TICKET_SUBCATEGORY_OPTIONS: CategorySubcategoryOption[] = [
+  { id: 1, name: 'theatre', label: '🎭 Theatre' },
+  { id: 2, name: 'movies', label: '🎬 Movies' },
+  { id: 6, name: 'concert', label: '🎤 Concert' },
+  { id: 3, name: 'standUp', label: '🤣 Stand Up' },
+  { id: 4, name: 'escape', label: '🎃 Escape Room' },
+  { id: 5, name: 'misc', label: '❓ Misc' },
+];
+
+export const CATEGORY_SUBCATEGORY_OPTIONS: Record<string, CategorySubcategoryOption[]> = {
+  Tickets: TICKET_SUBCATEGORY_OPTIONS,
+};
+
+export function categoryRequiresSubcategory(category: string): boolean {
+  return (CATEGORY_SUBCATEGORY_OPTIONS[category] ?? []).length > 0;
+}
+
+export function getSubcategoryOptions(category: string): CategorySubcategoryOption[] {
+  return CATEGORY_SUBCATEGORY_OPTIONS[category] ?? [];
+}
+
+export function getSubcategoryMetaById(
+  category: string,
+  subCategoryId?: number | null,
+): CategorySubcategoryOption | undefined {
+  if (subCategoryId == null) {
+    return undefined;
+  }
+
+  return getSubcategoryOptions(category).find((option) => option.id === Number(subCategoryId));
+}
+
+export function getSubcategoryMetaByName(
+  category: string,
+  subCategory?: string | null,
+): CategorySubcategoryOption | undefined {
+  if (!subCategory) {
+    return undefined;
+  }
+
+  return getSubcategoryOptions(category).find(
+    (option) => option.name.toLowerCase() === String(subCategory).toLowerCase(),
+  );
+}
+
 export const CATEGORY_BUDGETS: Record<string, number | null> = {
   Supermarket: 280,
   Medical: 200,

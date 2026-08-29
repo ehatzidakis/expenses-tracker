@@ -2,10 +2,13 @@ import { Component, inject, computed, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TransactionService } from '../../services/transaction-service';
 import { Transaction } from '../../models/transaction.model';
+import { getSubcategoryOptions } from '../../services/expense-state.service';
 import { PagedEntriesListComponent } from '../paged-entries-list/paged-entries-list';
 
 interface CategoryAverage {
+  key: string;
   category: string;
+  subCategoryId?: number;
   label: string;
   average: number;
   count: number;
@@ -42,8 +45,8 @@ export class CategoryAverageComponent implements OnInit {
     }
   }
 
-  toggleCategory(category: string): void {
-    this.expandedCategory.update((current) => (current === category ? null : category));
+  toggleCategory(key: string): void {
+    this.expandedCategory.update((current) => (current === key ? null : key));
   }
 
   readonly averages = computed<CategoryAverage[]>(() => {
@@ -71,13 +74,13 @@ export class CategoryAverageComponent implements OnInit {
         bgColor: 'bg-amber-500/15 border-amber-500/30',
         svg: 'M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119.993z',
       },
-      {
-        category: 'Tickets',
-        label: 'Ticket',
-        iconColor: 'text-purple-400',
-        bgColor: 'bg-purple-500/15 border-purple-500/30',
-        svg: 'M16.5 6v.75m0 3v.75m0 3v.75m0 3V18m-9-12v.75m0 3v.75m0 3v.75m0 3V18M3 7.5A2.25 2.25 0 015.25 5.25h13.5A2.25 2.25 0 0121 7.5v2.25a1.5 1.5 0 000 3V16.5a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 16.5v-3.75a1.5 1.5 0 000-3V7.5z',
-      },
+      // {
+      //   category: 'Tickets',
+      //   label: 'Ticket',
+      //   iconColor: 'text-purple-400',
+      //   bgColor: 'bg-purple-500/15 border-purple-500/30',
+      //   svg: 'M16.5 6v.75m0 3v.75m0 3v.75m0 3V18m-9-12v.75m0 3v.75m0 3v.75m0 3V18M3 7.5A2.25 2.25 0 015.25 5.25h13.5A2.25 2.25 0 0121 7.5v2.25a1.5 1.5 0 000 3V16.5a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 16.5v-3.75a1.5 1.5 0 000-3V7.5z',
+      // },
       {
         category: 'Gaming',
         label: 'Game',
@@ -87,13 +90,14 @@ export class CategoryAverageComponent implements OnInit {
       },
     ];
 
-    return configs.map((cfg) => {
+    const categorySummaries: CategoryAverage[] = configs.map((cfg) => {
       const matches = transactions.filter((t) => t.category === cfg.category);
       const count = matches.length;
       const sum = matches.reduce((acc, curr) => acc + Number(curr.amount), 0);
       const average = count > 0 ? sum / count : 0;
 
       return {
+        key: cfg.category,
         category: cfg.category,
         label: cfg.label,
         average,
@@ -103,5 +107,29 @@ export class CategoryAverageComponent implements OnInit {
         svgPath: cfg.svg,
       };
     });
+
+    const ticketSubcategories = getSubcategoryOptions('Tickets').map((option) => {
+      const matches = transactions.filter(
+        (t) => t.category === 'Tickets' && Number(t.subCategoryId ?? -1) === option.id,
+      );
+      const count = matches.length;
+      const sum = matches.reduce((acc, curr) => acc + Number(curr.amount), 0);
+      const average = count > 0 ? sum / count : 0;
+
+      return {
+        key: `Tickets:${option.id}`,
+        category: 'Tickets',
+        subCategoryId: option.id,
+        label: option.label,
+        average,
+        count,
+        iconColorClass: 'text-purple-400',
+        bgColorClass: 'bg-purple-500/15 border-purple-500/30',
+        svgPath:
+          'M16.5 6v.75m0 3v.75m0 3v.75m0 3V18m-9-12v.75m0 3v.75m0 3v.75m0 3V18M3 7.5A2.25 2.25 0 015.25 5.25h13.5A2.25 2.25 0 0121 7.5v2.25a1.5 1.5 0 000 3V16.5a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 16.5v-3.75a1.5 1.5 0 000-3V7.5z',
+      } satisfies CategoryAverage;
+    });
+
+    return [...categorySummaries, ...ticketSubcategories];
   });
 }
