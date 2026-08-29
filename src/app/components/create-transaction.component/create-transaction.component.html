@@ -150,7 +150,8 @@
         <label for="tx-category" class="text-xs font-medium text-gray-400">Category</label>
         <select
           id="tx-category"
-          [formField]="transactionForm.category"
+          [value]="transactionModel().category"
+          (change)="setCategory($any($event.target).value)"
           class="w-full bg-gray-800/60 border border-gray-800 rounded-xl px-3 py-2.5 text-sm text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/60"
         >
           <option value="">Select a category</option>
@@ -164,6 +165,32 @@
           </span>
         }
       </div>
+
+      @if (availableSubcategories().length > 0) {
+        <div class="space-y-1.5">
+          <label for="tx-subcategory" class="text-xs font-medium text-gray-400">Subcategory</label>
+          <select
+            id="tx-subcategory"
+            [value]="transactionModel().subCategoryId ?? ''"
+            (change)="
+              setSubcategory($any($event.target).value === '' ? null : +$any($event.target).value)
+            "
+            class="w-full bg-gray-800/60 border border-gray-800 rounded-xl px-3 py-2.5 text-sm text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/60"
+          >
+            <option value="">Select a subcategory</option>
+            @for (sub of availableSubcategories(); track sub.id) {
+              <option [value]="sub.id">{{ sub.label }}</option>
+            }
+          </select>
+          @if (
+            transactionForm.subCategoryId().touched() && transactionForm.subCategoryId().invalid()
+          ) {
+            <span class="text-[11px] text-red-400">
+              {{ transactionForm.subCategoryId().errors()[0]?.message }}
+            </span>
+          }
+        </div>
+      }
       <!-- Amount Input -->
 
       <div class="space-y-1.5">

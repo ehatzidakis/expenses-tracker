@@ -3,25 +3,18 @@ import { CommonModule } from '@angular/common';
 import { form, FormField, maxLength, min, required } from '@angular/forms/signals';
 import { QueryClient } from '@tanstack/angular-query-experimental';
 import { TransactionService } from '../../services/transaction-service';
-import { CATEGORY_NAMES, getCategoryMeta } from '../../services/expense-state.service';
+import {
+  CATEGORY_NAMES,
+  categoryRequiresSubcategory,
+  getCategoryMeta,
+  getSubcategoryOptions,
+} from '../../services/expense-state.service';
 import { Transaction } from '../../models/transaction.model';
 import { PEOPLE } from '../../models/splitz.model';
 import { PrivacyService } from '../../services/privacy.service';
 import { ConfirmModal } from '../confirm-modal/confirm-modal';
 import { normalizeDecimalInput, parseDecimalInput } from '../../utils/decimal-input';
-
-interface TransactionFormModel {
-  date: string;
-  description: string;
-  category: string;
-  amount: number;
-  isSplit?: boolean;
-  paidBy?: 'me' | number;
-  splitBy?: number[];
-  splitPaidPersonIds?: number[];
-  splitType?: 'split' | 'onlyMeOwes' | 'onlyTheyOwe';
-  totalAmount?: number;
-}
+import { TransactionFormModel, buildTransactionFormModel } from './edit-transaction.model';
 
 @Component({
   selector: 'app-edit-transaction',
@@ -50,6 +43,8 @@ export class EditTransactionComponent {
     date: '',
     description: '',
     category: '',
+    subCategoryId: null,
+    subCategory: '',
     amount: 0,
   });
 
@@ -69,23 +64,16 @@ export class EditTransactionComponent {
     };
   });
 
+  private hydrateModelFromTransaction(tx: Transaction): void {
+    this.model.set(buildTransactionFormModel(tx));
+  }
+
   constructor() {
     // Populate form model when input transaction signal resolves
     effect(() => {
       const tx = this.transaction();
       if (tx) {
-        this.model.set({
-          date: tx.date,
-          description: tx.description,
-          category: tx.category,
-          amount: tx.amount,
-          isSplit: tx.isSplit,
-          paidBy: tx.paidBy,
-          splitBy: tx.splitBy,
-          splitPaidPersonIds: tx.splitPaidPersonIds,
-          splitType: tx.splitType,
-          totalAmount: tx.totalAmount,
-        });
+        this.hydrateModelFromTransaction(tx);
       }
     });
   }
@@ -99,8 +87,42 @@ export class EditTransactionComponent {
     required(schemaPath.category, { message: 'Category is required' });
   });
 
+  readonly availableSubcategories = computed(() => getSubcategoryOptions(this.model().category));
+
   getCategoryOptionLabel(category: string): string {
     return `${getCategoryMeta(category).emoji} ${category}`;
+  }
+
+  setCategory(category: string): void {
+    const normalizedCategory =
+      CATEGORY_NAMES.find((name) => name.toLowerCase() === category.trim().toLowerCase()) ??
+      CATEGORY_NAMES[0] ??
+      '';
+
+    const options = getSubcategoryOptions(normalizedCategory);
+    const currentSelection = this.model().subCategoryId;
+    const nextSelection =
+      currentSelection != null && options.some((option) => option.id === currentSelection)
+        ? currentSelection
+        : options.length > 0
+          ? options[0].id
+          : null;
+
+    this.model.update((value) => ({
+      ...value,
+      category: normalizedCategory,
+      subCategoryId: nextSelection,
+      subCategory: options.find((option) => option.id === nextSelection)?.name ?? '',
+    }));
+  }
+
+  setSubcategory(subCategoryId: number | null): void {
+    const option = this.availableSubcategories().find((item) => item.id === subCategoryId) ?? null;
+    this.model.update((value) => ({
+      ...value,
+      subCategoryId: option?.id ?? null,
+      subCategory: option?.name ?? '',
+    }));
   }
 
   readonly submitting = signal(false);
@@ -159,6 +181,10 @@ export class EditTransactionComponent {
     }
 
     const value = this.model();
+    if (categoryRequiresSubcategory(value.category) && !value.subCategoryId) {
+      this.errorMessage.set('Please select a valid subcategory for this transaction.');
+      return;
+    }
     if (value.amount <= 0) {
       this.errorMessage.set('Amount must be greater than 0');
       return;
@@ -172,6 +198,8 @@ export class EditTransactionComponent {
         date: value.date,
         description: value.description.trim(),
         category: value.category,
+        subCategoryId: value.subCategoryId ?? undefined,
+        subCategory: value.subCategory,
         amount: value.amount,
       });
 

@@ -6,6 +6,8 @@ export interface Transaction {
   /** My share of the expense (equals totalAmount when not a split). */
   amount: number;
   category: string;
+  subCategoryId?: number;
+  subCategory?: string;
   createdAt: string;
   adjustmentId?: string;
   // Split fields — only present when isSplit is true

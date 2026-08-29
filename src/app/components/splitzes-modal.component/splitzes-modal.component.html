@@ -129,6 +129,43 @@
                           </div>
                         </div>
 
+                        @if (getPendingSubcategories(pending.category).length > 0) {
+                          <div>
+                            <label
+                              class="mb-1 block text-[10px] uppercase tracking-[0.12em] text-gray-400"
+                              >Subcategory</label
+                            >
+                            <select
+                              [value]="pending.subCategoryId ?? ''"
+                              (change)="
+                                updatePendingDraft(
+                                  pending.id,
+                                  'subCategoryId',
+                                  $any($event.target).value === ''
+                                    ? null
+                                    : +$any($event.target).value
+                                );
+                                updatePendingDraft(
+                                  pending.id,
+                                  'subCategory',
+                                  getPendingSubcategories(pending.category).find(
+                                    (option) => option.id === +($any($event.target).value || 0)
+                                  )?.name ?? ''
+                                )
+                              "
+                              class="w-full bg-gray-800/70 border border-gray-700 rounded-lg px-2 py-1.5 text-xs text-white"
+                            >
+                              <option value="">Select a subcategory</option>
+                              @for (
+                                option of getPendingSubcategories(pending.category);
+                                track option.id
+                              ) {
+                                <option [value]="option.id">{{ option.label }}</option>
+                              }
+                            </select>
+                          </div>
+                        }
+
                         <div>
                           <label
                             class="mb-1 block text-[10px] uppercase tracking-[0.12em] text-gray-400"
