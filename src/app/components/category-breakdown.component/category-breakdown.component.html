@@ -42,7 +42,9 @@
                   @if (!cat.isAllTime && cat.budget !== null) {
                     <span>
                       €{{ cat.amount | number: '1.2-2' }}
-                      <span class="text-gray-500">/ €{{ cat.budget | number: '1.2-2' }}</span>
+                      <span class="text-gray-500 text-xs"
+                        >/ €{{ cat.budget | number: '1.2-2' }}</span
+                      >
                     </span>
                   } @else {
                     <span>€{{ cat.amount | number: '1.2-2' }}</span>
