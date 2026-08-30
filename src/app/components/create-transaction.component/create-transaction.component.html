@@ -267,7 +267,6 @@
         </div>
 
         @if (goesSplitzes()) {
-          <!-- Split Mode toggle: standard split vs debtor/creditor variants -->
           <div class="space-y-1.5">
             <label class="text-xs font-medium text-gray-400">Split Mode</label>
             <div
@@ -275,13 +274,13 @@
             >
               <button
                 type="button"
-                (click)="setOnlyMeOwes(false); onlyTheyOwe.set(false)"
+                (click)="setCustomSplitMode(false); setOnlyMeOwes(false); onlyTheyOwe.set(false)"
                 class="py-2 rounded-lg text-xs font-semibold transition-all duration-150 flex items-center justify-center gap-1 cursor-pointer"
-                [class.bg-teal-500/20]="!onlyMeOwes() && !onlyTheyOwe()"
-                [class.text-teal-400]="!onlyMeOwes() && !onlyTheyOwe()"
-                [class.border]="!onlyMeOwes() && !onlyTheyOwe()"
-                [class.border-teal-500/30]="!onlyMeOwes() && !onlyTheyOwe()"
-                [class.text-gray-400]="onlyMeOwes() || onlyTheyOwe()"
+                [class.bg-teal-500/20]="!onlyMeOwes() && !onlyTheyOwe() && !customSplitMode()"
+                [class.text-teal-400]="!onlyMeOwes() && !onlyTheyOwe() && !customSplitMode()"
+                [class.border]="!onlyMeOwes() && !onlyTheyOwe() && !customSplitMode()"
+                [class.border-teal-500/30]="!onlyMeOwes() && !onlyTheyOwe() && !customSplitMode()"
+                [class.text-gray-400]="onlyMeOwes() || onlyTheyOwe() || customSplitMode()"
               >
                 👥 Split
               </button>
@@ -312,8 +311,75 @@
             </div>
           </div>
 
+          @if (!onlyMeOwes() && !onlyTheyOwe()) {
+            <div class="space-y-1.5">
+              <label class="text-xs font-medium text-gray-400">Custom split</label>
+              <div
+                class="grid grid-cols-2 gap-2 p-1 bg-gray-950/80 rounded-xl border border-gray-800"
+              >
+                <button
+                  type="button"
+                  (click)="setCustomSplitMode(true)"
+                  class="py-2 rounded-lg text-xs font-semibold transition-all duration-150 flex items-center justify-center gap-1 cursor-pointer"
+                  [class.bg-indigo-500/20]="customSplitMode()"
+                  [class.text-indigo-400]="customSplitMode()"
+                  [class.border]="customSplitMode()"
+                  [class.border-indigo-500/30]="customSplitMode()"
+                  [class.text-gray-400]="!customSplitMode()"
+                >
+                  Yes
+                </button>
+                <button
+                  type="button"
+                  (click)="setCustomSplitMode(false)"
+                  class="py-2 rounded-lg text-xs font-semibold transition-all duration-150 flex items-center justify-center gap-1 cursor-pointer"
+                  [class.bg-gray-700/60]="!customSplitMode()"
+                  [class.text-gray-200]="!customSplitMode()"
+                  [class.border]="!customSplitMode()"
+                  [class.border-gray-600/40]="!customSplitMode()"
+                  [class.text-gray-400]="customSplitMode()"
+                >
+                  No
+                </button>
+              </div>
+            </div>
+          }
+
+          @if (customSplitMode()) {
+            <div class="space-y-3 rounded-xl border border-indigo-500/30 bg-indigo-950/20 p-3">
+              <div class="flex items-center justify-between gap-3">
+                <p class="text-xs font-medium text-indigo-300">Custom split</p>
+                <span class="text-[11px] text-gray-300">{{ customSplitRemainingLabel() }}</span>
+              </div>
+
+              @if (customSplitParticipants().length > 0) {
+                <div class="space-y-2">
+                  @for (person of customSplitParticipants(); track person) {
+                    <div class="space-y-1">
+                      <label class="text-[11px] uppercase tracking-[0.12em] text-gray-400">
+                        {{ getPersonName(person) }}
+                      </label>
+                      <input
+                        type="text"
+                        inputmode="decimal"
+                        autocomplete="off"
+                        [value]="getCustomSplitValue(person)"
+                        (input)="onCustomSplitAmountInput($event, person)"
+                        class="w-full bg-gray-800/60 border border-gray-800 rounded-xl px-3 py-2 text-sm text-gray-100 placeholder:text-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/60 tabular-nums"
+                        placeholder="0.00"
+                      />
+                    </div>
+                  }
+                </div>
+              }
+
+              @if (!customSplitValid()) {
+                <p class="text-[11px] text-amber-300">{{ customSplitRemainingLabel() }}</p>
+              }
+            </div>
+          }
+
           @if (!onlyMeOwes()) {
-            <!-- Split With multi-select -->
             <div class="space-y-2">
               <label class="text-xs font-medium text-gray-400">
                 {{ onlyTheyOwe() ? 'People who owe you' : 'Split With' }}
@@ -337,8 +403,7 @@
               </div>
             </div>
 
-            <!-- Paid By single select (only when someone is selected) -->
-            @if (splitWith().length > 0 && !onlyTheyOwe()) {
+            @if (splitWith().length > 0 && !onlyTheyOwe() && !customSplitMode()) {
               <div class="space-y-1.5">
                 <label for="tx-paid-by" class="text-xs font-medium text-gray-400">Paid By</label>
                 <select
@@ -357,7 +422,6 @@
                 </select>
               </div>
 
-              <!-- Preview of split amounts -->
               <div class="p-3 bg-teal-950/30 border border-teal-800/40 rounded-xl space-y-1">
                 <p class="text-xs font-medium text-teal-400">Split preview</p>
                 <p class="text-xs text-gray-400">
@@ -372,7 +436,6 @@
           }
 
           @if (onlyMeOwes()) {
-            <!-- Paid By: all people (I owe the full amount to this person) -->
             <div class="space-y-1.5">
               <label for="tx-only-me-paid-by" class="text-xs font-medium text-gray-400">
                 Paid By
@@ -389,7 +452,6 @@
               </select>
             </div>
 
-            <!-- Full-amount-owed preview -->
             <div class="p-3 bg-amber-950/30 border border-amber-800/40 rounded-xl space-y-1">
               <p class="text-xs font-medium text-amber-400">Full amount owed by you</p>
               <p class="text-xs text-gray-400">
@@ -420,7 +482,12 @@
 
       <button
         type="submit"
-        [disabled]="transactionForm().invalid() || submitting() || privacyService.isPrivacyMode()"
+        [disabled]="
+          transactionForm().invalid() ||
+          submitting() ||
+          privacyService.isPrivacyMode() ||
+          (goesSplitzes() && customSplitMode() && !customSplitValid())
+        "
         class="w-full py-3 rounded-xl text-sm font-semibold text-white bg-linear-to-br from-indigo-500 to-violet-600 shadow-lg disabled:opacity-40 disabled:cursor-not-allowed active:scale-[0.99] transition-all cursor-pointer"
       >
         {{ submitting() ? 'Adding…' : 'Add Transaction' }}

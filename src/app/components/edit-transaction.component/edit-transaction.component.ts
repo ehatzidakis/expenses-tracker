@@ -146,12 +146,14 @@ export class EditTransactionComponent {
     return ids.map((id) => this.getPersonName(id)).join(', ');
   }
 
-  getSplitTypeLabel(type?: 'split' | 'onlyMeOwes' | 'onlyTheyOwe'): string {
+  getSplitTypeLabel(type?: 'split' | 'onlyMeOwes' | 'onlyTheyOwe' | 'custom'): string {
     switch (type) {
       case 'onlyMeOwes':
         return 'Borrowed 💸';
       case 'onlyTheyOwe':
         return 'Lent 💸';
+      case 'custom':
+        return 'Custom split';
       case 'split':
       default:
         return 'Splitz';

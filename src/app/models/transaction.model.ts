@@ -17,9 +17,11 @@ export interface Transaction {
   /** Person IDs (from PEOPLE) this was split with, excluding 'me'. */
   splitBy?: number[];
   /** Split mode used to derive the debt entries. */
-  splitType?: 'split' | 'onlyMeOwes' | 'onlyTheyOwe';
+  splitType?: 'split' | 'onlyMeOwes' | 'onlyTheyOwe' | 'custom';
   /** Original full amount before the split. */
   totalAmount?: number;
+  /** Exact amounts for each participant when using a custom split. Keys are 'me' or person IDs. */
+  customSplitAmounts?: Partial<Record<'me' | number, number>>;
   /** Debtors who have already settled their share. 0 = 'me', 1/2/3 = person IDs. */
   splitPaidPersonIds?: number[];
 }
