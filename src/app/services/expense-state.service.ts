@@ -30,8 +30,17 @@ export const TICKET_SUBCATEGORY_OPTIONS: CategorySubcategoryOption[] = [
   { id: 5, name: 'misc', label: '❓ Misc' },
 ];
 
+export const GAMING_SUBCATEGORY_OPTIONS: CategorySubcategoryOption[] = [
+  { id: 7, name: 'newRelease', label: '🎮 New Release' },
+  { id: 8, name: 'olderTitle', label: '🕹️ Older Title' },
+  { id: 9, name: 'subscription', label: '🔄 Subscription' },
+  { id: 10, name: 'peripheral', label: '👾 Peripheral' },
+  { id: 11, name: 'dlc', label: '🧩 DLC' },
+];
+
 export const CATEGORY_SUBCATEGORY_OPTIONS: Record<string, CategorySubcategoryOption[]> = {
   Tickets: TICKET_SUBCATEGORY_OPTIONS,
+  Gaming: GAMING_SUBCATEGORY_OPTIONS,
 };
 
 export function categoryRequiresSubcategory(category: string): boolean {
