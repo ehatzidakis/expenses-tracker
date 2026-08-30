@@ -20,7 +20,11 @@
             class="absolute inset-8 rounded-full bg-gray-950/95 border border-gray-700/80 flex flex-col items-center justify-center text-center"
           >
             <span class="text-[10px] uppercase tracking-[0.22em] text-gray-500">Total</span>
-            <span class="mt-1 text-lg font-bold text-white">
+            <span
+              class="mt-1 text-lg font-bold text-white"
+              [class.blur-md]="privacyService.isPrivacyMode()"
+              [class.select-none]="privacyService.isPrivacyMode()"
+            >
               €{{
                 pieChartSlices().reduce((sum, slice) => sum + slice.amount, 0) | number: '1.0-0'
               }}

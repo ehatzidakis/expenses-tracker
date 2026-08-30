@@ -6,6 +6,7 @@ import {
   dimColorForSelection,
   PieChartSlice,
 } from './category-budgets-pie-chart.util';
+import { PrivacyService } from '../../services/privacy.service';
 
 @Component({
   selector: 'app-category-budgets-pie-chart',
@@ -15,6 +16,8 @@ import {
 })
 export class CategoryBudgetsPieChartComponent {
   readonly state = inject(ExpenseStateService);
+  readonly privacyService = inject(PrivacyService);
+
   readonly selectedSlice = signal<string | null>(null);
 
   readonly pieChartSlices = computed(() => {

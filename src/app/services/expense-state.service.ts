@@ -1,6 +1,7 @@
 import { Injectable, inject, signal, computed } from '@angular/core';
 import { ExpenseService } from './expense-service';
 import { Expense } from '../models/expenses.model';
+import { BudgetSettingsService } from './budget-settings.service';
 
 export interface CategorySpend {
   name: string;
@@ -207,6 +208,7 @@ export const DEFAULT_TOTAL_WAGE = 1600;
 })
 export class ExpenseStateService {
   private expenseService = inject(ExpenseService);
+  private readonly budgetSettingsService = inject(BudgetSettingsService);
 
   private getTimestamp(monthName: string): number {
     if (!monthName) return 0;
@@ -334,7 +336,7 @@ export class ExpenseStateService {
         isAllTime && monthsExcludingCurrent > 0
           ? Math.ceil(amountExcludingCurrent / monthsExcludingCurrent / 5) * 5
           : null;
-      const budget = CATEGORY_BUDGETS[name] ?? null;
+      const budget = this.budgetSettingsService.getCategoryBudget(name);
       // For All Time, compare the normalized monthly average against the budget
       // instead of scaling the budget up, so it stays intuitive as a target.
       const comparisonAmount = monthlyAverage ?? amount;
