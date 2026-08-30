@@ -28,7 +28,7 @@ export class CategoryAverageComponent implements OnInit {
 
   private readonly categoryTxs = signal<Transaction[]>([]);
   readonly expandedCategory = signal<string | null>(null);
-  readonly viewMode = signal<'various' | 'tickets'>('various');
+  readonly viewMode = signal<'various' | 'tickets' | 'games'>('various');
   readonly targetCategories = ['Supermarket', 'EatingOut', 'Takeaway', 'Tickets', 'Gaming'];
 
   ngOnInit() {
@@ -109,6 +109,11 @@ export class CategoryAverageComponent implements OnInit {
       standUp: '🤣',
       escape: '🎃',
       misc: '❓',
+      newRelease: '🎮',
+      olderTitle: '🕹️',
+      subscription: '🔄',
+      peripheral: '👾',
+      dlc: '🧩',
     };
 
     const ticketSubcategories = getSubcategoryOptions('Tickets').map((option) => {
@@ -132,6 +137,35 @@ export class CategoryAverageComponent implements OnInit {
       } satisfies CategoryAverage;
     });
 
-    return this.viewMode() === 'various' ? categorySummaries : ticketSubcategories;
+    const gamingSubcategories = getSubcategoryOptions('Gaming').map((option) => {
+      const matches = transactions.filter(
+        (t) => t.category === 'Gaming' && Number(t.subCategoryId ?? -1) === option.id,
+      );
+      const count = matches.length;
+      const sum = matches.reduce((acc, curr) => acc + Number(curr.amount), 0);
+      const average = count > 0 ? sum / count : 0;
+
+      return {
+        key: `Gaming:${option.id}`,
+        category: 'Gaming',
+        subCategoryId: option.id,
+        label: this.stripEmojiPrefix(option.label),
+        average,
+        count,
+        iconColorClass: 'text-cyan-400',
+        bgColorClass: 'bg-cyan-500/15 border-cyan-500/30',
+        emoji: subcategoryEmojiMap[option.name] ?? '🎮',
+      } satisfies CategoryAverage;
+    });
+
+    if (this.viewMode() === 'tickets') {
+      return ticketSubcategories;
+    }
+
+    if (this.viewMode() === 'games') {
+      return gamingSubcategories;
+    }
+
+    return categorySummaries;
   });
 }
