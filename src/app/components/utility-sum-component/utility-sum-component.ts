@@ -12,7 +12,8 @@ interface UtilityAverage {
   iconColorClass: string;
   bgColorClass: string;
   svgPath: string;
-  freq: string; // Optional duration field
+  freq: string;
+  billMonths: number;
 }
 
 @Component({
@@ -27,6 +28,7 @@ export class UtilitySumComponent {
   // Local signal to hold the fetched utilities
   private readonly utilityTxs = signal<Transaction[]>([]);
   readonly expandedUtility = signal<string | null>(null);
+  readonly viewMode = signal<'bill' | 'monthly'>('bill');
 
   ngOnInit() {
     this.loadUtilities();
@@ -47,15 +49,17 @@ export class UtilitySumComponent {
 
   readonly utilityAverages = computed<UtilityAverage[]>(() => {
     const transactions = this.utilityTxs();
+    const mode = this.viewMode();
 
     const targets = [
       {
-        id: 'Energy', // Electric or Energy
+        id: 'Energy',
         label: 'Energy',
         iconColor: 'text-amber-400',
         bgColor: 'bg-amber-500/15 border-amber-500/30',
         svg: 'M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z',
         freq: '/mo',
+        billMonths: 1,
       },
       {
         id: 'Internet',
@@ -64,6 +68,7 @@ export class UtilitySumComponent {
         bgColor: 'bg-indigo-500/15 border-indigo-500/30',
         svg: 'M8.288 15.038a5.25 5.25 0 017.424 0M5.106 11.856c3.807-3.808 9.98-3.808 13.788 0M1.924 8.674c5.565-5.565 14.587-5.565 20.152 0M12.53 18.22l-.53.53-.53-.53a.75.75 0 011.06 0z',
         freq: '/bi-mo',
+        billMonths: 2,
       },
       {
         id: 'Mobile',
@@ -72,6 +77,7 @@ export class UtilitySumComponent {
         bgColor: 'bg-emerald-500/15 border-emerald-500/30',
         svg: 'M10.5 1.5H8.25A2.25 2.25 0 006 3.75v16.5a2.25 2.25 0 002.25 2.25h7.5A2.25 2.25 0 0018 20.25V3.75a2.25 2.25 0 00-2.25-2.25H13.5m-3 0V3h3V1.5m-3 0h3m-3 18.75h3',
         freq: '/mo',
+        billMonths: 1,
       },
       {
         id: 'Water',
@@ -80,6 +86,7 @@ export class UtilitySumComponent {
         bgColor: 'bg-cyan-500/15 border-cyan-500/30',
         svg: 'M12 2.25c0 0-6.75 8.25-6.75 13.5a6.75 6.75 0 0013.5 0C18.75 10.5 12 2.25 12 2.25z',
         freq: '/tri-mo',
+        billMonths: 3,
       },
       {
         id: 'Κοινόχρηστα',
@@ -88,6 +95,7 @@ export class UtilitySumComponent {
         bgColor: 'bg-violet-500/15 border-violet-500/30',
         svg: 'M21.75 6.75a4.5 4.5 0 01-4.884 4.484c-1.076-.091-2.264.071-2.95.904l-7.152 8.684a2.548 2.548 0 11-3.586-3.586l8.684-7.152c.833-.686.995-1.874.904-2.95a4.5 4.5 0 016.336-4.486l-3.276 3.276a3.004 3.004 0 002.25 2.25l3.276-3.276c.527.526.823 1.25.823 2.004z',
         freq: '/mo',
+        billMonths: 1,
       },
     ];
 
@@ -95,7 +103,9 @@ export class UtilitySumComponent {
       const matches = transactions.filter((t) => t.description === target.id);
       const count = matches.length;
       const sum = matches.reduce((acc, curr) => acc + Number(curr.amount), 0);
-      const average = count > 0 ? sum / count : 0;
+      const billAverage = count > 0 ? sum / count : 0;
+      const monthlyAverage = target.billMonths > 1 ? billAverage / target.billMonths : billAverage;
+      const average = mode === 'monthly' ? monthlyAverage : billAverage;
 
       return {
         id: target.id,
@@ -105,7 +115,8 @@ export class UtilitySumComponent {
         iconColorClass: target.iconColor,
         bgColorClass: target.bgColor,
         svgPath: target.svg,
-        freq: target.freq,
+        freq: mode === 'monthly' ? '/mo' : target.freq,
+        billMonths: target.billMonths,
       };
     });
   });

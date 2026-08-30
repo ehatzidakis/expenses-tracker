@@ -1,8 +1,35 @@
 <div class="bg-gray-900/60 border border-gray-800/80 rounded-2xl p-5 backdrop-blur-sm select-none">
   <!-- Header -->
-  <div class="mb-5">
-    <h3 class="text-sm font-semibold text-gray-100">Utility Averages</h3>
-    <p class="text-xs text-gray-400 mt-0.5">Average per bill</p>
+  <div class="mb-5 flex items-center justify-between gap-3">
+    <div>
+      <h3 class="text-sm font-semibold text-gray-100">Utility Averages</h3>
+      <p class="text-xs text-gray-400 mt-0.5">
+        {{ viewMode() === 'bill' ? 'Average per bill' : 'Average per month' }}
+      </p>
+    </div>
+
+    <div class="inline-flex rounded-full border border-gray-700 bg-gray-950/80 p-1">
+      <button
+        type="button"
+        class="rounded-full px-3 py-1.5 text-[11px] font-semibold transition-colors"
+        [class.bg-indigo-500]="viewMode() === 'bill'"
+        [class.text-white]="viewMode() === 'bill'"
+        [class.text-gray-400]="viewMode() !== 'bill'"
+        (click)="viewMode.set('bill')"
+      >
+        Bill
+      </button>
+      <button
+        type="button"
+        class="rounded-full px-3 py-1.5 text-[11px] font-semibold transition-colors"
+        [class.bg-indigo-500]="viewMode() === 'monthly'"
+        [class.text-white]="viewMode() === 'monthly'"
+        [class.text-gray-400]="viewMode() !== 'monthly'"
+        (click)="viewMode.set('monthly')"
+      >
+        Monthly
+      </button>
+    </div>
   </div>
 
   <!-- List Container -->
