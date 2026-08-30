@@ -167,6 +167,37 @@ export function computeSplitDebtEntries(tx: Transaction): DebtEntry[] {
       ? 'onlyTheyOwe'
       : 'split');
 
+  if (splitType === 'custom') {
+    const entries: DebtEntry[] = [];
+    const customAmounts = tx.customSplitAmounts ?? {};
+    const participants: Array<'me' | number> = ['me', ...(tx.splitBy ?? [])].filter((person) =>
+      Object.prototype.hasOwnProperty.call(customAmounts, person),
+    ) as Array<'me' | number>;
+
+    for (const participant of participants) {
+      if (participant === tx.paidBy) {
+        continue;
+      }
+
+      const amount = Number(customAmounts[participant] ?? 0);
+      const debtorId = participant;
+      const creditorId = tx.paidBy;
+      const numericId = participant === 'me' ? 0 : participant;
+
+      entries.push({
+        transactionId: tx.id,
+        description: tx.description,
+        date: tx.date,
+        debtorId,
+        creditorId,
+        amount: Math.round(amount * 100) / 100,
+        paid: paidPersonIds.includes(numericId),
+      });
+    }
+
+    return entries;
+  }
+
   if (splitType === 'onlyTheyOwe') {
     const people = tx.splitBy ?? [];
     if (people.length === 0) {

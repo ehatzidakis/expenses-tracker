@@ -76,12 +76,12 @@ export class CategoryAverageComponent implements OnInit {
         iconColor: 'text-amber-400',
         bgColor: 'bg-amber-500/15 border-amber-500/30',
       },
-      {
-        category: 'Gaming',
-        label: 'Game',
-        iconColor: 'text-cyan-400',
-        bgColor: 'bg-cyan-500/15 border-cyan-500/30',
-      },
+      // {
+      //   category: 'Gaming',
+      //   label: 'Game',
+      //   iconColor: 'text-cyan-400',
+      //   bgColor: 'bg-cyan-500/15 border-cyan-500/30',
+      // },
     ];
 
     const categorySummaries: CategoryAverage[] = configs.map((cfg) => {

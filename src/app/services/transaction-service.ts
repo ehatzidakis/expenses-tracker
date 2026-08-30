@@ -42,8 +42,9 @@ export interface NewTransactionInput {
   isSplit?: boolean;
   paidBy?: 'me' | number;
   splitBy?: number[];
-  splitType?: 'split' | 'onlyMeOwes' | 'onlyTheyOwe';
+  splitType?: 'split' | 'onlyMeOwes' | 'onlyTheyOwe' | 'custom';
   totalAmount?: number;
+  customSplitAmounts?: Partial<Record<'me' | number, number>>;
 }
 
 export interface PendingTransaction extends NewTransactionInput {
@@ -283,8 +284,12 @@ export class TransactionService {
       paidBy: (overrides?.paidBy ?? data['paidBy']) as 'me' | number | undefined,
       splitBy: overrides?.splitBy ?? (data['splitBy'] as number[]) ?? [],
       splitType: (overrides?.splitType ?? data['splitType']) as
-        'split' | 'onlyMeOwes' | 'onlyTheyOwe' | undefined,
+        'split' | 'onlyMeOwes' | 'onlyTheyOwe' | 'custom' | undefined,
       totalAmount: Number(overrides?.totalAmount ?? data['totalAmount'] ?? data['amount'] ?? 0),
+      customSplitAmounts:
+        overrides?.customSplitAmounts ??
+        (data['customSplitAmounts'] as Partial<Record<'me' | number, number>> | undefined) ??
+        undefined,
     };
 
     await this.createTransaction(input);
@@ -349,6 +354,9 @@ export class TransactionService {
       txData['splitBy'] = input.splitBy ?? [];
       txData['splitType'] = input.splitType ?? 'split';
       txData['totalAmount'] = input.totalAmount ?? input.amount;
+      if (input.customSplitAmounts) {
+        txData['customSplitAmounts'] = input.customSplitAmounts;
+      }
       txData['splitPaidPersonIds'] = [];
     }
     batch.set(transactionRef, txData);
@@ -537,8 +545,12 @@ export class TransactionService {
         isSplit: true,
         paidBy: data['paidBy'] as 'me' | number,
         splitBy: (data['splitBy'] as number[]) ?? [],
-        splitType: (data['splitType'] as 'split' | 'onlyMeOwes' | 'onlyTheyOwe') ?? 'split',
+        splitType:
+          (data['splitType'] as 'split' | 'onlyMeOwes' | 'onlyTheyOwe' | 'custom') ?? 'split',
         totalAmount: Number(data['totalAmount']) || 0,
+        customSplitAmounts:
+          (data['customSplitAmounts'] as Partial<Record<'me' | number, number>> | undefined) ??
+          undefined,
         splitPaidPersonIds: (data['splitPaidPersonIds'] as number[]) ?? [],
       } satisfies Transaction;
     });
@@ -568,8 +580,12 @@ export class TransactionService {
         tx.isSplit = true;
         tx.paidBy = data['paidBy'] as 'me' | number;
         tx.splitBy = (data['splitBy'] as number[]) ?? [];
-        tx.splitType = (data['splitType'] as 'split' | 'onlyMeOwes' | 'onlyTheyOwe') ?? 'split';
+        tx.splitType =
+          (data['splitType'] as 'split' | 'onlyMeOwes' | 'onlyTheyOwe' | 'custom') ?? 'split';
         tx.totalAmount = Number(data['totalAmount']) || 0;
+        tx.customSplitAmounts =
+          (data['customSplitAmounts'] as Partial<Record<'me' | number, number>> | undefined) ??
+          undefined;
         tx.splitPaidPersonIds = (data['splitPaidPersonIds'] as number[]) ?? [];
       }
 
