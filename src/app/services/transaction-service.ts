@@ -20,8 +20,9 @@ import {
 } from 'firebase/firestore/lite';
 import { Transaction } from '../models/transaction.model';
 import { db } from '../firebase.config';
-import { CATEGORY_NAMES, DEFAULT_TOTAL_WAGE } from './expense-state.service';
+import { CATEGORY_NAMES } from './expense-state.service';
 import { AuthService } from './auth.service';
+import { BudgetSettingsService } from './budget-settings.service';
 
 export interface TransactionPage {
   items: Transaction[];
@@ -86,6 +87,7 @@ function monthNameFromDateString(date: string): string {
 })
 export class TransactionService {
   private readonly authService = inject(AuthService);
+  private readonly budgetSettingsService = inject(BudgetSettingsService);
 
   async fetchPage(
     monthName: string,
@@ -313,7 +315,7 @@ export class TransactionService {
       } else {
         const newExpense: Record<string, string | number> = {
           MonthName: monthName,
-          TotalWage: DEFAULT_TOTAL_WAGE,
+          TotalWage: this.budgetSettingsService.getDefaultTotalWage(),
         };
         for (const name of CATEGORY_NAMES) {
           newExpense[name] = name === input.category ? input.amount : 0;
@@ -389,7 +391,7 @@ export class TransactionService {
         // If transitioning to a new month that doesn't exist yet in expenses
         const newExpense: Record<string, string | number> = {
           MonthName: newMonthName,
-          TotalWage: DEFAULT_TOTAL_WAGE,
+          TotalWage: this.budgetSettingsService.getDefaultTotalWage(),
         };
         for (const name of CATEGORY_NAMES) {
           newExpense[name] = name === input.category ? input.amount : 0;
