@@ -185,8 +185,12 @@ export class TransactionService {
           tx.isSplit = true;
           tx.paidBy = data['paidBy'] as 'me' | number;
           tx.splitBy = (data['splitBy'] as number[]) ?? [];
-          tx.splitType = (data['splitType'] as 'split' | 'onlyMeOwes' | 'onlyTheyOwe') ?? 'split';
+          tx.splitType =
+            (data['splitType'] as 'split' | 'onlyMeOwes' | 'onlyTheyOwe' | 'custom') ?? 'split';
           tx.totalAmount = Number(data['totalAmount']) || 0;
+          tx.customSplitAmounts =
+            (data['customSplitAmounts'] as Partial<Record<'me' | number, number>> | undefined) ??
+            undefined;
           tx.splitPaidPersonIds = (data['splitPaidPersonIds'] as number[]) ?? [];
         }
         return tx;
@@ -213,8 +217,12 @@ export class TransactionService {
         isSplit: Boolean(data['isSplit']),
         paidBy: data['paidBy'] as 'me' | number | undefined,
         splitBy: (data['splitBy'] as number[]) ?? [],
-        splitType: (data['splitType'] as 'split' | 'onlyMeOwes' | 'onlyTheyOwe') ?? 'split',
+        splitType:
+          (data['splitType'] as 'split' | 'onlyMeOwes' | 'onlyTheyOwe' | 'custom') ?? 'split',
         totalAmount: Number(data['totalAmount']) || 0,
+        customSplitAmounts:
+          (data['customSplitAmounts'] as Partial<Record<'me' | number, number>> | undefined) ??
+          undefined,
         createdAt: (data['createdAt'] as string) ?? new Date().toISOString(),
         createdByUid: (data['createdByUid'] as string | undefined) ?? undefined,
         sourceRole: (data['sourceRole'] as 'kiosk') ?? 'kiosk',
@@ -281,10 +289,10 @@ export class TransactionService {
       amount: Number(overrides?.amount ?? data['amount'] ?? 0),
       adjustmentId: (overrides?.adjustmentId ?? data['adjustmentId']) as string | undefined,
       isSplit: overrides?.isSplit ?? Boolean(data['isSplit']),
-      paidBy: (overrides?.paidBy ?? data['paidBy']) as 'me' | number | undefined,
-      splitBy: overrides?.splitBy ?? (data['splitBy'] as number[]) ?? [],
-      splitType: (overrides?.splitType ?? data['splitType']) as
-        'split' | 'onlyMeOwes' | 'onlyTheyOwe' | 'custom' | undefined,
+      paidBy: ((overrides?.paidBy ?? data['paidBy'] ?? 'me') as 'me' | number) || 'me',
+      splitBy: overrides?.splitBy ?? (data['splitBy'] as number[] | undefined) ?? [],
+      splitType: (overrides?.splitType ?? data['splitType'] ?? 'split') as
+        'split' | 'onlyMeOwes' | 'onlyTheyOwe' | 'custom',
       totalAmount: Number(overrides?.totalAmount ?? data['totalAmount'] ?? data['amount'] ?? 0),
       customSplitAmounts:
         overrides?.customSplitAmounts ??
@@ -349,10 +357,14 @@ export class TransactionService {
       txData['adjustmentId'] = input.adjustmentId;
     }
     if (input.isSplit) {
+      const paidBy = input.paidBy ?? 'me';
+      const splitBy = input.splitBy ?? [];
+      const splitType = input.splitType ?? 'split';
+
       txData['isSplit'] = true;
-      txData['paidBy'] = input.paidBy;
-      txData['splitBy'] = input.splitBy ?? [];
-      txData['splitType'] = input.splitType ?? 'split';
+      txData['paidBy'] = paidBy;
+      txData['splitBy'] = splitBy;
+      txData['splitType'] = splitType;
       txData['totalAmount'] = input.totalAmount ?? input.amount;
       if (input.customSplitAmounts) {
         txData['customSplitAmounts'] = input.customSplitAmounts;

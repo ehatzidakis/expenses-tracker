@@ -1,11 +1,11 @@
 <!-- Backdrop -->
 <div
-  class="modal-backdrop fixed inset-0 z-100 bg-black/60 backdrop-blur-sm flex items-end justify-center sm:items-center"
+  class="modal-backdrop fixed inset-0 z-100 bg-black/60 backdrop-blur-sm flex items-end justify-center sm:items-center overflow-hidden"
   (click)="onBackdropClick($event)"
 >
   <!-- Panel -->
   <div
-    class="w-full max-w-md bg-gray-900 border border-gray-800/80 rounded-t-3xl sm:rounded-2xl p-6 space-y-5 shadow-2xl"
+    class="w-full max-w-md max-h-[85vh] overflow-y-auto bg-gray-900 border border-gray-800/80 rounded-t-3xl sm:rounded-2xl p-6 space-y-5 shadow-2xl"
   >
     <!-- Header -->
     <div class="flex items-center justify-between">
@@ -260,8 +260,46 @@
                                 <option value="split">Split evenly</option>
                                 <option value="onlyMeOwes">Only me owes</option>
                                 <option value="onlyTheyOwe">Only they owe</option>
+                                <option value="custom">Custom split</option>
                               </select>
                             </div>
+
+                            @if (pending.splitType === 'custom') {
+                              <div class="rounded-xl border border-indigo-500/30 bg-indigo-950/10 p-3 space-y-2">
+                                <div class="flex items-center justify-between gap-2">
+                                  <p class="text-[10px] uppercase tracking-[0.12em] text-indigo-300">
+                                    Custom amounts
+                                  </p>
+                                  <span class="text-[10px] text-gray-300">
+                                    {{ getPendingCustomTotal(pending).toFixed(2) }} / {{
+                                      pending.amount.toFixed(2)
+                                    }}
+                                  </span>
+                                </div>
+
+                                <div class="space-y-2">
+                                  @for (
+                                    person of getPendingCustomParticipants(pending);
+                                    track person
+                                  ) {
+                                    <div class="space-y-1">
+                                      <label class="text-[10px] uppercase tracking-[0.12em] text-gray-400">
+                                        {{ person === 'me' ? 'Me' : allPeople.find((p) => p.id === person)?.name ?? 'Person ' + person }}
+                                      </label>
+                                      <input
+                                        type="text"
+                                        inputmode="decimal"
+                                        autocomplete="off"
+                                        [value]="getPendingCustomValue(pending, person)"
+                                        (input)="onPendingCustomSplitInput($event, pending.id, person)"
+                                        class="w-full bg-gray-800/70 border border-gray-700 rounded-lg px-2 py-1.5 text-xs text-white tabular-nums"
+                                        placeholder="0.00"
+                                      />
+                                    </div>
+                                  }
+                                </div>
+                              </div>
+                            }
 
                             <div>
                               <label

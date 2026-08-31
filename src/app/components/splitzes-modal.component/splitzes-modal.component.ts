@@ -8,6 +8,7 @@ import {
   categoryRequiresSubcategory,
   getSubcategoryOptions,
 } from '../../services/expense-state.service';
+import { normalizeDecimalInput, parseDecimalInput } from '../../utils/decimal-input';
 
 @Component({
   selector: 'app-splitzes-modal',
@@ -89,8 +90,15 @@ export class SplitzesModalComponent {
       | 'paidBy'
       | 'splitBy'
       | 'splitType'
-      | 'totalAmount',
-    value: string | number | boolean | number[] | null,
+      | 'totalAmount'
+      | 'customSplitAmounts',
+    value:
+      | string
+      | number
+      | boolean
+      | number[]
+      | Partial<Record<'me' | number, number>>
+      | null,
   ): void {
     const current = this.pendingTransactions().find((entry) => entry.id === id);
     if (!current) {
@@ -103,9 +111,52 @@ export class SplitzesModalComponent {
       [id]: {
         ...current,
         ...(field === 'splitBy' && Array.isArray(nextValue) ? { splitBy: nextValue } : {}),
-        ...(field !== 'splitBy' ? { [field]: nextValue } : {}),
+        ...(field === 'customSplitAmounts' && nextValue && typeof nextValue === 'object'
+          ? { customSplitAmounts: nextValue }
+          : {}),
+        ...(field !== 'splitBy' && field !== 'customSplitAmounts' ? { [field]: nextValue } : {}),
       },
     }));
+  }
+
+  getPendingCustomParticipants(pending: PendingTransaction): Array<'me' | number> {
+    return ['me', ...(pending.splitBy ?? [])];
+  }
+
+  getPendingCustomValue(pending: PendingTransaction, personId: 'me' | number): string {
+    const value = pending.customSplitAmounts?.[personId] ?? 0;
+    return value === 0 ? '' : String(value);
+  }
+
+  getPendingCustomTotal(pending: PendingTransaction): number {
+    const customSplitAmounts = pending.customSplitAmounts ?? {};
+    const meShare = Number(customSplitAmounts['me'] ?? 0);
+    const otherShare = (pending.splitBy ?? []).reduce((sum, personId) => {
+      return sum + Number(customSplitAmounts[personId] ?? 0);
+    }, 0);
+    return meShare + otherShare;
+  }
+
+  onPendingCustomSplitInput(event: Event, pendingId: string, personId: 'me' | number): void {
+    const current = this.pendingTransactions().find((entry) => entry.id === pendingId);
+    if (!current) {
+      return;
+    }
+
+    const input = event.target as HTMLInputElement;
+    const normalized = normalizeDecimalInput(input.value);
+    const amount = parseDecimalInput(normalized);
+
+    const nextAmounts: Partial<Record<'me' | number, number>> = {
+      ...(current.customSplitAmounts ?? {}),
+      [personId]: amount,
+    };
+
+    this.updatePendingDraft(pendingId, 'customSplitAmounts', nextAmounts);
+
+    if (input.value !== normalized && (input.value.includes(',') || input.value.includes('.'))) {
+      input.value = normalized;
+    }
   }
 
   toggleSplitParticipant(id: string, personId: number): void {
@@ -147,6 +198,8 @@ export class SplitzesModalComponent {
         finalAmount = totalAmount;
       } else if (splitType === 'onlyTheyOwe') {
         finalAmount = 0;
+      } else if (splitType === 'custom') {
+        finalAmount = Number(draft.customSplitAmounts?.['me'] ?? 0);
       } else if (splitBy.length > 0) {
         const { myShare } = computeSplit(totalAmount, paidBy, splitBy);
         finalAmount = myShare;
@@ -165,10 +218,11 @@ export class SplitzesModalComponent {
         amount: finalAmount,
         adjustmentId: draft.adjustmentId,
         isSplit: draft.isSplit,
-        paidBy: draft.paidBy,
+        paidBy: draft.paidBy ?? 'me',
         splitBy: draft.splitBy,
         splitType: draft.splitType,
         totalAmount: totalAmount,
+        customSplitAmounts: draft.customSplitAmounts,
       });
       await this.queryClient.invalidateQueries({ queryKey: ['pendingTransactions'] });
       await this.queryClient.invalidateQueries({ queryKey: ['expenses'] });
