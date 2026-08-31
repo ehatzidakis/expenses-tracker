@@ -9,12 +9,12 @@
       <button
         type="button"
         class="rounded-full px-3 py-1.5 text-[11px] font-semibold transition-colors"
-        [class.bg-indigo-500]="viewMode() === 'various'"
-        [class.text-white]="viewMode() === 'various'"
-        [class.text-gray-400]="viewMode() !== 'various'"
-        (click)="viewMode.set('various')"
+        [class.bg-indigo-500]="viewMode() === 'food'"
+        [class.text-white]="viewMode() === 'food'"
+        [class.text-gray-400]="viewMode() !== 'food'"
+        (click)="viewMode.set('food')"
       >
-        Various
+        Food
       </button>
       <button
         type="button"

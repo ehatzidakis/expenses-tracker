@@ -28,7 +28,7 @@ export class CategoryAverageComponent implements OnInit {
 
   private readonly categoryTxs = signal<Transaction[]>([]);
   readonly expandedCategory = signal<string | null>(null);
-  readonly viewMode = signal<'various' | 'tickets' | 'games'>('various');
+  readonly viewMode = signal<'food' | 'tickets' | 'games'>('food');
   readonly targetCategories = ['Supermarket', 'EatingOut', 'Takeaway', 'Tickets', 'Gaming'];
 
   ngOnInit() {

@@ -92,13 +92,7 @@ export class SplitzesModalComponent {
       | 'splitType'
       | 'totalAmount'
       | 'customSplitAmounts',
-    value:
-      | string
-      | number
-      | boolean
-      | number[]
-      | Partial<Record<'me' | number, number>>
-      | null,
+    value: string | number | boolean | number[] | Partial<Record<'me' | number, number>> | null,
   ): void {
     const current = this.pendingTransactions().find((entry) => entry.id === id);
     if (!current) {

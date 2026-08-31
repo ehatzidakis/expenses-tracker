@@ -265,15 +265,18 @@
                             </div>
 
                             @if (pending.splitType === 'custom') {
-                              <div class="rounded-xl border border-indigo-500/30 bg-indigo-950/10 p-3 space-y-2">
+                              <div
+                                class="rounded-xl border border-indigo-500/30 bg-indigo-950/10 p-3 space-y-2"
+                              >
                                 <div class="flex items-center justify-between gap-2">
-                                  <p class="text-[10px] uppercase tracking-[0.12em] text-indigo-300">
+                                  <p
+                                    class="text-[10px] uppercase tracking-[0.12em] text-indigo-300"
+                                  >
                                     Custom amounts
                                   </p>
                                   <span class="text-[10px] text-gray-300">
-                                    {{ getPendingCustomTotal(pending).toFixed(2) }} / {{
-                                      pending.amount.toFixed(2)
-                                    }}
+                                    {{ getPendingCustomTotal(pending).toFixed(2) }} /
+                                    {{ pending.amount.toFixed(2) }}
                                   </span>
                                 </div>
 
@@ -283,15 +286,24 @@
                                     track person
                                   ) {
                                     <div class="space-y-1">
-                                      <label class="text-[10px] uppercase tracking-[0.12em] text-gray-400">
-                                        {{ person === 'me' ? 'Me' : allPeople.find((p) => p.id === person)?.name ?? 'Person ' + person }}
+                                      <label
+                                        class="text-[10px] uppercase tracking-[0.12em] text-gray-400"
+                                      >
+                                        {{
+                                          person === 'me'
+                                            ? 'Me'
+                                            : (allPeople.find((p) => p.id === person)?.name ??
+                                              'Person ' + person)
+                                        }}
                                       </label>
                                       <input
                                         type="text"
                                         inputmode="decimal"
                                         autocomplete="off"
                                         [value]="getPendingCustomValue(pending, person)"
-                                        (input)="onPendingCustomSplitInput($event, pending.id, person)"
+                                        (input)="
+                                          onPendingCustomSplitInput($event, pending.id, person)
+                                        "
                                         class="w-full bg-gray-800/70 border border-gray-700 rounded-lg px-2 py-1.5 text-xs text-white tabular-nums"
                                         placeholder="0.00"
                                       />
