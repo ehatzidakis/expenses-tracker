@@ -103,8 +103,6 @@ export class CreateTransactionComponent {
     this.paidById.set('me');
     this.customSplitMode.set(false);
     this.customSplitAmounts.set({});
-    this.onlyMeOwes.set(false);
-    this.onlyTheyOwe.set(false);
     this.linkWithAdjustment.set(false);
     this.selectedAdjustmentId.set('');
   }
@@ -124,10 +122,6 @@ export class CreateTransactionComponent {
   readonly paidById = signal<'me' | number>('me');
   readonly customSplitMode = signal<boolean>(false);
   readonly customSplitAmounts = signal<Partial<Record<'me' | number, number>>>({});
-  /** When true, only 'me' owes the full amount to the payer — no other participants. */
-  readonly onlyMeOwes = signal<boolean>(false);
-  /** When true, selected people owe 'me' the full amount split evenly among them. */
-  readonly onlyTheyOwe = signal<boolean>(false);
 
   readonly customSplitParticipants = computed<Array<'me' | number>>(() => {
     const participants: Array<'me' | number> = ['me', ...this.splitWith()];
@@ -160,22 +154,13 @@ export class CreateTransactionComponent {
     return `€${Math.abs(remaining).toFixed(2)} over the total`;
   });
 
-  readonly paidByOptions = computed<Array<{ id: 'me' | number; label: string }>>(() => {
-    if (this.onlyMeOwes()) {
-      // Only show other people (not me) — I can't be the payer if I'm the sole debtor
-      return this.allPeople.map((p) => ({ id: p.id as 'me' | number, label: p.name }));
-    }
-    if (this.onlyTheyOwe()) {
-      return [{ id: 'me', label: 'Me' }];
-    }
-    return [
-      { id: 'me', label: 'Me' },
-      ...this.splitWith().map((personId) => {
-        const person = this.allPeople.find((p) => p.id === personId);
-        return { id: personId as 'me' | number, label: person?.name ?? `Person ${personId}` };
-      }),
-    ];
-  });
+  readonly paidByOptions = computed<Array<{ id: 'me' | number; label: string }>>(() => [
+    { id: 'me', label: 'Me' },
+    ...this.splitWith().map((personId) => {
+      const person = this.allPeople.find((p) => p.id === personId);
+      return { id: personId as 'me' | number, label: person?.name ?? `Person ${personId}` };
+    }),
+  ]);
   // ─────────────────────────────────────────────────────────────────────────
 
   readonly transactionForm = form(this.transactionModel, (schemaPath) => {
@@ -321,8 +306,6 @@ export class CreateTransactionComponent {
       return;
     }
 
-    this.onlyMeOwes.set(false);
-    this.onlyTheyOwe.set(false);
     if (this.customSplitMode()) {
       this.customSplitMode.set(true);
     }
@@ -354,8 +337,6 @@ export class CreateTransactionComponent {
       this.paidById.set('me');
       this.customSplitMode.set(false);
       this.customSplitAmounts.set({});
-      this.onlyMeOwes.set(false);
-      this.onlyTheyOwe.set(false);
       return;
     }
 
@@ -364,8 +345,6 @@ export class CreateTransactionComponent {
     this.paidById.set('me');
     this.customSplitMode.set(false);
     this.customSplitAmounts.set({});
-    this.onlyMeOwes.set(false);
-    this.onlyTheyOwe.set(false);
   }
 
   setCustomSplitMode(value: boolean): void {
@@ -374,39 +353,8 @@ export class CreateTransactionComponent {
     }
 
     this.customSplitMode.set(value);
-    this.onlyMeOwes.set(false);
-    this.onlyTheyOwe.set(false);
     if (value) {
       this.goesSplitzes.set(true);
-      this.paidById.set('me');
-    }
-  }
-
-  setOnlyMeOwes(value: boolean): void {
-    if (this.isKioskMode()) {
-      return;
-    }
-
-    this.customSplitMode.set(false);
-    this.onlyMeOwes.set(value);
-    this.onlyTheyOwe.set(false);
-    if (value) {
-      this.splitWith.set([]);
-      if (this.paidById() === 'me' && this.allPeople.length > 0) {
-        this.paidById.set(this.allPeople[0].id);
-      }
-    }
-  }
-
-  setOnlyTheyOwe(value: boolean): void {
-    if (this.isKioskMode()) {
-      return;
-    }
-
-    this.customSplitMode.set(false);
-    this.onlyTheyOwe.set(value);
-    this.onlyMeOwes.set(false);
-    if (value) {
       this.paidById.set('me');
     }
   }
@@ -495,11 +443,7 @@ export class CreateTransactionComponent {
         : {};
 
       if (this.goesSplitzes()) {
-        if (this.onlyMeOwes() && this.paidById() !== 'me') {
-          finalAmount = value.amount;
-        } else if (this.onlyTheyOwe()) {
-          finalAmount = 0;
-        } else if (this.customSplitMode()) {
+        if (this.customSplitMode()) {
           if (!this.customSplitValid()) {
             this.errorMessage.set(
               `Custom split total must equal €${value.amount.toFixed(2)}. ${this.customSplitRemainingLabel()}`,
@@ -515,19 +459,8 @@ export class CreateTransactionComponent {
       }
 
       const isSplitActive =
-        this.goesSplitzes() &&
-        (this.splitWith().length > 0 ||
-          (this.onlyMeOwes() && this.paidById() !== 'me') ||
-          this.onlyTheyOwe() ||
-          this.customSplitMode());
-
-      const splitType = this.onlyMeOwes()
-        ? 'onlyMeOwes'
-        : this.onlyTheyOwe()
-          ? 'onlyTheyOwe'
-          : this.customSplitMode()
-            ? 'custom'
-            : 'split';
+        this.goesSplitzes() && (this.splitWith().length > 0 || this.customSplitMode());
+      const splitType: 'split' | 'custom' = this.customSplitMode() ? 'custom' : 'split';
 
       if (categoryRequiresSubcategory(value.category) && !value.subCategoryId) {
         this.errorMessage.set('Please select a subcategory for this ticket transaction.');
@@ -554,8 +487,8 @@ export class CreateTransactionComponent {
         ...(isSplitActive
           ? {
               isSplit: true,
-              paidBy: this.onlyTheyOwe() ? 'me' : this.paidById(),
-              splitBy: this.onlyMeOwes() ? [] : this.splitWith(),
+              paidBy: this.paidById(),
+              splitBy: this.splitWith(),
               splitType,
               totalAmount: value.amount,
               ...(this.customSplitMode() ? { customSplitAmounts: customAmounts } : {}),
