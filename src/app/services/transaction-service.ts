@@ -521,7 +521,7 @@ export class TransactionService {
 
     return sortedTransactions.map((d) => {
       const data = d.data();
-      return {
+      const tx: Transaction = {
         id: d.id,
         monthName: data['monthName'] as string,
         date: data['date'] as string,
@@ -530,8 +530,23 @@ export class TransactionService {
         subCategoryId: data['subCategoryId'] != null ? Number(data['subCategoryId']) : undefined,
         subCategory: (data['subCategory'] as string | undefined) ?? undefined,
         amount: Number(data['amount']) || 0,
+        createdAt: (data['createdAt'] as string) ?? new Date().toISOString(),
         adjustmentId: (data['adjustmentId'] as string) ?? undefined,
-      } as Transaction;
+      };
+
+      if (data['isSplit']) {
+        tx.isSplit = true;
+        tx.paidBy = data['paidBy'] as 'me' | number;
+        tx.splitBy = (data['splitBy'] as number[]) ?? [];
+        tx.splitType = (data['splitType'] as 'split' | 'custom') ?? 'split';
+        tx.totalAmount = Number(data['totalAmount']) || 0;
+        tx.customSplitAmounts =
+          (data['customSplitAmounts'] as Partial<Record<'me' | number, number>> | undefined) ??
+          undefined;
+        tx.splitPaidPersonIds = (data['splitPaidPersonIds'] as number[]) ?? [];
+      }
+
+      return tx;
     });
   }
 

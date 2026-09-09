@@ -5,6 +5,7 @@ import { TransactionService } from '../../services/transaction-service';
 import { Adjustment } from '../../models/adjustments.model';
 import { TRIP_CATEGORY_NAMES } from '../../services/expense-state.service';
 import { Transaction } from '../../models/transaction.model';
+import { PEOPLE } from '../../models/splitz.model';
 import { AdjustmentCardComponent } from '../adjustment-card.component/adjustment-card.component';
 import { EditAdjustmentComponent } from '../edit-adjustment.component/edit-adjustment.component';
 
@@ -52,10 +53,10 @@ interface TripCategoryRow {
         <div class="p-4 bg-red-950/40 border border-red-800/60 text-red-300 rounded-xl text-sm">
           Unable to load trip transactions.
         </div>
-      } @else if (selectedTransaction()) {
+      } @else if (selectedTransaction(); as tx) {
         <!-- Edit transaction overlay -->
         <app-edit-transaction
-          [transaction]="selectedTransaction()!"
+          [transaction]="tx"
           [categoryOverride]="tripCategories"
           (back)="selectedTransaction.set(null)"
           (updated)="onEditFinished()"
@@ -120,9 +121,19 @@ interface TripCategoryRow {
                         class="w-full text-left bg-gray-800/40 border border-gray-800/80 rounded-xl px-3 py-2 flex items-center justify-between hover:border-gray-700 transition-colors cursor-pointer"
                       >
                         <div class="min-w-0">
-                          <span class="text-xs font-medium text-gray-200 truncate block">{{
-                            tx.description
-                          }}</span>
+                          <span
+                            class="text-xs font-medium text-gray-200 truncate flex items-center gap-1.5"
+                          >
+                            <span class="truncate">{{ tx.description }}</span>
+                            @if (tx.isSplit) {
+                              <span
+                                aria-label="Split transaction"
+                                title="Split transaction"
+                                class="text-[11px] leading-none"
+                                >✂️</span
+                              >
+                            }
+                          </span>
                           <span class="text-[10px] text-gray-500 block mt-0.5">{{
                             tx.date | date: 'dd/MM/yyyy'
                           }}</span>
@@ -212,6 +223,33 @@ export class TripBreakdownComponent {
   formatPercent(value: number): string {
     const rounded = value.toFixed(1);
     return rounded.endsWith('.0') ? rounded.slice(0, -2) : rounded;
+  }
+
+  getPersonName(id: 'me' | number | undefined): string {
+    if (id === 'me' || id === undefined) {
+      return id === 'me' ? 'me' : 'Unknown';
+    }
+
+    const person = PEOPLE.find((entry) => entry.id === id);
+    return person?.name ?? `Person ${id}`;
+  }
+
+  getSplitWithNames(ids: number[] = []): string {
+    if (!ids.length) {
+      return 'None';
+    }
+
+    return ids.map((id) => this.getPersonName(id)).join(', ');
+  }
+
+  getSplitTypeLabel(type?: 'split' | 'custom'): string {
+    switch (type) {
+      case 'custom':
+        return 'Custom split';
+      case 'split':
+      default:
+        return 'Splitz';
+    }
   }
 
   toggleCategory(name: string): void {
