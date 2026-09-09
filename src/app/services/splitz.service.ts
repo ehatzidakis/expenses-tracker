@@ -161,11 +161,7 @@ export function computeSplitDebtEntries(tx: Transaction): DebtEntry[] {
   }
 
   const paidPersonIds = tx.splitPaidPersonIds ?? [];
-  const splitType =
-    tx.splitType ??
-    (tx.paidBy === 'me' && tx.amount === 0 && (tx.splitBy?.length ?? 0) > 0
-      ? 'onlyTheyOwe'
-      : 'split');
+  const splitType = tx.splitType ?? 'split';
 
   if (splitType === 'custom') {
     const entries: DebtEntry[] = [];
@@ -196,25 +192,6 @@ export function computeSplitDebtEntries(tx: Transaction): DebtEntry[] {
     }
 
     return entries;
-  }
-
-  if (splitType === 'onlyTheyOwe') {
-    const people = tx.splitBy ?? [];
-    if (people.length === 0) {
-      return [];
-    }
-
-    const share = Math.round((tx.totalAmount / people.length) * 100) / 100;
-
-    return people.map((personId): DebtEntry => ({
-      transactionId: tx.id,
-      description: tx.description,
-      date: tx.date,
-      debtorId: personId,
-      creditorId: 'me',
-      amount: share,
-      paid: paidPersonIds.includes(personId),
-    }));
   }
 
   const allParticipants: ('me' | number)[] = ['me', ...(tx.splitBy ?? [])];

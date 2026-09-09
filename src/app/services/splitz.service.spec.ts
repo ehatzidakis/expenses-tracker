@@ -3,7 +3,7 @@ import { Transaction } from '../models/transaction.model';
 import { computeSplitDebtEntries } from './splitz.service';
 
 describe('splitz debt calculations', () => {
-  it('supports “Only They Owe” transactions as zero-value payer transactions', () => {
+  it('supports standard split transactions', () => {
     const tx: Transaction = {
       id: 'tx-1',
       monthName: 'August 2026',
@@ -15,7 +15,7 @@ describe('splitz debt calculations', () => {
       isSplit: true,
       paidBy: 'me',
       splitBy: [1, 2],
-      splitType: 'onlyTheyOwe',
+      splitType: 'split',
       totalAmount: 20,
       splitPaidPersonIds: [],
     };
@@ -27,7 +27,7 @@ describe('splitz debt calculations', () => {
         date: '2026-08-18',
         debtorId: 1,
         creditorId: 'me',
-        amount: 10,
+        amount: 6.66,
         paid: false,
       },
       {
@@ -36,7 +36,7 @@ describe('splitz debt calculations', () => {
         date: '2026-08-18',
         debtorId: 2,
         creditorId: 'me',
-        amount: 10,
+        amount: 6.66,
         paid: false,
       },
     ]);
@@ -86,7 +86,7 @@ describe('splitz debt calculations', () => {
     ]);
   });
 
-  it('infers legacy “Only They Owe” records from the stored zero-amount split shape', () => {
+  it('keeps even splits on the standard split path', () => {
     const tx: Transaction = {
       id: 'tx-2',
       monthName: 'August 2026',
@@ -98,6 +98,7 @@ describe('splitz debt calculations', () => {
       isSplit: true,
       paidBy: 'me',
       splitBy: [1, 2],
+      splitType: 'split',
       totalAmount: 20,
       splitPaidPersonIds: [],
     };
@@ -109,7 +110,7 @@ describe('splitz debt calculations', () => {
         date: '2026-08-18',
         debtorId: 1,
         creditorId: 'me',
-        amount: 10,
+        amount: 6.66,
         paid: false,
       },
       {
@@ -118,7 +119,7 @@ describe('splitz debt calculations', () => {
         date: '2026-08-18',
         debtorId: 2,
         creditorId: 'me',
-        amount: 10,
+        amount: 6.66,
         paid: false,
       },
     ]);

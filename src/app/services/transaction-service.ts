@@ -42,7 +42,7 @@ export interface NewTransactionInput {
   isSplit?: boolean;
   paidBy?: 'me' | number;
   splitBy?: number[];
-  splitType?: 'split' | 'onlyMeOwes' | 'onlyTheyOwe' | 'custom';
+  splitType?: 'split' | 'custom';
   totalAmount?: number;
   customSplitAmounts?: Partial<Record<'me' | number, number>>;
 }
@@ -185,8 +185,7 @@ export class TransactionService {
           tx.isSplit = true;
           tx.paidBy = data['paidBy'] as 'me' | number;
           tx.splitBy = (data['splitBy'] as number[]) ?? [];
-          tx.splitType =
-            (data['splitType'] as 'split' | 'onlyMeOwes' | 'onlyTheyOwe' | 'custom') ?? 'split';
+          tx.splitType = (data['splitType'] as 'split' | 'custom') ?? 'split';
           tx.totalAmount = Number(data['totalAmount']) || 0;
           tx.customSplitAmounts =
             (data['customSplitAmounts'] as Partial<Record<'me' | number, number>> | undefined) ??
@@ -217,8 +216,7 @@ export class TransactionService {
         isSplit: Boolean(data['isSplit']),
         paidBy: data['paidBy'] as 'me' | number | undefined,
         splitBy: (data['splitBy'] as number[]) ?? [],
-        splitType:
-          (data['splitType'] as 'split' | 'onlyMeOwes' | 'onlyTheyOwe' | 'custom') ?? 'split',
+        splitType: (data['splitType'] as 'split' | 'custom') ?? 'split',
         totalAmount: Number(data['totalAmount']) || 0,
         customSplitAmounts:
           (data['customSplitAmounts'] as Partial<Record<'me' | number, number>> | undefined) ??
@@ -291,8 +289,7 @@ export class TransactionService {
       isSplit: overrides?.isSplit ?? Boolean(data['isSplit']),
       paidBy: ((overrides?.paidBy ?? data['paidBy'] ?? 'me') as 'me' | number) || 'me',
       splitBy: overrides?.splitBy ?? (data['splitBy'] as number[] | undefined) ?? [],
-      splitType: (overrides?.splitType ?? data['splitType'] ?? 'split') as
-        'split' | 'onlyMeOwes' | 'onlyTheyOwe' | 'custom',
+      splitType: (overrides?.splitType ?? data['splitType'] ?? 'split') as 'split' | 'custom',
       totalAmount: Number(overrides?.totalAmount ?? data['totalAmount'] ?? data['amount'] ?? 0),
       customSplitAmounts:
         overrides?.customSplitAmounts ??
@@ -557,8 +554,7 @@ export class TransactionService {
         isSplit: true,
         paidBy: data['paidBy'] as 'me' | number,
         splitBy: (data['splitBy'] as number[]) ?? [],
-        splitType:
-          (data['splitType'] as 'split' | 'onlyMeOwes' | 'onlyTheyOwe' | 'custom') ?? 'split',
+        splitType: (data['splitType'] as 'split' | 'custom') ?? 'split',
         totalAmount: Number(data['totalAmount']) || 0,
         customSplitAmounts:
           (data['customSplitAmounts'] as Partial<Record<'me' | number, number>> | undefined) ??
@@ -592,8 +588,7 @@ export class TransactionService {
         tx.isSplit = true;
         tx.paidBy = data['paidBy'] as 'me' | number;
         tx.splitBy = (data['splitBy'] as number[]) ?? [];
-        tx.splitType =
-          (data['splitType'] as 'split' | 'onlyMeOwes' | 'onlyTheyOwe' | 'custom') ?? 'split';
+        tx.splitType = (data['splitType'] as 'split' | 'custom') ?? 'split';
         tx.totalAmount = Number(data['totalAmount']) || 0;
         tx.customSplitAmounts =
           (data['customSplitAmounts'] as Partial<Record<'me' | number, number>> | undefined) ??

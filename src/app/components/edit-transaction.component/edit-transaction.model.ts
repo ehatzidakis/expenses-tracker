@@ -16,7 +16,7 @@ export interface TransactionFormModel {
   paidBy?: 'me' | number;
   splitBy?: number[];
   splitPaidPersonIds?: number[];
-  splitType?: 'split' | 'onlyMeOwes' | 'onlyTheyOwe' | 'custom';
+  splitType?: 'split' | 'custom';
   totalAmount?: number;
 }
 

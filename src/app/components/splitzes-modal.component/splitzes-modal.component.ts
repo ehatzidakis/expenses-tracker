@@ -188,11 +188,7 @@ export class SplitzesModalComponent {
       const splitBy = draft.splitBy ?? [];
       const paidBy = draft.paidBy ?? 'me';
 
-      if (splitType === 'onlyMeOwes') {
-        finalAmount = totalAmount;
-      } else if (splitType === 'onlyTheyOwe') {
-        finalAmount = 0;
-      } else if (splitType === 'custom') {
+      if (splitType === 'custom') {
         finalAmount = Number(draft.customSplitAmounts?.['me'] ?? 0);
       } else if (splitBy.length > 0) {
         const { myShare } = computeSplit(totalAmount, paidBy, splitBy);
