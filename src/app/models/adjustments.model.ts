@@ -1,7 +1,10 @@
 export interface Adjustment {
   id: string;
   title: string;
-  adjType: 'income' | 'expense';
+  adjType: boolean;
   amount: number;
-  date: Date;
+  startDate: Date;
+  endDate: Date;
+  isTrip?: boolean;
+  isSelectable?: boolean;
 }

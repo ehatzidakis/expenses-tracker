@@ -1,0 +1,140 @@
+<div class="space-y-6">
+  <div
+    class="bg-gray-900/60 border border-gray-800/80 rounded-2xl p-5 space-y-4 backdrop-blur-sm overflow-hidden select-none"
+  >
+    <div class="flex items-center justify-between gap-3">
+      <div>
+        <h3 class="text-sm font-semibold text-gray-100">Monthly Allocated Budget Per Category</h3>
+      </div>
+
+      @if (!isEditing) {
+        <button
+          type="button"
+          class="rounded-lg border border-indigo-500/40 bg-indigo-500/10 px-2.5 py-1 text-[10px] font-medium uppercase tracking-wide text-indigo-200 transition hover:bg-indigo-500/20"
+          (click)="startEditing()"
+        >
+          Edit
+        </button>
+      }
+    </div>
+
+    <div class="grid grid-cols-4 gap-1">
+      @for (item of budgets; track item.category) {
+        <div
+          class="bg-gray-800/40 border border-gray-800/60 rounded-2xl p-3.5 flex flex-col justify-between"
+        >
+          <span
+            class="font-medium text-gray-400 block whitespace-nowrap"
+            [class]="getCategoryTextSize(item.category)"
+          >
+            {{ item.category }}
+          </span>
+
+          @if (isEditing) {
+            <label class="mt-2 block text-[10px] text-gray-400">
+              <span class="mb-1 block">Budget</span>
+              <div
+                class="flex items-center gap-1 rounded-md border border-gray-700 bg-gray-950/70 px-2 py-1.5"
+              >
+                <span class="text-gray-400">€</span>
+                <input
+                  type="text"
+                  inputmode="numeric"
+                  autocomplete="off"
+                  pattern="[0-9]*"
+                  class="w-full bg-transparent text-sm text-white outline-none"
+                  [ngModel]="draftBudgets[item.category] ?? 0"
+                  (ngModelChange)="updateDraftBudget(item.category, $event)"
+                />
+              </div>
+              @if (item.suggestion !== null) {
+                <span class="mt-1 block text-[9px] text-indigo-300">
+                  suggested: €{{ item.suggestion | number: '1.0-0' }}
+                </span>
+              }
+            </label>
+          } @else {
+            <span class="text-base font-semibold text-gray-100 mt-1">
+              €{{ item.budget | number: '1.0-0' }}
+            </span>
+          }
+        </div>
+      }
+    </div>
+
+    @if (isEditing) {
+      <div class="rounded-2xl border border-indigo-500/40 bg-indigo-950/20 p-3">
+        <div class="flex items-center justify-between gap-3">
+          <div>
+            <div class="text-[10px] font-semibold uppercase tracking-[0.2em] text-indigo-300">
+              Total wage
+            </div>
+            <!-- <div class="mt-1 text-sm text-gray-200">
+              This value is used in your projected savings.
+            </div> -->
+          </div>
+          <div
+            class="flex items-center gap-2 rounded-md border border-indigo-500/30 bg-gray-950/70 px-2 py-1.5"
+          >
+            <span class="text-gray-400">€</span>
+            <input
+              type="text"
+              inputmode="numeric"
+              autocomplete="off"
+              pattern="[0-9]*"
+              class="w-24 bg-transparent text-right text-base font-semibold text-white outline-none"
+              [ngModel]="draftWage"
+              (ngModelChange)="setDraftWage($event)"
+            />
+          </div>
+        </div>
+      </div>
+
+      <div class="flex justify-end gap-2 pt-1">
+        <button
+          type="button"
+          class="rounded-lg border border-gray-700 px-3 py-1.5 text-xs font-medium text-gray-200 transition hover:border-gray-500"
+          (click)="cancelEditing()"
+        >
+          Cancel
+        </button>
+        <button
+          type="button"
+          class="rounded-lg bg-indigo-600 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-indigo-500"
+          (click)="saveBudgetSettings()"
+        >
+          Save
+        </button>
+      </div>
+    }
+
+    <div class="space-y-3">
+      <div class="grid grid-cols-2 gap-3">
+        <div
+          class="bg-indigo-950/30 border border-indigo-800/50 rounded-2xl p-2 flex items-center justify-between"
+        >
+          <span class="text-xs font-semibold uppercase tracking-wider text-indigo-300"
+            >Total Budgeted Sum</span
+          >
+          <span class="text-lg font-bold text-indigo-200">
+            €{{ totalBudget | number: '1.0-0' }}
+          </span>
+        </div>
+        <div
+          class="bg-indigo-950/30 border border-indigo-800/50 rounded-2xl p-2 flex items-center justify-between"
+        >
+          <span class="text-xs font-semibold uppercase tracking-wider text-indigo-300"
+            >Monthly Savings</span
+          >
+          <span
+            class="text-lg font-bold text-indigo-200"
+            [class.blur-md]="privacyService.isPrivacyMode()"
+            [class.select-none]="privacyService.isPrivacyMode()"
+          >
+            €{{ projectedSave | number: '1.0-0' }}
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

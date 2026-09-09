@@ -1,6 +1,7 @@
 import { Injectable, inject, signal, computed } from '@angular/core';
 import { ExpenseService } from './expense-service';
 import { Expense } from '../models/expenses.model';
+import { BudgetSettingsService } from './budget-settings.service';
 
 export interface CategorySpend {
   name: string;
@@ -15,26 +16,199 @@ export interface CategorySpend {
 
 export type AppTab = 'monthly' | 'sumup' | 'create' | 'oneoffs' | 'charts';
 
+export interface CategorySubcategoryOption {
+  id: number;
+  name: string;
+  label: string;
+}
+
+export const TICKET_SUBCATEGORY_OPTIONS: CategorySubcategoryOption[] = [
+  { id: 1, name: 'theatre', label: '🎭 Theatre' },
+  { id: 2, name: 'movies', label: '🎬 Movies' },
+  { id: 6, name: 'concert', label: '🎤 Concert' },
+  { id: 3, name: 'standUp', label: '🤣 Stand Up' },
+  { id: 4, name: 'escape', label: '🎃 Escape Room' },
+  { id: 5, name: 'misc', label: '❓ Misc' },
+];
+
+export const GAMING_SUBCATEGORY_OPTIONS: CategorySubcategoryOption[] = [
+  { id: 7, name: 'newRelease', label: '🎮 New Release' },
+  { id: 8, name: 'olderTitle', label: '🕹️ Older Title' },
+  { id: 9, name: 'subscription', label: '🔄 Subscription' },
+  { id: 10, name: 'peripheral', label: '👾 Peripheral' },
+  { id: 11, name: 'dlc', label: '🧩 DLC' },
+];
+
+export const CATEGORY_SUBCATEGORY_OPTIONS: Record<string, CategorySubcategoryOption[]> = {
+  Tickets: TICKET_SUBCATEGORY_OPTIONS,
+  Gaming: GAMING_SUBCATEGORY_OPTIONS,
+};
+
+export function categoryRequiresSubcategory(category: string): boolean {
+  return (CATEGORY_SUBCATEGORY_OPTIONS[category] ?? []).length > 0;
+}
+
+export function getSubcategoryOptions(category: string): CategorySubcategoryOption[] {
+  return CATEGORY_SUBCATEGORY_OPTIONS[category] ?? [];
+}
+
+export function getSubcategoryMetaById(
+  category: string,
+  subCategoryId?: number | null,
+): CategorySubcategoryOption | undefined {
+  if (subCategoryId == null) {
+    return undefined;
+  }
+
+  return getSubcategoryOptions(category).find((option) => option.id === Number(subCategoryId));
+}
+
+export function getSubcategoryMetaByName(
+  category: string,
+  subCategory?: string | null,
+): CategorySubcategoryOption | undefined {
+  if (!subCategory) {
+    return undefined;
+  }
+
+  return getSubcategoryOptions(category).find(
+    (option) => option.name.toLowerCase() === String(subCategory).toLowerCase(),
+  );
+}
+
 export const CATEGORY_BUDGETS: Record<string, number | null> = {
   Supermarket: 280,
   Medical: 200,
   Personal: 200,
-  EatingOut: 140,
-  Utilities: 100,
+  EatingOut: 130,
+  Utilities: 110,
   Takeaway: 100,
   Tickets: 75,
   Gaming: 75,
   Cats: 50,
   Travel: 30,
   Subscriptions: 15,
-  Gym: 70, // No budget limit defined
+  Gym: 65,
 };
+
+export const CATEGORY_NAMES = Object.keys(CATEGORY_BUDGETS);
+
+export const CATEGORY_META: Record<string, { emoji: string; classes: string }> = {
+  Supermarket: {
+    emoji: '🛒',
+    classes: 'bg-emerald-500/15 text-emerald-200 border border-emerald-400/20',
+  },
+  Medical: {
+    emoji: '❤️‍🩹',
+    classes: 'bg-rose-500/15 text-rose-200 border border-rose-400/20',
+  },
+  Personal: {
+    emoji: '👤',
+    classes: 'bg-violet-500/15 text-violet-200 border border-violet-400/20',
+  },
+  EatingOut: {
+    emoji: '🍽️',
+    classes: 'bg-amber-500/15 text-amber-200 border border-amber-400/20',
+  },
+  Utilities: {
+    emoji: '💡',
+    classes: 'bg-yellow-500/15 text-yellow-200 border border-yellow-400/20',
+  },
+  Takeaway: {
+    emoji: '🥡',
+    classes: 'bg-orange-500/15 text-orange-200 border border-orange-400/20',
+  },
+  Tickets: {
+    emoji: '🎟️',
+    classes: 'bg-sky-500/15 text-sky-200 border border-sky-400/20',
+  },
+  Gaming: {
+    emoji: '🎮',
+    classes: 'bg-cyan-500/15 text-cyan-200 border border-cyan-400/20',
+  },
+  Cats: {
+    emoji: '🐱',
+    classes: 'bg-pink-500/15 text-pink-200 border border-pink-400/20',
+  },
+  Travel: {
+    emoji: '🚅',
+    classes: 'bg-indigo-500/15 text-indigo-200 border border-indigo-400/20',
+  },
+  Subscriptions: {
+    emoji: '📺',
+    classes: 'bg-fuchsia-500/15 text-fuchsia-200 border border-fuchsia-400/20',
+  },
+  Gym: {
+    emoji: '🏋️',
+    classes: 'bg-teal-500/15 text-teal-200 border border-teal-400/20',
+  },
+  'Plane Tickets': {
+    emoji: '🎫',
+    classes: 'bg-sky-500/15 text-sky-200 border border-sky-400/20',
+  },
+  Accommodation: {
+    emoji: '🏨',
+    classes: 'bg-violet-500/15 text-violet-200 border border-violet-400/20',
+  },
+  Food: {
+    emoji: '🍽️',
+    classes: 'bg-amber-500/15 text-amber-200 border border-amber-400/20',
+  },
+  Transportation: {
+    emoji: '🚅',
+    classes: 'bg-indigo-500/15 text-indigo-200 border border-indigo-400/20',
+  },
+  Gifts: {
+    emoji: '🎁',
+    classes: 'bg-pink-500/15 text-pink-200 border border-pink-400/20',
+  },
+  Activities: {
+    emoji: '🎉',
+    classes: 'bg-teal-500/15 text-teal-200 border border-teal-400/20',
+  },
+  Attractions: {
+    emoji: '🏛️',
+    classes: 'bg-yellow-500/15 text-yellow-200 border border-yellow-400/20',
+  },
+  Splurge: {
+    emoji: '🤑',
+    classes: 'bg-fuchsia-500/15 text-fuchsia-200 border border-fuchsia-400/20',
+  },
+  Miscellaneous: {
+    emoji: '✨',
+    classes: 'bg-slate-500/15 text-slate-200 border border-slate-400/20',
+  },
+};
+
+export function getCategoryMeta(name: string): { emoji: string; classes: string } {
+  return (
+    CATEGORY_META[name] ?? {
+      emoji: '•',
+      classes: 'bg-slate-500/15 text-slate-200 border border-slate-400/20',
+    }
+  );
+}
+
+export const TRIP_CATEGORY_NAMES = [
+  'Plane Tickets',
+  'Accommodation',
+  'Food',
+  'Transportation',
+  'Gifts',
+  'Activities',
+  'Attractions',
+  'Splurge',
+  'Miscellaneous',
+];
+
+export const DEFAULT_TOTAL_WAGE = 1600;
 
 @Injectable({
   providedIn: 'root',
 })
 export class ExpenseStateService {
   private expenseService = inject(ExpenseService);
+  private readonly budgetSettingsService = inject(BudgetSettingsService);
 
   private getTimestamp(monthName: string): number {
     if (!monthName) return 0;
@@ -154,9 +328,15 @@ export class ExpenseStateService {
 
     return entries.map(([name, val]) => {
       const amount = Number(val) || 0;
+      const lastMonthExpense = this.latestMonthExpense();
+      const currentMonthValue = Number(lastMonthExpense?.[name as keyof Expense] ?? 0);
+      const amountExcludingCurrent = isAllTime ? Math.max(0, amount - currentMonthValue) : amount;
+      const monthsExcludingCurrent = Math.max(0, totalMonthsCount - 1);
       const monthlyAverage =
-        isAllTime && totalMonthsCount > 0 ? Math.ceil(amount / totalMonthsCount / 5) * 5 : null;
-      const budget = CATEGORY_BUDGETS[name] ?? null;
+        isAllTime && monthsExcludingCurrent > 0
+          ? Math.ceil(amountExcludingCurrent / monthsExcludingCurrent / 5) * 5
+          : null;
+      const budget = this.budgetSettingsService.getCategoryBudget(name);
       // For All Time, compare the normalized monthly average against the budget
       // instead of scaling the budget up, so it stays intuitive as a target.
       const comparisonAmount = monthlyAverage ?? amount;

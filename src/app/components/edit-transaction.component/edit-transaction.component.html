@@ -1,0 +1,200 @@
+<div class="space-y-4 border border-gray-800/80 rounded-2xl p-4 bg-gray-900/60 backdrop-blur-sm">
+  <!-- Top Navigation Header -->
+  <div class="flex items-center justify-between">
+    <button
+      type="button"
+      (click)="back.emit()"
+      class="text-xs font-medium text-gray-400 hover:text-gray-200 flex items-center gap-1 transition-colors"
+    >
+      ← Back
+    </button>
+    <h3 class="text-sm font-semibold text-gray-200">Edit Transaction</h3>
+    <div class="w-10"></div>
+    <!-- Spacer -->
+  </div>
+
+  <form
+    (submit)="onSubmit($event)"
+    class="bg-gray-900/60 border border-gray-800/80 rounded-2xl p-5 space-y-4 backdrop-blur-sm"
+  >
+    <div class="space-y-1.5">
+      <label for="tx-edit-date" class="text-xs font-medium text-gray-400">Date</label>
+      <input
+        id="tx-edit-date"
+        type="date"
+        [formField]="transactionForm.date"
+        class="w-full min-w-0 appearance-none scheme-dark bg-gray-800/60 border border-gray-800 rounded-xl px-3 py-2.5 text-sm text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/60"
+      />
+      @if (transactionForm.date().touched() && transactionForm.date().invalid()) {
+        <span class="text-[11px] text-red-400">{{
+          transactionForm.date().errors()[0]?.message
+        }}</span>
+      }
+    </div>
+
+    <div class="space-y-1.5">
+      <label for="tx-edit-description" class="text-xs font-medium text-gray-400">Description</label>
+      <input
+        id="tx-edit-description"
+        type="text"
+        placeholder="e.g. Σκλαβενίτης"
+        [formField]="transactionForm.description"
+        class="w-full bg-gray-800/60 border border-gray-800 rounded-xl px-3 py-2.5 text-sm text-gray-100 placeholder:text-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/60"
+      />
+      @if (transactionForm.description().touched() && transactionForm.description().invalid()) {
+        <span class="text-[11px] text-red-400">{{
+          transactionForm.description().errors()[0]?.message
+        }}</span>
+      }
+    </div>
+
+    <div class="space-y-1.5">
+      <label for="tx-edit-category" class="text-xs font-medium text-gray-400">Category</label>
+      <select
+        id="tx-edit-category"
+        [value]="model().category"
+        (change)="setCategory($any($event.target).value)"
+        class="w-full bg-gray-800/60 border border-gray-800 rounded-xl px-3 py-2.5 text-sm text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/60"
+      >
+        <option value="">Select a category</option>
+        @for (cat of categories(); track cat) {
+          <option [value]="cat" [selected]="model().category === cat">
+            {{ getCategoryOptionLabel(cat) }}
+          </option>
+        }
+      </select>
+      @if (transactionForm.category().touched() && transactionForm.category().invalid()) {
+        <span class="text-[11px] text-red-400">{{
+          transactionForm.category().errors()[0]?.message
+        }}</span>
+      }
+    </div>
+
+    @if (availableSubcategories().length > 0) {
+      <div class="space-y-1.5">
+        <label for="tx-edit-subcategory" class="text-xs font-medium text-gray-400"
+          >Subcategory</label
+        >
+        <select
+          id="tx-edit-subcategory"
+          [value]="model().subCategoryId ?? ''"
+          (change)="
+            setSubcategory($any($event.target).value === '' ? null : +$any($event.target).value)
+          "
+          class="w-full bg-gray-800/60 border border-gray-800 rounded-xl px-3 py-2.5 text-sm text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/60"
+        >
+          <option value="">Select a subcategory</option>
+          @for (sub of availableSubcategories(); track sub.id) {
+            <option [value]="sub.id" [selected]="model().subCategoryId === sub.id">
+              {{ sub.label }}
+            </option>
+          }
+        </select>
+        @if (
+          transactionForm.subCategoryId().touched() && transactionForm.subCategoryId().invalid()
+        ) {
+          <span class="text-[11px] text-red-400">{{
+            transactionForm.subCategoryId().errors()[0]?.message
+          }}</span>
+        }
+      </div>
+    }
+
+    <div class="space-y-1.5">
+      <label for="tx-edit-amount" class="text-xs font-medium text-gray-400">Amount</label>
+      <input
+        id="tx-edit-amount"
+        type="text"
+        inputmode="decimal"
+        autocomplete="off"
+        [value]="model().amount === 0 ? '' : model().amount.toString()"
+        placeholder="0.00"
+        (input)="onAmountInput($event)"
+        class="w-full bg-gray-800/60 border border-gray-800 rounded-xl px-3 py-2.5 text-sm text-gray-100 placeholder:text-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/60"
+      />
+      @if (transactionForm.amount().touched() && transactionForm.amount().invalid()) {
+        <span class="text-[11px] text-red-400">{{
+          transactionForm.amount().errors()[0]?.message
+        }}</span>
+      }
+    </div>
+
+    @if (splitMeta(); as split) {
+      <div class="rounded-2xl border border-teal-800/40 bg-teal-950/20 p-3 space-y-3">
+        <div class="flex items-center justify-between">
+          <p class="text-xs font-semibold uppercase tracking-wide text-teal-300">Split Details</p>
+          <span class="text-[10px] font-medium px-2 py-1 rounded-full bg-teal-500/10 text-teal-200">
+            Read only
+          </span>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3 text-xs text-gray-300">
+          <div>
+            <p class="text-gray-400">Split Type</p>
+            <p class="mt-1 font-medium text-white">{{ getSplitTypeLabel(split.splitType) }}</p>
+          </div>
+          <div>
+            <p class="text-gray-400">Paid By</p>
+            <p class="mt-1 font-medium text-white">
+              {{ getPersonName(split.paidBy) }}
+            </p>
+          </div>
+          <div class="col-span-2">
+            <p class="text-gray-400">Split With</p>
+            <p class="mt-1 font-medium text-white">
+              {{ getSplitWithNames(split.splitBy) }}
+            </p>
+          </div>
+          <div>
+            <p class="text-gray-400">Total Amount</p>
+            <p class="mt-1 font-medium text-white">€{{ split.totalAmount.toFixed(2) }}</p>
+          </div>
+          <div>
+            <p class="text-gray-400">Settled</p>
+            <p class="mt-1 font-medium text-white">
+              {{ split.splitPaidPersonIds.length > 0 ? 'Yes' : 'No' }}
+            </p>
+          </div>
+        </div>
+      </div>
+    }
+
+    @if (errorMessage()) {
+      <div class="p-3 bg-red-950/40 border border-red-800/60 text-red-300 rounded-xl text-xs">
+        {{ errorMessage() }}
+      </div>
+    }
+
+    <div class="pt-2 space-y-2">
+      <button
+        type="submit"
+        [disabled]="
+          transactionForm().invalid() ||
+          submitting() ||
+          deleting() ||
+          privacyService.isPrivacyMode()
+        "
+        class="w-full py-3 rounded-xl text-sm font-semibold text-white bg-linear-to-br from-indigo-500 to-violet-600 shadow-lg disabled:opacity-40 disabled:cursor-not-allowed active:scale-[0.99] transition-all"
+      >
+        {{ submitting() ? 'Saving…' : 'Save Changes' }}
+      </button>
+
+      <button
+        type="button"
+        (click)="requestDelete()"
+        [disabled]="submitting() || deleting() || privacyService.isPrivacyMode()"
+        class="w-full py-3 rounded-xl text-sm font-semibold text-red-400 bg-red-950/30 hover:bg-red-900/40 border border-red-800/50 disabled:opacity-40 disabled:cursor-not-allowed active:scale-[0.99] transition-all"
+      >
+        {{ deleting() ? 'Deleting…' : 'Delete Transaction' }}
+      </button>
+    </div>
+  </form>
+</div>
+<app-confirm-modal
+  [isOpen]="showDeleteConfirm()"
+  title="Delete Adjustment?"
+  message="Are you sure you want to delete this adjustment?"
+  confirmText="Delete"
+  (confirmed)="onDelete()"
+  (cancelled)="showDeleteConfirm.set(false)"
+/>

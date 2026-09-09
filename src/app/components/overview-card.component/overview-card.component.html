@@ -1,8 +1,10 @@
 <section
-  class="bg-linear-to-br from-gray-900 via-gray-900 to-indigo-950/50 border border-gray-800 rounded-2xl p-5 shadow-xl"
+  class="bg-linear-to-br from-gray-900 via-gray-900 to-indigo-950/50 border border-gray-800 rounded-2xl p-5 shadow-xl transition-all duration-200"
+  [class.cursor-pointer]="hasBreakdown()"
+  (click)="toggleExpanded()"
 >
   @if (dateRangeInfo(); as info) {
-    <span class="text-xs font-medium text-gray-400 uppercase tracking-wider block mb-2">
+    <span class="text-xs font-medium text-gray-400 uppercase tracking-wider block mb-4">
       @if (info.first === info.last) {
         Sum for <span class="text-gray-100 font-semibold">{{ info.count }}</span> month:
         <span class="text-gray-100 font-semibold">{{ info.first }}</span>
@@ -13,42 +15,316 @@
       }
     </span>
   }
-  <div class="flex items-start justify-between">
-    <div>
-      <span class="text-xs font-medium text-gray-400 uppercase tracking-wider"
+  <div class="grid items-start justify-between grid-cols-2 gap-6">
+    <!-- LEFT COLUMN: Everything sticks left -->
+    <div class="text-left">
+      <span class="text-xs font-medium text-gray-400 uppercase tracking-wider block"
         >Total Actual Spend</span
       >
-      <div class="flex items-baseline mt-1">
-        <h2 class="text-3xl font-extrabold text-white tracking-tight">
+
+      <!-- Total Amount -->
+      <div class="flex items-baseline justify-start mt-1">
+        <h2
+          class="text-3xl font-extrabold text-white tracking-tight tabular-nums"
+          [class.blur-md]="privacyService.isPrivacyMode()"
+          [class.select-none]="privacyService.isPrivacyMode()"
+        >
           €{{ totalSpend() | number: '1.2-2' }}
         </h2>
       </div>
+      @if (hasBreakdown()) {
+        <div class="mt-2.5 space-y-2">
+          <div class="flex items-center justify-between gap-2 text-[11px]">
+            <span class="text-gray-500 text-[10px]">Monthly Expenses:</span>
+            <span
+              class="text-gray-300 font-medium tabular-nums"
+              [class.blur-md]="privacyService.isPrivacyMode()"
+              [class.select-none]="privacyService.isPrivacyMode()"
+              >€{{ monthlyExpenses() | number: '1.2-2' }}</span
+            >
+          </div>
+          <div class="flex items-center justify-between gap-2 text-[11px]">
+            <span class="text-gray-500 text-[10px]">One-Off Expenses:</span>
+            <span
+              class="text-gray-300 font-medium tabular-nums"
+              [class.blur-md]="privacyService.isPrivacyMode()"
+              [class.select-none]="privacyService.isPrivacyMode()"
+              >€{{ oneOffExpenses() | number: '1.2-2' }}</span
+            >
+          </div>
+        </div>
+      }
+
+      <!-- SumUp Breakdown -->
+      <div
+        class="grid overflow-hidden transition-[grid-template-rows,opacity,transform] duration-300 ease-out"
+        [class.grid-rows-[0fr]]="!expanded()"
+        [class.grid-rows-[1fr]]="expanded()"
+        [class.opacity-0]="!expanded()"
+        [class.opacity-100]="expanded()"
+        [class.translate-y-[-4px]]="!expanded()"
+        [class.translate-y-0]="expanded()"
+      >
+        <div class="overflow-hidden">
+          @if (hasBreakdown()) {
+            @if (yearlyBreakdown().length) {
+              <div class="mt-2.5 space-y-2">
+                @for (yearSummary of yearlyBreakdown(); track yearSummary.year; let idx = $index) {
+                  <div
+                    class="space-y-1 transition-all duration-300 ease-out"
+                    [style.transition-delay]="expanded() ? idx * 35 + 'ms' : '0ms'"
+                    [class.translate-y-[-4px]]="!expanded()"
+                    [class.translate-y-0]="expanded()"
+                    [class.opacity-0]="!expanded()"
+                    [class.opacity-100]="expanded()"
+                  >
+                    <div
+                      class="text-[10px] font-semibold uppercase tracking-[0.18em] text-violet-500"
+                    >
+                      {{ yearSummary.year }}
+                    </div>
+
+                    <div class="flex items-center justify-between gap-2 text-[11px]">
+                      <span class="text-gray-500 text-[9px]">Monthly Expenses:</span>
+                      <span
+                        class="text-gray-300 font-medium tabular-nums"
+                        [class.blur-md]="privacyService.isPrivacyMode()"
+                        [class.select-none]="privacyService.isPrivacyMode()"
+                        >€{{ yearSummary.monthlyExpenses | number: '1.2-2' }}</span
+                      >
+                    </div>
+                    <div class="flex items-center justify-between text-[11px]">
+                      <span class="text-gray-500 text-[9px]">One-Off Expenses:</span>
+                      <span
+                        class="text-gray-300 font-medium tabular-nums"
+                        [class.blur-md]="privacyService.isPrivacyMode()"
+                        [class.select-none]="privacyService.isPrivacyMode()"
+                        >€{{ yearSummary.oneOffExpenses | number: '1.2-2' }}</span
+                      >
+                    </div>
+                    <div class="flex items-center justify-between text-nowrap text-[11px]">
+                      <span class="text-gray-500 text-[9px]">
+                        Total {{ yearSummary.year }} Expenses:</span
+                      >
+                      <span
+                        class="text-gray-300 font-medium tabular-nums"
+                        [class.blur-md]="privacyService.isPrivacyMode()"
+                        [class.select-none]="privacyService.isPrivacyMode()"
+                        >€{{
+                          yearSummary.monthlyExpenses + yearSummary.oneOffExpenses | number: '1.2-2'
+                        }}</span
+                      >
+                    </div>
+                  </div>
+                }
+              </div>
+            } @else {
+              <div class="mt-2.5 space-y-1">
+                <div
+                  class="flex justify-baseline gap-2 text-[11px] transition-all duration-300 ease-out"
+                  [class.translate-y-[-4px]]="!expanded()"
+                  [class.translate-y-0]="expanded()"
+                  [class.opacity-0]="!expanded()"
+                  [class.opacity-100]="expanded()"
+                >
+                  <span class="text-gray-500">Monthly Expenses:</span>
+                  <span
+                    class="text-gray-300 font-medium tabular-nums"
+                    [class.blur-md]="privacyService.isPrivacyMode()"
+                    [class.select-none]="privacyService.isPrivacyMode()"
+                    >€{{ monthlyExpenses() | number: '1.2-2' }}</span
+                  >
+                </div>
+                <div
+                  class="flex justify-baseline gap-2 text-[11px] transition-all duration-300 ease-out"
+                  [style.transition-delay]="expanded() ? '80ms' : '0ms'"
+                  [class.translate-y-[-4px]]="!expanded()"
+                  [class.translate-y-0]="expanded()"
+                  [class.opacity-0]="!expanded()"
+                  [class.opacity-100]="expanded()"
+                >
+                  <span class="text-gray-500">One-Off Expenses:</span>
+                  <span
+                    class="text-gray-300 font-medium tabular-nums"
+                    [class.blur-md]="privacyService.isPrivacyMode()"
+                    [class.select-none]="privacyService.isPrivacyMode()"
+                    >€{{ oneOffExpenses() | number: '1.2-2' }}</span
+                  >
+                </div>
+              </div>
+            }
+          }
+        </div>
+      </div>
     </div>
-    <div class="text-left">
-      <span class="text-xs font-medium text-gray-400 uppercase tracking-wider">Total Saved</span>
-      <div class="flex items-baseline mt-1">
+
+    <!-- RIGHT COLUMN: Everything sticks right -->
+    <div class="text-right">
+      <span class="text-xs font-medium text-gray-400 uppercase tracking-wider block"
+        >Total Saved</span
+      >
+      <div class="flex items-baseline justify-end mt-1">
         <h2
-          class="text-3xl font-extrabold tracking-tight"
-          [class]="totalSaved() >= 0 ? 'text-emerald-400' : 'text-red-400'"
+          class="text-3xl font-extrabold tracking-tight tabular-nums"
+          [class]="computedTotalSaved() >= 0 ? 'text-emerald-400' : 'text-red-400'"
+          [class.blur-md]="privacyService.isPrivacyMode()"
+          [class.select-none]="privacyService.isPrivacyMode()"
         >
-          €{{ totalSaved() | number: '1.2-2' }}
+          €{{ computedTotalSaved() | number: '1.2-2' }}
         </h2>
+      </div>
+
+      @if (hasBreakdown()) {
+        <div class="mt-2.5 space-y-2">
+          <div class="flex items-center justify-between gap-2 text-[11px]">
+            <span class="text-gray-500 text-[10px]">Monthly Saved:</span>
+            <span
+              class="text-gray-300 font-medium tabular-nums"
+              [class.blur-md]="privacyService.isPrivacyMode()"
+              [class.select-none]="privacyService.isPrivacyMode()"
+              >€{{ monthlySaved() | number: '1.2-2' }}</span
+            >
+          </div>
+          <div class="flex items-center justify-between gap-2 text-[11px]">
+            <span class="text-gray-500 text-[10px]">One-Off Bonuses:</span>
+            <span
+              class="text-gray-300 font-medium tabular-nums"
+              [class.blur-md]="privacyService.isPrivacyMode()"
+              [class.select-none]="privacyService.isPrivacyMode()"
+              >€{{ oneOffBonuses() | number: '1.2-2' }}</span
+            >
+          </div>
+        </div>
+      }
+
+      <!-- Right Column Breakdown -->
+      <div
+        class="grid overflow-hidden transition-[grid-template-rows,opacity,transform] duration-300 ease-out"
+        [class.grid-rows-[0fr]]="!expanded()"
+        [class.grid-rows-[1fr]]="expanded()"
+        [class.opacity-0]="!expanded()"
+        [class.opacity-100]="expanded()"
+        [class.translate-y-[-4px]]="!expanded()"
+        [class.translate-y-0]="expanded()"
+      >
+        <div class="overflow-hidden">
+          @if (hasBreakdown()) {
+            @if (yearlyBreakdown().length) {
+              <div class="mt-2.5 space-y-2 text-left">
+                @for (yearSummary of yearlyBreakdown(); track yearSummary.year; let idx = $index) {
+                  <div
+                    class="space-y-1 transition-all duration-300 ease-out"
+                    [style.transition-delay]="expanded() ? idx * 35 + 'ms' : '0ms'"
+                    [class.translate-y-[-4px]]="!expanded()"
+                    [class.translate-y-0]="expanded()"
+                    [class.opacity-0]="!expanded()"
+                    [class.opacity-100]="expanded()"
+                  >
+                    <div
+                      class="text-[10px] font-semibold uppercase tracking-[0.18em] text-violet-500"
+                    >
+                      {{ yearSummary.year }}
+                    </div>
+
+                    <div class="flex items-center justify-between gap-2 text-[11px]">
+                      <span class="text-gray-500 text-[9px]">Monthly Saved:</span>
+                      <span
+                        class="text-gray-300 font-medium tabular-nums"
+                        [class.blur-md]="privacyService.isPrivacyMode()"
+                        [class.select-none]="privacyService.isPrivacyMode()"
+                        >€{{ yearSummary.monthlySaved | number: '1.2-2' }}</span
+                      >
+                    </div>
+                    <div class="flex items-center justify-between gap-2 text-[11px]">
+                      <span class="text-gray-500 text-[9px]">One-Off Bonuses:</span>
+                      <span
+                        class="text-gray-300 font-medium tabular-nums"
+                        [class.blur-md]="privacyService.isPrivacyMode()"
+                        [class.select-none]="privacyService.isPrivacyMode()"
+                        >€{{ yearSummary.oneOffBonuses | number: '1.2-2' }}</span
+                      >
+                    </div>
+                    <div class="flex items-center justify-between gap-2 text-[11px]">
+                      <span class="text-gray-500 text-[9px]"
+                        >Total {{ yearSummary.year }} Saved:</span
+                      >
+                      <span
+                        class="text-emerald-400 font-medium tabular-nums"
+                        [class.blur-md]="privacyService.isPrivacyMode()"
+                        [class.select-none]="privacyService.isPrivacyMode()"
+                        >€{{
+                          yearSummary.oneOffBonuses +
+                            yearSummary.monthlySaved -
+                            yearSummary.oneOffExpenses | number: '1.2-2'
+                        }}</span
+                      >
+                    </div>
+                  </div>
+                }
+              </div>
+            } @else {
+              <div class="mt-2.5 space-y-1 text-right">
+                <div
+                  class="flex justify-end gap-2 text-[11px] transition-all duration-300 ease-out"
+                  [class.translate-y-[-4px]]="!expanded()"
+                  [class.translate-y-0]="expanded()"
+                  [class.opacity-0]="!expanded()"
+                  [class.opacity-100]="expanded()"
+                >
+                  <span class="text-gray-500">Monthly Saved:</span>
+                  <span
+                    class="text-gray-300 font-medium tabular-nums"
+                    [class.blur-md]="privacyService.isPrivacyMode()"
+                    [class.select-none]="privacyService.isPrivacyMode()"
+                    >€{{ monthlySaved() | number: '1.2-2' }}</span
+                  >
+                </div>
+                <div
+                  class="flex justify-end gap-2 text-[11px] transition-all duration-300 ease-out"
+                  [style.transition-delay]="expanded() ? '80ms' : '0ms'"
+                  [class.translate-y-[-4px]]="!expanded()"
+                  [class.translate-y-0]="expanded()"
+                  [class.opacity-0]="!expanded()"
+                  [class.opacity-100]="expanded()"
+                >
+                  <span class="text-gray-500">One-Off Bonuses:</span>
+                  <span
+                    class="text-gray-300 font-medium tabular-nums"
+                    [class.blur-md]="privacyService.isPrivacyMode()"
+                    [class.select-none]="privacyService.isPrivacyMode()"
+                    >€{{ oneOffBonuses() | number: '1.2-2' }}</span
+                  >
+                </div>
+              </div>
+            }
+          }
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- <div class="grid grid-cols-2 gap-3 mt-6 pt-4 border-t border-gray-800/80">
-    <div>
-      <span class="text-[10px] text-gray-400 block uppercase font-medium">Top Category</span>
-      <span class="text-sm font-semibold text-gray-200 mt-0.5 block">
-        {{ topCategory()?.name ?? 'N/A' }}
+  @if (!hasBreakdown() && monthCountdownLabel()) {
+    <div class="mt-3 text-center">
+      <span class="text-[10px] font-medium uppercase tracking-[0.14em] text-gray-400">
+        {{ monthCountdownLabel() }}
       </span>
     </div>
-    <div>
-      <span class="text-[10px] text-gray-400 block uppercase font-medium">Top Category Cost</span>
-      <span class="text-sm font-semibold text-emerald-400 mt-0.5 block">
-        €{{ (topCategory()?.amount ?? 0) | number:'1.2-2' }}
-      </span>
+  }
+
+  @if (hasBreakdown()) {
+    <div class="flex justify-center mt-3 pt-2 border-t border-gray-800/60">
+      <svg
+        class="w-4 h-4 text-gray-500 transition-transform duration-400"
+        [class.rotate-180]="expanded()"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <polyline points="6 9 12 15 18 9" />
+      </svg>
     </div>
-  </div> -->
+  }
 </section>

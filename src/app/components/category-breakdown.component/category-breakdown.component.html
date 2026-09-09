@@ -1,75 +1,134 @@
 <section
-  class="bg-gray-900/60 border border-gray-800/80 rounded-2xl p-5 space-y-4 backdrop-blur-sm"
+  class="bg-gray-900/60 border border-gray-800/80 rounded-2xl p-2 space-y-4 backdrop-blur-sm"
 >
-  <div class="flex justify-between items-center">
-    <h3 class="text-sm font-semibold text-gray-200">Spend by Category</h3>
-    <!-- <span class="text-xs text-gray-400">{{ categories().length }} items</span> -->
-  </div>
+  <!-- <div class="flex justify-between items-center px-3 py-1">
+    <h3 class="text-sm font-semibold text-gray-200">{{ budgetTitle() }}</h3>
+    <span class="text-xs text-gray-400">{{ categories().length }} items</span>
+  </div> -->
 
-  <div class="space-y-3.5">
+  <div class="space-y-2">
     @for (cat of categories(); track cat.name) {
-      <div class="space-y-1.5">
-        <div class="flex justify-between text-xs">
-          <div class="flex items-center gap-1.5">
-            <span class="font-medium text-gray-300">{{ cat.name }}</span>
-            <span
-              class="text-[10px] px-1 py-0.5 rounded bg-red-500/10 text-red-400 border border-red-500/20 font-medium"
-              [class.invisible]="!cat.isOverBudget"
-            >
-              Over Budget
-            </span>
-          </div>
-          <div class="space-x-1">
-            <span class="text-gray-400">{{ cat.percentage | number: '1.1-1' }}%</span>
-            <span class="text-white font-semibold">
-              €{{ cat.amount | number: '1.2-2' }}{{ cat.isAllTime ? '' : '' }}
-            </span>
-            @if (!cat.isAllTime) {
+      <div class="space-y-1.5 border border-gray-800/60 px-3 py-1.5 rounded-xl bg-amber-50/5">
+        <div
+          class="space-y-1.5 cursor-pointer"
+          role="button"
+          tabindex="0"
+          (click)="toggleCategory(cat.name)"
+          (keydown.enter)="toggleCategory(cat.name)"
+          (keydown.space)="toggleCategory(cat.name)"
+        >
+          <!-- Category Header -->
+          <div class="flex items-center justify-between text-xs py-0.5">
+            <!-- Left Group: Category Name and Over Budget Badge -->
+            <div class="flex items-center gap-2 min-w-0 pr-2">
               <span
-                class="text-red-400 font-semibold"
-                [class.invisible]="!cat.isOverBudget || cat.budget === null"
+                class="flex h-8 w-8 items-center justify-center rounded-full text-[14px] leading-none shadow-inner"
+                [ngClass]="categoryMeta(cat.name).classes"
+                aria-hidden="true"
               >
-                (+€{{ (cat.monthlyAverage ?? cat.amount) - (cat.budget ?? 0) | number: '1.2-2' }})
+                {{ categoryMeta(cat.name).emoji }}
               </span>
-            }
-          </div>
-        </div>
-        @if (cat.isAllTime && cat.monthlyAverage !== null) {
-          <div class="flex justify-between text-xs">
-            <div class="flex items-center gap-1.5">
-              <span
-                class="inline-flex items-center gap-1 text-xs font-semibold px-5 py-0.5 rounded-md bg-indigo-500/15 text-indigo-300 border border-indigo-500/30"
+
+              <span class="font-medium text-gray-300 text-sm">{{ cat.name }}</span
+              ><span class="text-gray-400 tabular-nums text-[10px]"
+                >({{ cat.percentage | number: '1.1-1' }}%)</span
               >
-                €{{ cat.monthlyAverage | number: '1.2-2' }} / mo avg
+            </div>
+
+            <!-- Right Group: Amount + Budget + Remaining -->
+            <div class="flex items-end gap-2 shrink-0 justify-end pr-1">
+              <div class="text-right">
+                <div class="text-[13px] text-white-40 tabular-nums">
+                  @if (!cat.isAllTime && cat.budget !== null) {
+                    <span>
+                      €{{ cat.amount | number: '1.2-2' }}
+                      <span class="text-gray-500 text-xs"
+                        >/ €{{ cat.budget | number: '1.2-2' }}</span
+                      >
+                    </span>
+                  } @else {
+                    <span>€{{ cat.amount | number: '1.2-2' }}</span>
+                  }
+                </div>
+
+                @if (!cat.isAllTime && cat.budget !== null) {
+                  @if (cat.isOverBudget) {
+                    <div class="mt-1 text-[10px] font-medium text-red-400 tabular-nums">
+                      €{{
+                        (cat.monthlyAverage ?? cat.amount) - (cat.budget ?? 0) | number: '1.2-2'
+                      }}
+                    </div>
+                  } @else {
+                    <div class="mt-1 text-[11px] font-medium text-teal-300/90 tabular-nums">
+                      €{{ cat.budget - (cat.monthlyAverage ?? cat.amount) | number: '1.2-2' }} left
+                    </div>
+                  }
+                }
+              </div>
+            </div>
+          </div>
+
+          <!-- All-Time average Row -->
+          @if (cat.isAllTime && cat.monthlyAverage !== null) {
+            <div class="flex items-center justify-between text-xs w-full gap-2 py-0.5">
+              <!-- Left Group: Average Label -->
+              <span
+                class="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-0.5 rounded-md bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 tabular-nums"
+              >
+                €{{ cat.budget | number: '1.2-2' }} / mo budget
+              </span>
+              <span
+                class="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-0.5 rounded-md bg-indigo-500/15 text-indigo-300 border border-indigo-500/30 tabular-nums"
+              >
+                €{{ cat.monthlyAverage | number: '1.2-2' }} / mo average
               </span>
             </div>
-            @if (cat.overallBudget !== null) {
-              <div class="space-x-1">
-                <span
-                  class="font-semibold"
-                  [class]="cat.isOverBudget ? 'text-red-400' : 'text-green-400'"
-                >
-                  ({{ cat.isOverBudget ? '+' : '' }}€{{
-                    cat.amount - cat.overallBudget | number: '1.2-2'
-                  }}
-                  overall)
-                </span>
+          }
+          <!-- Progress Bar -->
+          @if (!cat.isAllTime) {
+            <div class="mt-2.5">
+              <div class="h-2 w-full bg-gray-800 rounded-full overflow-hidden">
+                <div
+                  [class]="
+                    cat.isOverBudget
+                      ? 'bg-linear-to-r from-red-600 to-rose-800'
+                      : 'bg-linear-to-r from-indigo-500 to-violet-500'
+                  "
+                  class="h-full rounded-full transition-all duration-300"
+                  [style.width.%]="(cat.amount / (cat.budget ?? cat.amount)) * 100"
+                ></div>
               </div>
-            }
-          </div>
-        }
-        <!-- Progress Bar -->
-        <div class="h-2 w-full bg-gray-800 rounded-full overflow-hidden mt-2.5">
-          <div
-            [class]="
-              cat.isOverBudget
-                ? 'bg-linear-to-r from-red-500 to-rose-600'
-                : 'bg-linear-to-r from-indigo-500 to-violet-500'
-            "
-            class="h-full rounded-full transition-all duration-300"
-            [style.width.%]="cat.percentage"
-          ></div>
+              <div class="mt-1.5 text-[10px] text-gray-400">
+                {{ transactionCounts()[cat.name] ?? 0 }} transaction{{
+                  (transactionCounts()[cat.name] ?? 0) === 1 ? '' : 's'
+                }}
+              </div>
+            </div>
+          }
         </div>
+
+        @if (expandedCategory() === cat.name) {
+          @defer (on immediate) {
+            @if (cat.isAllTime) {
+              <app-yearly-category-sums [category]="cat.name" />
+            } @else if (selectedTransaction(); as tx) {
+              <app-edit-transaction
+                [transaction]="tx"
+                (back)="selectedTransaction.set(null)"
+                (updated)="onEditFinished()"
+                (deleted)="onEditFinished()"
+              />
+            } @else {
+              <app-transaction-grid
+                [monthName]="monthName()"
+                [category]="cat.name"
+                (selectTransaction)="onSelectTransaction($event)"
+              ></app-transaction-grid>
+            }
+          } @loading {
+            <div class="mt-3 h-24 bg-gray-800/40 rounded-xl animate-pulse"></div>
+          }
+        }
       </div>
     }
   </div>
