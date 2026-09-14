@@ -37,6 +37,7 @@ export class PagedEntriesListComponent {
       this.title();
       this.mode();
       this.filterValue();
+      this.subCategoryId();
       this.sortByAmount();
       this.cursors = [null];
       this.loadPage(1);

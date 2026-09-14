@@ -39,9 +39,20 @@ export const GAMING_SUBCATEGORY_OPTIONS: CategorySubcategoryOption[] = [
   { id: 11, name: 'dlc', label: '🧩 DLC' },
 ];
 
+export const UTILITIES_SUBCATEGORY_OPTIONS: CategorySubcategoryOption[] = [
+  { id: 12, name: 'electricity', label: '⚡ Electricity' },
+  { id: 13, name: 'maintenance', label: '🧑‍🔧 Maintenance' },
+  { id: 14, name: 'internet', label: '🌐 Internet' },
+  { id: 15, name: 'mobile', label: '📱 Mobile' },
+  { id: 16, name: 'water', label: '🚰 Water' },
+  { id: 17, name: 'other', label: '⭐ Other' },
+  { id: 18, name: 'taxes', label: '🧾 Taxes' },
+];
+
 export const CATEGORY_SUBCATEGORY_OPTIONS: Record<string, CategorySubcategoryOption[]> = {
   Tickets: TICKET_SUBCATEGORY_OPTIONS,
   Gaming: GAMING_SUBCATEGORY_OPTIONS,
+  Utilities: UTILITIES_SUBCATEGORY_OPTIONS,
 };
 
 export function categoryRequiresSubcategory(category: string): boolean {

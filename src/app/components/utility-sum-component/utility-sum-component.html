@@ -84,8 +84,9 @@
         @if (expandedUtility() === item.label) {
           <app-paged-entries-list
             [title]="item.label"
-            mode="description"
-            [filterValue]="item.label"
+            mode="category"
+            [filterValue]="'Utilities'"
+            [subCategoryId]="+item.id"
           />
         }
       </div>
