@@ -29,6 +29,14 @@
                 >✂️</span
               >
             }
+            @if (tx.comment) {
+              <span
+                aria-label="Transaction has a comment"
+                title="Transaction has a comment"
+                class="text-[11px] leading-none"
+                >💬</span
+              >
+            }
             <!-- <span class="truncate">{{ tx.description }}</span> -->
           </span>
           <span class="text-[10px] text-gray-500 block mt-0.5">{{

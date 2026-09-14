@@ -119,6 +119,22 @@
       }
     </div>
 
+    <div class="space-y-1.5">
+      <label for="tx-edit-comment" class="text-xs font-medium text-gray-400">Comment</label>
+      <textarea
+        id="tx-edit-comment"
+        rows="3"
+        [formField]="transactionForm.comment"
+        placeholder="Add a note about this transaction"
+        class="w-full bg-gray-800/60 border border-gray-800 rounded-xl px-3 py-2.5 text-sm text-gray-100 placeholder:text-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/60 resize-none"
+      ></textarea>
+      @if (transactionForm.comment().touched() && transactionForm.comment().invalid()) {
+        <span class="text-[11px] text-red-400">{{
+          transactionForm.comment().errors()[0]?.message
+        }}</span>
+      }
+    </div>
+
     @if (splitMeta(); as split) {
       <div class="rounded-2xl border border-teal-800/40 bg-teal-950/20 p-3 space-y-3">
         <div class="flex items-center justify-between">

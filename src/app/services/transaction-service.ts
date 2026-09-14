@@ -36,6 +36,7 @@ export interface NewTransactionInput {
   category: string;
   subCategoryId?: number;
   subCategory?: string;
+  comment?: string;
   amount: number;
   adjustmentId?: string; // Optional: ID of the associated adjustment, if any
   // Optional split metadata
@@ -61,6 +62,11 @@ function stripUndefinedFields<T extends Record<string, unknown>>(value: T): T {
   return Object.fromEntries(
     Object.entries(value).filter(([, entryValue]) => entryValue !== undefined),
   ) as T;
+}
+
+function normalizeComment(value: unknown): string | undefined {
+  const comment = typeof value === 'string' ? value.trim() : '';
+  return comment || undefined;
 }
 
 const MONTH_NAMES = [
@@ -178,6 +184,7 @@ export class TransactionService {
           category: data['category'],
           subCategoryId: data['subCategoryId'] != null ? Number(data['subCategoryId']) : undefined,
           subCategory: (data['subCategory'] as string | undefined) ?? undefined,
+          comment: normalizeComment(data['comment']),
           createdAt: data['createdAt'],
           adjustmentId: data['adjustmentId'] ?? undefined,
         };
@@ -211,6 +218,7 @@ export class TransactionService {
         category: data['category'] as string,
         subCategoryId: data['subCategoryId'] != null ? Number(data['subCategoryId']) : undefined,
         subCategory: (data['subCategory'] as string | undefined) ?? undefined,
+        comment: normalizeComment(data['comment']),
         amount: Number(data['amount']) || 0,
         adjustmentId: (data['adjustmentId'] as string | undefined) ?? undefined,
         isSplit: Boolean(data['isSplit']),
@@ -284,6 +292,7 @@ export class TransactionService {
         (data['subCategoryId'] != null ? Number(data['subCategoryId']) : undefined),
       subCategory:
         overrides?.subCategory ?? (data['subCategory'] as string | undefined) ?? undefined,
+      comment: overrides?.comment ?? normalizeComment(data['comment']),
       amount: Number(overrides?.amount ?? data['amount'] ?? 0),
       adjustmentId: (overrides?.adjustmentId ?? data['adjustmentId']) as string | undefined,
       isSplit: overrides?.isSplit ?? Boolean(data['isSplit']),
@@ -349,6 +358,9 @@ export class TransactionService {
     if (input.subCategoryId != null) {
       txData['subCategoryId'] = input.subCategoryId;
       txData['subCategory'] = input.subCategory ?? '';
+    }
+    if (input.comment !== undefined) {
+      txData['comment'] = input.comment.trim();
     }
     if (input.adjustmentId) {
       txData['adjustmentId'] = input.adjustmentId;
@@ -440,6 +452,7 @@ export class TransactionService {
       updateData['subCategoryId'] = -1;
       updateData['subCategory'] = '';
     }
+    updateData['comment'] = input.comment?.trim() ?? '';
     if (oldTx.adjustmentId) {
       updateData['adjustmentId'] = oldTx.adjustmentId;
     }

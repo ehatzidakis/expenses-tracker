@@ -387,6 +387,54 @@
           }
         }
       }
+
+      <div class="space-y-2 pt-1">
+        <label class="text-xs font-medium text-gray-400">Add Comment</label>
+        <div class="grid grid-cols-2 gap-2 p-1 bg-gray-950/80 rounded-xl border border-gray-800">
+          <button
+            type="button"
+            (click)="setHasComment(true)"
+            class="py-2 rounded-lg text-xs font-semibold transition-all duration-150 flex items-center justify-center gap-1 cursor-pointer"
+            [class.bg-indigo-500/20]="hasComment()"
+            [class.text-indigo-400]="hasComment()"
+            [class.border]="hasComment()"
+            [class.border-indigo-500/30]="hasComment()"
+            [class.text-gray-400]="!hasComment()"
+          >
+            Yes
+          </button>
+          <button
+            type="button"
+            (click)="setHasComment(false)"
+            class="py-2 rounded-lg text-xs font-semibold transition-all duration-150 flex items-center justify-center gap-1 cursor-pointer"
+            [class.bg-gray-700/60]="!hasComment()"
+            [class.text-gray-200]="!hasComment()"
+            [class.border]="!hasComment()"
+            [class.border-gray-600/40]="!hasComment()"
+            [class.text-gray-400]="hasComment()"
+          >
+            No
+          </button>
+        </div>
+      </div>
+
+      @if (hasComment()) {
+        <div class="space-y-1.5">
+          <label for="tx-comment" class="text-xs font-medium text-gray-400">Comment</label>
+          <textarea
+            id="tx-comment"
+            rows="2"
+            [formField]="transactionForm.comment"
+            placeholder="Add a note about this transaction"
+            class="w-full bg-gray-800/60 border border-gray-800 rounded-xl px-3 py-2.5 text-sm text-gray-100 placeholder:text-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/60 resize-none"
+          ></textarea>
+          @if (transactionForm.comment().touched() && transactionForm.comment().invalid()) {
+            <span class="text-[11px] text-red-400">
+              {{ transactionForm.comment().errors()[0]?.message }}
+            </span>
+          }
+        </div>
+      }
       <!-- ─────────────────────────────────────────────────────────────── -->
 
       <button

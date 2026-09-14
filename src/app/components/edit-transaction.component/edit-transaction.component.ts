@@ -45,6 +45,7 @@ export class EditTransactionComponent {
     category: '',
     subCategoryId: null,
     subCategory: '',
+    comment: '',
     amount: 0,
   });
 
@@ -83,6 +84,9 @@ export class EditTransactionComponent {
     required(schemaPath.description, { message: 'Description is required' });
     maxLength(schemaPath.description, 60, {
       message: 'Description must be 60 characters or fewer',
+    });
+    maxLength(schemaPath.comment, 250, {
+      message: 'Comment must be 250 characters or fewer',
     });
     required(schemaPath.category, { message: 'Category is required' });
   });
@@ -198,6 +202,7 @@ export class EditTransactionComponent {
         category: value.category,
         subCategoryId: value.subCategoryId ?? undefined,
         subCategory: value.subCategory,
+        comment: value.comment.trim() || undefined,
         amount: value.amount,
       });
 
