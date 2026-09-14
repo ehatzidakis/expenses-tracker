@@ -41,4 +41,23 @@ describe('EditTransactionComponent preselection', () => {
     expect(model.subCategoryId).toBeNull();
     expect(model.subCategory).toBe('');
   });
+
+  it('restores an existing comment for editing', () => {
+    const tx = {
+      id: 'abc',
+      monthName: 'August 2026',
+      date: '2026-08-19',
+      description: 'Cinema night',
+      amount: 25,
+      category: 'Tickets',
+      subCategoryId: 2,
+      subCategory: 'movies',
+      createdAt: '2026-08-20T00:00:00.000Z',
+      comment: 'Family outing',
+    };
+
+    const model = buildTransactionFormModel(tx);
+
+    expect(model.comment).toBe('Family outing');
+  });
 });

@@ -11,6 +11,7 @@ export interface TransactionFormModel {
   category: string;
   subCategoryId: number | null;
   subCategory: string;
+  comment: string;
   amount: number;
   isSplit?: boolean;
   paidBy?: 'me' | number;
@@ -63,6 +64,7 @@ export function buildTransactionFormModel(tx: Transaction): TransactionFormModel
     category,
     subCategoryId: resolvedSubcategoryId,
     subCategory: resolvedSubcategory,
+    comment: tx.comment ?? '',
     amount: tx.amount ?? 0,
     isSplit: tx.isSplit,
     paidBy: tx.paidBy,

@@ -25,6 +25,7 @@ interface TransactionFormModel {
   category: string;
   subCategoryId: number | null;
   subCategory: string;
+  comment: string;
   amount: number;
 }
 
@@ -52,6 +53,7 @@ function defaultTransactionModel(): TransactionFormModel {
     category: '',
     subCategoryId: null,
     subCategory: '',
+    comment: '',
     amount: 0,
   };
 }
@@ -99,6 +101,7 @@ export class CreateTransactionComponent {
   private applyKioskDefaults(): void {
     this.activeTab.set('transaction');
     this.goesSplitzes.set(false);
+    this.hasComment.set(false);
     this.splitWith.set([]);
     this.paidById.set('me');
     this.customSplitMode.set(false);
@@ -118,6 +121,7 @@ export class CreateTransactionComponent {
   // ── Split fields ──────────────────────────────────────────────────────────
   readonly allPeople: Person[] = PEOPLE;
   readonly goesSplitzes = signal<boolean>(false);
+  readonly hasComment = signal<boolean>(false);
   readonly splitWith = signal<number[]>([]);
   readonly paidById = signal<'me' | number>('me');
   readonly customSplitMode = signal<boolean>(false);
@@ -168,6 +172,9 @@ export class CreateTransactionComponent {
     required(schemaPath.description, { message: 'Description is required' });
     maxLength(schemaPath.description, 60, {
       message: 'Description must be 60 characters or fewer',
+    });
+    maxLength(schemaPath.comment, 250, {
+      message: 'Comment must be 250 characters or fewer',
     });
     required(schemaPath.category, { message: 'Category is required' });
     // min(schemaPath.amount, 0.01, { message: 'Amount must be greater than 0' });
@@ -333,6 +340,7 @@ export class CreateTransactionComponent {
   resetSplitFields(): void {
     if (this.isKioskMode()) {
       this.goesSplitzes.set(false);
+      this.hasComment.set(false);
       this.splitWith.set([]);
       this.paidById.set('me');
       this.customSplitMode.set(false);
@@ -341,10 +349,18 @@ export class CreateTransactionComponent {
     }
 
     this.goesSplitzes.set(false);
+    this.hasComment.set(false);
     this.splitWith.set([]);
     this.paidById.set('me');
     this.customSplitMode.set(false);
     this.customSplitAmounts.set({});
+  }
+
+  setHasComment(value: boolean): void {
+    this.hasComment.set(value);
+    if (!value) {
+      this.transactionModel.update((model) => ({ ...model, comment: '' }));
+    }
   }
 
   setCustomSplitMode(value: boolean): void {
@@ -482,6 +498,7 @@ export class CreateTransactionComponent {
         category: value.category,
         subCategoryId: value.subCategoryId ?? undefined,
         subCategory: value.subCategory,
+        comment: value.comment.trim() || undefined,
         amount: finalAmount,
         adjustmentId: this.linkWithAdjustment() ? this.selectedAdjustmentId() : undefined,
         ...(isSplitActive
@@ -532,6 +549,7 @@ export class CreateTransactionComponent {
         category: value.category,
         subCategoryId: value.subCategoryId ?? undefined,
         subCategory: value.subCategory,
+        comment: value.comment.trim() || undefined,
         amount: value.amount,
         adjustmentId: this.linkWithAdjustment() ? this.selectedAdjustmentId() : undefined,
         isSplit: false,

@@ -133,6 +133,14 @@ interface TripCategoryRow {
                                 >✂️</span
                               >
                             }
+                            @if (tx.comment) {
+                              <span
+                                aria-label="Transaction has a comment"
+                                title="Transaction has a comment"
+                                class="text-[11px] leading-none"
+                                >💬</span
+                              >
+                            }
                           </span>
                           <span class="text-[10px] text-gray-500 block mt-0.5">{{
                             tx.date | date: 'dd/MM/yyyy'

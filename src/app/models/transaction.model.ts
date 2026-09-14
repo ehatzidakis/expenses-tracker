@@ -8,6 +8,7 @@ export interface Transaction {
   category: string;
   subCategoryId?: number;
   subCategory?: string;
+  comment?: string;
   createdAt: string;
   adjustmentId?: string;
   // Split fields — only present when isSplit is true
