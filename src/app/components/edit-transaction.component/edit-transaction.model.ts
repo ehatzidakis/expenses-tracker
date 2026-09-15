@@ -35,9 +35,9 @@ export function normalizeCategoryName(category?: string | null): string {
 export function buildTransactionFormModel(tx: Transaction): TransactionFormModel {
   const normalizedCategory = normalizeCategoryName(tx.category);
   const category =
-    CATEGORY_NAMES.includes(normalizedCategory) || !normalizedCategory
-      ? normalizedCategory || CATEGORY_NAMES[0] || ''
-      : CATEGORY_NAMES[0] || '';
+    normalizedCategory && CATEGORY_NAMES.includes(normalizedCategory)
+      ? normalizedCategory
+      : normalizedCategory || CATEGORY_NAMES[0] || '';
 
   const categorySubcategories = getSubcategoryOptions(category);
 

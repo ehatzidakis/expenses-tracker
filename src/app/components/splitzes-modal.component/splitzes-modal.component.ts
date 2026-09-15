@@ -2,13 +2,18 @@ import { Component, computed, inject, output, signal } from '@angular/core';
 import { QueryClient, injectQuery } from '@tanstack/angular-query-experimental';
 import { AuthService } from '../../services/auth.service';
 import { computeSplit, SplitzService } from '../../services/splitz.service';
-import { PendingTransaction, TransactionService } from '../../services/transaction-service';
+import {
+  normalizePendingSplitOverride,
+  PendingTransaction,
+  TransactionService,
+} from '../../services/transaction-service';
 import { PEOPLE, PersonSummary } from '../../models/splitz.model';
 import {
   categoryRequiresSubcategory,
   getSubcategoryOptions,
 } from '../../services/expense-state.service';
 import { normalizeDecimalInput, parseDecimalInput } from '../../utils/decimal-input';
+import { resolvePendingCategoryOptions } from '../../services/transaction-service';
 
 @Component({
   selector: 'app-splitzes-modal',
@@ -36,7 +41,11 @@ export class SplitzesModalComponent {
     const base = this.pendingTxQuery.data() ?? [];
     const drafts = this.pendingDrafts();
 
-    return base.map((entry) => drafts[entry.id] ?? entry);
+    return base.map((entry) => {
+      const normalized = normalizePendingSplitOverride(entry);
+      const draft = drafts[entry.id];
+      return draft ? { ...normalized, ...draft } : normalized;
+    });
   });
   readonly hasPendingTransactions = computed(() => this.pendingTransactions().length > 0);
 
@@ -50,6 +59,9 @@ export class SplitzesModalComponent {
   readonly isRefreshingPending = signal(false);
   readonly editingPendingId = signal<string | null>(null);
   readonly allPeople = PEOPLE;
+
+  readonly getPendingCategoryOptions = (pending: PendingTransaction): string[] =>
+    resolvePendingCategoryOptions(pending);
 
   onBackdropClick(event: MouseEvent): void {
     if ((event.target as HTMLElement).classList.contains('modal-backdrop')) {
@@ -70,6 +82,11 @@ export class SplitzesModalComponent {
       return;
     }
 
+    const normalized = normalizePendingSplitOverride(pending);
+    this.pendingDrafts.update((drafts) => ({
+      ...drafts,
+      [id]: { ...normalized },
+    }));
     this.editingPendingId.set(id);
   }
 
@@ -84,6 +101,7 @@ export class SplitzesModalComponent {
       | 'category'
       | 'subCategoryId'
       | 'subCategory'
+      | 'comment'
       | 'amount'
       | 'date'
       | 'isSplit'
@@ -111,6 +129,10 @@ export class SplitzesModalComponent {
         ...(field !== 'splitBy' && field !== 'customSplitAmounts' ? { [field]: nextValue } : {}),
       },
     }));
+  }
+
+  getPendingPaidByValue(pending: PendingTransaction): 'me' | number {
+    return pending.paidBy === 'me' ? 1 : (pending.paidBy ?? 1);
   }
 
   getPendingCustomParticipants(pending: PendingTransaction): Array<'me' | number> {
@@ -205,6 +227,7 @@ export class SplitzesModalComponent {
         category: draft.category,
         subCategoryId: draft.subCategoryId,
         subCategory: draft.subCategory,
+        comment: draft.comment?.trim() || undefined,
         amount: finalAmount,
         adjustmentId: draft.adjustmentId,
         isSplit: draft.isSplit,

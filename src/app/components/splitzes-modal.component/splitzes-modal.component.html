@@ -100,10 +100,9 @@
                               class="mb-1 block text-[10px] uppercase tracking-[0.12em] text-gray-400"
                               >Category</label
                             >
-                            <input
-                              type="text"
+                            <select
                               [value]="pending.category"
-                              (input)="
+                              (change)="
                                 updatePendingDraft(
                                   pending.id,
                                   'category',
@@ -111,7 +110,11 @@
                                 )
                               "
                               class="w-full min-w-0 bg-gray-800/70 border border-gray-700 rounded-lg px-2 py-1.5 text-xs text-white"
-                            />
+                            >
+                              @for (option of getPendingCategoryOptions(pending); track option) {
+                                <option [value]="option">{{ option }}</option>
+                              }
+                            </select>
                           </div>
                           <div class="min-w-0">
                             <label
@@ -189,6 +192,22 @@
                             class="w-full bg-gray-800/70 border border-gray-700 rounded-lg px-2 py-1.5 text-xs text-white"
                           />
                         </div>
+
+                        <div>
+                          <label
+                            class="mb-1 block text-[10px] uppercase tracking-[0.12em] text-gray-400"
+                            >Comment</label
+                          >
+                          <textarea
+                            rows="2"
+                            [value]="pending.comment ?? ''"
+                            (input)="
+                              updatePendingDraft(pending.id, 'comment', $any($event.target).value)
+                            "
+                            placeholder="Add a note for this pending transaction"
+                            class="w-full bg-gray-800/70 border border-gray-700 rounded-lg px-2 py-1.5 text-xs text-white resize-none"
+                          ></textarea>
+                        </div>
                       </div>
 
                       <div
@@ -222,22 +241,22 @@
                                 >Who paid</label
                               >
                               <select
-                                [value]="pending.paidBy ?? 'me'"
+                                [value]="getPendingPaidByValue(pending)"
                                 (change)="
                                   updatePendingDraft(
                                     pending.id,
                                     'paidBy',
                                     $any($event.target).value === 'me'
-                                      ? 'me'
+                                      ? 1
                                       : +$any($event.target).value
                                   )
                                 "
                                 class="w-full bg-gray-800/70 border border-gray-700 rounded-lg px-2 py-1.5 text-xs text-white"
                               >
-                                <option value="me">Me</option>
                                 @for (person of allPeople; track person.id) {
                                   <option [value]="person.id">{{ person.name }}</option>
                                 }
+                                <option value="me">Me</option>
                               </select>
                             </div>
 
@@ -341,6 +360,11 @@
                       <p class="text-[10px] text-gray-400">
                         {{ pending.category }} • €{{ pending.amount.toFixed(2) }}
                       </p>
+                      @if (pending.comment) {
+                        <p class="text-[10px] text-amber-200/90 border-l border-amber-500/40 pl-2">
+                          {{ pending.comment }}
+                        </p>
+                      }
                     </div>
                   }
 

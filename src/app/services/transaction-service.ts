@@ -56,6 +56,71 @@ export interface PendingTransaction extends NewTransactionInput {
   status: 'pending';
 }
 
+export const DEFAULT_PENDING_SPLIT_PAID_BY = 1 as const;
+export const DEFAULT_PENDING_SPLIT_WITH = [1] as const;
+
+export function resolvePendingCategoryOptions(
+  input: Partial<Pick<NewTransactionInput, 'category' | 'adjustmentId'>> = {},
+): string[] {
+  const hasLinkedAdjustment = Boolean(input.adjustmentId);
+  const category = input.category ?? '';
+
+  const tripCategories = [
+    'Plane Tickets',
+    'Accommodation',
+    'Food',
+    'Transportation',
+    'Gifts',
+    'Activities',
+    'Attractions',
+    'Splurge',
+    'Miscellaneous',
+  ];
+
+  const standardCategories = [
+    'Supermarket',
+    'Medical',
+    'Personal',
+    'EatingOut',
+    'Utilities',
+    'Takeaway',
+    'Tickets',
+    'Gaming',
+    'Cats',
+    'Travel',
+    'Subscriptions',
+    'Gym',
+    'Food',
+  ];
+
+  if (hasLinkedAdjustment) {
+    return tripCategories.includes(category) ? tripCategories : tripCategories;
+  }
+
+  return standardCategories.includes(category)
+    ? [...new Set([category, ...standardCategories])]
+    : standardCategories;
+}
+
+export function normalizePendingSplitOverride<T extends Partial<NewTransactionInput>>(
+  input: T,
+): T & {
+  isSplit: boolean;
+  paidBy: 'me' | number;
+  splitBy: number[];
+  splitType: 'split' | 'custom';
+  customSplitAmounts?: Partial<Record<'me' | number, number>>;
+} {
+  return {
+    ...input,
+    isSplit: true,
+    paidBy: DEFAULT_PENDING_SPLIT_PAID_BY,
+    splitBy: [...DEFAULT_PENDING_SPLIT_WITH],
+    splitType: 'split',
+    customSplitAmounts: undefined,
+  };
+}
+
 const PAGE_SIZE = 10;
 
 function stripUndefinedFields<T extends Record<string, unknown>>(value: T): T {
@@ -211,7 +276,7 @@ export class TransactionService {
 
     return snapshot.docs.map((docSnap) => {
       const data = docSnap.data();
-      return {
+      const base: PendingTransaction = {
         id: docSnap.id,
         date: data['date'] as string,
         description: data['description'] as string,
@@ -233,7 +298,9 @@ export class TransactionService {
         createdByUid: (data['createdByUid'] as string | undefined) ?? undefined,
         sourceRole: (data['sourceRole'] as 'kiosk') ?? 'kiosk',
         status: (data['status'] as 'pending') ?? 'pending',
-      } satisfies PendingTransaction;
+      };
+
+      return normalizePendingSplitOverride(base) as PendingTransaction;
     });
   }
 
@@ -281,7 +348,9 @@ export class TransactionService {
     }
 
     const data = pendingSnap.data();
-    const input: NewTransactionInput = {
+    const resolvedInput = normalizePendingSplitOverride({
+      ...data,
+      ...overrides,
       date: (overrides?.date ?? data['date'] ?? new Date().toISOString().slice(0, 10)) as string,
       description: (overrides?.description ??
         data['description'] ??
@@ -295,15 +364,24 @@ export class TransactionService {
       comment: overrides?.comment ?? normalizeComment(data['comment']),
       amount: Number(overrides?.amount ?? data['amount'] ?? 0),
       adjustmentId: (overrides?.adjustmentId ?? data['adjustmentId']) as string | undefined,
-      isSplit: overrides?.isSplit ?? Boolean(data['isSplit']),
-      paidBy: ((overrides?.paidBy ?? data['paidBy'] ?? 'me') as 'me' | number) || 'me',
-      splitBy: overrides?.splitBy ?? (data['splitBy'] as number[] | undefined) ?? [],
-      splitType: (overrides?.splitType ?? data['splitType'] ?? 'split') as 'split' | 'custom',
       totalAmount: Number(overrides?.totalAmount ?? data['totalAmount'] ?? data['amount'] ?? 0),
-      customSplitAmounts:
-        overrides?.customSplitAmounts ??
-        (data['customSplitAmounts'] as Partial<Record<'me' | number, number>> | undefined) ??
-        undefined,
+    });
+
+    const input: NewTransactionInput = {
+      date: resolvedInput.date as string,
+      description: resolvedInput.description as string,
+      category: resolvedInput.category as string,
+      subCategoryId: resolvedInput.subCategoryId,
+      subCategory: resolvedInput.subCategory,
+      comment: resolvedInput.comment,
+      amount: Number(resolvedInput.amount ?? 0),
+      adjustmentId: resolvedInput.adjustmentId,
+      isSplit: resolvedInput.isSplit,
+      paidBy: resolvedInput.paidBy,
+      splitBy: resolvedInput.splitBy,
+      splitType: resolvedInput.splitType,
+      totalAmount: Number(resolvedInput.totalAmount ?? resolvedInput.amount ?? 0),
+      customSplitAmounts: resolvedInput.customSplitAmounts,
     };
 
     await this.createTransaction(input);

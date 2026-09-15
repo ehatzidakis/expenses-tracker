@@ -1,6 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import { Transaction } from '../models/transaction.model';
 import { computeSplitDebtEntries } from './splitz.service';
+import {
+  normalizePendingSplitOverride,
+  resolvePendingCategoryOptions,
+  type PendingTransaction,
+} from './transaction-service';
 
 describe('splitz debt calculations', () => {
   it('supports standard split transactions', () => {
@@ -123,5 +128,41 @@ describe('splitz debt calculations', () => {
         paid: false,
       },
     ]);
+  });
+
+  it('overrides incoming pending split data to Stavi defaults', () => {
+    const pending: PendingTransaction = {
+      id: 'pending-1',
+      createdAt: '2026-08-18T00:00:00.000Z',
+      sourceRole: 'kiosk',
+      status: 'pending',
+      date: '2026-08-18',
+      description: 'Incoming data',
+      category: 'Food',
+      amount: 12.5,
+      isSplit: false,
+      paidBy: 2,
+      splitBy: [2, 3],
+      splitType: 'custom',
+      totalAmount: 12.5,
+      customSplitAmounts: { me: 3, 2: 5, 3: 4.5 },
+    };
+
+    expect(normalizePendingSplitOverride(pending)).toMatchObject({
+      isSplit: true,
+      paidBy: 1,
+      splitBy: [1],
+      splitType: 'split',
+    });
+  });
+
+  it('uses the right category set for normal and linked pending transactions', () => {
+    expect(resolvePendingCategoryOptions({ category: 'Food' })).toContain('Food');
+    expect(resolvePendingCategoryOptions({ category: 'Food', adjustmentId: 'trip-1' })).toContain(
+      'Food',
+    );
+    expect(resolvePendingCategoryOptions({ category: 'Accommodation', adjustmentId: 'trip-1' })).toContain(
+      'Accommodation',
+    );
   });
 });
