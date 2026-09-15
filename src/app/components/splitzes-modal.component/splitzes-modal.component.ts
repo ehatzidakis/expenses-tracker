@@ -13,6 +13,7 @@ import {
   getSubcategoryOptions,
 } from '../../services/expense-state.service';
 import { normalizeDecimalInput, parseDecimalInput } from '../../utils/decimal-input';
+import { resolvePendingCategoryOptions } from '../../services/transaction-service';
 
 @Component({
   selector: 'app-splitzes-modal',
@@ -58,6 +59,9 @@ export class SplitzesModalComponent {
   readonly isRefreshingPending = signal(false);
   readonly editingPendingId = signal<string | null>(null);
   readonly allPeople = PEOPLE;
+
+  readonly getPendingCategoryOptions = (pending: PendingTransaction): string[] =>
+    resolvePendingCategoryOptions(pending);
 
   onBackdropClick(event: MouseEvent): void {
     if ((event.target as HTMLElement).classList.contains('modal-backdrop')) {

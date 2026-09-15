@@ -59,6 +59,49 @@ export interface PendingTransaction extends NewTransactionInput {
 export const DEFAULT_PENDING_SPLIT_PAID_BY = 1 as const;
 export const DEFAULT_PENDING_SPLIT_WITH = [1] as const;
 
+export function resolvePendingCategoryOptions(
+  input: Partial<Pick<NewTransactionInput, 'category' | 'adjustmentId'>> = {},
+): string[] {
+  const hasLinkedAdjustment = Boolean(input.adjustmentId);
+  const category = input.category ?? '';
+
+  const tripCategories = [
+    'Plane Tickets',
+    'Accommodation',
+    'Food',
+    'Transportation',
+    'Gifts',
+    'Activities',
+    'Attractions',
+    'Splurge',
+    'Miscellaneous',
+  ];
+
+  const standardCategories = [
+    'Supermarket',
+    'Medical',
+    'Personal',
+    'EatingOut',
+    'Utilities',
+    'Takeaway',
+    'Tickets',
+    'Gaming',
+    'Cats',
+    'Travel',
+    'Subscriptions',
+    'Gym',
+    'Food',
+  ];
+
+  if (hasLinkedAdjustment) {
+    return tripCategories.includes(category) ? tripCategories : tripCategories;
+  }
+
+  return standardCategories.includes(category)
+    ? [...new Set([category, ...standardCategories])]
+    : standardCategories;
+}
+
 export function normalizePendingSplitOverride<T extends Partial<NewTransactionInput>>(
   input: T,
 ): T & {

@@ -1,7 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import { Transaction } from '../models/transaction.model';
 import { computeSplitDebtEntries } from './splitz.service';
-import { normalizePendingSplitOverride, type PendingTransaction } from './transaction-service';
+import {
+  normalizePendingSplitOverride,
+  resolvePendingCategoryOptions,
+  type PendingTransaction,
+} from './transaction-service';
 
 describe('splitz debt calculations', () => {
   it('supports standard split transactions', () => {
@@ -150,5 +154,15 @@ describe('splitz debt calculations', () => {
       splitBy: [1],
       splitType: 'split',
     });
+  });
+
+  it('uses the right category set for normal and linked pending transactions', () => {
+    expect(resolvePendingCategoryOptions({ category: 'Food' })).toContain('Food');
+    expect(resolvePendingCategoryOptions({ category: 'Food', adjustmentId: 'trip-1' })).toContain(
+      'Food',
+    );
+    expect(resolvePendingCategoryOptions({ category: 'Accommodation', adjustmentId: 'trip-1' })).toContain(
+      'Accommodation',
+    );
   });
 });
