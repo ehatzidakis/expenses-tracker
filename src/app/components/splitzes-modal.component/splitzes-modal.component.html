@@ -238,22 +238,22 @@
                                 >Who paid</label
                               >
                               <select
-                                [value]="pending.paidBy ?? 'me'"
+                                [value]="getPendingPaidByValue(pending)"
                                 (change)="
                                   updatePendingDraft(
                                     pending.id,
                                     'paidBy',
                                     $any($event.target).value === 'me'
-                                      ? 'me'
+                                      ? 1
                                       : +$any($event.target).value
                                   )
                                 "
                                 class="w-full bg-gray-800/70 border border-gray-700 rounded-lg px-2 py-1.5 text-xs text-white"
                               >
-                                <option value="me">Me</option>
                                 @for (person of allPeople; track person.id) {
                                   <option [value]="person.id">{{ person.name }}</option>
                                 }
+                                <option value="me">Me</option>
                               </select>
                             </div>
 
