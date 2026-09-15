@@ -84,6 +84,7 @@ export class SplitzesModalComponent {
       | 'category'
       | 'subCategoryId'
       | 'subCategory'
+      | 'comment'
       | 'amount'
       | 'date'
       | 'isSplit'
@@ -205,6 +206,7 @@ export class SplitzesModalComponent {
         category: draft.category,
         subCategoryId: draft.subCategoryId,
         subCategory: draft.subCategory,
+        comment: draft.comment?.trim() || undefined,
         amount: finalAmount,
         adjustmentId: draft.adjustmentId,
         isSplit: draft.isSplit,
