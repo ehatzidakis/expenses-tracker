@@ -39,6 +39,8 @@ export class CategoryBreakdownComponent {
 
   readonly expandedCategory = signal<string | null>(null);
   readonly transactionCounts = signal<Record<string, number>>({});
+  private readonly transactionCountCache = new Map<string, Record<string, number>>();
+  private transactionCountRequestId = 0;
 
   protected readonly Math = Math;
 
@@ -64,12 +66,21 @@ export class CategoryBreakdownComponent {
     month: string,
     currentCategories: CategorySpend[],
   ): Promise<void> {
-    const counts: Record<string, number> = {};
+    const requestId = ++this.transactionCountRequestId;
+    const categoryNames = currentCategories.map((category) => category.name);
+    const cachedCounts = this.transactionCountCache.get(month);
 
-    for (const category of currentCategories) {
-      counts[category.name] = await this.transactionService.countTransactions(month, category.name);
+    if (cachedCounts && categoryNames.every((name) => name in cachedCounts)) {
+      this.transactionCounts.set(cachedCounts);
+      return;
     }
 
+    const counts = await this.transactionService.countTransactionsByCategory(month, categoryNames);
+
+    this.transactionCountCache.set(month, counts);
+    if (requestId !== this.transactionCountRequestId) {
+      return;
+    }
     this.transactionCounts.set(counts);
   }
 
@@ -85,6 +96,6 @@ export class CategoryBreakdownComponent {
 
   onEditFinished(): void {
     this.selectedTransaction.set(null);
-    // Optional: trigger grid refresh if needed
+    this.transactionCountCache.delete(this.monthName());
   }
 }
