@@ -203,6 +203,30 @@ export class TransactionService {
     return snapshot.size;
   }
 
+  async countTransactionsByCategory(
+    monthName: string,
+    categories: string[],
+  ): Promise<Record<string, number>> {
+    const counts = Object.fromEntries(categories.map((category) => [category, 0]));
+
+    if (!monthName || categories.length === 0) {
+      return counts;
+    }
+
+    const transactionsRef = collection(db, 'transactions');
+    const snapshot = await getDocs(query(transactionsRef, where('monthName', '==', monthName)));
+    const categorySet = new Set(categories);
+
+    for (const transaction of snapshot.docs) {
+      const category = transaction.data()['category'];
+      if (typeof category === 'string' && categorySet.has(category)) {
+        counts[category] += 1;
+      }
+    }
+
+    return counts;
+  }
+
   async fetchPageByDescription(
     description: string,
     cursor: QueryDocumentSnapshot<DocumentData> | null,

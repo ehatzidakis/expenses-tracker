@@ -108,7 +108,9 @@ interface TripCategoryRow {
                 </div>
 
                 <div class="text-[10px] text-gray-500 pt-1">
-                  {{ row.transactions.length }} transactions
+                  {{ row.transactions.length }} transaction{{
+                    row.transactions.length !== 1 ? 's' : ''
+                  }}
                 </div>
 
                 <!-- Expanded transactions -->
