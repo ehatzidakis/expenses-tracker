@@ -84,13 +84,13 @@ import {
 
     @if (successMessage()) {
       <div
-        class="p-3 bg-emerald-950/40 border border-emerald-800/60 text-emerald-300 rounded-xl text-xs"
+        class="mt-2 p-3 bg-emerald-950/40 border border-emerald-800/60 text-emerald-300 rounded-xl text-xs"
       >
         <span>{{ successMessage() }}</span>
       </div>
     }
     @if (errorMessage()) {
-      <div class="p-3 bg-red-950/40 border border-red-800/60 text-red-300 rounded-xl text-xs">
+      <div class="mt-2 p-3 bg-red-950/40 border border-red-800/60 text-red-300 rounded-xl text-xs">
         {{ errorMessage() }}
       </div>
     }
@@ -267,9 +267,9 @@ export class CreateTransactionFormComponent {
       this.transactionModel.set(defaultTransactionModel());
       this.transactionForm().reset();
       this.resetSplitFields();
-      this.successMessage.set('Transaction added');
+      this.successMessage.set('🎉Transaction added🎉');
     } catch (err) {
-      this.errorMessage.set('Unable to add transaction. Please try again.');
+      this.errorMessage.set('😢Unable to add transaction😢 Please try again.');
     } finally {
       this.submitting.set(false);
     }
@@ -300,7 +300,7 @@ export class CreateTransactionFormComponent {
       this.resetSplitFields();
       this.successMessage.set('Transaction sent for approval');
     } catch (err) {
-      console.error('Kiosk approval submission failed:', err);
+      console.error('😢Kiosk approval submission failed😢:', err);
       const message =
         err instanceof Error ? err.message : 'Unable to submit kiosk transaction for approval.';
       this.errorMessage.set(message);

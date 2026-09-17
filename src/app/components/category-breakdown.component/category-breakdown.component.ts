@@ -90,6 +90,10 @@ export class CategoryBreakdownComponent {
   }
 
   onEditFinished(): void {
-    this.transactionCountCache.delete(this.monthName());
+    const month = this.monthName();
+    const currentCategories = this.categories();
+
+    this.transactionCountCache.delete(month);
+    void this.loadTransactionCounts(month, currentCategories);
   }
 }
