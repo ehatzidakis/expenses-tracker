@@ -1,30 +1,37 @@
 import { Component, computed, effect, inject, input, signal } from '@angular/core';
-import { EditTransactionComponent } from '../edit-transaction.component/edit-transaction.component';
-import { CommonModule } from '@angular/common';
-import { CategorySpend, getCategoryMeta } from '../../services/expense-state.service';
-import { TransactionGridComponent } from '../transaction-grid.component/transaction-grid.component';
-import { YearlyCategorySumsComponent } from '../yearly-category-sums/yearly-category-sums';
-import { Transaction } from '../../models/transaction.model';
+import { CategorySpend } from '../../services/expense-state.service';
 import { TransactionService } from '../../services/transaction-service';
+import { CategoryBreakdownItemComponent } from './category-breakdown-item';
 
 @Component({
   selector: 'app-category-breakdown',
   standalone: true,
-  imports: [
-    CommonModule,
-    TransactionGridComponent,
-    EditTransactionComponent,
-    YearlyCategorySumsComponent,
-  ],
+  imports: [CategoryBreakdownItemComponent],
   host: { class: 'block' },
-  templateUrl: './category-breakdown.component.html',
+  template: `
+    <section
+      class="bg-gray-900/60 border border-gray-800/80 rounded-2xl p-2 space-y-4 backdrop-blur-sm"
+    >
+      <div class="space-y-2">
+        @for (category of categories(); track category.name) {
+          <app-category-breakdown-item
+            [category]="category"
+            [monthName]="monthName()"
+            [transactionCount]="transactionCounts()[category.name] ?? 0"
+            [expanded]="expandedCategory() === category.name"
+            (toggle)="toggleCategory(category.name)"
+            (changed)="onEditFinished()"
+          />
+        }
+      </div>
+    </section>
+  `,
 })
 export class CategoryBreakdownComponent {
   private readonly transactionService = inject(TransactionService);
 
-  categories = input.required<CategorySpend[]>();
-  monthName = input<string>('');
-  selectedTransaction = signal<Transaction | null>(null);
+  readonly categories = input.required<CategorySpend[]>();
+  readonly monthName = input<string>('');
 
   readonly budgetTitle = computed(() => {
     const month = this.monthName().trim();
@@ -42,8 +49,6 @@ export class CategoryBreakdownComponent {
   private readonly transactionCountCache = new Map<string, Record<string, number>>();
   private transactionCountRequestId = 0;
 
-  protected readonly Math = Math;
-
   constructor() {
     effect(() => {
       const month = this.monthName();
@@ -56,10 +61,6 @@ export class CategoryBreakdownComponent {
 
       void this.loadTransactionCounts(month, currentCategories);
     });
-  }
-
-  categoryMeta(name: string): { emoji: string; classes: string } {
-    return getCategoryMeta(name);
   }
 
   private async loadTransactionCounts(
@@ -85,17 +86,10 @@ export class CategoryBreakdownComponent {
   }
 
   toggleCategory(name: string): void {
-    this.selectedTransaction.set(null);
     this.expandedCategory.update((current) => (current === name ? null : name));
   }
 
-  onSelectTransaction(tx: Transaction): void {
-    console.log('Parent received selected transaction:', tx);
-    this.selectedTransaction.set(tx);
-  }
-
   onEditFinished(): void {
-    this.selectedTransaction.set(null);
     this.transactionCountCache.delete(this.monthName());
   }
 }
