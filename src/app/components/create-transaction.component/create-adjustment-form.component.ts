@@ -35,7 +35,6 @@ import { buildAdjustmentPayload } from './transaction-payload';
           [amount]="adjustmentModel().amount"
           [people]="allPeople"
           [state]="splitStore.state()"
-          [paidByInputId]="'adj-paid-by'"
           (stateChange)="splitStore.apply($event)"
           (reset)="resetSplitFields()"
         />

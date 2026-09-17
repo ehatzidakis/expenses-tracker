@@ -134,18 +134,25 @@ export interface CreateSplitState {
 
       @if (state().splitWith.length > 0 && !state().customSplitMode) {
         <div class="space-y-1.5">
-          <label [for]="paidByInputId()" class="text-xs font-medium text-gray-400">Paid By</label>
-          <select
-            [id]="paidByInputId()"
-            [value]="state().paidById"
-            (change)="setPaidBy($any($event.target).value)"
-            class="w-full bg-gray-800/60 border border-gray-800 rounded-xl px-3 py-2.5 text-sm text-gray-100 focus:outline-none focus:ring-2 focus:ring-teal-500/60"
-          >
-            <option value="me">Me</option>
-            @for (person of selectedPeople(); track person.id) {
-              <option [value]="person.id">{{ person.name }}</option>
+          <label class="text-xs font-medium text-gray-400">Paid By</label>
+          <div class="flex flex-wrap gap-2">
+            @for (opt of paidByOptions(); track opt.id) {
+              <button
+                type="button"
+                (click)="setPaidBy(opt.id)"
+                [attr.aria-pressed]="state().paidById === opt.id"
+                class="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold border transition-all duration-150 cursor-pointer"
+                [class.bg-teal-500/20]="state().paidById === opt.id"
+                [class.border-teal-500/40]="state().paidById === opt.id"
+                [class.text-teal-400]="state().paidById === opt.id"
+                [class.bg-gray-800/60]="state().paidById !== opt.id"
+                [class.border-gray-700/50]="state().paidById !== opt.id"
+                [class.text-gray-400]="state().paidById !== opt.id"
+              >
+                {{ opt.label }}
+              </button>
             }
-          </select>
+          </div>
         </div>
         <div class="p-3 bg-teal-950/30 border border-teal-800/40 rounded-xl space-y-1">
           <p class="text-xs font-medium text-teal-400">Split preview</p>
@@ -166,7 +173,6 @@ export class SplitFieldsComponent {
   readonly people = input.required<ReadonlyArray<Person>>();
   readonly state = input.required<CreateSplitState>();
   readonly allowCustom = input(false);
-  readonly paidByInputId = input('tx-paid-by');
   readonly stateChange = output<CreateSplitState>();
   readonly reset = output<void>();
 
@@ -174,6 +180,10 @@ export class SplitFieldsComponent {
   readonly selectedPeople = computed(() =>
     this.people().filter((person) => this.state().splitWith.includes(person.id)),
   );
+  readonly paidByOptions = computed<Array<{ id: 'me' | number; label: string }>>(() => [
+    { id: 'me', label: 'Me' },
+    ...this.selectedPeople().map((person) => ({ id: person.id, label: person.name })),
+  ]);
   readonly remaining = computed(
     () =>
       Math.round(
@@ -233,8 +243,8 @@ export class SplitFieldsComponent {
     });
   }
 
-  setPaidBy(value: string): void {
-    this.emit({ ...this.state(), paidById: value === 'me' ? 'me' : Number(value) });
+  setPaidBy(value: 'me' | number): void {
+    this.emit({ ...this.state(), paidById: value });
   }
 
   onCustomInput(event: Event, personId: 'me' | number): void {
