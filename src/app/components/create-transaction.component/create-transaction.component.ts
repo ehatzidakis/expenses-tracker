@@ -1,21 +1,25 @@
 import { Component, computed, effect, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { form, FormField, maxLength, min, required } from '@angular/forms/signals';
+import { form, maxLength, min, required } from '@angular/forms/signals';
 import { QueryClient } from '@tanstack/angular-query-experimental';
 import { TransactionService } from '../../services/transaction-service';
 import {
   CATEGORY_NAMES,
   TRIP_CATEGORY_NAMES,
   categoryRequiresSubcategory,
-  getCategoryMeta,
   getSubcategoryOptions,
 } from '../../services/expense-state.service';
 import { AdjustmentService } from '../../services/adjustment-service';
 import { PrivacyService } from '../../services/privacy.service';
 import { computeSplit, SplitzService } from '../../services/splitz.service';
 import { PEOPLE, Person } from '../../models/splitz.model';
-import { normalizeDecimalInput, parseDecimalInput } from '../../utils/decimal-input';
 import { AuthService } from '../../services/auth.service';
+import { KioskBalanceComponent } from './kiosk-balance.component';
+import { CreateEntryTabsComponent } from './create-entry-tabs.component';
+import { TransactionBasicFieldsComponent } from './transaction-basic-fields.component';
+import { CreateSplitState, SplitFieldsComponent } from './split-fields.component';
+import { TransactionCommentFieldsComponent } from './transaction-comment-fields.component';
+import { AdjustmentFieldsComponent } from './adjustment-fields.component';
 
 export type EntryType = 'transaction' | 'adjustment';
 
@@ -72,9 +76,126 @@ function defaultAdjustmentModel(): AdjustmentFormModel {
 @Component({
   selector: 'app-create-transaction',
   standalone: true,
-  imports: [CommonModule, FormField],
+  imports: [
+    CommonModule,
+    KioskBalanceComponent,
+    CreateEntryTabsComponent,
+    TransactionBasicFieldsComponent,
+    SplitFieldsComponent,
+    TransactionCommentFieldsComponent,
+    AdjustmentFieldsComponent,
+  ],
   host: { class: 'block' },
-  templateUrl: './create-transaction.component.html',
+  template: `
+    <div
+      class="bg-gray-900/60 border border-gray-800/80 rounded-2xl p-5 space-y-4 backdrop-blur-sm"
+    >
+      @if (isKioskMode()) {
+        <app-kiosk-balance />
+      }
+      @if (!isKioskMode()) {
+        <app-create-entry-tabs [activeTab]="activeTab()" (tabChange)="setTab($event)" />
+      }
+
+      @if (activeTab() === 'transaction') {
+        <form (submit)="onSubmitTransaction($event)" class="space-y-4">
+          <app-transaction-basic-fields
+            [model]="transactionModel()"
+            [categories]="activeCategories()"
+            [linked]="linkWithAdjustment()"
+            [trips]="selectableTrips()"
+            [selectedTripId]="selectedAdjustmentId()"
+            [dateField]="transactionForm.date"
+            [descriptionField]="transactionForm.description"
+            [categoryField]="transactionForm.category"
+            [subCategoryField]="transactionForm.subCategoryId"
+            [amountField]="transactionForm.amount"
+            (linkChange)="toggleLinkWithAdjustment($event)"
+            (tripChange)="selectedAdjustmentId.set($event)"
+            (categoryChange)="setCategory($event)"
+            (subcategoryChange)="setSubcategory($event)"
+            (amountChange)="transactionModel.update((model) => ({ ...model, amount: $event }))"
+          />
+          @if (!isKioskMode()) {
+            <app-split-fields
+              [amount]="transactionModel().amount"
+              [people]="allPeople"
+              [state]="splitState()"
+              [allowCustom]="true"
+              (stateChange)="applySplitState($event)"
+              (reset)="resetSplitFields()"
+            />
+          }
+          <app-transaction-comment-fields
+            [enabled]="hasComment()"
+            [commentField]="transactionForm.comment"
+            (commentToggle)="setHasComment($event)"
+          />
+          <button
+            type="submit"
+            [disabled]="
+              transactionForm().invalid() ||
+              submitting() ||
+              privacyService.isPrivacyMode() ||
+              (goesSplitzes() && customSplitMode() && !customSplitValid())
+            "
+            class="w-full py-3 rounded-xl text-sm font-semibold text-white bg-linear-to-br from-indigo-500 to-violet-600 shadow-lg disabled:opacity-40 disabled:cursor-not-allowed active:scale-[0.99] transition-all cursor-pointer"
+          >
+            {{ submitting() ? 'Adding…' : 'Add Transaction' }}
+          </button>
+        </form>
+      }
+
+      @if (activeTab() === 'adjustment') {
+        <form (submit)="onSubmitAdjustment($event)" class="space-y-4">
+          <app-adjustment-fields
+            [model]="adjustmentModel()"
+            [addition]="isAddition()"
+            [descriptionField]="adjustmentForm.description"
+            [amountField]="adjustmentForm.amount"
+            [startDateField]="adjustmentForm.startDate"
+            [endDateField]="adjustmentForm.endDate"
+            (tripChange)="setIsTrip($event)"
+            (selectableChange)="setIsSelectable($event)"
+            (additionChange)="isAddition.set($event)"
+            (amountChange)="adjustmentModel.update((model) => ({ ...model, amount: $event }))"
+          />
+          @if (!adjustmentModel().isTrip) {
+            <app-split-fields
+              [amount]="adjustmentModel().amount"
+              [people]="allPeople"
+              [state]="splitState()"
+              [paidByInputId]="'adj-paid-by'"
+              (stateChange)="applySplitState($event)"
+              (reset)="resetSplitFields()"
+            />
+          }
+          <button
+            type="submit"
+            [disabled]="
+              adjustmentForm().invalid() || submitting() || privacyService.isPrivacyMode()
+            "
+            class="w-full py-3 rounded-xl text-sm font-semibold text-white bg-linear-to-br from-indigo-500 to-violet-600 shadow-lg disabled:opacity-40 disabled:cursor-not-allowed active:scale-[0.99] transition-all cursor-pointer"
+          >
+            {{ submitting() ? 'Adding…' : 'Add One-Off' }}
+          </button>
+        </form>
+      }
+
+      @if (successMessage()) {
+        <div
+          class="p-3 bg-emerald-950/40 border border-emerald-800/60 text-emerald-300 rounded-xl text-xs"
+        >
+          <span>{{ successMessage() }}</span>
+        </div>
+      }
+      @if (errorMessage()) {
+        <div class="p-3 bg-red-950/40 border border-red-800/60 text-red-300 rounded-xl text-xs">
+          {{ errorMessage() }}
+        </div>
+      }
+    </div>
+  `,
 })
 export class CreateTransactionComponent {
   private transactionService = inject(TransactionService);
@@ -127,6 +248,14 @@ export class CreateTransactionComponent {
   readonly customSplitMode = signal<boolean>(false);
   readonly customSplitAmounts = signal<Partial<Record<'me' | number, number>>>({});
 
+  readonly splitState = computed<CreateSplitState>(() => ({
+    goesSplitzes: this.goesSplitzes(),
+    splitWith: this.splitWith(),
+    paidById: this.paidById(),
+    customSplitMode: this.customSplitMode(),
+    customSplitAmounts: this.customSplitAmounts(),
+  }));
+
   readonly customSplitParticipants = computed<Array<'me' | number>>(() => {
     const participants: Array<'me' | number> = ['me', ...this.splitWith()];
     return participants;
@@ -158,13 +287,6 @@ export class CreateTransactionComponent {
     return `€${Math.abs(remaining).toFixed(2)} over the total`;
   });
 
-  readonly paidByOptions = computed<Array<{ id: 'me' | number; label: string }>>(() => [
-    { id: 'me', label: 'Me' },
-    ...this.splitWith().map((personId) => {
-      const person = this.allPeople.find((p) => p.id === personId);
-      return { id: personId as 'me' | number, label: person?.name ?? `Person ${personId}` };
-    }),
-  ]);
   // ─────────────────────────────────────────────────────────────────────────
 
   readonly transactionForm = form(this.transactionModel, (schemaPath) => {
@@ -205,7 +327,6 @@ export class CreateTransactionComponent {
     const summary = summaries.find((entry) => entry.person.id === stavi.id);
     return -(summary?.netWithMe ?? 0);
   });
-
   readonly selectableTrips = computed(() =>
     (this.adjustmentsQuery.data() ?? []).filter((a) => a.isTrip && a.isSelectable),
   );
@@ -254,10 +375,6 @@ export class CreateTransactionComponent {
     }));
   }
 
-  getCategoryOptionLabel(category: string): string {
-    return `${getCategoryMeta(category).emoji} ${category}`;
-  }
-
   setCategory(category: string): void {
     this.transactionModel.update((model) => ({ ...model, category }));
     this.syncSubcategorySelection(category);
@@ -270,6 +387,14 @@ export class CreateTransactionComponent {
       subCategoryId: option?.id ?? null,
       subCategory: option?.name ?? '',
     }));
+  }
+
+  applySplitState(state: CreateSplitState): void {
+    this.goesSplitzes.set(state.goesSplitzes);
+    this.splitWith.set(state.splitWith);
+    this.paidById.set(state.paidById);
+    this.customSplitMode.set(state.customSplitMode);
+    this.customSplitAmounts.set(state.customSplitAmounts);
   }
 
   setTab(tab: EntryType): void {
@@ -308,35 +433,6 @@ export class CreateTransactionComponent {
     this.adjustmentModel.update((m) => ({ ...m, isSelectable: value }));
   }
 
-  togglePersonInSplit(personId: number): void {
-    if (this.isKioskMode()) {
-      return;
-    }
-
-    if (this.customSplitMode()) {
-      this.customSplitMode.set(true);
-    }
-    this.splitWith.update((current) => {
-      const next = current.includes(personId)
-        ? current.filter((id) => id !== personId)
-        : [...current, personId];
-
-      if (this.paidById() === personId && !next.includes(personId)) {
-        this.paidById.set('me');
-      }
-
-      this.customSplitAmounts.update((amounts) => {
-        const updated = { ...amounts };
-        if (!next.includes(personId)) {
-          delete updated[personId];
-        }
-        return updated;
-      });
-
-      return next;
-    });
-  }
-
   resetSplitFields(): void {
     if (this.isKioskMode()) {
       this.goesSplitzes.set(false);
@@ -361,76 +457,6 @@ export class CreateTransactionComponent {
     if (!value) {
       this.transactionModel.update((model) => ({ ...model, comment: '' }));
     }
-  }
-
-  setCustomSplitMode(value: boolean): void {
-    if (this.isKioskMode()) {
-      return;
-    }
-
-    this.customSplitMode.set(value);
-    if (value) {
-      this.goesSplitzes.set(true);
-      this.paidById.set('me');
-    }
-  }
-
-  getPersonName(personId: 'me' | number): string {
-    if (personId === 'me') {
-      return 'Me';
-    }
-    return this.allPeople.find((person) => person.id === personId)?.name ?? `Person ${personId}`;
-  }
-
-  getCustomSplitValue(personId: 'me' | number): string {
-    const value = this.customSplitAmounts()[personId] ?? 0;
-    return value === 0 ? '' : String(value);
-  }
-
-  onCustomSplitAmountInput(event: Event, personId: 'me' | number): void {
-    const input = event.target as HTMLInputElement;
-    const normalized = normalizeDecimalInput(input.value);
-    const amount = parseDecimalInput(normalized);
-
-    this.customSplitAmounts.update((current) => ({
-      ...current,
-      [personId]: amount,
-    }));
-
-    if (input.value !== normalized && (input.value.includes(',') || input.value.includes('.'))) {
-      input.value = normalized;
-    }
-  }
-
-  getPaidByName(): string {
-    const id = this.paidById();
-    if (id === 'me') return 'Me';
-    const person = this.allPeople.find((p) => p.id === id);
-    return person?.name ?? `Person ${id}`;
-  }
-
-  private normalizeAmount(rawValue: string): number {
-    const normalized = normalizeDecimalInput(rawValue);
-    const parsed = parseDecimalInput(normalized);
-
-    const input = document.activeElement as HTMLInputElement | null;
-    if (input && input.value !== normalized && (rawValue.includes(',') || rawValue.includes('.'))) {
-      input.value = normalized;
-    }
-
-    return parsed;
-  }
-
-  onTransactionAmountInput(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    const amount = this.normalizeAmount(input.value);
-    this.transactionModel.update((m) => ({ ...m, amount }));
-  }
-
-  onAdjustmentAmountInput(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    const amount = this.normalizeAmount(input.value);
-    this.adjustmentModel.update((m) => ({ ...m, amount }));
   }
 
   async onSubmitTransaction(event: Event): Promise<void> {
