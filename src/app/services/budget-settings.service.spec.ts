@@ -15,6 +15,6 @@ describe('BudgetSettingsService', () => {
     });
 
     expect(settings.defaultTotalWage).toBeGreaterThan(0);
-    expect(settings.categoryBudgets.Supermarket).toBeGreaterThan(0);
+    expect(settings.categoryBudgets['Supermarket']).toBeGreaterThan(0);
   });
 });
