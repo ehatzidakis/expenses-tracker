@@ -358,21 +358,25 @@
 
           @if (splitWith().length > 0 && !customSplitMode()) {
             <div class="space-y-1.5">
-              <label for="tx-paid-by" class="text-xs font-medium text-gray-400">Paid By</label>
-              <select
-                id="tx-paid-by"
-                [value]="paidById()"
-                (change)="
-                  paidById.set(
-                    $any($event.target).value === 'me' ? 'me' : +$any($event.target).value
-                  )
-                "
-                class="w-full bg-gray-800/60 border border-gray-800 rounded-xl px-3 py-2.5 text-sm text-gray-100 focus:outline-none focus:ring-2 focus:ring-teal-500/60"
-              >
+              <label class="text-xs font-medium text-gray-400">Paid By</label>
+              <div class="flex flex-wrap gap-2">
                 @for (opt of paidByOptions(); track opt.id) {
-                  <option [value]="opt.id">{{ opt.label }}</option>
+                  <button
+                    type="button"
+                    (click)="paidById.set(opt.id)"
+                    [attr.aria-pressed]="paidById() === opt.id"
+                    class="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold border transition-all duration-150 cursor-pointer"
+                    [class.bg-teal-500/20]="paidById() === opt.id"
+                    [class.border-teal-500/40]="paidById() === opt.id"
+                    [class.text-teal-400]="paidById() === opt.id"
+                    [class.bg-gray-800/60]="paidById() !== opt.id"
+                    [class.border-gray-700/50]="paidById() !== opt.id"
+                    [class.text-gray-400]="paidById() !== opt.id"
+                  >
+                    {{ opt.label }}
+                  </button>
                 }
-              </select>
+              </div>
             </div>
 
             <div class="p-3 bg-teal-950/30 border border-teal-800/40 rounded-xl space-y-1">
@@ -682,21 +686,25 @@
           <!-- Paid By single select -->
           @if (splitWith().length > 0) {
             <div class="space-y-1.5">
-              <label for="adj-paid-by" class="text-xs font-medium text-gray-400">Paid By</label>
-              <select
-                id="adj-paid-by"
-                [value]="paidById()"
-                (change)="
-                  paidById.set(
-                    $any($event.target).value === 'me' ? 'me' : +$any($event.target).value
-                  )
-                "
-                class="w-full bg-gray-800/60 border border-gray-800 rounded-xl px-3 py-2.5 text-sm text-gray-100 focus:outline-none focus:ring-2 focus:ring-teal-500/60"
-              >
+              <label class="text-xs font-medium text-gray-400">Paid By</label>
+              <div class="flex flex-wrap gap-2">
                 @for (opt of paidByOptions(); track opt.id) {
-                  <option [value]="opt.id">{{ opt.label }}</option>
+                  <button
+                    type="button"
+                    (click)="paidById.set(opt.id)"
+                    [attr.aria-pressed]="paidById() === opt.id"
+                    class="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold border transition-all duration-150 cursor-pointer"
+                    [class.bg-teal-500/20]="paidById() === opt.id"
+                    [class.border-teal-500/40]="paidById() === opt.id"
+                    [class.text-teal-400]="paidById() === opt.id"
+                    [class.bg-gray-800/60]="paidById() !== opt.id"
+                    [class.border-gray-700/50]="paidById() !== opt.id"
+                    [class.text-gray-400]="paidById() !== opt.id"
+                  >
+                    {{ opt.label }}
+                  </button>
                 }
-              </select>
+              </div>
             </div>
 
             <!-- Preview of split amounts -->
