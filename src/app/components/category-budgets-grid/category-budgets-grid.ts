@@ -1,30 +1,71 @@
 import { Component, effect, inject, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
 import {
   CATEGORY_BUDGETS,
   DEFAULT_TOTAL_WAGE,
   ExpenseStateService,
 } from '../../services/expense-state.service';
-import { PrivacyService } from '../../services/privacy.service';
 import { BudgetSettingsService } from '../../services/budget-settings.service';
-
-interface BudgetCardItem {
-  category: string;
-  budget: number;
-  suggestion: number | null;
-}
+import { BudgetCardItem, CategoryBudgetCardsComponent } from './category-budget-cards';
+import { CategoryBudgetEditControlsComponent } from './category-budget-edit-controls';
+import { CategoryBudgetSummaryComponent } from './category-budget-summary';
 
 @Component({
   selector: 'app-category-budgets-grid',
   standalone: true,
-  imports: [CommonModule, FormsModule],
-  templateUrl: './category-budgets-grid.html',
+  imports: [
+    CategoryBudgetCardsComponent,
+    CategoryBudgetEditControlsComponent,
+    CategoryBudgetSummaryComponent,
+  ],
+  template: `
+    <div class="space-y-6">
+      <div
+        class="bg-gray-900/60 border border-gray-800/80 rounded-2xl p-5 space-y-4 backdrop-blur-sm overflow-hidden select-none"
+      >
+        <div class="flex items-center justify-between gap-3">
+          <div>
+            <h3 class="text-sm font-semibold text-gray-100">
+              Monthly Allocated Budget Per Category
+            </h3>
+          </div>
+
+          @if (!isEditing) {
+            <button
+              type="button"
+              class="rounded-lg border border-indigo-500/40 bg-indigo-500/10 px-2.5 py-1 text-[10px] font-medium uppercase tracking-wide text-indigo-200 transition hover:bg-indigo-500/20"
+              (click)="startEditing()"
+            >
+              Edit
+            </button>
+          }
+        </div>
+
+        <app-category-budget-cards
+          [budgets]="budgets"
+          [isEditing]="isEditing"
+          [draftBudgets]="draftBudgets"
+          (budgetChange)="updateDraftBudget($event.category, $event.value)"
+        />
+
+        <app-category-budget-edit-controls
+          [isEditing]="isEditing"
+          [draftWage]="draftWage"
+          (wageChange)="setDraftWage($event)"
+          (cancel)="cancelEditing()"
+          (save)="saveBudgetSettings()"
+        />
+
+        <app-category-budget-summary
+          [totalBudget]="totalBudget"
+          [projectedSave]="projectedSave"
+        />
+      </div>
+    </div>
+  `,
 })
 export class CategoryBudgetsGrid implements OnInit {
   private readonly expenseState = inject(ExpenseStateService);
   private readonly budgetSettingsService = inject(BudgetSettingsService);
-  readonly privacyService = inject(PrivacyService);
 
   budgets: BudgetCardItem[] = [];
   totalBudget = 0;
@@ -116,10 +157,5 @@ export class CategoryBudgetsGrid implements OnInit {
   setDraftWage(value: string | number): void {
     const parsed = Number(value);
     this.draftWage = Number.isFinite(parsed) ? parsed : 0;
-  }
-
-  getCategoryTextSize(category: string): string {
-    if (category.length > 9) return 'text-[8.5px]';
-    return 'text-[11px]';
   }
 }

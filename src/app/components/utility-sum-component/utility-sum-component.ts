@@ -95,11 +95,13 @@ interface UtilityAverage {
 
               <!-- Average Amount -->
               <div class="text-right">
-                @if (item.count > 0) {
+                @if (item.count > 0 && item.id !== '18' && item.id !== '17') {
                   <span class="block text-sm font-bold text-gray-100">
                     €{{ item.average | number: '1.2-2' }}
                   </span>
                   <span class="block text-[10px] text-gray-400 font-medium">{{ item.freq }}</span>
+                } @else if (item.id === '18' || item.id === '17') {
+                  <span class="block text-xs font-medium text-gray-500 italic">-</span>
                 } @else {
                   <span class="block text-xs font-medium text-gray-500 italic">No data</span>
                 }
