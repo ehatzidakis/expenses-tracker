@@ -1,5 +1,5 @@
 import { Component, input, output } from '@angular/core';
-import type { EntryType } from './create-transaction.component';
+import type { EntryType } from './create-transaction.models';
 
 @Component({
   selector: 'app-create-entry-tabs',
