@@ -5,6 +5,7 @@ import { PrivacyService } from '../../services/privacy.service';
 @Component({
   selector: 'app-category-budget-summary',
   standalone: true,
+  host: { class: 'block' },
   imports: [CommonModule],
   template: `
     <div class="space-y-3">

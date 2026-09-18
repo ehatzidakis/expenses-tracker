@@ -11,6 +11,7 @@ export interface BudgetCardItem {
 @Component({
   selector: 'app-category-budget-cards',
   standalone: true,
+  host: { class: 'block' },
   imports: [CommonModule, FormsModule],
   template: `
     <div class="grid grid-cols-4 gap-1">

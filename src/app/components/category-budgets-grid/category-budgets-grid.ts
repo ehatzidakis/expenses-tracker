@@ -47,18 +47,17 @@ import { CategoryBudgetSummaryComponent } from './category-budget-summary';
           (budgetChange)="updateDraftBudget($event.category, $event.value)"
         />
 
-        <app-category-budget-edit-controls
-          [isEditing]="isEditing"
-          [draftWage]="draftWage"
-          (wageChange)="setDraftWage($event)"
-          (cancel)="cancelEditing()"
-          (save)="saveBudgetSettings()"
-        />
+        @if (isEditing) {
+          <app-category-budget-edit-controls
+            [isEditing]="isEditing"
+            [draftWage]="draftWage"
+            (wageChange)="setDraftWage($event)"
+            (cancel)="cancelEditing()"
+            (save)="saveBudgetSettings()"
+          />
+        }
 
-        <app-category-budget-summary
-          [totalBudget]="totalBudget"
-          [projectedSave]="projectedSave"
-        />
+        <app-category-budget-summary [totalBudget]="totalBudget" [projectedSave]="projectedSave" />
       </div>
     </div>
   `,
