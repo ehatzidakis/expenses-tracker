@@ -1,17 +1,101 @@
-import { CommonModule } from '@angular/common';
 import { Component, inject, output, signal } from '@angular/core';
-import { FormsModule } from '@angular/forms';
 import { APP_VERSION } from '../../../environments/version';
 import { AuthService } from '../../services/auth.service';
 import { PrivacyService } from '../../services/privacy.service';
+import { PinEntryFormComponent } from './pin-entry-form.component';
+import {
+  SettingsFeedbackBannerComponent,
+  type SettingsFeedbackMessage,
+} from './settings-feedback-banner.component';
+import { SettingsModalFooterComponent } from './settings-modal-footer.component';
+import { SettingsModalHeaderComponent } from './settings-modal-header.component';
+import { SignOutActionComponent } from './sign-out-action.component';
+import { StealthModeSettingComponent } from './stealth-mode-setting.component';
+import { StealthPasscodeSettingComponent } from './stealth-passcode-setting.component';
 
 type PinAction = 'none' | 'set' | 'remove' | 'unlock-to-disable';
 
 @Component({
   selector: 'app-settings-modal',
   standalone: true,
-  imports: [CommonModule, FormsModule],
-  templateUrl: './settings-modal.component.html',
+  imports: [
+    PinEntryFormComponent,
+    SettingsFeedbackBannerComponent,
+    SettingsModalFooterComponent,
+    SettingsModalHeaderComponent,
+    SignOutActionComponent,
+    StealthModeSettingComponent,
+    StealthPasscodeSettingComponent,
+  ],
+  template: `
+    <div
+      class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fadeIn"
+      (click)="close.emit()"
+    >
+      <div
+        class="bg-gray-900 border border-gray-800 rounded-3xl p-6 w-full max-w-sm shadow-2xl space-y-6 text-gray-100"
+        (click)="$event.stopPropagation()"
+      >
+        <app-settings-modal-header (close)="close.emit()" />
+
+        <app-settings-feedback-banner [message]="feedbackMessage()" />
+
+        <app-stealth-mode-setting
+          [enabled]="privacyService.isPrivacyMode()"
+          (toggle)="handleToggleStealth()"
+        />
+
+        <!-- Inline Form: Unlock to Disable Stealth Mode -->
+        @if (activeAction() === 'unlock-to-disable') {
+          <app-pin-entry-form
+            title="Enter Passcode to Exit Stealth"
+            placeholder="••••"
+            submitLabel="Confirm"
+            [centerTitle]="true"
+            [autofocus]="true"
+            (valueChange)="pinInput.set($event)"
+            (cancel)="resetForm()"
+            (submitted)="handleUnlockDisable()"
+          />
+        }
+
+        @if (activeAction() === 'none') {
+          <app-stealth-passcode-setting
+            [hasPassword]="privacyService.hasPassword()"
+            (set)="activeAction.set('set'); clearFeedback()"
+            (remove)="activeAction.set('remove'); clearFeedback()"
+          />
+        }
+
+        @if (activeAction() === 'set') {
+          <app-pin-entry-form
+            title="Create New Passcode"
+            placeholder="Enter PIN (e.g. 1234)"
+            submitLabel="Save PIN"
+            (valueChange)="pinInput.set($event)"
+            (cancel)="resetForm()"
+            (submitted)="handleSetPin()"
+          />
+        }
+
+        @if (activeAction() === 'remove') {
+          <app-pin-entry-form
+            title="Confirm Current Passcode"
+            placeholder="Current PIN"
+            submitLabel="Remove PIN"
+            variant="red"
+            (valueChange)="currentPinInput.set($event)"
+            (cancel)="resetForm()"
+            (submitted)="handleRemovePin()"
+          />
+        }
+
+        <app-sign-out-action (signOut)="handleSignOut()" />
+
+        <app-settings-modal-footer [version]="appVersion" />
+      </div>
+    </div>
+  `,
 })
 export class SettingsModalComponent {
   readonly privacyService = inject(PrivacyService);
@@ -22,7 +106,7 @@ export class SettingsModalComponent {
   readonly activeAction = signal<PinAction>('none');
   readonly pinInput = signal<string>('');
   readonly currentPinInput = signal<string>('');
-  readonly feedbackMessage = signal<{ type: 'error' | 'success'; text: string } | null>(null);
+  readonly feedbackMessage = signal<SettingsFeedbackMessage | null>(null);
 
   async handleToggleStealth(): Promise<void> {
     this.clearFeedback();

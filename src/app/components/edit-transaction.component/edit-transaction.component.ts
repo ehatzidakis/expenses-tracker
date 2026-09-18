@@ -1,6 +1,5 @@
 import { Component, inject, input, output, signal, effect, computed } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { form, FormField, maxLength, min, required } from '@angular/forms/signals';
+import { form, maxLength, required } from '@angular/forms/signals';
 import { QueryClient } from '@tanstack/angular-query-experimental';
 import { TransactionService } from '../../services/transaction-service';
 import {
@@ -12,16 +11,65 @@ import {
 import { Transaction } from '../../models/transaction.model';
 import { PEOPLE } from '../../models/splitz.model';
 import { PrivacyService } from '../../services/privacy.service';
-import { ConfirmModal } from '../confirm-modal/confirm-modal';
-import { normalizeDecimalInput, parseDecimalInput } from '../../utils/decimal-input';
 import { TransactionFormModel, buildTransactionFormModel } from './edit-transaction.model';
+import { EditFormShellComponent } from '../edit-form/edit-form-shell.component';
+import { TransactionEditFieldsComponent } from './transaction-edit-fields.component';
+import { TransactionSplitDetailsComponent } from './transaction-split-details.component';
 
 @Component({
   selector: 'app-edit-transaction',
   standalone: true,
-  imports: [CommonModule, FormField, ConfirmModal],
+  imports: [
+    EditFormShellComponent,
+    TransactionEditFieldsComponent,
+    TransactionSplitDetailsComponent,
+  ],
   host: { class: 'block' },
-  templateUrl: './edit-transaction.component.html',
+  template: `
+    <app-edit-form-shell
+      title="Edit Transaction"
+      outerClass="space-y-4 border border-gray-800/80 rounded-2xl p-4 bg-gray-900/60 backdrop-blur-sm"
+      [formInvalid]="transactionForm().invalid()"
+      [submitting]="submitting()"
+      [deleting]="deleting()"
+      [privacyDisabled]="privacyService.isPrivacyMode()"
+      [errorMessage]="errorMessage()"
+      deleteLabel="Delete Transaction"
+      deleteTitle="Delete Transaction?"
+      deleteMessage="Are you sure you want to delete this transaction?"
+      [showDeleteConfirm]="showDeleteConfirm()"
+      (back)="back.emit()"
+      (submitted)="onSubmit($event)"
+      (deleteRequested)="requestDelete()"
+      (deleteConfirmed)="onDelete()"
+      (deleteCancelled)="showDeleteConfirm.set(false)"
+    >
+      <app-transaction-edit-fields
+        [model]="model()"
+        [categories]="categories()"
+        [subcategories]="availableSubcategories()"
+        [dateField]="transactionForm.date"
+        [descriptionField]="transactionForm.description"
+        [categoryField]="transactionForm.category"
+        [subCategoryField]="transactionForm.subCategoryId"
+        [amountField]="transactionForm.amount"
+        [commentField]="transactionForm.comment"
+        [categoryLabel]="getCategoryOptionLabel"
+        (categoryChange)="setCategory($event)"
+        (subcategoryChange)="setSubcategory($event)"
+        (amountChange)="onAmountChange($event)"
+      />
+
+      @if (splitMeta(); as split) {
+        <app-transaction-split-details
+          [details]="split"
+          [personName]="personNameForChild"
+          [splitWithNames]="splitWithNamesForChild"
+          [splitTypeLabel]="splitTypeLabelForChild"
+        />
+      }
+    </app-edit-form-shell>
+  `,
 })
 export class EditTransactionComponent {
   readonly showDeleteConfirm = signal(false);
@@ -64,6 +112,11 @@ export class EditTransactionComponent {
       splitPaidPersonIds: tx.splitPaidPersonIds ?? [],
     };
   });
+
+  readonly personNameForChild = (id: 'me' | number | undefined): string => this.getPersonName(id);
+  readonly splitWithNamesForChild = (ids: number[]): string => this.getSplitWithNames(ids);
+  readonly splitTypeLabelForChild = (type: 'split' | 'custom'): string =>
+    this.getSplitTypeLabel(type);
 
   private hydrateModelFromTransaction(tx: Transaction): void {
     this.model.set(buildTransactionFormModel(tx));
@@ -164,16 +217,8 @@ export class EditTransactionComponent {
     this.showDeleteConfirm.set(true);
   }
 
-  onAmountInput(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    const normalized = normalizeDecimalInput(input.value);
-    const parsed = parseDecimalInput(normalized);
-
-    if (input.value.includes(',')) {
-      input.value = normalized;
-    }
-
-    this.model.update((value) => ({ ...value, amount: parsed }));
+  onAmountChange(amount: number): void {
+    this.model.update((value) => ({ ...value, amount }));
   }
 
   async onSubmit(event: Event): Promise<void> {

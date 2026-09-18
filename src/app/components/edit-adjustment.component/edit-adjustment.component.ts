@@ -1,12 +1,12 @@
 import { Component, effect, inject, signal, input, output } from '@angular/core';
-import { ConfirmModal } from '../confirm-modal/confirm-modal';
-import { CommonModule } from '@angular/common';
 import { AdjustmentService } from '../../services/adjustment-service';
 import { QueryClient } from '@tanstack/angular-query-experimental';
 import { Adjustment } from '../../models/adjustments.model';
-import { form, FormField, maxLength, min, required } from '@angular/forms/signals';
+import { form, maxLength, required } from '@angular/forms/signals';
 import { PrivacyService } from '../../services/privacy.service';
-import { normalizeDecimalInput, parseDecimalInput } from '../../utils/decimal-input';
+import { EditFormShellComponent } from '../edit-form/edit-form-shell.component';
+import { AdjustmentEditFieldsComponent } from './adjustment-edit-fields.component';
+import { AdjustmentEditOptionsComponent } from './adjustment-edit-options.component';
 
 interface AdjustmentFormModel {
   description: string;
@@ -31,9 +31,47 @@ function formatDateForInput(dateVal: Date | string): string {
 @Component({
   selector: 'app-edit-adjustment',
   standalone: true,
-  imports: [CommonModule, FormField, ConfirmModal],
+  imports: [EditFormShellComponent, AdjustmentEditFieldsComponent, AdjustmentEditOptionsComponent],
   host: { class: 'block' },
-  templateUrl: './edit-adjustment.component.html',
+  template: `
+    <app-edit-form-shell
+      title="Edit Adjustment"
+      backClass="text-xs font-medium text-gray-400 hover:text-gray-200 flex items-center gap-1 transition-colors cursor-pointer"
+      [formInvalid]="adjustmentForm().invalid()"
+      [submitting]="submitting()"
+      [deleting]="deleting()"
+      [privacyDisabled]="privacyService.isPrivacyMode()"
+      [errorMessage]="errorMessage()"
+      deleteLabel="Delete Adjustment"
+      deleteTitle="Delete Adjustment?"
+      deleteMessage="Are you sure you want to delete this adjustment?"
+      [showDeleteConfirm]="showDeleteConfirm()"
+      (back)="back.emit()"
+      (submitted)="onSubmit($event)"
+      (deleteRequested)="requestDelete()"
+      (deleteConfirmed)="onDelete()"
+      (deleteCancelled)="showDeleteConfirm.set(false)"
+    >
+      <app-adjustment-edit-fields
+        [amount]="adjustmentModel().amount"
+        [privacyMode]="privacyService.isPrivacyMode()"
+        [descriptionField]="adjustmentForm.description"
+        [amountField]="adjustmentForm.amount"
+        [startDateField]="adjustmentForm.startDate"
+        [endDateField]="adjustmentForm.endDate"
+        (amountChange)="onAmountChange($event)"
+      />
+
+      <app-adjustment-edit-options
+        [isAddition]="adjustmentModel().isAddition"
+        [isTrip]="adjustmentModel().isTrip ?? false"
+        [isSelectable]="adjustmentModel().isSelectable ?? false"
+        (typeChange)="toggleType($event)"
+        (tripChange)="toggleTrip($event)"
+        (selectableChange)="toggleSelectable($event)"
+      />
+    </app-edit-form-shell>
+  `,
 })
 export class EditAdjustmentComponent {
   private adjustmentService = inject(AdjustmentService);
@@ -106,16 +144,8 @@ export class EditAdjustmentComponent {
     this.showDeleteConfirm.set(true);
   }
 
-  onAmountInput(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    const normalized = normalizeDecimalInput(input.value);
-    const parsed = parseDecimalInput(normalized);
-
-    if (input.value.includes(',')) {
-      input.value = normalized;
-    }
-
-    this.adjustmentModel.update((value) => ({ ...value, amount: parsed }));
+  onAmountChange(amount: number): void {
+    this.adjustmentModel.update((value) => ({ ...value, amount }));
   }
 
   async onSubmit(event: Event): Promise<void> {

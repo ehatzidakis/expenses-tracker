@@ -1,22 +1,81 @@
-import { Component, computed, inject, input, signal } from '@angular/core';
+import { Component, computed, input, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { CategorySpend } from '../../services/expense-state.service';
-import { PrivacyService } from '../../services/privacy.service';
+import { OverviewCardSavedColumnComponent } from './overview-card-saved-column.component';
+import { OverviewCardSpendColumnComponent } from './overview-card-spend-column.component';
+import { YearlyBreakdownEntry } from './overview-card.models';
 
-export interface YearlyBreakdownEntry {
-  year: number;
-  monthlyExpenses: number;
-  oneOffExpenses: number;
-  monthlySaved: number;
-  oneOffBonuses: number;
-}
+export type { YearlyBreakdownEntry } from './overview-card.models';
 
 @Component({
   selector: 'app-overview-card',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, OverviewCardSavedColumnComponent, OverviewCardSpendColumnComponent],
   host: { class: 'block' },
-  templateUrl: './overview-card.component.html',
+  template: `
+    <section
+      class="bg-linear-to-br from-gray-900 via-gray-900 to-indigo-950/50 border border-gray-800 rounded-2xl p-5 shadow-xl transition-all duration-200"
+      [class.cursor-pointer]="hasBreakdown()"
+      (click)="toggleExpanded()"
+    >
+      @if (dateRangeInfo(); as info) {
+        <span class="text-xs font-medium text-gray-400 uppercase tracking-wider block mb-4">
+          @if (info.first === info.last) {
+            Sum for <span class="text-gray-100 font-semibold">{{ info.count }}</span> month:
+            <span class="text-gray-100 font-semibold">{{ info.first }}</span>
+          } @else {
+            Sum for <span class="text-gray-100 font-semibold">{{ info.count }}</span> months:
+            <span class="text-gray-100 font-semibold">{{ info.first }}</span> to
+            <span class="text-gray-100 font-semibold">{{ info.last }}</span>
+          }
+        </span>
+      }
+
+      <div class="grid items-start justify-between grid-cols-2 gap-6">
+        <app-overview-card-spend-column
+          [totalSpend]="totalSpend()"
+          [hasBreakdown]="hasBreakdown()"
+          [expanded]="expanded()"
+          [monthlyExpenses]="monthlyExpenses()"
+          [oneOffExpenses]="oneOffExpenses()"
+          [yearlyBreakdown]="yearlyBreakdown()"
+        />
+        <app-overview-card-saved-column
+          [totalSaved]="computedTotalSaved()"
+          [hasBreakdown]="hasBreakdown()"
+          [expanded]="expanded()"
+          [monthlySaved]="monthlySaved()"
+          [oneOffBonuses]="oneOffBonuses()"
+          [yearlyBreakdown]="yearlyBreakdown()"
+        />
+      </div>
+
+      @if (!hasBreakdown() && monthCountdownLabel()) {
+        <div class="mt-3 text-center">
+          <span class="text-[10px] font-medium uppercase tracking-[0.14em] text-gray-400">
+            {{ monthCountdownLabel() }}
+          </span>
+        </div>
+      }
+
+      @if (hasBreakdown()) {
+        <div class="flex justify-center mt-3 pt-2 border-t border-gray-800/60">
+          <svg
+            class="w-4 h-4 text-gray-500 transition-transform duration-400"
+            [class.rotate-180]="expanded()"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <polyline points="6 9 12 15 18 9" />
+          </svg>
+        </div>
+      }
+    </section>
+  `,
 })
 export class OverviewCardComponent {
   totalSpend = input.required<number>();
@@ -88,8 +147,6 @@ export class OverviewCardComponent {
   });
 
   expanded = signal(false);
-
-  readonly privacyService = inject(PrivacyService);
 
   toggleExpanded(): void {
     if (this.hasBreakdown()) {
