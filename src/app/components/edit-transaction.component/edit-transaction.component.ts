@@ -14,9 +14,7 @@ import { PrivacyService } from '../../services/privacy.service';
 import { TransactionFormModel, buildTransactionFormModel } from './edit-transaction.model';
 import { EditFormShellComponent } from '../edit-form/edit-form-shell.component';
 import { TransactionEditFieldsComponent } from './transaction-edit-fields.component';
-import {
-  TransactionSplitDetailsComponent,
-} from './transaction-split-details.component';
+import { TransactionSplitDetailsComponent } from './transaction-split-details.component';
 
 @Component({
   selector: 'app-edit-transaction',

@@ -5,16 +5,11 @@ import { ConfirmModal } from '../confirm-modal/confirm-modal';
   selector: 'app-edit-form-shell',
   standalone: true,
   imports: [ConfirmModal],
+  host: { class: 'block' },
   template: `
     <div [class]="outerClass()">
       <div class="flex items-center justify-between">
-        <button
-          type="button"
-          (click)="back.emit()"
-          [class]="backClass()"
-        >
-          ← Back
-        </button>
+        <button type="button" (click)="back.emit()" [class]="backClass()">← Back</button>
         <h3 class="text-sm font-semibold text-gray-200">{{ title() }}</h3>
         <div class="w-10"></div>
       </div>

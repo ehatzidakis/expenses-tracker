@@ -11,6 +11,7 @@ export interface TransactionSplitDetails {
 @Component({
   selector: 'app-transaction-split-details',
   standalone: true,
+  host: { class: 'block' },
   template: `
     <div class="rounded-2xl border border-teal-800/40 bg-teal-950/20 p-3 space-y-3">
       <div class="flex items-center justify-between">

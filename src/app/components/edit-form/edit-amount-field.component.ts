@@ -7,6 +7,7 @@ import { normalizeDecimalInput, parseDecimalInput } from '../../utils/decimal-in
   selector: 'app-edit-amount-field',
   standalone: true,
   imports: [CommonModule],
+  host: { class: 'block' },
   template: `
     <div class="space-y-1.5">
       <label [for]="inputId()" class="text-xs font-medium text-gray-400">Amount</label>
