@@ -68,7 +68,9 @@
               @for (pending of pendingTransactions(); track pending.id) {
                 <div class="rounded-xl border border-amber-500/25 bg-gray-950/40 p-3 space-y-2">
                   <div class="flex items-center justify-between gap-2">
-                    <span class="text-[10px] uppercase tracking-[0.14em] text-amber-300">Temp</span>
+                    <span class="text-[10px] uppercase tracking-[0.14em] text-amber-300">{{
+                      pending.description
+                    }}</span>
                     <span class="text-[10px] text-gray-400">{{ pending.date }}</span>
                   </div>
 
@@ -217,49 +219,24 @@
                           <p class="text-[10px] uppercase tracking-[0.12em] text-amber-300">
                             Split settings
                           </p>
-                          <label class="inline-flex items-center gap-2 text-[10px] text-gray-200">
-                            <input
-                              type="checkbox"
-                              [checked]="pending.isSplit"
-                              (change)="
-                                updatePendingDraft(
-                                  pending.id,
-                                  'isSplit',
-                                  $any($event.target).checked
-                                )
-                              "
-                            />
-                            Enabled
-                          </label>
+                          <button
+                            type="button"
+                            (click)="updatePendingDraft(pending.id, 'isSplit', !pending.isSplit)"
+                            [attr.aria-pressed]="pending.isSplit"
+                            class="flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-[10px] font-semibold transition-all duration-150 cursor-pointer"
+                            [class.bg-teal-500/20]="pending.isSplit"
+                            [class.border-teal-500/40]="pending.isSplit"
+                            [class.text-teal-300]="pending.isSplit"
+                            [class.bg-gray-800/60]="!pending.isSplit"
+                            [class.border-gray-700/50]="!pending.isSplit"
+                            [class.text-gray-300]="!pending.isSplit"
+                          >
+                            {{ pending.isSplit ? 'Enabled' : 'Disabled' }}
+                          </button>
                         </div>
 
                         @if (pending.isSplit) {
                           <div class="space-y-2">
-                            <div>
-                              <label
-                                class="mb-1 block text-[10px] uppercase tracking-[0.12em] text-gray-400"
-                                >Who paid</label
-                              >
-                              <select
-                                [value]="getPendingPaidByValue(pending)"
-                                (change)="
-                                  updatePendingDraft(
-                                    pending.id,
-                                    'paidBy',
-                                    $any($event.target).value === 'me'
-                                      ? 1
-                                      : +$any($event.target).value
-                                  )
-                                "
-                                class="w-full bg-gray-800/70 border border-gray-700 rounded-lg px-2 py-1.5 text-xs text-white"
-                              >
-                                @for (person of allPeople; track person.id) {
-                                  <option [value]="person.id">{{ person.name }}</option>
-                                }
-                                <option value="me">Me</option>
-                              </select>
-                            </div>
-
                             <div>
                               <label
                                 class="mb-1 block text-[10px] uppercase tracking-[0.12em] text-gray-400"
@@ -337,16 +314,59 @@
                               >
                               <div class="flex flex-wrap gap-2">
                                 @for (person of allPeople; track person.id) {
-                                  <label
-                                    class="inline-flex items-center gap-1.5 rounded-full border border-gray-700 bg-gray-800/60 px-2 py-1 text-[10px] text-gray-200"
+                                  <button
+                                    type="button"
+                                    (click)="toggleSplitParticipant(pending.id, person.id)"
+                                    [attr.aria-pressed]="
+                                      (pending.splitBy ?? []).includes(person.id)
+                                    "
+                                    class="flex items-center gap-1.5 px-3 py-2 rounded-full text-xs font-semibold border transition-all duration-150 cursor-pointer"
+                                    [class.bg-teal-500/20]="
+                                      (pending.splitBy ?? []).includes(person.id)
+                                    "
+                                    [class.border-teal-500/40]="
+                                      (pending.splitBy ?? []).includes(person.id)
+                                    "
+                                    [class.text-teal-400]="
+                                      (pending.splitBy ?? []).includes(person.id)
+                                    "
+                                    [class.bg-gray-800/60]="
+                                      !(pending.splitBy ?? []).includes(person.id)
+                                    "
+                                    [class.border-gray-700/50]="
+                                      !(pending.splitBy ?? []).includes(person.id)
+                                    "
+                                    [class.text-gray-400]="
+                                      !(pending.splitBy ?? []).includes(person.id)
+                                    "
                                   >
-                                    <input
-                                      type="checkbox"
-                                      [checked]="(pending.splitBy ?? []).includes(person.id)"
-                                      (change)="toggleSplitParticipant(pending.id, person.id)"
-                                    />
                                     {{ person.name }}
-                                  </label>
+                                  </button>
+                                }
+                              </div>
+                            </div>
+
+                            <div>
+                              <label
+                                class="mb-1 block text-[10px] uppercase tracking-[0.12em] text-gray-400"
+                                >Who paid</label
+                              >
+                              <div class="flex flex-wrap gap-2">
+                                @for (opt of getPendingPaidByOptions(pending); track opt.id) {
+                                  <button
+                                    type="button"
+                                    (click)="setPendingPaidBy(pending.id, opt.id)"
+                                    [attr.aria-pressed]="isPendingPaidBy(pending, opt.id)"
+                                    class="flex items-center gap-1.5 px-3 py-2 rounded-full text-xs font-semibold border transition-all duration-150 cursor-pointer"
+                                    [class.bg-teal-500/20]="isPendingPaidBy(pending, opt.id)"
+                                    [class.border-teal-500/40]="isPendingPaidBy(pending, opt.id)"
+                                    [class.text-teal-400]="isPendingPaidBy(pending, opt.id)"
+                                    [class.bg-gray-800/60]="!isPendingPaidBy(pending, opt.id)"
+                                    [class.border-gray-700/50]="!isPendingPaidBy(pending, opt.id)"
+                                    [class.text-gray-400]="!isPendingPaidBy(pending, opt.id)"
+                                  >
+                                    {{ opt.label }}
+                                  </button>
                                 }
                               </div>
                             </div>

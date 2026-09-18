@@ -131,8 +131,24 @@ export class SplitzesModalComponent {
     }));
   }
 
-  getPendingPaidByValue(pending: PendingTransaction): 'me' | number {
-    return pending.paidBy === 'me' ? 1 : (pending.paidBy ?? 1);
+  getPendingPaidByOptions(
+    pending: PendingTransaction,
+  ): Array<{ id: 'me' | number; label: string }> {
+    return [
+      { id: 'me', label: 'Me' },
+      ...(pending.splitBy ?? [])
+        .map((personId) => this.allPeople.find((person) => person.id === personId))
+        .filter((person): person is (typeof this.allPeople)[number] => person !== undefined)
+        .map((person) => ({ id: person.id, label: person.name })),
+    ];
+  }
+
+  isPendingPaidBy(pending: PendingTransaction, paidBy: 'me' | number): boolean {
+    return (pending.paidBy ?? 'me') === paidBy;
+  }
+
+  setPendingPaidBy(id: string, paidBy: 'me' | number): void {
+    this.updatePendingDraft(id, 'paidBy', paidBy);
   }
 
   getPendingCustomParticipants(pending: PendingTransaction): Array<'me' | number> {
