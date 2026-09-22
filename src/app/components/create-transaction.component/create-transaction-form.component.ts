@@ -119,6 +119,8 @@ export class CreateTransactionFormComponent {
   readonly successMessage = signal<string | null>(null);
   readonly errorMessage = signal<string | null>(null);
 
+  private successMessageTimer?: ReturnType<typeof setTimeout>;
+
   private adjustmentsQuery = this.adjustmentService.getAdjustmentsQuery();
 
   readonly transactionForm = form(this.transactionModel, (schemaPath) => {
@@ -229,6 +231,18 @@ export class CreateTransactionFormComponent {
     this.hasComment.set(false);
   }
 
+  private showSuccessMessage(message: string): void {
+    if (this.successMessageTimer) {
+      clearTimeout(this.successMessageTimer);
+    }
+
+    this.successMessage.set(message);
+    this.successMessageTimer = setTimeout(() => {
+      this.successMessage.set(null);
+      this.successMessageTimer = undefined;
+    }, 3000);
+  }
+
   async onSubmit(event: Event): Promise<void> {
     event.preventDefault();
     if (this.transactionForm().invalid() || this.submitting()) {
@@ -267,7 +281,7 @@ export class CreateTransactionFormComponent {
       this.transactionModel.set(defaultTransactionModel());
       this.transactionForm().reset();
       this.resetSplitFields();
-      this.successMessage.set('🎉Transaction added🎉');
+      this.showSuccessMessage('🎉Transaction added🎉');
     } catch (err) {
       this.errorMessage.set('😢Unable to add transaction😢 Please try again.');
     } finally {
@@ -298,7 +312,7 @@ export class CreateTransactionFormComponent {
       this.transactionModel.set(defaultTransactionModel());
       this.transactionForm().reset();
       this.resetSplitFields();
-      this.successMessage.set('Transaction sent for approval');
+      this.showSuccessMessage('Transaction sent for approval');
     } catch (err) {
       console.error('😢Kiosk approval submission failed😢:', err);
       const message =
