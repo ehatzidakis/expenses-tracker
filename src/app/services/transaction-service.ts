@@ -1,4 +1,4 @@
-import { inject, Injectable } from '@angular/core';
+import { inject, Injectable, signal } from '@angular/core';
 import {
   collection,
   deleteDoc,
@@ -160,6 +160,12 @@ function monthNameFromDateString(date: string): string {
 export class TransactionService {
   private readonly authService = inject(AuthService);
   private readonly budgetSettingsService = inject(BudgetSettingsService);
+
+  readonly transactionRevision = signal(0);
+
+  private notifyTransactionChanged(): void {
+    this.transactionRevision.update((revision) => revision + 1);
+  }
 
   async fetchPage(
     monthName: string,
@@ -486,6 +492,8 @@ export class TransactionService {
 
     await batch.commit();
 
+    this.notifyTransactionChanged();
+
     return transactionRef.id;
   }
 
@@ -565,6 +573,8 @@ export class TransactionService {
     batch.update(txRef, updateData);
 
     await batch.commit();
+
+    this.notifyTransactionChanged();
   }
 
   async deleteTransaction(target: string | Transaction): Promise<void> {
@@ -623,6 +633,8 @@ export class TransactionService {
     batch.delete(transactionRef);
 
     await batch.commit();
+
+    this.notifyTransactionChanged();
   }
 
   async fetchAllByAdjustmentId(adjustmentId: string): Promise<Transaction[]> {

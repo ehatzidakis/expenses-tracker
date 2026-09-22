@@ -48,11 +48,18 @@ export class CategoryBreakdownComponent {
   readonly transactionCounts = signal<Record<string, number>>({});
   private readonly transactionCountCache = new Map<string, Record<string, number>>();
   private transactionCountRequestId = 0;
+  private lastTransactionRevision = -1;
 
   constructor() {
     effect(() => {
       const month = this.monthName();
       const currentCategories = this.categories();
+      const transactionRevision = this.transactionService.transactionRevision();
+
+      if (transactionRevision !== this.lastTransactionRevision) {
+        this.transactionCountCache.delete(month);
+        this.lastTransactionRevision = transactionRevision;
+      }
 
       if (!month || currentCategories.length === 0) {
         this.transactionCounts.set({});

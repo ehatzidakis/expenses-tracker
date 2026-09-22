@@ -84,13 +84,15 @@ import {
 
     @if (successMessage()) {
       <div
-        class="mt-2 p-3 bg-emerald-950/40 border border-emerald-800/60 text-emerald-300 rounded-xl text-xs"
+        class="mt-2 p-3 bg-emerald-950/40 border border-emerald-800/60 text-emerald-300 rounded-xl text-xs text-center"
       >
         <span>{{ successMessage() }}</span>
       </div>
     }
     @if (errorMessage()) {
-      <div class="mt-2 p-3 bg-red-950/40 border border-red-800/60 text-red-300 rounded-xl text-xs">
+      <div
+        class="mt-2 p-3 bg-red-950/40 border border-red-800/60 text-red-300 rounded-xl text-xs text-center"
+      >
         {{ errorMessage() }}
       </div>
     }
@@ -240,7 +242,7 @@ export class CreateTransactionFormComponent {
     this.successMessageTimer = setTimeout(() => {
       this.successMessage.set(null);
       this.successMessageTimer = undefined;
-    }, 3000);
+    }, 1500);
   }
 
   async onSubmit(event: Event): Promise<void> {
