@@ -95,12 +95,13 @@ export class CategoryBudgetsGrid implements OnInit {
   }
 
   private syncDisplayState(categoryBudgets: Record<string, number>, totalWage: number): void {
+    const averageByCategory = new Map(
+      this.expenseState.allTimeCategoryBreakdown().map((item) => [item.name, item.monthlyAverage]),
+    );
     const nextBudgets = Object.entries(categoryBudgets).map(([category, budget]) => ({
       category,
       budget: Number(budget ?? 0),
-      suggestion:
-        this.expenseState.categoryBreakdown().find((item) => item.name === category)
-          ?.monthlyAverage ?? null,
+      suggestion: averageByCategory.get(category) ?? null,
     }));
 
     this.budgets = nextBudgets;
