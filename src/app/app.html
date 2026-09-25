@@ -140,6 +140,10 @@
               [monthName]="state.selectedExpense()?.MonthName ?? ''"
             >
             </app-category-breakdown>
+
+            <app-recent-transactions
+              [monthName]="state.selectedExpense()?.MonthName ?? null"
+            ></app-recent-transactions>
           }
           @case ('sumup') {
             @defer (on immediate) {
@@ -215,6 +219,7 @@
           } @else if (selectedTrip()) {
             <!-- TRIP BREAKDOWN VIEW -->
             <app-trip-breakdown [trip]="selectedTrip()!" />
+            <app-recent-transactions [adjustmentId]="selectedTrip()!.id"></app-recent-transactions>
           }
         }
       }

@@ -19,6 +19,7 @@ import { CategoryBudgetsGrid } from './components/category-budgets-grid/category
 import { CategoryBudgetsChartComponent } from './components/category-budgets-chart/category-budgets-chart';
 import { UtilitySumComponent } from './components/utility-sum-component/utility-sum-component';
 import { CategoryAverageComponent } from './components/category-average/category-average';
+import { RecentTransactionsComponent } from './components/recent-transactions/recent-transactions';
 import { AuthService } from './services/auth.service';
 
 export interface YearlyBreakdownEntry {
@@ -48,6 +49,7 @@ export interface YearlyBreakdownEntry {
     TripBreakdownComponent,
     UtilitySumComponent,
     CategoryAverageComponent,
+    RecentTransactionsComponent,
   ],
   templateUrl: './app.html',
 })

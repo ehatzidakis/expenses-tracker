@@ -30,6 +30,11 @@ export interface TransactionPage {
   hasMore: boolean;
 }
 
+export interface RecentTransactionsFilter {
+  monthName?: string;
+  adjustmentId?: string;
+}
+
 export interface NewTransactionInput {
   date: string; // 'YYYY-MM-DD'
   description: string;
@@ -162,6 +167,22 @@ export class TransactionService {
   private readonly budgetSettingsService = inject(BudgetSettingsService);
 
   readonly transactionRevision = signal(0);
+
+  async fetchRecentTransactions(filter: RecentTransactionsFilter): Promise<Transaction[]> {
+    const transactionsRef = collection(db, 'transactions');
+    const constraint = filter.adjustmentId
+      ? where('adjustmentId', '==', filter.adjustmentId)
+      : where('monthName', '==', filter.monthName ?? '');
+    const snapshot = await getDocs(query(transactionsRef, constraint));
+
+    return snapshot.docs
+      .map((document) => this.mapTransaction(document.data(), document.id))
+      .sort((a, b) => {
+        const createdAtDifference = this.getTimestamp(b.createdAt) - this.getTimestamp(a.createdAt);
+        return createdAtDifference || new Date(b.date).getTime() - new Date(a.date).getTime();
+      })
+      .slice(0, 10);
+  }
 
   private notifyTransactionChanged(): void {
     this.transactionRevision.update((revision) => revision + 1);
@@ -299,6 +320,41 @@ export class TransactionService {
       lastDoc: docs.length ? docs[docs.length - 1] : null,
       hasMore,
     };
+  }
+
+  private getTimestamp(value: string | undefined): number {
+    const timestamp = value ? new Date(value).getTime() : 0;
+    return Number.isNaN(timestamp) ? 0 : timestamp;
+  }
+
+  private mapTransaction(data: DocumentData, id: string): Transaction {
+    const tx: Transaction = {
+      id,
+      monthName: data['monthName'] as string,
+      date: data['date'] as string,
+      description: data['description'] as string,
+      amount: Number(data['amount']) || 0,
+      category: data['category'] as string,
+      subCategoryId: data['subCategoryId'] != null ? Number(data['subCategoryId']) : undefined,
+      subCategory: (data['subCategory'] as string | undefined) ?? undefined,
+      comment: normalizeComment(data['comment']),
+      createdAt: (data['createdAt'] as string) ?? '',
+      adjustmentId: (data['adjustmentId'] as string) ?? undefined,
+    };
+
+    if (data['isSplit']) {
+      tx.isSplit = true;
+      tx.paidBy = data['paidBy'] as 'me' | number;
+      tx.splitBy = (data['splitBy'] as number[]) ?? [];
+      tx.splitType = (data['splitType'] as 'split' | 'custom') ?? 'split';
+      tx.totalAmount = Number(data['totalAmount']) || 0;
+      tx.customSplitAmounts =
+        (data['customSplitAmounts'] as Partial<Record<'me' | number, number>> | undefined) ??
+        undefined;
+      tx.splitPaidPersonIds = (data['splitPaidPersonIds'] as number[]) ?? [];
+    }
+
+    return tx;
   }
 
   async fetchPendingTransactions(): Promise<PendingTransaction[]> {
