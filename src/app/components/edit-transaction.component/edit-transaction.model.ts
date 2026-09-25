@@ -1,6 +1,7 @@
 import { Transaction } from '../../models/transaction.model';
 import {
   CATEGORY_NAMES,
+  TRIP_CATEGORY_NAMES,
   getSubcategoryOptions,
   categoryRequiresSubcategory,
 } from '../../services/expense-state.service';
@@ -35,9 +36,11 @@ export function normalizeCategoryName(category?: string | null): string {
 export function buildTransactionFormModel(tx: Transaction): TransactionFormModel {
   const normalizedCategory = normalizeCategoryName(tx.category);
   const category =
-    normalizedCategory && CATEGORY_NAMES.includes(normalizedCategory)
+    normalizedCategory &&
+    (CATEGORY_NAMES.includes(normalizedCategory) ||
+      TRIP_CATEGORY_NAMES.includes(normalizedCategory))
       ? normalizedCategory
-      : normalizedCategory || CATEGORY_NAMES[0] || '';
+      : CATEGORY_NAMES[0] || '';
 
   const categorySubcategories = getSubcategoryOptions(category);
 
