@@ -13,6 +13,7 @@ describe('MonthSelectorComponent', () => {
 
     fixture = TestBed.createComponent(MonthSelectorComponent);
     component = fixture.componentInstance;
+    fixture.componentRef.setInput('months', []);
     await fixture.whenStable();
   });
 

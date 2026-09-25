@@ -86,23 +86,23 @@ describe('UtilitySumComponent', () => {
     await fixture.whenStable();
   });
 
-  it('keeps monthly utilities unchanged but converts bi/tri-monthly bills to a monthly equivalent', () => {
+  it('shows monthly equivalents by default and supports per-bill averages', () => {
     const internet = component.utilityAverages().find((item) => item.label === 'Internet');
     const water = component.utilityAverages().find((item) => item.label === 'Water');
     const energy = component.utilityAverages().find((item) => item.label === 'Energy');
 
-    expect(internet?.average).toBe(70);
-    expect(water?.average).toBe(90);
+    expect(internet?.average).toBe(35);
+    expect(water?.average).toBe(30);
     expect(energy?.average).toBe(50);
 
-    component.viewMode.set('monthly');
+    component.viewMode.set('bill');
 
     const monthInternet = component.utilityAverages().find((item) => item.label === 'Internet');
     const monthWater = component.utilityAverages().find((item) => item.label === 'Water');
     const monthEnergy = component.utilityAverages().find((item) => item.label === 'Energy');
 
-    expect(monthInternet?.average).toBe(35);
-    expect(monthWater?.average).toBe(30);
+    expect(monthInternet?.average).toBe(70);
+    expect(monthWater?.average).toBe(90);
     expect(monthEnergy?.average).toBe(50);
   });
 });

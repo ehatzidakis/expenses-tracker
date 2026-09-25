@@ -13,6 +13,7 @@ describe('OverviewCardComponent', () => {
 
     fixture = TestBed.createComponent(OverviewCardComponent);
     component = fixture.componentInstance;
+    fixture.componentRef.setInput('totalSpend', 0);
     await fixture.whenStable();
   });
 

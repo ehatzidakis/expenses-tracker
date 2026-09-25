@@ -42,7 +42,7 @@ describe('PagedEntriesListComponent', () => {
     fixture.detectChanges();
     await fixture.whenStable();
 
-    expect(transactionService.fetchPageByCategory).toHaveBeenCalledWith('Food', null, true, undefined);
+    expect(transactionService.fetchPageByCategory).toHaveBeenCalledWith('Food', null, true, null);
   });
 
   it('uses the selected subcategory id when fetching category entries', async () => {

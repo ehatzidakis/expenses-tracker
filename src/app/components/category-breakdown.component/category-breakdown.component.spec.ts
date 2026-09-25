@@ -43,6 +43,7 @@ describe('CategoryBreakdownComponent', () => {
 
     fixture = TestBed.createComponent(CategoryBreakdownComponent);
     component = fixture.componentInstance;
+    fixture.componentRef.setInput('categories', []);
     await fixture.whenStable();
   });
 
