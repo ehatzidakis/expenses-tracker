@@ -330,6 +330,17 @@ export class ExpenseStateService {
     if (!expense) return [];
 
     const rawList = this.expensesQuery.data() ?? [];
+    return this.buildCategoryBreakdown(expense, rawList);
+  });
+
+  readonly allTimeCategoryBreakdown = computed<CategorySpend[]>(() => {
+    const allTimeExpense = this.processedExpenses().find((expense) => expense.id === 'ALL');
+    if (!allTimeExpense) return [];
+
+    return this.buildCategoryBreakdown(allTimeExpense, this.expensesQuery.data() ?? []);
+  });
+
+  private buildCategoryBreakdown(expense: Expense, rawList: Expense[]): CategorySpend[] {
     const totalMonthsCount = rawList.length;
     const isAllTime = expense.id === 'ALL';
 
@@ -365,7 +376,7 @@ export class ExpenseStateService {
         isOverBudget,
       };
     });
-  });
+  }
 
   readonly totalMonthlySpend = computed(() => {
     return this.categoryBreakdown().reduce((sum, item) => sum + item.amount, 0);
