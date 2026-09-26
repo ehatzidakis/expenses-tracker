@@ -21,18 +21,26 @@ interface MonthSummary {
         <article class="space-y-3 rounded-xl border border-gray-800/60 bg-amber-50/5 px-3 py-3">
           <div class="flex items-center justify-between gap-3">
             <h3 class="font-medium text-sm text-gray-200">{{ month.name }}</h3>
-            <span class="text-xs text-gray-400 tabular-nums">
-              €{{ month.saved | number: '1.2-2' }} saved
+            <span class="text-xs text-gray-500 tabular-nums">
+              Wage €{{ month.wage | number: '1.2-2' }}
             </span>
           </div>
-          <div class="grid grid-cols-2 gap-2 text-xs">
-            <div class="rounded-lg bg-gray-950/50 px-2.5 py-2">
-              <span class="block text-gray-500">Wage</span>
-              <span class="text-gray-200 tabular-nums">€{{ month.wage | number: '1.2-2' }}</span>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <span class="block text-[10px] uppercase tracking-wider text-gray-500">Saved</span>
+              <span
+                class="saved-amount text-xl font-semibold tabular-nums"
+                [class.text-emerald-300]="month.saved >= 0"
+                [class.text-red-300]="month.saved < 0"
+              >
+                €{{ month.saved | number: '1.2-2' }}
+              </span>
             </div>
-            <div class="rounded-lg bg-gray-950/50 px-2.5 py-2">
-              <span class="block text-gray-500">Spend</span>
-              <span class="text-gray-200 tabular-nums">€{{ month.spend | number: '1.2-2' }}</span>
+            <div class="text-right">
+              <span class="block text-[10px] uppercase tracking-wider text-gray-500">Spend</span>
+              <span class="text-lg font-medium text-gray-200 tabular-nums">
+                €{{ month.spend | number: '1.2-2' }}
+              </span>
             </div>
           </div>
           @if (month.adjustments.length) {
@@ -98,17 +106,13 @@ export class MonthBreakdownComponent {
           (adjustment) =>
             this.monthKeyFromDate(adjustment.endDate) === this.monthKey(expense.MonthName),
         );
-        const adjustmentTotal = adjustments.reduce(
-          (sum, adjustment) => sum + (adjustment.adjType ? adjustment.amount : -adjustment.amount),
-          0,
-        );
         const wage = Number(expense.TotalWage) || 0;
 
         return {
           name: expense.MonthName,
           wage,
           spend,
-          saved: wage - spend + adjustmentTotal,
+          saved: wage - spend,
           adjustments,
         };
       });
