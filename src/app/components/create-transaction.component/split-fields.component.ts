@@ -49,6 +49,65 @@ export interface CreateSplitState {
       </div>
 
       @if (state().goesSplitzes) {
+        <div class="space-y-2">
+          <label class="text-xs font-medium text-gray-400">Split With</label>
+          <div class="flex flex-wrap gap-2">
+            @for (person of people(); track person.id) {
+              <button
+                type="button"
+                (click)="togglePerson(person.id)"
+                class="flex items-center gap-1.5 px-3 py-2 rounded-full text-xs font-semibold border transition-all duration-150 cursor-pointer"
+                [class.bg-teal-500/20]="state().splitWith.includes(person.id)"
+                [class.border-teal-500/40]="state().splitWith.includes(person.id)"
+                [class.text-teal-400]="state().splitWith.includes(person.id)"
+                [class.bg-gray-800/60]="!state().splitWith.includes(person.id)"
+                [class.border-gray-700/50]="!state().splitWith.includes(person.id)"
+                [class.text-gray-400]="!state().splitWith.includes(person.id)"
+              >
+                {{ person.name }}
+              </button>
+            }
+          </div>
+        </div>
+
+        @if (state().splitWith.length > 0) {
+          <div class="space-y-1.5">
+            <label class="text-xs font-medium text-gray-400">Paid By</label>
+            <div class="flex flex-wrap gap-2">
+              @for (opt of paidByOptions(); track opt.id) {
+                <button
+                  type="button"
+                  (click)="setPaidBy(opt.id)"
+                  [attr.aria-pressed]="state().paidById === opt.id"
+                  class="flex items-center gap-1.5 px-3 py-2 rounded-full text-xs font-semibold border transition-all duration-150 cursor-pointer"
+                  [class.bg-teal-500/20]="state().paidById === opt.id"
+                  [class.border-teal-500/40]="state().paidById === opt.id"
+                  [class.text-teal-400]="state().paidById === opt.id"
+                  [class.bg-gray-800/60]="state().paidById !== opt.id"
+                  [class.border-gray-700/50]="state().paidById !== opt.id"
+                  [class.text-gray-400]="state().paidById !== opt.id"
+                >
+                  {{ opt.label }}
+                </button>
+              }
+            </div>
+          </div>
+
+          @if (!state().customSplitMode) {
+            <div class="p-3 bg-teal-950/30 border border-teal-800/40 rounded-xl space-y-1">
+              <p class="text-xs font-medium text-teal-400">Split preview</p>
+              <p class="text-xs text-gray-400">
+                Your share:
+                <span class="text-white font-semibold"
+                  >€{{ (amount() / (state().splitWith.length + 1)).toFixed(2) }}</span
+                ><span class="text-gray-500">
+                  (1 of {{ state().splitWith.length + 1 }} people)</span
+                >
+              </p>
+            </div>
+          }
+        }
+
         @if (allowCustom()) {
           <div class="space-y-1.5">
             <label class="text-xs font-medium text-gray-400">Split Mode</label>
@@ -112,60 +171,6 @@ export interface CreateSplitState {
             }
           </div>
         }
-
-        <div class="space-y-2">
-          <label class="text-xs font-medium text-gray-400">Split With</label>
-          <div class="flex flex-wrap gap-2">
-            @for (person of people(); track person.id) {
-              <button
-                type="button"
-                (click)="togglePerson(person.id)"
-                class="flex items-center gap-1.5 px-3 py-2 rounded-full text-xs font-semibold border transition-all duration-150 cursor-pointer"
-                [class.bg-teal-500/20]="state().splitWith.includes(person.id)"
-                [class.border-teal-500/40]="state().splitWith.includes(person.id)"
-                [class.text-teal-400]="state().splitWith.includes(person.id)"
-                [class.bg-gray-800/60]="!state().splitWith.includes(person.id)"
-                [class.border-gray-700/50]="!state().splitWith.includes(person.id)"
-                [class.text-gray-400]="!state().splitWith.includes(person.id)"
-              >
-                {{ person.name }}
-              </button>
-            }
-          </div>
-        </div>
-
-        @if (state().splitWith.length > 0 && !state().customSplitMode) {
-          <div class="space-y-1.5">
-            <label class="text-xs font-medium text-gray-400">Paid By</label>
-            <div class="flex flex-wrap gap-2">
-              @for (opt of paidByOptions(); track opt.id) {
-                <button
-                  type="button"
-                  (click)="setPaidBy(opt.id)"
-                  [attr.aria-pressed]="state().paidById === opt.id"
-                  class="flex items-center gap-1.5 px-3 py-2 rounded-full text-xs font-semibold border transition-all duration-150 cursor-pointer"
-                  [class.bg-teal-500/20]="state().paidById === opt.id"
-                  [class.border-teal-500/40]="state().paidById === opt.id"
-                  [class.text-teal-400]="state().paidById === opt.id"
-                  [class.bg-gray-800/60]="state().paidById !== opt.id"
-                  [class.border-gray-700/50]="state().paidById !== opt.id"
-                  [class.text-gray-400]="state().paidById !== opt.id"
-                >
-                  {{ opt.label }}
-                </button>
-              }
-            </div>
-          </div>
-          <div class="p-3 bg-teal-950/30 border border-teal-800/40 rounded-xl space-y-1">
-            <p class="text-xs font-medium text-teal-400">Split preview</p>
-            <p class="text-xs text-gray-400">
-              Your share:
-              <span class="text-white font-semibold"
-                >€{{ (amount() / (state().splitWith.length + 1)).toFixed(2) }}</span
-              ><span class="text-gray-500"> (1 of {{ state().splitWith.length + 1 }} people)</span>
-            </p>
-          </div>
-        }
       }
     </div>
   `,
@@ -223,11 +228,18 @@ export class SplitFieldsComponent {
   }
 
   setCustom(custom: boolean): void {
+    const currentPaidBy = this.state().paidById;
+    const paidById =
+      currentPaidBy === 'me' ||
+      (typeof currentPaidBy === 'number' && this.state().splitWith.includes(currentPaidBy))
+        ? currentPaidBy
+        : 'me';
+
     this.emit({
       ...this.state(),
       goesSplitzes: true,
       customSplitMode: custom,
-      paidById: custom ? 'me' : this.state().paidById,
+      paidById,
     });
   }
 

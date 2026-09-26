@@ -91,6 +91,37 @@ describe('splitz debt calculations', () => {
     ]);
   });
 
+  it('makes me owe the selected payer only my custom share', () => {
+    const tx: Transaction = {
+      id: 'tx-custom-paid-by-person',
+      monthName: 'September 2026',
+      date: '2026-09-26',
+      description: 'Dinner',
+      amount: 5,
+      category: 'Food',
+      createdAt: '2026-09-26T00:00:00.000Z',
+      isSplit: true,
+      paidBy: 2,
+      splitBy: [2],
+      splitType: 'custom',
+      totalAmount: 15,
+      customSplitAmounts: { me: 5, 2: 10 },
+      splitPaidPersonIds: [],
+    };
+
+    expect(computeSplitDebtEntries(tx)).toEqual([
+      {
+        transactionId: 'tx-custom-paid-by-person',
+        description: 'Dinner',
+        date: '2026-09-26',
+        debtorId: 'me',
+        creditorId: 2,
+        amount: 5,
+        paid: false,
+      },
+    ]);
+  });
+
   it('keeps even splits on the standard split path', () => {
     const tx: Transaction = {
       id: 'tx-2',
@@ -161,8 +192,8 @@ describe('splitz debt calculations', () => {
     expect(resolvePendingCategoryOptions({ category: 'Food', adjustmentId: 'trip-1' })).toContain(
       'Food',
     );
-    expect(resolvePendingCategoryOptions({ category: 'Accommodation', adjustmentId: 'trip-1' })).toContain(
-      'Accommodation',
-    );
+    expect(
+      resolvePendingCategoryOptions({ category: 'Accommodation', adjustmentId: 'trip-1' }),
+    ).toContain('Accommodation');
   });
 });
