@@ -1,29 +1,64 @@
+import { CommonModule } from '@angular/common';
 import { Component, computed, effect, inject, input, signal } from '@angular/core';
+import { Adjustment } from '../../models/adjustments.model';
+import { Expense } from '../../models/expenses.model';
 import { CategorySpend } from '../../services/expense-state.service';
 import { TransactionService } from '../../services/transaction-service';
 import { CategoryBreakdownItemComponent } from './category-breakdown-item';
+import { MonthBreakdownComponent } from '../month-breakdown/month-breakdown.component';
 
 @Component({
   selector: 'app-category-breakdown',
   standalone: true,
-  imports: [CategoryBreakdownItemComponent],
+  imports: [CommonModule, CategoryBreakdownItemComponent, MonthBreakdownComponent],
   host: { class: 'block' },
   template: `
     <section
       class="bg-gray-900/60 border border-gray-800/80 rounded-2xl p-2 space-y-4 backdrop-blur-sm"
     >
-      <div class="space-y-2">
-        @for (category of categories(); track category.name) {
-          <app-category-breakdown-item
-            [category]="category"
-            [monthName]="monthName()"
-            [transactionCount]="transactionCounts()[category.name] ?? 0"
-            [expanded]="expandedCategory() === category.name"
-            (toggle)="toggleCategory(category.name)"
-            (changed)="onEditFinished()"
-          />
-        }
-      </div>
+      @if (showMonthView()) {
+        <div class="flex justify-center">
+          <div class="inline-flex rounded-full border border-gray-700/80 bg-gray-950/60 p-1">
+            <button
+              type="button"
+              class="rounded-full px-4 py-1.5 text-xs font-medium transition-colors"
+              [class.bg-gray-700]="viewMode() === 'category'"
+              [class.text-white]="viewMode() === 'category'"
+              [class.text-gray-400]="viewMode() !== 'category'"
+              (click)="viewMode.set('category')"
+            >
+              Category
+            </button>
+            <button
+              type="button"
+              class="rounded-full px-4 py-1.5 text-xs font-medium transition-colors"
+              [class.bg-gray-700]="viewMode() === 'month'"
+              [class.text-white]="viewMode() === 'month'"
+              [class.text-gray-400]="viewMode() !== 'month'"
+              (click)="viewMode.set('month')"
+            >
+              Month
+            </button>
+          </div>
+        </div>
+      }
+
+      @if (viewMode() === 'month' && showMonthView()) {
+        <app-month-breakdown [months]="months()" [adjustments]="adjustments()" />
+      } @else {
+        <div class="space-y-2">
+          @for (category of categories(); track category.name) {
+            <app-category-breakdown-item
+              [category]="category"
+              [monthName]="monthName()"
+              [transactionCount]="transactionCounts()[category.name] ?? 0"
+              [expanded]="expandedCategory() === category.name"
+              (toggle)="toggleCategory(category.name)"
+              (changed)="onEditFinished()"
+            />
+          }
+        </div>
+      }
     </section>
   `,
 })
@@ -32,6 +67,11 @@ export class CategoryBreakdownComponent {
 
   readonly categories = input.required<CategorySpend[]>();
   readonly monthName = input<string>('');
+  readonly months = input<Expense[]>([]);
+  readonly adjustments = input<Adjustment[]>([]);
+  readonly viewMode = signal<'category' | 'month'>('category');
+
+  readonly showMonthView = computed(() => this.months().length > 0);
 
   readonly budgetTitle = computed(() => {
     const month = this.monthName().trim();
