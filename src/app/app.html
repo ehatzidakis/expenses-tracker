@@ -162,7 +162,11 @@
               >
               </app-overview-card>
 
-              <app-category-breakdown [categories]="state.categoryBreakdown()">
+              <app-category-breakdown
+                [categories]="state.allTimeCategoryBreakdown()"
+                [months]="state.expensesQuery.data() ?? []"
+                [adjustments]="adjustmentsQuery.data() ?? []"
+              >
               </app-category-breakdown>
             }
           }
