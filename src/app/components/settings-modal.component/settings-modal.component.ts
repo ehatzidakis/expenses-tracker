@@ -12,6 +12,7 @@ import { SettingsModalHeaderComponent } from './settings-modal-header.component'
 import { SignOutActionComponent } from './sign-out-action.component';
 import { StealthModeSettingComponent } from './stealth-mode-setting.component';
 import { StealthPasscodeSettingComponent } from './stealth-passcode-setting.component';
+import { DataExportSettingComponent } from './data-export-setting.component';
 
 type PinAction = 'none' | 'set' | 'remove' | 'unlock-to-disable';
 
@@ -26,6 +27,7 @@ type PinAction = 'none' | 'set' | 'remove' | 'unlock-to-disable';
     SignOutActionComponent,
     StealthModeSettingComponent,
     StealthPasscodeSettingComponent,
+    DataExportSettingComponent,
   ],
   template: `
     <div
@@ -89,6 +91,8 @@ type PinAction = 'none' | 'set' | 'remove' | 'unlock-to-disable';
             (submitted)="handleRemovePin()"
           />
         }
+
+        <app-data-export-setting />
 
         <app-sign-out-action (signOut)="handleSignOut()" />
 

@@ -3,7 +3,7 @@ import { Component, output } from '@angular/core';
 @Component({
   selector: 'app-sign-out-action',
   standalone: true,
-  host: { class: 'block' },
+  host: { class: 'block mt-3' },
   template: `
     <div class="space-y-3">
       <button
