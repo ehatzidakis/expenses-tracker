@@ -73,16 +73,13 @@ export class SplitzesModalComponent {
   readonly editingPendingId = signal<string | null>(null);
   readonly settlementConfirmation = signal<{
     personId: number;
-    direction: 'person-pays-me' | 'i-pay-person';
     debts: DebtEntry[];
+    netWithMe: number;
   } | null>(null);
+  readonly showSettlementTransactions = signal(false);
   readonly settlementNote = signal('');
-  readonly reminderDraft = signal<{ personId: number; debt: DebtEntry } | null>(null);
-  readonly reminderDate = signal('');
-  readonly reminderNote = signal('');
   readonly settlementMessage = signal<string | null>(null);
   readonly allPeople = PEOPLE;
-  readonly today = new Date().toISOString().slice(0, 10);
 
   readonly getPendingCategoryOptions = (pending: PendingTransaction): string[] =>
     resolvePendingCategoryOptions(pending);
@@ -109,6 +106,10 @@ export class SplitzesModalComponent {
     return total + debt.amount;
   }
 
+  absoluteAmount(amount: number): string {
+    return Math.abs(amount).toFixed(2);
+  }
+
   requestSettlement(personId: number, direction: 'person-pays-me' | 'i-pay-person'): void {
     const debts = this.splitzService.getDebtsToSettle(
       personId,
@@ -117,16 +118,28 @@ export class SplitzesModalComponent {
     );
     if (debts.length === 0) return;
     this.settlementNote.set('');
-    this.settlementConfirmation.set({ personId, direction, debts });
+    const netWithMe =
+      direction === 'person-pays-me'
+        ? debts.reduce(this.sumDebt, 0)
+        : -debts.reduce(this.sumDebt, 0);
+    this.settlementConfirmation.set({ personId, debts, netWithMe });
   }
 
   requestNetSettlement(personId: number, netWithMe: number): void {
-    this.requestSettlement(personId, netWithMe > 0 ? 'person-pays-me' : 'i-pay-person');
+    const debts = this.splitzService.getDebtsBetweenMeAndPerson(
+      personId,
+      this.splitTxQuery.data() ?? [],
+    );
+    if (debts.length === 0) return;
+    this.settlementNote.set('');
+    this.showSettlementTransactions.set(false);
+    this.settlementConfirmation.set({ personId, debts, netWithMe });
   }
 
   cancelSettlement(): void {
     this.settlementConfirmation.set(null);
     this.settlementNote.set('');
+    this.showSettlementTransactions.set(false);
   }
 
   async confirmSettlement(): Promise<void> {
@@ -148,42 +161,6 @@ export class SplitzesModalComponent {
       this.settlementMessage.set('Unable to record settlement. Please try again.');
     } finally {
       this.markingPersonId.set(null);
-    }
-  }
-
-  requestReminder(personId: number): void {
-    const summary = this.personSummaries().find((item) => item.person.id === personId);
-    const direction = summary && summary.netWithMe < 0 ? 'i-pay-person' : 'person-pays-me';
-    const debt = this.splitzService.getDebtsToSettle(
-      personId,
-      this.splitTxQuery.data() ?? [],
-      direction,
-    )[0];
-    if (!debt) return;
-    this.reminderDraft.set({ personId, debt });
-    this.reminderDate.set('');
-    this.reminderNote.set('');
-  }
-
-  cancelReminderDraft(): void {
-    this.reminderDraft.set(null);
-    this.reminderDate.set('');
-    this.reminderNote.set('');
-  }
-
-  async saveReminder(): Promise<void> {
-    const draft = this.reminderDraft();
-    const date = this.reminderDate();
-    if (!draft || !date || date < new Date().toISOString().slice(0, 10)) return;
-
-    try {
-      await this.settlementService.createReminder(draft.debt, date, this.reminderNote());
-      await this.queryClient.invalidateQueries({ queryKey: ['splitzSettlementHistory'] });
-      this.settlementMessage.set('Reminder saved.');
-      this.cancelReminderDraft();
-    } catch (error) {
-      console.error('Unable to save Splitzes reminder:', error);
-      this.settlementMessage.set('Unable to save reminder. Please try again.');
     }
   }
 

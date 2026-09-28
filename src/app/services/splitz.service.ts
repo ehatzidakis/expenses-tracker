@@ -93,6 +93,18 @@ export class SplitzService {
     return selectDebtsToSettle(this.computeAllDebts(transactions), personId, direction);
   }
 
+  getDebtsBetweenMeAndPerson(personId: number, transactions: Transaction[]): DebtEntry[] {
+    const debts = this.computeAllDebts(transactions);
+    return debts.filter((debt) => {
+      if (debt.paid) return false;
+
+      return (
+        (debt.debtorId === personId && debt.creditorId === 'me') ||
+        (debt.debtorId === 'me' && debt.creditorId === personId)
+      );
+    });
+  }
+
   /**
    * Marks the outstanding debt between Person X and me as settled.
    */

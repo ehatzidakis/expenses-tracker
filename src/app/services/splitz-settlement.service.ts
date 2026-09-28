@@ -56,28 +56,7 @@ export class SplitzSettlementService {
     );
   }
 
-  async createReminder(debt: DebtEntry, reminderAt: string, note?: string): Promise<void> {
-    const uid = this.requireUid();
-    const createdAt = new Date().toISOString();
-    const id = this.recordId('reminder', debt);
-    const record: SplitzSettlementRecord = {
-      id,
-      recordType: 'reminder',
-      transactionId: debt.transactionId,
-      description: debt.description,
-      date: debt.date,
-      debtorId: debt.debtorId,
-      creditorId: debt.creditorId,
-      amount: debt.amount,
-      note: note?.trim() || undefined,
-      reminderAt,
-      createdAt,
-      createdByUid: uid,
-    };
-    await setDoc(doc(db, 'splitzSettlements', id), record, { merge: true });
-  }
-
-  private recordId(type: 'settlement' | 'reminder', debt: DebtEntry): string {
+  private recordId(type: 'settlement', debt: DebtEntry): string {
     return [
       type,
       debt.transactionId,

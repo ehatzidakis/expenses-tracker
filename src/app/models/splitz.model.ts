@@ -53,7 +53,7 @@ export type SplitzParticipant = 'me' | number;
 
 export interface SplitzSettlementRecord {
   id: string;
-  recordType: 'settlement' | 'reminder';
+  recordType: 'settlement';
   transactionId?: string;
   description?: string;
   date?: string;
@@ -61,7 +61,6 @@ export interface SplitzSettlementRecord {
   creditorId: SplitzParticipant;
   amount: number;
   note?: string;
-  reminderAt?: string;
   settledAt?: string;
   createdAt: string;
   createdByUid: string;
