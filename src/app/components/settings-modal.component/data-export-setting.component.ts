@@ -65,7 +65,6 @@ export class DataExportSettingComponent {
   private readonly exportService = inject(ExportService);
   private readonly adjustmentService = inject(AdjustmentService);
   private readonly transactionService = inject(TransactionService);
-  private readonly adjustmentsQuery = this.adjustmentService.getAdjustmentsQuery();
 
   readonly loading = signal(false);
   readonly message = signal<string | null>(null);
@@ -83,10 +82,7 @@ export class DataExportSettingComponent {
 
   async downloadAdjustments(format: 'csv' | 'json'): Promise<void> {
     await this.runExport(async () => {
-      const adjustments = this.adjustmentsQuery.data() ?? [];
-      if (this.adjustmentsQuery.isPending()) {
-        throw new Error('One-offs are still loading.');
-      }
+      const adjustments = await this.adjustmentService.fetchAllAdjustmentsForExport();
 
       return this.exportService.downloadAdjustments(
         adjustments.map((adjustment) => this.toExportAdjustment(adjustment)),

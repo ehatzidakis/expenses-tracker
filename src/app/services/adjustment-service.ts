@@ -36,40 +36,47 @@ export class AdjustmentService {
       return {
         queryKey: ['adjustments', uid],
         enabled: !!uid,
-        queryFn: async (): Promise<Adjustment[]> => {
-          try {
-            // Reference the 'adjustments' collection in your Firestore DB
-            const adjustmentsRef = collection(db, 'adjustments');
-            const snapshot = await getDocs(adjustmentsRef);
-
-            // Map the Firestore documents into your Adjustment interface
-            return snapshot.docs.map((doc) => {
-              const data = doc.data();
-              const rawStartDate = data['startDate'];
-              const rawEndDate = data['endDate'];
-
-              return {
-                id: doc.id, // Firestore's auto-generated ID
-                title: data['title'],
-                adjType: Boolean(data['adjType']),
-                amount: Number(data['amount']) || 0,
-                startDate:
-                  rawStartDate instanceof Timestamp
-                    ? rawStartDate.toDate()
-                    : new Date(rawStartDate),
-                endDate:
-                  rawEndDate instanceof Timestamp ? rawEndDate.toDate() : new Date(rawEndDate),
-                isTrip: Boolean(data['isTrip']),
-                isSelectable: Boolean(data['isSelectable']),
-              } as Adjustment;
-            });
-          } catch (err) {
-            console.error('Firestore Fetch Error:', err);
-            throw err;
-          }
-        },
+        queryFn: async (): Promise<Adjustment[]> => this.fetchAllAdjustments(),
       };
     });
+  }
+
+  async fetchAllAdjustmentsForExport(): Promise<Adjustment[]> {
+    return this.fetchAllAdjustments();
+  }
+
+  private async fetchAllAdjustments(): Promise<Adjustment[]> {
+    try {
+      const adjustmentsRef = collection(db, 'adjustments');
+      const snapshot = await getDocs(adjustmentsRef);
+
+      return snapshot.docs.map((adjustmentDoc) =>
+        this.mapAdjustment(adjustmentDoc.id, adjustmentDoc.data()),
+      );
+    } catch (err) {
+      console.error('Firestore Fetch Error:', err);
+      throw err;
+    }
+  }
+
+  private mapAdjustment(id: string, data: Record<string, unknown>): Adjustment {
+    const rawStartDate = data['startDate'];
+    const rawEndDate = data['endDate'];
+
+    return {
+      id,
+      title: data['title'],
+      adjType: Boolean(data['adjType']),
+      amount: Number(data['amount']) || 0,
+      startDate:
+        rawStartDate instanceof Timestamp
+          ? rawStartDate.toDate()
+          : new Date(rawStartDate as string),
+      endDate:
+        rawEndDate instanceof Timestamp ? rawEndDate.toDate() : new Date(rawEndDate as string),
+      isTrip: Boolean(data['isTrip']),
+      isSelectable: Boolean(data['isSelectable']),
+    } as Adjustment;
   }
 
   async createAdjustment(input: NewAdjustmentInput): Promise<string> {
