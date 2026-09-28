@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { Transaction } from '../models/transaction.model';
-import { computeSplitDebtEntries } from './splitz.service';
+import { computeSplitDebtEntries, selectDebtsToSettle } from './splitz.service';
 import {
   normalizePendingSplitOverride,
   resolvePendingCategoryOptions,
@@ -8,6 +8,32 @@ import {
 } from './transaction-service';
 
 describe('splitz debt calculations', () => {
+  it('selects only the confirmed settlement direction', () => {
+    const debts = [
+      {
+        transactionId: 'tx-direction',
+        description: 'Dinner',
+        date: '2026-09-18',
+        debtorId: 1,
+        creditorId: 'me' as const,
+        amount: 10,
+        paid: false,
+      },
+      {
+        transactionId: 'tx-direction',
+        description: 'Dinner',
+        date: '2026-09-18',
+        debtorId: 'me' as const,
+        creditorId: 1,
+        amount: 5,
+        paid: false,
+      },
+    ];
+
+    expect(selectDebtsToSettle(debts, 1, 'person-pays-me')).toEqual([debts[0]]);
+    expect(selectDebtsToSettle(debts, 1, 'i-pay-person')).toEqual([debts[1]]);
+  });
+
   it('supports standard split transactions', () => {
     const tx: Transaction = {
       id: 'tx-1',

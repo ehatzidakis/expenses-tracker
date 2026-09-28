@@ -420,6 +420,122 @@
       </div>
     }
 
+    @if (settlementMessage(); as message) {
+      <p class="rounded-xl border border-teal-500/30 bg-teal-950/20 p-3 text-xs text-teal-200">
+        {{ message }}
+      </p>
+    }
+
+    @if (settlementConfirmation(); as confirmation) {
+      <div class="rounded-xl border border-amber-500/40 bg-amber-950/20 p-4 space-y-3">
+        <div>
+          <p class="text-sm font-semibold text-amber-100">Confirm settlement</p>
+          <p class="mt-1 text-xs text-amber-200/80">
+            {{
+              confirmation.direction === 'person-pays-me'
+                ? 'Settling debts owed by'
+                : 'Settling my debts to'
+            }}
+            {{ participantName(confirmation.personId) }}: €{{
+              confirmation.debts.reduce(sumDebt, 0).toFixed(2)
+            }}
+            across {{ confirmation.debts.length }} entries.
+          </p>
+        </div>
+        <textarea
+          rows="2"
+          [value]="settlementNote()"
+          (input)="settlementNote.set($any($event.target).value)"
+          placeholder="Optional settlement note"
+          class="w-full resize-none rounded-lg border border-gray-700 bg-gray-800/70 px-2 py-1.5 text-xs text-white"
+        ></textarea>
+        <div class="flex gap-2">
+          <button
+            type="button"
+            (click)="confirmSettlement()"
+            [disabled]="markingPersonId() !== null"
+            class="rounded-full border border-emerald-500/30 bg-emerald-500/15 px-3 py-1.5 text-xs text-emerald-300 disabled:opacity-50"
+          >
+            Confirm settlement
+          </button>
+          <button
+            type="button"
+            (click)="cancelSettlement()"
+            class="rounded-full border border-gray-700 bg-gray-800/70 px-3 py-1.5 text-xs text-gray-300"
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    }
+
+    @if (reminderDraft(); as reminder) {
+      <div class="rounded-xl border border-sky-500/30 bg-sky-950/20 p-4 space-y-3">
+        <div>
+          <p class="text-sm font-semibold text-sky-100">Set a payment reminder</p>
+          <p class="mt-1 text-xs text-sky-200/80">
+            {{ reminder.debt.description }} · €{{ reminder.debt.amount.toFixed(2) }}
+          </p>
+        </div>
+        <input
+          type="date"
+          [value]="reminderDate()"
+          [min]="today"
+          (input)="reminderDate.set($any($event.target).value)"
+          class="w-full rounded-lg border border-gray-700 bg-gray-800/70 px-2 py-1.5 text-xs text-white"
+        />
+        <input
+          type="text"
+          [value]="reminderNote()"
+          (input)="reminderNote.set($any($event.target).value)"
+          placeholder="Optional reminder note"
+          class="w-full rounded-lg border border-gray-700 bg-gray-800/70 px-2 py-1.5 text-xs text-white"
+        />
+        <div class="flex gap-2">
+          <button
+            type="button"
+            (click)="saveReminder()"
+            [disabled]="!reminderDate()"
+            class="rounded-full border border-sky-500/30 bg-sky-500/15 px-3 py-1.5 text-xs text-sky-300 disabled:opacity-50"
+          >
+            Save reminder
+          </button>
+          <button
+            type="button"
+            (click)="cancelReminderDraft()"
+            class="rounded-full border border-gray-700 bg-gray-800/70 px-3 py-1.5 text-xs text-gray-300"
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    }
+
+    @if (settlementHistoryQuery.isPending()) {
+      <p class="text-xs text-gray-500">Loading settlement history...</p>
+    } @else if (settlementHistory().length > 0) {
+      <section class="rounded-xl border border-gray-800/80 bg-gray-950/30 p-3 space-y-2">
+        <h3 class="text-xs font-semibold uppercase tracking-[0.12em] text-gray-400">History</h3>
+        @for (record of settlementHistory(); track record.id) {
+          <div
+            class="flex items-start justify-between gap-3 border-t border-gray-800/70 pt-2 first:border-t-0 first:pt-0"
+          >
+            <div class="min-w-0">
+              <p class="truncate text-xs text-gray-200">
+                {{ record.recordType === 'reminder' ? 'Reminder' : 'Settled' }} ·
+                {{ record.description }}
+              </p>
+              <p class="text-[10px] text-gray-500">
+                {{ participantName(record.debtorId) }} → {{ participantName(record.creditorId) }} ·
+                {{ record.settledAt ?? record.reminderAt | date: 'dd/MM/yyyy' }}
+              </p>
+            </div>
+            <span class="shrink-0 text-xs text-gray-300">€{{ record.amount.toFixed(2) }}</span>
+          </div>
+        }
+      </section>
+    }
+
     <!-- Person Cards -->
     @if (!isLoading() && !isError()) {
       <div class="flex flex-col gap-3">
@@ -475,38 +591,27 @@
             }
 
             <!-- Action buttons -->
-            @if (summary.hasUnsettledDebts || summary.iOweThisPerson) {
+            @if (summary.netWithMe !== 0) {
               <div class="ml-12 flex flex-wrap gap-2 pt-1">
-                <!-- Mark person's debts as settled (they paid what they owe) -->
-                @if (summary.hasUnsettledDebts || summary.iOweThisPerson) {
-                  <button
-                    type="button"
-                    (click)="onMarkPersonSettled(summary.person.id)"
-                    [disabled]="markingPersonId() !== null"
-                    class="text-xs px-3 py-1 rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/25 disabled:opacity-50 disabled:cursor-not-allowed transition-colors cursor-pointer"
-                  >
-                    @if (markingPersonId() === summary.person.id) {
-                      Settling…
-                    } @else {
-                      ✓ Mark debt settled
-                    }
-                  </button>
-                }
-                <!-- Mark my debt to this person as paid -->
-                <!-- @if (summary.iOweThisPerson) {
-                  <button
-                    type="button"
-                    (click)="onMarkMePaid(summary.person.id)"
-                    [disabled]="markingPersonId() !== null"
-                    class="text-xs px-3 py-1 rounded-full bg-amber-500/15 text-amber-400 border border-amber-500/30 hover:bg-amber-500/25 disabled:opacity-50 disabled:cursor-not-allowed transition-colors cursor-pointer"
-                  >
-                    @if (markingPersonId() === summary.person.id) {
-                      Settling…
-                    } @else {
-                      ✓ Mark I paid {{ summary.person.name }}
-                    }
-                  </button>
-                } -->
+                <button
+                  type="button"
+                  (click)="requestNetSettlement(summary.person.id, summary.netWithMe)"
+                  [disabled]="markingPersonId() !== null"
+                  class="text-xs px-3 py-1 rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/25 disabled:opacity-50 disabled:cursor-not-allowed transition-colors cursor-pointer"
+                >
+                  @if (markingPersonId() === summary.person.id) {
+                    Settling…
+                  } @else {
+                    ✓ Mark debt settled
+                  }
+                </button>
+                <button
+                  type="button"
+                  (click)="requestReminder(summary.person.id)"
+                  class="text-xs px-3 py-1 rounded-full bg-sky-500/15 text-sky-300 border border-sky-500/30 hover:bg-sky-500/25 transition-colors cursor-pointer"
+                >
+                  Set reminder
+                </button>
               </div>
             }
           </div>
