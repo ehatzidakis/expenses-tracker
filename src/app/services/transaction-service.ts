@@ -733,6 +733,17 @@ export class TransactionService {
     });
   }
 
+  async fetchAllTransactionsForExport(): Promise<Transaction[]> {
+    const snapshot = await getDocs(collection(db, 'transactions'));
+
+    return snapshot.docs
+      .map((document) => this.mapTransaction(document.data(), document.id))
+      .sort((a, b) => {
+        const dateDifference = new Date(b.date).getTime() - new Date(a.date).getTime();
+        return dateDifference || this.getTimestamp(b.createdAt) - this.getTimestamp(a.createdAt);
+      });
+  }
+
   async fetchAllSplitTransactions(): Promise<Transaction[]> {
     const transactionsRef = collection(db, 'transactions');
     const snapshot = await getDocs(query(transactionsRef, where('isSplit', '==', true)));
