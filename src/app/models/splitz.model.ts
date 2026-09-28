@@ -48,3 +48,20 @@ export interface PersonSummary {
   /** True when I have at least one unpaid debt to this person. */
   iOweThisPerson: boolean;
 }
+
+export type SplitzParticipant = 'me' | number;
+
+export interface SplitzSettlementRecord {
+  id: string;
+  recordType: 'settlement';
+  transactionId?: string;
+  description?: string;
+  date?: string;
+  debtorId: SplitzParticipant;
+  creditorId: SplitzParticipant;
+  amount: number;
+  note?: string;
+  settledAt?: string;
+  createdAt: string;
+  createdByUid: string;
+}

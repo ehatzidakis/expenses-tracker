@@ -85,31 +85,34 @@ export class SplitzService {
     });
   }
 
+  getDebtsToSettle(
+    personId: number,
+    transactions: Transaction[],
+    direction: 'person-pays-me' | 'i-pay-person',
+  ): DebtEntry[] {
+    return selectDebtsToSettle(this.computeAllDebts(transactions), personId, direction);
+  }
+
+  getDebtsBetweenMeAndPerson(personId: number, transactions: Transaction[]): DebtEntry[] {
+    const debts = this.computeAllDebts(transactions);
+    return debts.filter((debt) => {
+      if (debt.paid) return false;
+
+      return (
+        (debt.debtorId === personId && debt.creditorId === 'me') ||
+        (debt.debtorId === 'me' && debt.creditorId === personId)
+      );
+    });
+  }
+
   /**
-   * Marks all of Person X's outstanding debts as settled.
-   * Covers debts to 'me' and to peer persons.
+   * Marks the outstanding debt between Person X and me as settled.
    */
   async markPersonSettled(personId: number, transactions: Transaction[]): Promise<void> {
-    const updates: Promise<void>[] = [];
-
-    for (const tx of transactions) {
-      if (!tx.isSplit || !tx.splitBy || tx.paidBy === undefined) continue;
-
-      const paidIds = [...(tx.splitPaidPersonIds ?? [])];
-      let changed = false;
-
-      // Person is a debtor (person in splitBy, didn't pay)
-      if (tx.splitBy.includes(personId) && tx.paidBy !== personId && !paidIds.includes(personId)) {
-        paidIds.push(personId);
-        changed = true;
-      }
-
-      if (changed) {
-        updates.push(this.transactionService.updateSplitPaidPersons(tx.id, paidIds));
-      }
-    }
-
-    await Promise.all(updates);
+    await this.markDebtsSettled(
+      this.getDebtsToSettle(personId, transactions, 'person-pays-me'),
+      transactions,
+    );
   }
 
   /**
@@ -117,21 +120,50 @@ export class SplitzService {
    * Used when I owe this person (they paid and I split with them).
    */
   async markMePaid(personId: number, transactions: Transaction[]): Promise<void> {
-    const ME_ID = 0;
+    await this.markDebtsSettled(
+      this.getDebtsToSettle(personId, transactions, 'i-pay-person'),
+      transactions,
+    );
+  }
+
+  async markDebtsSettled(debts: DebtEntry[], transactions: Transaction[]): Promise<void> {
+    const debtsByTransaction = new Map<string, DebtEntry[]>();
+    for (const debt of debts) {
+      const transactionDebts = debtsByTransaction.get(debt.transactionId) ?? [];
+      transactionDebts.push(debt);
+      debtsByTransaction.set(debt.transactionId, transactionDebts);
+    }
+
     const updates: Promise<void>[] = [];
+    for (const [transactionId, transactionDebts] of debtsByTransaction) {
+      const transaction = transactions.find((item) => item.id === transactionId);
+      if (!transaction) continue;
 
-    for (const tx of transactions) {
-      if (!tx.isSplit || tx.paidBy !== personId) continue;
-
-      const paidIds = [...(tx.splitPaidPersonIds ?? [])];
-      if (!paidIds.includes(ME_ID)) {
-        paidIds.push(ME_ID);
-        updates.push(this.transactionService.updateSplitPaidPersons(tx.id, paidIds));
+      const paidIds = [...(transaction.splitPaidPersonIds ?? [])];
+      for (const debt of transactionDebts) {
+        const paidId = debt.debtorId === 'me' ? 0 : debt.debtorId;
+        if (!paidIds.includes(paidId)) paidIds.push(paidId);
       }
+
+      updates.push(this.transactionService.updateSplitPaidPersons(transactionId, paidIds));
     }
 
     await Promise.all(updates);
   }
+}
+
+export function selectDebtsToSettle(
+  debts: DebtEntry[],
+  personId: number,
+  direction: 'person-pays-me' | 'i-pay-person',
+): DebtEntry[] {
+  return debts.filter((debt) => {
+    if (debt.paid) return false;
+
+    return direction === 'person-pays-me'
+      ? debt.debtorId === personId && debt.creditorId === 'me'
+      : debt.debtorId === 'me' && debt.creditorId === personId;
+  });
 }
 
 /**

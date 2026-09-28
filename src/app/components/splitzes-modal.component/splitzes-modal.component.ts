@@ -1,13 +1,20 @@
+import { CommonModule } from '@angular/common';
 import { Component, computed, inject, output, signal } from '@angular/core';
 import { QueryClient, injectQuery } from '@tanstack/angular-query-experimental';
 import { AuthService } from '../../services/auth.service';
 import { computeSplit, SplitzService } from '../../services/splitz.service';
+import { SplitzSettlementService } from '../../services/splitz-settlement.service';
 import {
   normalizePendingSplitOverride,
   PendingTransaction,
   TransactionService,
 } from '../../services/transaction-service';
-import { PEOPLE, PersonSummary } from '../../models/splitz.model';
+import {
+  DebtEntry,
+  PEOPLE,
+  PersonSummary,
+  SplitzSettlementRecord,
+} from '../../models/splitz.model';
 import {
   categoryRequiresSubcategory,
   getSubcategoryOptions,
@@ -18,6 +25,7 @@ import { resolvePendingCategoryOptions } from '../../services/transaction-servic
 @Component({
   selector: 'app-splitzes-modal',
   standalone: true,
+  imports: [CommonModule],
   templateUrl: './splitzes-modal.component.html',
 })
 export class SplitzesModalComponent {
@@ -25,6 +33,7 @@ export class SplitzesModalComponent {
 
   private authService = inject(AuthService);
   private splitzService = inject(SplitzService);
+  private settlementService = inject(SplitzSettlementService);
   private transactionService = inject(TransactionService);
   private queryClient = inject(QueryClient);
   private splitTxQuery = this.splitzService.getSplitTransactionsQuery();
@@ -32,6 +41,7 @@ export class SplitzesModalComponent {
     queryKey: ['pendingTransactions'],
     queryFn: () => this.transactionService.fetchPendingTransactions(),
   }));
+  readonly settlementHistoryQuery = this.settlementService.getHistoryQuery();
 
   readonly isAdmin = this.authService.isAdmin;
   readonly isLoading = computed(() => this.splitTxQuery.isPending());
@@ -48,6 +58,9 @@ export class SplitzesModalComponent {
     });
   });
   readonly hasPendingTransactions = computed(() => this.pendingTransactions().length > 0);
+  readonly settlementHistory = computed<SplitzSettlementRecord[]>(
+    () => this.settlementHistoryQuery.data() ?? [],
+  );
 
   readonly personSummaries = computed<PersonSummary[]>(() => {
     const txs = this.splitTxQuery.data() ?? [];
@@ -58,6 +71,14 @@ export class SplitzesModalComponent {
   readonly showPendingReview = signal(false);
   readonly isRefreshingPending = signal(false);
   readonly editingPendingId = signal<string | null>(null);
+  readonly settlementConfirmation = signal<{
+    personId: number;
+    debts: DebtEntry[];
+    netWithMe: number;
+  } | null>(null);
+  readonly showSettlementTransactions = signal(false);
+  readonly settlementNote = signal('');
+  readonly settlementMessage = signal<string | null>(null);
   readonly allPeople = PEOPLE;
 
   readonly getPendingCategoryOptions = (pending: PendingTransaction): string[] =>
@@ -74,6 +95,73 @@ export class SplitzesModalComponent {
     return netWithMe > 0
       ? `Owes me €${netWithMe.toFixed(2)}`
       : `I owe €${Math.abs(netWithMe).toFixed(2)}`;
+  }
+
+  participantName(id: 'me' | number): string {
+    if (id === 'me') return 'Me';
+    return this.allPeople.find((person) => person.id === id)?.name ?? `Person ${id}`;
+  }
+
+  sumDebt(total: number, debt: DebtEntry): number {
+    return total + debt.amount;
+  }
+
+  absoluteAmount(amount: number): string {
+    return Math.abs(amount).toFixed(2);
+  }
+
+  requestSettlement(personId: number, direction: 'person-pays-me' | 'i-pay-person'): void {
+    const debts = this.splitzService.getDebtsToSettle(
+      personId,
+      this.splitTxQuery.data() ?? [],
+      direction,
+    );
+    if (debts.length === 0) return;
+    this.settlementNote.set('');
+    const netWithMe =
+      direction === 'person-pays-me'
+        ? debts.reduce(this.sumDebt, 0)
+        : -debts.reduce(this.sumDebt, 0);
+    this.settlementConfirmation.set({ personId, debts, netWithMe });
+  }
+
+  requestNetSettlement(personId: number, netWithMe: number): void {
+    const debts = this.splitzService.getDebtsBetweenMeAndPerson(
+      personId,
+      this.splitTxQuery.data() ?? [],
+    );
+    if (debts.length === 0) return;
+    this.settlementNote.set('');
+    this.showSettlementTransactions.set(false);
+    this.settlementConfirmation.set({ personId, debts, netWithMe });
+  }
+
+  cancelSettlement(): void {
+    this.settlementConfirmation.set(null);
+    this.settlementNote.set('');
+    this.showSettlementTransactions.set(false);
+  }
+
+  async confirmSettlement(): Promise<void> {
+    const confirmation = this.settlementConfirmation();
+    if (!confirmation || this.markingPersonId() !== null) return;
+
+    this.markingPersonId.set(confirmation.personId);
+    this.settlementMessage.set(null);
+    try {
+      const transactions = this.splitTxQuery.data() ?? [];
+      await this.splitzService.markDebtsSettled(confirmation.debts, transactions);
+      await this.settlementService.recordSettlements(confirmation.debts, this.settlementNote());
+      await this.queryClient.invalidateQueries({ queryKey: ['splitTransactions'] });
+      await this.queryClient.invalidateQueries({ queryKey: ['splitzSettlementHistory'] });
+      this.settlementMessage.set('Settlement recorded.');
+      this.cancelSettlement();
+    } catch (error) {
+      console.error('Unable to record Splitzes settlement:', error);
+      this.settlementMessage.set('Unable to record settlement. Please try again.');
+    } finally {
+      this.markingPersonId.set(null);
+    }
   }
 
   startEditingPending(id: string): void {
@@ -286,27 +374,10 @@ export class SplitzesModalComponent {
   }
 
   async onMarkPersonSettled(personId: number): Promise<void> {
-    if (this.markingPersonId() !== null) return;
-    this.markingPersonId.set(personId);
-    try {
-      const txs = this.splitTxQuery.data() ?? [];
-      await this.splitzService.markPersonSettled(personId, txs);
-      await this.splitzService.markMePaid(personId, txs);
-      await this.queryClient.invalidateQueries({ queryKey: ['splitTransactions'] });
-    } finally {
-      this.markingPersonId.set(null);
-    }
+    this.requestSettlement(personId, 'person-pays-me');
   }
 
   async onMarkMePaid(personId: number): Promise<void> {
-    if (this.markingPersonId() !== null) return;
-    this.markingPersonId.set(personId);
-    try {
-      const txs = this.splitTxQuery.data() ?? [];
-      await this.splitzService.markMePaid(personId, txs);
-      await this.queryClient.invalidateQueries({ queryKey: ['splitTransactions'] });
-    } finally {
-      this.markingPersonId.set(null);
-    }
+    this.requestSettlement(personId, 'i-pay-person');
   }
 }

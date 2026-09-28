@@ -420,6 +420,148 @@
       </div>
     }
 
+    @if (settlementMessage(); as message) {
+      <p class="rounded-xl border border-teal-500/30 bg-teal-950/20 p-3 text-xs text-teal-200">
+        {{ message }}
+      </p>
+    }
+
+    @if (settlementConfirmation(); as confirmation) {
+      <div
+        class="fixed inset-0 z-110 flex items-center justify-center bg-black/75 p-4 backdrop-blur-sm"
+        (click)="$event.stopPropagation()"
+      >
+        <section
+          class="w-full max-w-lg max-h-[85vh] overflow-y-auto rounded-2xl border border-amber-500/40 bg-gray-900 p-6 shadow-2xl space-y-5"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="settlement-title"
+        >
+          <div class="flex items-start justify-between gap-4">
+            <div>
+              <p id="settlement-title" class="text-lg font-semibold text-amber-100">
+                Confirm debt settlement
+              </p>
+              <p class="mt-1 text-sm text-gray-300">
+                This settles the net amount between you and
+                {{ participantName(confirmation.personId) }}.
+              </p>
+            </div>
+            <button
+              type="button"
+              (click)="cancelSettlement()"
+              class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gray-800 text-gray-400 hover:text-white"
+              aria-label="Close settlement confirmation"
+            >
+              ✕
+            </button>
+          </div>
+
+          <div class="rounded-xl border border-amber-500/30 bg-amber-950/20 p-4">
+            <p class="text-xs uppercase tracking-[0.12em] text-amber-300">Net amount to settle</p>
+            <p class="mt-1 text-3xl font-bold tabular-nums text-white">
+              €{{ absoluteAmount(confirmation.netWithMe) }}
+            </p>
+            <p class="mt-1 text-xs text-amber-100/80">
+              {{
+                confirmation.netWithMe > 0
+                  ? participantName(confirmation.personId) + ' owes you'
+                  : 'You owe ' + participantName(confirmation.personId)
+              }}
+            </p>
+          </div>
+
+          <div class="rounded-xl border border-gray-800 bg-gray-950/40 p-3">
+            <button
+              type="button"
+              (click)="showSettlementTransactions.update((visible) => !visible)"
+              class="flex w-full items-center justify-between text-left text-sm font-medium text-gray-200"
+              [attr.aria-expanded]="showSettlementTransactions()"
+            >
+              <span>Transactions included ({{ confirmation.debts.length }})</span>
+              <span class="text-xs text-gray-400">{{
+                showSettlementTransactions() ? 'Hide' : 'Show'
+              }}</span>
+            </button>
+
+            @if (showSettlementTransactions()) {
+              <div class="mt-3 space-y-2 border-t border-gray-800 pt-3">
+                @for (
+                  debt of confirmation.debts;
+                  track debt.transactionId + '-' + debt.debtorId + '-' + debt.creditorId
+                ) {
+                  <div class="rounded-lg border border-gray-800 bg-gray-900/70 p-3">
+                    <div class="flex items-start justify-between gap-3">
+                      <div class="min-w-0">
+                        <p class="truncate text-sm text-gray-200">{{ debt.description }}</p>
+                        <p class="mt-1 text-xs text-gray-500">
+                          {{ debt.date }} · {{ participantName(debt.debtorId) }} owes
+                          {{ participantName(debt.creditorId) }}
+                        </p>
+                      </div>
+                      <span class="shrink-0 text-sm font-semibold tabular-nums text-gray-100">
+                        €{{ debt.amount.toFixed(2) }}
+                      </span>
+                    </div>
+                  </div>
+                }
+              </div>
+            }
+          </div>
+
+          <textarea
+            rows="3"
+            [value]="settlementNote()"
+            (input)="settlementNote.set($any($event.target).value)"
+            placeholder="Optional settlement note"
+            class="w-full resize-none rounded-lg border border-gray-700 bg-gray-800/70 px-3 py-2 text-sm text-white"
+          ></textarea>
+
+          <div class="flex flex-wrap justify-end gap-2">
+            <button
+              type="button"
+              (click)="cancelSettlement()"
+              class="rounded-full border border-gray-700 bg-gray-800/70 px-4 py-2 text-sm text-gray-300"
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              (click)="confirmSettlement()"
+              [disabled]="markingPersonId() !== null"
+              class="rounded-full border border-emerald-500/30 bg-emerald-500/15 px-4 py-2 text-sm font-semibold text-emerald-300 disabled:opacity-50"
+            >
+              Confirm settlement
+            </button>
+          </div>
+        </section>
+      </div>
+    }
+
+    @if (settlementHistoryQuery.isPending()) {
+      <p class="text-xs text-gray-500">Loading settlement history...</p>
+    } @else if (settlementHistory().length > 0) {
+      <section class="rounded-xl border border-gray-800/80 bg-gray-950/30 p-3 space-y-2">
+        <h3 class="text-xs font-semibold uppercase tracking-[0.12em] text-gray-400">History</h3>
+        @for (record of settlementHistory(); track record.id) {
+          <div
+            class="flex items-start justify-between gap-3 border-t border-gray-800/70 pt-2 first:border-t-0 first:pt-0"
+          >
+            <div class="min-w-0">
+              <p class="truncate text-xs text-gray-200">
+                Settled · {{ record.description }}
+              </p>
+              <p class="text-[10px] text-gray-500">
+                {{ participantName(record.debtorId) }} → {{ participantName(record.creditorId) }} ·
+                {{ record.settledAt | date: 'dd/MM/yyyy' }}
+              </p>
+            </div>
+            <span class="shrink-0 text-xs text-gray-300">€{{ record.amount.toFixed(2) }}</span>
+          </div>
+        }
+      </section>
+    }
+
     <!-- Person Cards -->
     @if (!isLoading() && !isError()) {
       <div class="flex flex-col gap-3">
@@ -475,38 +617,20 @@
             }
 
             <!-- Action buttons -->
-            @if (summary.hasUnsettledDebts || summary.iOweThisPerson) {
+            @if (summary.netWithMe !== 0) {
               <div class="ml-12 flex flex-wrap gap-2 pt-1">
-                <!-- Mark person's debts as settled (they paid what they owe) -->
-                @if (summary.hasUnsettledDebts || summary.iOweThisPerson) {
-                  <button
-                    type="button"
-                    (click)="onMarkPersonSettled(summary.person.id)"
-                    [disabled]="markingPersonId() !== null"
-                    class="text-xs px-3 py-1 rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/25 disabled:opacity-50 disabled:cursor-not-allowed transition-colors cursor-pointer"
-                  >
-                    @if (markingPersonId() === summary.person.id) {
-                      Settling…
-                    } @else {
-                      ✓ Mark debt settled
-                    }
-                  </button>
-                }
-                <!-- Mark my debt to this person as paid -->
-                <!-- @if (summary.iOweThisPerson) {
-                  <button
-                    type="button"
-                    (click)="onMarkMePaid(summary.person.id)"
-                    [disabled]="markingPersonId() !== null"
-                    class="text-xs px-3 py-1 rounded-full bg-amber-500/15 text-amber-400 border border-amber-500/30 hover:bg-amber-500/25 disabled:opacity-50 disabled:cursor-not-allowed transition-colors cursor-pointer"
-                  >
-                    @if (markingPersonId() === summary.person.id) {
-                      Settling…
-                    } @else {
-                      ✓ Mark I paid {{ summary.person.name }}
-                    }
-                  </button>
-                } -->
+                <button
+                  type="button"
+                  (click)="requestNetSettlement(summary.person.id, summary.netWithMe)"
+                  [disabled]="markingPersonId() !== null"
+                  class="text-xs px-3 py-1 rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/25 disabled:opacity-50 disabled:cursor-not-allowed transition-colors cursor-pointer"
+                >
+                  @if (markingPersonId() === summary.person.id) {
+                    Settling…
+                  } @else {
+                    ✓ Mark debt settled
+                  }
+                </button>
               </div>
             }
           </div>
