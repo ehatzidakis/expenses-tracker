@@ -177,6 +177,7 @@ export class TransactionService {
 
     return snapshot.docs
       .map((document) => this.mapTransaction(document.data(), document.id))
+      .filter((transaction) => filter.adjustmentId || !transaction.adjustmentId)
       .sort((a, b) => {
         const createdAtDifference = this.getTimestamp(b.createdAt) - this.getTimestamp(a.createdAt);
         return createdAtDifference || new Date(b.date).getTime() - new Date(a.date).getTime();
