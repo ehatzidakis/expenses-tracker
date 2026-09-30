@@ -9,6 +9,7 @@ import {
   normalizePendingSplitOverride,
   PendingTransaction,
   comparePendingTransactionsByDate,
+  getPendingTransactionTotalAmount,
   TransactionService,
 } from '../../services/transaction-service';
 import {
@@ -87,6 +88,8 @@ export class SplitzesModalComponent {
 
   readonly getPendingCategoryOptions = (pending: PendingTransaction): string[] =>
     resolvePendingCategoryOptions(pending);
+
+  readonly getPendingTotalAmount = getPendingTransactionTotalAmount;
 
   formatPendingDate(date: string): string {
     const [year, month, day] = date.split('-').map(Number);
@@ -337,7 +340,7 @@ export class SplitzesModalComponent {
     if (categoryRequiresSubcategory(draft.category) && !draft.subCategoryId) {
       return;
     }
-    const totalAmount = Number(draft.totalAmount ?? draft.amount ?? 0);
+    const totalAmount = getPendingTransactionTotalAmount(draft);
     let finalAmount = Number(draft.amount ?? 0);
 
     if (draft.isSplit) {

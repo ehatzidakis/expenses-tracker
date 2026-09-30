@@ -61,6 +61,15 @@ export interface PendingTransaction extends NewTransactionInput {
   status: 'pending';
 }
 
+export function getPendingTransactionTotalAmount(
+  input: Pick<PendingTransaction, 'amount' | 'totalAmount' | 'isSplit'>,
+): number {
+  const amount = Number(input.amount) || 0;
+  const totalAmount = Number(input.totalAmount);
+
+  return input.isSplit && Number.isFinite(totalAmount) && totalAmount > 0 ? totalAmount : amount;
+}
+
 export function comparePendingTransactionsByDate(
   left: Pick<PendingTransaction, 'date' | 'id'>,
   right: Pick<PendingTransaction, 'date' | 'id'>,

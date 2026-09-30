@@ -5,6 +5,7 @@ import {
   normalizePendingSplitOverride,
   resolvePendingCategoryOptions,
   comparePendingTransactionsByDate,
+  getPendingTransactionTotalAmount,
   normalizePendingForReview,
   type PendingTransaction,
 } from './transaction-service';
@@ -257,5 +258,15 @@ describe('splitz debt calculations', () => {
       subCategoryId: 2,
       subCategory: 'movies',
     });
+  });
+
+  it('uses the full transaction amount for split pending reviews', () => {
+    expect(
+      getPendingTransactionTotalAmount({ amount: 32.25, totalAmount: 64.5, isSplit: true }),
+    ).toBe(64.5);
+    expect(getPendingTransactionTotalAmount({ amount: 32.25, isSplit: false })).toBe(32.25);
+    expect(getPendingTransactionTotalAmount({ amount: 32.25, totalAmount: 0, isSplit: true })).toBe(
+      32.25,
+    );
   });
 });
