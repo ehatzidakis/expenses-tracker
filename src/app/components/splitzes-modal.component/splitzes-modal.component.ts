@@ -5,6 +5,7 @@ import { AuthService } from '../../services/auth.service';
 import { computeSplit, SplitzService } from '../../services/splitz.service';
 import { SplitzSettlementService } from '../../services/splitz-settlement.service';
 import {
+  normalizePendingForReview,
   normalizePendingSplitOverride,
   PendingTransaction,
   TransactionService,
@@ -52,7 +53,7 @@ export class SplitzesModalComponent {
     const drafts = this.pendingDrafts();
 
     return base.map((entry) => {
-      const normalized = normalizePendingSplitOverride(entry);
+      const normalized = normalizePendingForReview(entry);
       const draft = drafts[entry.id];
       return draft ? { ...normalized, ...draft } : normalized;
     });
@@ -170,7 +171,7 @@ export class SplitzesModalComponent {
       return;
     }
 
-    const normalized = normalizePendingSplitOverride(pending);
+    const normalized = normalizePendingForReview(pending);
     this.pendingDrafts.update((drafts) => ({
       ...drafts,
       [id]: { ...normalized },
