@@ -405,9 +405,19 @@
                           ? onAcceptPending(pending.id)
                           : startEditingPending(pending.id)
                       "
-                      class="text-[10px] px-2.5 py-1.5 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 hover:bg-emerald-500/20 transition-colors cursor-pointer"
+                      [disabled]="pendingAction() !== null"
+                      [attr.aria-busy]="pendingActionFor(pending.id) === 'accept'"
+                      class="inline-flex items-center gap-1.5 text-[10px] px-2.5 py-1.5 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 hover:bg-emerald-500/20 disabled:opacity-50 disabled:cursor-not-allowed transition-colors cursor-pointer"
                     >
-                      {{ editingPendingId() === pending.id ? 'Accept' : 'Edit / Accept' }}
+                      @if (pendingActionFor(pending.id) === 'accept') {
+                        <span
+                          class="h-3 w-3 animate-spin rounded-full border-2 border-emerald-300 border-t-transparent"
+                          aria-hidden="true"
+                        ></span>
+                        Accepting…
+                      } @else {
+                        {{ editingPendingId() === pending.id ? 'Accept' : 'Edit / Accept' }}
+                      }
                     </button>
                     <button
                       type="button"
@@ -416,11 +426,30 @@
                           ? cancelEditingPending()
                           : onDeclinePending(pending.id)
                       "
-                      class="text-[10px] px-2.5 py-1.5 rounded-full bg-red-500/15 text-red-300 border border-red-500/30 hover:bg-red-500/20 transition-colors cursor-pointer"
+                      [disabled]="pendingAction() !== null"
+                      [attr.aria-busy]="pendingActionFor(pending.id) === 'decline'"
+                      class="inline-flex items-center gap-1.5 text-[10px] px-2.5 py-1.5 rounded-full bg-red-500/15 text-red-300 border border-red-500/30 hover:bg-red-500/20 disabled:opacity-50 disabled:cursor-not-allowed transition-colors cursor-pointer"
                     >
-                      {{ editingPendingId() === pending.id ? 'Cancel' : 'Decline' }}
+                      @if (pendingActionFor(pending.id) === 'decline') {
+                        <span
+                          class="h-3 w-3 animate-spin rounded-full border-2 border-red-300 border-t-transparent"
+                          aria-hidden="true"
+                        ></span>
+                        Declining…
+                      } @else {
+                        {{ editingPendingId() === pending.id ? 'Cancel' : 'Decline' }}
+                      }
                     </button>
                   </div>
+
+                  @if (pendingError()?.id === pending.id) {
+                    <p
+                      role="alert"
+                      class="text-[10px] text-red-300 border-l border-red-500/40 pl-2"
+                    >
+                      {{ pendingError()?.message }}
+                    </p>
+                  }
                 </div>
               }
             </div>
