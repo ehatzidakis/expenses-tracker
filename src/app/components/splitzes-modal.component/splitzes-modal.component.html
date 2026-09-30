@@ -72,7 +72,9 @@
                       >Incoming From ->
                       {{ pending.sourceRole === 'admin' ? 'Eftihis' : pending.sourceRole }}</span
                     >
-                    <span class="text-[10px] text-gray-400">{{ pending.date }}</span>
+                    <span class="text-[10px] text-gray-400">{{
+                      pending.date | date: 'EEEE, MMMM d, y' : 'UTC'
+                    }}</span>
                   </div>
 
                   @if (editingPendingId() === pending.id) {
@@ -166,7 +168,12 @@
                                 option of getPendingSubcategories(pending.category);
                                 track option.id
                               ) {
-                                <option [value]="option.id">{{ option.label }}</option>
+                                <option
+                                  [value]="option.id"
+                                  [selected]="isPendingSubcategorySelected(pending, option.id)"
+                                >
+                                  {{ option.label }}
+                                </option>
                               }
                             </select>
                           </div>

@@ -8,6 +8,7 @@ import {
   normalizePendingForReview,
   normalizePendingSplitOverride,
   PendingTransaction,
+  comparePendingTransactionsByDate,
   TransactionService,
 } from '../../services/transaction-service';
 import {
@@ -52,11 +53,13 @@ export class SplitzesModalComponent {
     const base = this.pendingTxQuery.data() ?? [];
     const drafts = this.pendingDrafts();
 
-    return base.map((entry) => {
-      const normalized = normalizePendingForReview(entry);
-      const draft = drafts[entry.id];
-      return draft ? { ...normalized, ...draft } : normalized;
-    });
+    return base
+      .map((entry) => {
+        const normalized = normalizePendingForReview(entry);
+        const draft = drafts[entry.id];
+        return draft ? { ...normalized, ...draft } : normalized;
+      })
+      .sort(comparePendingTransactionsByDate);
   });
   readonly hasPendingTransactions = computed(() => this.pendingTransactions().length > 0);
   readonly settlementHistory = computed<SplitzSettlementRecord[]>(
@@ -296,6 +299,10 @@ export class SplitzesModalComponent {
   }
 
   readonly getPendingSubcategories = (category: string) => getSubcategoryOptions(category);
+
+  isPendingSubcategorySelected(pending: PendingTransaction, optionId: number): boolean {
+    return pending.subCategoryId != null && Number(pending.subCategoryId) === optionId;
+  }
 
   async onAcceptPending(id: string): Promise<void> {
     const current = this.pendingTransactions().find((entry) => entry.id === id);
