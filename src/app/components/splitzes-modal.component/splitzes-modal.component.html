@@ -73,7 +73,7 @@
                       {{ pending.sourceRole === 'admin' ? 'Eftihis' : pending.sourceRole }}</span
                     >
                     <span class="text-[10px] text-gray-400">{{
-                      pending.date | date: 'EEEE, MMMM d, y' : 'UTC'
+                      formatPendingDate(pending.date)
                     }}</span>
                   </div>
 

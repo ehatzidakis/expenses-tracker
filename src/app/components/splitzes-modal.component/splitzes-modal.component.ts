@@ -88,6 +88,29 @@ export class SplitzesModalComponent {
   readonly getPendingCategoryOptions = (pending: PendingTransaction): string[] =>
     resolvePendingCategoryOptions(pending);
 
+  formatPendingDate(date: string): string {
+    const [year, month, day] = date.split('-').map(Number);
+    if (![year, month, day].every(Number.isInteger)) {
+      return date;
+    }
+
+    const localDate = new Date(year, month - 1, day);
+    if (
+      localDate.getFullYear() !== year ||
+      localDate.getMonth() !== month - 1 ||
+      localDate.getDate() !== day
+    ) {
+      return date;
+    }
+
+    return localDate.toLocaleDateString('en-US', {
+      weekday: 'long',
+      month: 'long',
+      day: 'numeric',
+      year: 'numeric',
+    });
+  }
+
   onBackdropClick(event: MouseEvent): void {
     if ((event.target as HTMLElement).classList.contains('modal-backdrop')) {
       this.close.emit();
