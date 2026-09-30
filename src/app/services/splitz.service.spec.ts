@@ -4,6 +4,9 @@ import { computeSplitDebtEntries, selectDebtsToSettle } from './splitz.service';
 import {
   normalizePendingSplitOverride,
   resolvePendingCategoryOptions,
+  comparePendingTransactionsByDate,
+  getPendingTransactionTotalAmount,
+  normalizePendingForReview,
   type PendingTransaction,
 } from './transaction-service';
 
@@ -221,5 +224,49 @@ describe('splitz debt calculations', () => {
     expect(
       resolvePendingCategoryOptions({ category: 'Accommodation', adjustmentId: 'trip-1' }),
     ).toContain('Accommodation');
+  });
+
+  it('sorts pending reviews by transaction date instead of createdAt', () => {
+    const pending = [
+      { id: 'created-first', date: '2026-10-25', createdAt: '2026-09-01T00:00:00.000Z' },
+      { id: 'created-second', date: '2026-10-01', createdAt: '2026-09-03T00:00:00.000Z' },
+      { id: 'created-third', date: '2026-10-04', createdAt: '2026-09-02T00:00:00.000Z' },
+    ];
+
+    expect([...pending].sort(comparePendingTransactionsByDate).map((entry) => entry.id)).toEqual([
+      'created-second',
+      'created-third',
+      'created-first',
+    ]);
+  });
+
+  it('keeps a valid pending subcategory ID unchanged during review normalization', () => {
+    const pending: PendingTransaction = {
+      id: 'pending-subcategory',
+      createdAt: '2026-09-18T00:00:00.000Z',
+      sourceRole: 'admin',
+      status: 'pending',
+      date: '2026-09-18',
+      description: 'Cinema night',
+      category: 'Tickets',
+      subCategoryId: 2,
+      subCategory: 'movies',
+      amount: 25,
+    };
+
+    expect(normalizePendingForReview(pending)).toMatchObject({
+      subCategoryId: 2,
+      subCategory: 'movies',
+    });
+  });
+
+  it('uses the full transaction amount for split pending reviews', () => {
+    expect(
+      getPendingTransactionTotalAmount({ amount: 32.25, totalAmount: 64.5, isSplit: true }),
+    ).toBe(64.5);
+    expect(getPendingTransactionTotalAmount({ amount: 32.25, isSplit: false })).toBe(32.25);
+    expect(getPendingTransactionTotalAmount({ amount: 32.25, totalAmount: 0, isSplit: true })).toBe(
+      32.25,
+    );
   });
 });

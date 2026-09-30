@@ -72,7 +72,9 @@
                       >Incoming From ->
                       {{ pending.sourceRole === 'admin' ? 'Eftihis' : pending.sourceRole }}</span
                     >
-                    <span class="text-[10px] text-gray-400">{{ pending.date }}</span>
+                    <span class="text-[10px] text-gray-400">{{
+                      formatPendingDate(pending.date)
+                    }}</span>
                   </div>
 
                   @if (editingPendingId() === pending.id) {
@@ -166,7 +168,12 @@
                                 option of getPendingSubcategories(pending.category);
                                 track option.id
                               ) {
-                                <option [value]="option.id">{{ option.label }}</option>
+                                <option
+                                  [value]="option.id"
+                                  [selected]="isPendingSubcategorySelected(pending, option.id)"
+                                >
+                                  {{ option.label }}
+                                </option>
                               }
                             </select>
                           </div>
@@ -175,11 +182,11 @@
                         <div>
                           <label
                             class="mb-1 block text-[10px] uppercase tracking-[0.12em] text-gray-400"
-                            >Amount</label
+                            >{{ pending.isSplit ? 'Total amount' : 'Amount' }}</label
                           >
                           <input
                             type="number"
-                            [value]="pending.amount"
+                            [value]="getPendingTotalAmount(pending)"
                             (input)="
                               updatePendingDraft(
                                 pending.id,
@@ -271,7 +278,7 @@
                                   </p>
                                   <span class="text-[10px] text-gray-300">
                                     {{ getPendingCustomTotal(pending).toFixed(2) }} /
-                                    {{ pending.amount.toFixed(2) }}
+                                    {{ getPendingTotalAmount(pending).toFixed(2) }}
                                   </span>
                                 </div>
 
@@ -379,7 +386,8 @@
                     <div class="space-y-1">
                       <p class="text-xs font-semibold text-white">{{ pending.description }}</p>
                       <p class="text-[10px] text-gray-400">
-                        {{ pending.category }} • €{{ pending.amount.toFixed(2) }}
+                        {{ pending.category }} • €{{ getPendingTotalAmount(pending).toFixed(2) }}
+                        {{ pending.isSplit ? ' • Split' : '' }}
                       </p>
                       @if (pending.comment) {
                         <p class="text-[10px] text-amber-200/90 border-l border-amber-500/40 pl-2">

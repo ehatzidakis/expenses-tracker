@@ -8,6 +8,8 @@ import {
   normalizePendingForReview,
   normalizePendingSplitOverride,
   PendingTransaction,
+  comparePendingTransactionsByDate,
+  getPendingTransactionTotalAmount,
   TransactionService,
 } from '../../services/transaction-service';
 import {
@@ -52,11 +54,13 @@ export class SplitzesModalComponent {
     const base = this.pendingTxQuery.data() ?? [];
     const drafts = this.pendingDrafts();
 
-    return base.map((entry) => {
-      const normalized = normalizePendingForReview(entry);
-      const draft = drafts[entry.id];
-      return draft ? { ...normalized, ...draft } : normalized;
-    });
+    return base
+      .map((entry) => {
+        const normalized = normalizePendingForReview(entry);
+        const draft = drafts[entry.id];
+        return draft ? { ...normalized, ...draft } : normalized;
+      })
+      .sort(comparePendingTransactionsByDate);
   });
   readonly hasPendingTransactions = computed(() => this.pendingTransactions().length > 0);
   readonly settlementHistory = computed<SplitzSettlementRecord[]>(
@@ -84,6 +88,31 @@ export class SplitzesModalComponent {
 
   readonly getPendingCategoryOptions = (pending: PendingTransaction): string[] =>
     resolvePendingCategoryOptions(pending);
+
+  readonly getPendingTotalAmount = getPendingTransactionTotalAmount;
+
+  formatPendingDate(date: string): string {
+    const [year, month, day] = date.split('-').map(Number);
+    if (![year, month, day].every(Number.isInteger)) {
+      return date;
+    }
+
+    const localDate = new Date(year, month - 1, day);
+    if (
+      localDate.getFullYear() !== year ||
+      localDate.getMonth() !== month - 1 ||
+      localDate.getDate() !== day
+    ) {
+      return date;
+    }
+
+    return localDate.toLocaleDateString('en-US', {
+      weekday: 'long',
+      month: 'long',
+      day: 'numeric',
+      year: 'numeric',
+    });
+  }
 
   onBackdropClick(event: MouseEvent): void {
     if ((event.target as HTMLElement).classList.contains('modal-backdrop')) {
@@ -297,6 +326,10 @@ export class SplitzesModalComponent {
 
   readonly getPendingSubcategories = (category: string) => getSubcategoryOptions(category);
 
+  isPendingSubcategorySelected(pending: PendingTransaction, optionId: number): boolean {
+    return pending.subCategoryId != null && Number(pending.subCategoryId) === optionId;
+  }
+
   async onAcceptPending(id: string): Promise<void> {
     const current = this.pendingTransactions().find((entry) => entry.id === id);
     if (!current) {
@@ -307,7 +340,7 @@ export class SplitzesModalComponent {
     if (categoryRequiresSubcategory(draft.category) && !draft.subCategoryId) {
       return;
     }
-    const totalAmount = Number(draft.totalAmount ?? draft.amount ?? 0);
+    const totalAmount = getPendingTransactionTotalAmount(draft);
     let finalAmount = Number(draft.amount ?? 0);
 
     if (draft.isSplit) {

@@ -61,6 +61,32 @@ export interface PendingTransaction extends NewTransactionInput {
   status: 'pending';
 }
 
+export function getPendingTransactionTotalAmount(
+  input: Pick<PendingTransaction, 'amount' | 'totalAmount' | 'isSplit'>,
+): number {
+  const amount = Number(input.amount) || 0;
+  const totalAmount = Number(input.totalAmount);
+
+  return input.isSplit && Number.isFinite(totalAmount) && totalAmount > 0 ? totalAmount : amount;
+}
+
+export function comparePendingTransactionsByDate(
+  left: Pick<PendingTransaction, 'date' | 'id'>,
+  right: Pick<PendingTransaction, 'date' | 'id'>,
+): number {
+  const leftTime = Date.parse(`${left.date}T00:00:00`);
+  const rightTime = Date.parse(`${right.date}T00:00:00`);
+
+  if (Number.isNaN(leftTime)) {
+    return Number.isNaN(rightTime) ? left.id.localeCompare(right.id) : 1;
+  }
+  if (Number.isNaN(rightTime)) {
+    return -1;
+  }
+
+  return leftTime - rightTime || left.id.localeCompare(right.id);
+}
+
 export const DEFAULT_PENDING_SPLIT_PAID_BY = 1 as const;
 export const DEFAULT_PENDING_SPLIT_WITH = [1] as const;
 
