@@ -76,6 +76,8 @@ export class SplitzesModalComponent {
   readonly showPendingReview = signal(false);
   readonly isRefreshingPending = signal(false);
   readonly editingPendingId = signal<string | null>(null);
+  readonly pendingAction = signal<{ id: string; action: 'accept' | 'decline' } | null>(null);
+  readonly pendingError = signal<{ id: string; message: string } | null>(null);
   readonly settlementConfirmation = signal<{
     personId: number;
     debts: DebtEntry[];
@@ -194,6 +196,11 @@ export class SplitzesModalComponent {
     }
   }
 
+  pendingActionFor(id: string): 'accept' | 'decline' | null {
+    const current = this.pendingAction();
+    return current?.id === id ? current.action : null;
+  }
+
   startEditingPending(id: string): void {
     const pending = this.pendingTransactions().find((entry) => entry.id === id);
     if (!pending) {
@@ -205,10 +212,12 @@ export class SplitzesModalComponent {
       ...drafts,
       [id]: { ...normalized },
     }));
+    this.pendingError.set(null);
     this.editingPendingId.set(id);
   }
 
   cancelEditingPending(): void {
+    this.pendingError.set(null);
     this.editingPendingId.set(null);
   }
 
@@ -331,6 +340,10 @@ export class SplitzesModalComponent {
   }
 
   async onAcceptPending(id: string): Promise<void> {
+    if (this.pendingAction() !== null) {
+      return;
+    }
+
     const current = this.pendingTransactions().find((entry) => entry.id === id);
     if (!current) {
       return;
@@ -358,6 +371,8 @@ export class SplitzesModalComponent {
       }
     }
 
+    this.pendingError.set(null);
+    this.pendingAction.set({ id, action: 'accept' });
     try {
       await this.transactionService.acceptPendingTransaction(id, {
         date: draft.date,
@@ -375,13 +390,18 @@ export class SplitzesModalComponent {
         totalAmount: totalAmount,
         customSplitAmounts: draft.customSplitAmounts,
       });
-      await this.queryClient.invalidateQueries({ queryKey: ['pendingTransactions'] });
-      await this.queryClient.invalidateQueries({ queryKey: ['expenses'] });
-      await this.queryClient.invalidateQueries({ queryKey: ['adjustments'] });
-      await this.queryClient.invalidateQueries({ queryKey: ['splitTransactions'] });
+      await Promise.all([
+        this.queryClient.invalidateQueries({ queryKey: ['pendingTransactions'] }),
+        this.queryClient.invalidateQueries({ queryKey: ['expenses'] }),
+        this.queryClient.invalidateQueries({ queryKey: ['adjustments'] }),
+        this.queryClient.invalidateQueries({ queryKey: ['splitTransactions'] }),
+      ]);
       this.editingPendingId.set(null);
     } catch (error) {
       console.error('Unable to accept pending transaction:', error);
+      this.pendingError.set({ id, message: 'Unable to accept. Please try again.' });
+    } finally {
+      this.pendingAction.set(null);
     }
   }
 
@@ -399,11 +419,20 @@ export class SplitzesModalComponent {
   }
 
   async onDeclinePending(id: string): Promise<void> {
+    if (this.pendingAction() !== null) {
+      return;
+    }
+
+    this.pendingError.set(null);
+    this.pendingAction.set({ id, action: 'decline' });
     try {
       await this.transactionService.declinePendingTransaction(id);
       await this.queryClient.invalidateQueries({ queryKey: ['pendingTransactions'] });
     } catch (error) {
       console.error('Unable to decline pending transaction:', error);
+      this.pendingError.set({ id, message: 'Unable to decline. Please try again.' });
+    } finally {
+      this.pendingAction.set(null);
     }
   }
 

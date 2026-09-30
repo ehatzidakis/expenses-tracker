@@ -197,6 +197,7 @@ function monthNameFromDateString(date: string): string {
 export class TransactionService {
   private readonly authService = inject(AuthService);
   private readonly budgetSettingsService = inject(BudgetSettingsService);
+  private readonly acceptingPendingIds = new Set<string>();
 
   readonly transactionRevision = signal(0);
 
@@ -460,6 +461,23 @@ export class TransactionService {
   }
 
   async acceptPendingTransaction(
+    id: string,
+    overrides?: Partial<NewTransactionInput>,
+  ): Promise<void> {
+    // The pending doc is only deleted at the end, so a concurrent call would create a duplicate.
+    if (this.acceptingPendingIds.has(id)) {
+      return;
+    }
+
+    this.acceptingPendingIds.add(id);
+    try {
+      await this.commitPendingTransaction(id, overrides);
+    } finally {
+      this.acceptingPendingIds.delete(id);
+    }
+  }
+
+  private async commitPendingTransaction(
     id: string,
     overrides?: Partial<NewTransactionInput>,
   ): Promise<void> {
