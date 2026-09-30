@@ -57,7 +57,7 @@ export interface PendingTransaction extends NewTransactionInput {
   id: string;
   createdAt: string;
   createdByUid?: string;
-  sourceRole: 'kiosk';
+  sourceRole: 'kiosk' | 'admin';
   status: 'pending';
 }
 
@@ -124,6 +124,12 @@ export function normalizePendingSplitOverride<T extends Partial<NewTransactionIn
     splitType: 'split',
     customSplitAmounts: undefined,
   };
+}
+
+export function normalizePendingForReview(input: PendingTransaction): PendingTransaction {
+  return input.sourceRole === 'kiosk'
+    ? (normalizePendingSplitOverride(input) as PendingTransaction)
+    : input;
 }
 
 const PAGE_SIZE = 10;
@@ -363,6 +369,7 @@ export class TransactionService {
 
     return snapshot.docs.map((docSnap) => {
       const data = docSnap.data();
+      const sourceRole = data['sourceRole'] === 'admin' ? 'admin' : 'kiosk';
       const base: PendingTransaction = {
         id: docSnap.id,
         date: data['date'] as string,
@@ -383,15 +390,18 @@ export class TransactionService {
           undefined,
         createdAt: (data['createdAt'] as string) ?? new Date().toISOString(),
         createdByUid: (data['createdByUid'] as string | undefined) ?? undefined,
-        sourceRole: (data['sourceRole'] as 'kiosk') ?? 'kiosk',
+        sourceRole,
         status: (data['status'] as 'pending') ?? 'pending',
       };
 
-      return normalizePendingSplitOverride(base) as PendingTransaction;
+      return normalizePendingForReview(base);
     });
   }
 
-  async createPendingTransaction(input: NewTransactionInput): Promise<string> {
+  async createPendingTransaction(
+    input: NewTransactionInput,
+    sourceRole: PendingTransaction['sourceRole'] = 'kiosk',
+  ): Promise<string> {
     const currentUser = this.authService.user();
     if (!currentUser?.uid) {
       throw new Error('Kiosk user is not authenticated. Please sign in again.');
@@ -400,12 +410,12 @@ export class TransactionService {
     const pendingRef = doc(collection(db, 'adjustments-temp'));
     const pendingData = stripUndefinedFields({
       ...input,
-      isSplit: false,
-      splitBy: [],
-      totalAmount: input.amount,
+      isSplit: input.isSplit ?? false,
+      splitBy: input.splitBy ?? [],
+      totalAmount: input.totalAmount ?? input.amount,
       createdAt: new Date().toISOString(),
       createdByUid: currentUser.uid,
-      sourceRole: 'kiosk' as const,
+      sourceRole,
       status: 'pending' as const,
     });
 
@@ -435,7 +445,8 @@ export class TransactionService {
     }
 
     const data = pendingSnap.data();
-    const resolvedInput = normalizePendingSplitOverride({
+    const sourceRole = data['sourceRole'] === 'admin' ? 'admin' : 'kiosk';
+    const pendingInput = {
       ...data,
       ...overrides,
       date: (overrides?.date ?? data['date'] ?? new Date().toISOString().slice(0, 10)) as string,
@@ -452,7 +463,9 @@ export class TransactionService {
       amount: Number(overrides?.amount ?? data['amount'] ?? 0),
       adjustmentId: (overrides?.adjustmentId ?? data['adjustmentId']) as string | undefined,
       totalAmount: Number(overrides?.totalAmount ?? data['totalAmount'] ?? data['amount'] ?? 0),
-    });
+    };
+    const resolvedInput =
+      sourceRole === 'kiosk' ? normalizePendingSplitOverride(pendingInput) : pendingInput;
 
     const input: NewTransactionInput = {
       date: resolvedInput.date as string,

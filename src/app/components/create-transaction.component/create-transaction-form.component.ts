@@ -17,7 +17,11 @@ import { TransactionBasicFieldsComponent } from './transaction-basic-fields.comp
 import { SplitFieldsComponent } from './split-fields.component';
 import { TransactionCommentFieldsComponent } from './transaction-comment-fields.component';
 import { SplitStateStore } from './split-state.store';
-import { TransactionFormModel, defaultTransactionModel } from './create-transaction.models';
+import {
+  shouldSaveTransactionForApproval,
+  TransactionFormModel,
+  defaultTransactionModel,
+} from './create-transaction.models';
 import {
   buildKioskPayload,
   buildTransactionPayload,
@@ -271,6 +275,22 @@ export class CreateTransactionFormComponent {
       if (!result.ok) {
         this.errorMessage.set(result.error);
         this.submitting.set(false);
+        return;
+      }
+
+      const saveForApproval = shouldSaveTransactionForApproval(
+        result.payload.date,
+        result.payload.adjustmentId,
+      );
+
+      if (saveForApproval) {
+        await this.transactionService.createPendingTransaction(result.payload, 'admin');
+        await this.queryClient.invalidateQueries({ queryKey: ['pendingTransactions'] });
+
+        this.transactionModel.set(defaultTransactionModel());
+        this.transactionForm().reset();
+        this.resetSplitFields();
+        this.showSuccessMessage('Transaction saved for approval');
         return;
       }
 
