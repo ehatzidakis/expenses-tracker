@@ -276,11 +276,23 @@
                                   >
                                     Custom amounts
                                   </p>
-                                  <span class="text-[10px] text-gray-300">
+                                  <span
+                                    class="text-[10px] text-gray-300"
+                                    [class.text-amber-300]="!isPendingCustomSplitValid(pending)"
+                                  >
                                     {{ getPendingCustomTotal(pending).toFixed(2) }} /
                                     {{ getPendingTotalAmount(pending).toFixed(2) }}
                                   </span>
                                 </div>
+                                <p
+                                  class="text-[10px]"
+                                  [class.text-emerald-300]="isPendingCustomSplitValid(pending)"
+                                  [class.text-amber-300]="!isPendingCustomSplitValid(pending)"
+                                  aria-live="polite"
+                                  role="status"
+                                >
+                                  {{ getPendingCustomRemainingLabel(pending) }}
+                                </p>
 
                                 <div class="space-y-2">
                                   @for (

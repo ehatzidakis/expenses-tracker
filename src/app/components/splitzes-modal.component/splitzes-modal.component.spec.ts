@@ -156,6 +156,74 @@ describe('SplitzesModalComponent pending review', () => {
     expect(fixture.nativeElement.querySelector('[role="alert"]')).toBeNull();
   });
 
+  it('shows the live custom split remainder for incoming transactions', () => {
+    const pending = {
+      ...pendingTransaction('p1'),
+      isSplit: true,
+      splitType: 'custom' as const,
+      splitBy: [1],
+      totalAmount: 12,
+      customSplitAmounts: { me: 5, 1: 3 },
+    };
+    component.pendingDrafts.set({ p1: pending });
+    component.editingPendingId.set('p1');
+    fixture.detectChanges();
+
+    expect(component.getPendingCustomRemainingLabel(component.pendingTransactions()[0])).toBe(
+      '€4.00 remaining to be split',
+    );
+    expect(fixture.nativeElement.textContent).toContain('€4.00 remaining to be split');
+
+    component.updatePendingDraft('p1', 'customSplitAmounts', { me: 8, 1: 4 });
+    fixture.detectChanges();
+    expect(fixture.nativeElement.textContent).toContain('All split — €0.00');
+  });
+
+  it('labels custom splits that exceed the total and rounds remainder to cents', () => {
+    const pending = {
+      ...pendingTransaction('p1'),
+      isSplit: true,
+      splitType: 'custom' as const,
+      splitBy: [1],
+      totalAmount: 12,
+      customSplitAmounts: { me: 8.01, 1: 4 },
+    };
+
+    expect(component.getPendingCustomRemaining(pending)).toBe(-0.01);
+    expect(component.getPendingCustomRemainingLabel(pending)).toBe('€0.01 over the total');
+  });
+
+  it('does not accept a custom split until its shares equal the total', async () => {
+    component.pendingDrafts.set({
+      p1: {
+        ...pendingTransaction('p1'),
+        isSplit: true,
+        splitType: 'custom',
+        splitBy: [1],
+        totalAmount: 12,
+        customSplitAmounts: { me: 5, 1: 3 },
+      },
+    });
+    component.editingPendingId.set('p1');
+    await component.onAcceptPending('p1');
+
+    expect(transactionService.acceptPendingTransaction).not.toHaveBeenCalled();
+    expect(component.pendingError()).toEqual({
+      id: 'p1',
+      message: 'Custom split total must equal €12.00. €4.00 remaining to be split',
+    });
+
+    component.updatePendingDraft('p1', 'customSplitAmounts', { me: 8, 1: 4 });
+    expect(component.pendingError()).toBeNull();
+    await component.onAcceptPending('p1');
+
+    expect(transactionService.acceptPendingTransaction).toHaveBeenCalledTimes(1);
+    expect(transactionService.acceptPendingTransaction).toHaveBeenCalledWith(
+      'p1',
+      expect.objectContaining({ amount: 8, totalAmount: 12 }),
+    );
+  });
+
   it('locks every row while declining and releases them afterwards', async () => {
     const declining = deferred();
     transactionService.declinePendingTransaction.mockReturnValue(declining.promise);

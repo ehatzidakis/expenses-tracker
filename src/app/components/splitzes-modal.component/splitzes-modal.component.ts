@@ -256,6 +256,9 @@ export class SplitzesModalComponent {
         ...(field !== 'splitBy' && field !== 'customSplitAmounts' ? { [field]: nextValue } : {}),
       },
     }));
+    if (this.pendingError()?.id === id) {
+      this.pendingError.set(null);
+    }
   }
 
   getPendingPaidByOptions(
@@ -294,6 +297,28 @@ export class SplitzesModalComponent {
       return sum + Number(customSplitAmounts[personId] ?? 0);
     }, 0);
     return meShare + otherShare;
+  }
+
+  getPendingCustomRemaining(pending: PendingTransaction): number {
+    return (
+      Math.round(
+        (getPendingTransactionTotalAmount(pending) - this.getPendingCustomTotal(pending)) * 100,
+      ) / 100
+    );
+  }
+
+  isPendingCustomSplitValid(pending: PendingTransaction): boolean {
+    return Math.abs(this.getPendingCustomRemaining(pending)) < 0.005;
+  }
+
+  getPendingCustomRemainingLabel(pending: PendingTransaction): string {
+    const remaining = this.getPendingCustomRemaining(pending);
+    if (Math.abs(remaining) < 0.005) {
+      return 'All split — €0.00';
+    }
+    return remaining > 0
+      ? `€${remaining.toFixed(2)} remaining to be split`
+      : `€${Math.abs(remaining).toFixed(2)} over the total`;
   }
 
   onPendingCustomSplitInput(event: Event, pendingId: string, personId: 'me' | number): void {
@@ -362,6 +387,13 @@ export class SplitzesModalComponent {
       const paidBy = draft.paidBy ?? 'me';
 
       if (splitType === 'custom') {
+        if (!this.isPendingCustomSplitValid(draft)) {
+          this.pendingError.set({
+            id,
+            message: `Custom split total must equal €${totalAmount.toFixed(2)}. ${this.getPendingCustomRemainingLabel(draft)}`,
+          });
+          return;
+        }
         finalAmount = Number(draft.customSplitAmounts?.['me'] ?? 0);
       } else if (splitBy.length > 0) {
         const { myShare } = computeSplit(totalAmount, paidBy, splitBy);
