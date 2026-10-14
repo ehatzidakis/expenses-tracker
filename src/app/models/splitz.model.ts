@@ -20,6 +20,8 @@ export interface DebtEntry {
   creditorId: 'me' | number;
   /** Amount owed (always positive). */
   amount: number;
+  /** Original full amount of the split transaction. */
+  transactionTotalAmount: number;
   /** Whether the debtor has marked this debt as settled. */
   paid: boolean;
 }

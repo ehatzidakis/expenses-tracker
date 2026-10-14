@@ -130,7 +130,7 @@ export class SplitzesModalComponent {
   }
 
   participantName(id: 'me' | number): string {
-    if (id === 'me') return 'Me';
+    if (id === 'me') return 'I';
     return this.allPeople.find((person) => person.id === id)?.name ?? `Person ${id}`;
   }
 
@@ -154,7 +154,11 @@ export class SplitzesModalComponent {
       direction === 'person-pays-me'
         ? debts.reduce(this.sumDebt, 0)
         : -debts.reduce(this.sumDebt, 0);
-    this.settlementConfirmation.set({ personId, debts, netWithMe });
+    this.settlementConfirmation.set({
+      personId,
+      debts: [...debts].sort((a, b) => b.date.localeCompare(a.date)),
+      netWithMe,
+    });
   }
 
   requestNetSettlement(personId: number, netWithMe: number): void {
@@ -165,7 +169,11 @@ export class SplitzesModalComponent {
     if (debts.length === 0) return;
     this.settlementNote.set('');
     this.showSettlementTransactions.set(false);
-    this.settlementConfirmation.set({ personId, debts, netWithMe });
+    this.settlementConfirmation.set({
+      personId,
+      debts: [...debts].sort((a, b) => b.date.localeCompare(a.date)),
+      netWithMe,
+    });
   }
 
   cancelSettlement(): void {

@@ -219,6 +219,7 @@ export function computeSplitDebtEntries(tx: Transaction): DebtEntry[] {
         debtorId,
         creditorId,
         amount: Math.round(amount * 100) / 100,
+        transactionTotalAmount: tx.totalAmount,
         paid: paidPersonIds.includes(numericId),
       });
     }
@@ -246,6 +247,7 @@ export function computeSplitDebtEntries(tx: Transaction): DebtEntry[] {
       debtorId: participant,
       creditorId: tx.paidBy,
       amount: share,
+      transactionTotalAmount: tx.totalAmount,
       paid: paidPersonIds.includes(numericId),
     });
   }

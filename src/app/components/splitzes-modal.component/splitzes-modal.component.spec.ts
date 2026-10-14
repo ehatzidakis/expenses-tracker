@@ -2,6 +2,7 @@ import { signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { QueryClient } from '@tanstack/angular-query-experimental';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { DebtEntry } from '../../models/splitz.model';
 import { AuthService } from '../../services/auth.service';
 import { SplitzService } from '../../services/splitz.service';
 import { SplitzSettlementService } from '../../services/splitz-settlement.service';
@@ -33,6 +34,10 @@ describe('SplitzesModalComponent pending review', () => {
   let fixture: ComponentFixture<SplitzesModalComponent>;
   let component: SplitzesModalComponent;
   let pendingList: PendingTransaction[];
+  let splitzService: {
+    getDebtsToSettle: ReturnType<typeof vi.fn>;
+    getDebtsBetweenMeAndPerson: ReturnType<typeof vi.fn>;
+  };
   let transactionService: {
     fetchPendingTransactions: ReturnType<typeof vi.fn>;
     acceptPendingTransaction: ReturnType<typeof vi.fn>;
@@ -51,6 +56,10 @@ describe('SplitzesModalComponent pending review', () => {
       acceptPendingTransaction: vi.fn().mockResolvedValue(undefined),
       declinePendingTransaction: vi.fn().mockResolvedValue(undefined),
     };
+    splitzService = {
+      getDebtsToSettle: vi.fn((): DebtEntry[] => []),
+      getDebtsBetweenMeAndPerson: vi.fn((): DebtEntry[] => []),
+    };
 
     await TestBed.configureTestingModule({
       imports: [SplitzesModalComponent],
@@ -66,6 +75,7 @@ describe('SplitzesModalComponent pending review', () => {
         {
           provide: SplitzService,
           useValue: {
+            ...splitzService,
             getSplitTransactionsQuery: () => ({
               isPending: () => false,
               isError: () => false,
@@ -257,5 +267,89 @@ describe('SplitzesModalComponent pending review', () => {
     pendingList = [pendingTransaction('p2')];
     accepting.resolve();
     await first;
+  });
+
+  it('sorts debts newest-first in both settlement confirmation flows', () => {
+    const debts: DebtEntry[] = [
+      {
+        transactionId: 'older',
+        description: 'Older transaction',
+        date: '2026-09-10',
+        debtorId: 1,
+        creditorId: 'me',
+        amount: 5,
+        transactionTotalAmount: 15,
+        paid: false,
+      },
+      {
+        transactionId: 'newer',
+        description: 'Newer transaction',
+        date: '2026-09-20',
+        debtorId: 1,
+        creditorId: 'me',
+        amount: 7,
+        transactionTotalAmount: 21,
+        paid: false,
+      },
+    ];
+    splitzService.getDebtsToSettle.mockReturnValue(debts);
+    splitzService.getDebtsBetweenMeAndPerson.mockReturnValue(debts);
+
+    component.requestSettlement(1, 'person-pays-me');
+    expect(component.settlementConfirmation()?.debts.map((debt) => debt.transactionId)).toEqual([
+      'newer',
+      'older',
+    ]);
+
+    component.requestNetSettlement(1, 12);
+    expect(component.settlementConfirmation()?.debts.map((debt) => debt.transactionId)).toEqual([
+      'newer',
+      'older',
+    ]);
+    expect(debts.map((debt) => debt.transactionId)).toEqual(['older', 'newer']);
+  });
+
+  it('shows owed and full amounts and colors each card by who paid', () => {
+    const debts: DebtEntry[] = [
+      {
+        transactionId: 'paid-by-me',
+        description: 'Paid by me',
+        date: '2026-09-20',
+        debtorId: 1,
+        creditorId: 'me',
+        amount: 7,
+        transactionTotalAmount: 21,
+        paid: false,
+      },
+      {
+        transactionId: 'paid-by-person',
+        description: 'Paid by Alex',
+        date: '2026-09-10',
+        debtorId: 'me',
+        creditorId: 2,
+        amount: 5,
+        transactionTotalAmount: 15,
+        paid: false,
+      },
+    ];
+    splitzService.getDebtsBetweenMeAndPerson.mockReturnValue(debts);
+    component.requestNetSettlement(2, 2);
+    component.showSettlementTransactions.set(true);
+    fixture.detectChanges();
+
+    const cards = Array.from<HTMLElement>(
+      fixture.nativeElement.querySelectorAll('.settlement-transaction-card'),
+    );
+    expect(cards).toHaveLength(2);
+    expect(cards[0].textContent).toContain('I paid');
+    expect(cards[0].textContent).toContain('Owed: €7.00');
+    expect(cards[0].textContent).toContain('Full amount: €21.00');
+    expect(cards[0].classList.contains('border-teal-500/40')).toBe(true);
+    expect(cards[0].classList.contains('bg-teal-950/20')).toBe(true);
+    expect(cards[1].textContent).toContain('Alex paid');
+    expect(cards[1].textContent).toContain('Owed: €5.00');
+    expect(cards[1].textContent).toContain('Full amount: €15.00');
+    expect(cards[1].classList.contains('border-amber-500/40')).toBe(true);
+    expect(cards[1].classList.contains('bg-amber-950/20')).toBe(true);
   });
 });

@@ -20,6 +20,7 @@ describe('splitz debt calculations', () => {
         debtorId: 1,
         creditorId: 'me' as const,
         amount: 10,
+        transactionTotalAmount: 20,
         paid: false,
       },
       {
@@ -29,6 +30,7 @@ describe('splitz debt calculations', () => {
         debtorId: 'me' as const,
         creditorId: 1,
         amount: 5,
+        transactionTotalAmount: 10,
         paid: false,
       },
     ];
@@ -62,6 +64,7 @@ describe('splitz debt calculations', () => {
         debtorId: 1,
         creditorId: 'me',
         amount: 6.66,
+        transactionTotalAmount: 20,
         paid: false,
       },
       {
@@ -71,6 +74,7 @@ describe('splitz debt calculations', () => {
         debtorId: 2,
         creditorId: 'me',
         amount: 6.66,
+        transactionTotalAmount: 20,
         paid: false,
       },
     ]);
@@ -106,6 +110,7 @@ describe('splitz debt calculations', () => {
         debtorId: 1,
         creditorId: 'me',
         amount: 8,
+        transactionTotalAmount: 24.9,
         paid: false,
       },
       {
@@ -115,6 +120,7 @@ describe('splitz debt calculations', () => {
         debtorId: 2,
         creditorId: 'me',
         amount: 4,
+        transactionTotalAmount: 24.9,
         paid: false,
       },
     ]);
@@ -146,6 +152,7 @@ describe('splitz debt calculations', () => {
         debtorId: 'me',
         creditorId: 2,
         amount: 5,
+        transactionTotalAmount: 15,
         paid: false,
       },
     ]);
@@ -176,6 +183,7 @@ describe('splitz debt calculations', () => {
         debtorId: 1,
         creditorId: 'me',
         amount: 6.66,
+        transactionTotalAmount: 20,
         paid: false,
       },
       {
@@ -185,6 +193,7 @@ describe('splitz debt calculations', () => {
         debtorId: 2,
         creditorId: 'me',
         amount: 6.66,
+        transactionTotalAmount: 20,
         paid: false,
       },
     ]);
