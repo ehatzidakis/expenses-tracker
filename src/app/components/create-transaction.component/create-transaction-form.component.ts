@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, effect, inject, signal } from '@angular/core';
+import { Component, computed, effect, ElementRef, inject, signal } from '@angular/core';
 import { form, maxLength, required } from '@angular/forms/signals';
 import { QueryClient } from '@tanstack/angular-query-experimental';
 import { TransactionService } from '../../services/transaction-service';
@@ -39,7 +39,7 @@ import {
   ],
   host: { class: 'block' },
   template: `
-    <form (submit)="onSubmit($event)" class="space-y-4">
+    <form (submit)="onSubmit($event)" class="space-y-4 scroll-mb-32">
       <app-transaction-basic-fields
         [model]="transactionModel()"
         [categories]="activeCategories()"
@@ -63,6 +63,7 @@ import {
           [people]="allPeople"
           [state]="splitStore.state()"
           [allowCustom]="true"
+          [scrollOnSplitInteraction]="true"
           (stateChange)="splitStore.apply($event)"
           (reset)="resetSplitFields()"
         />
@@ -103,6 +104,7 @@ import {
   `,
 })
 export class CreateTransactionFormComponent {
+  private readonly host = inject(ElementRef<HTMLElement>);
   private transactionService = inject(TransactionService);
   private adjustmentService = inject(AdjustmentService);
   private queryClient = inject(QueryClient);
@@ -229,7 +231,24 @@ export class CreateTransactionFormComponent {
     this.hasComment.set(value);
     if (!value) {
       this.transactionModel.update((model) => ({ ...model, comment: '' }));
+      return;
     }
+
+    this.scrollFormToBottom();
+  }
+
+  private scrollFormToBottom(): void {
+    if (typeof window === 'undefined') return;
+
+    requestAnimationFrame(() => {
+      if (!window.matchMedia('(max-width: 767px)').matches) return;
+
+      const form = this.host.nativeElement.querySelector('form');
+      form?.scrollIntoView({
+        behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth',
+        block: 'end',
+      });
+    });
   }
 
   resetSplitFields(): void {

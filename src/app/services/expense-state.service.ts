@@ -272,8 +272,8 @@ export class ExpenseStateService {
       Supermarket: 0,
       Medical: 0,
       Personal: 0,
-      EatingOut: 0,
       Utilities: 0,
+      EatingOut: 0,
       Takeaway: 0,
       Tickets: 0,
       Gaming: 0,
@@ -288,8 +288,8 @@ export class ExpenseStateService {
       aggregatedRecord.Supermarket += Number(expense.Supermarket) || 0;
       aggregatedRecord.Medical += Number(expense.Medical) || 0;
       aggregatedRecord.Personal += Number(expense.Personal) || 0;
-      aggregatedRecord.EatingOut += Number(expense.EatingOut) || 0;
       aggregatedRecord.Utilities += Number(expense.Utilities) || 0;
+      aggregatedRecord.EatingOut += Number(expense.EatingOut) || 0;
       aggregatedRecord.Takeaway += Number(expense.Takeaway) || 0;
       aggregatedRecord.Tickets += Number(expense.Tickets) || 0;
       aggregatedRecord.Gaming += Number(expense.Gaming) || 0;
