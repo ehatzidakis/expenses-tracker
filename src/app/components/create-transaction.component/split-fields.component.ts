@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, input, output } from '@angular/core';
+import { Component, computed, ElementRef, inject, input, output } from '@angular/core';
 import { normalizeDecimalInput, parseDecimalInput } from '../../utils/decimal-input';
 import { Person } from '../../models/splitz.model';
 
@@ -176,10 +176,13 @@ export interface CreateSplitState {
   `,
 })
 export class SplitFieldsComponent {
+  private readonly host = inject(ElementRef<HTMLElement>);
+
   readonly amount = input.required<number>();
   readonly people = input.required<ReadonlyArray<Person>>();
   readonly state = input.required<CreateSplitState>();
   readonly allowCustom = input(false);
+  readonly scrollOnSplitInteraction = input(false);
   readonly stateChange = output<CreateSplitState>();
   readonly reset = output<void>();
 
@@ -225,6 +228,7 @@ export class SplitFieldsComponent {
 
   setEnabled(enabled: boolean): void {
     this.emit({ ...this.state(), goesSplitzes: enabled });
+    if (enabled) this.scrollFormToBottom();
   }
 
   setCustom(custom: boolean): void {
@@ -241,6 +245,7 @@ export class SplitFieldsComponent {
       customSplitMode: custom,
       paidById,
     });
+    this.scrollFormToBottom();
   }
 
   togglePerson(personId: number): void {
@@ -255,10 +260,12 @@ export class SplitFieldsComponent {
       customSplitAmounts,
       paidById: this.state().paidById === personId ? 'me' : this.state().paidById,
     });
+    this.scrollFormToBottom();
   }
 
   setPaidBy(value: 'me' | number): void {
     this.emit({ ...this.state(), paidById: value });
+    this.scrollFormToBottom();
   }
 
   onCustomInput(event: Event, personId: 'me' | number): void {
@@ -277,5 +284,19 @@ export class SplitFieldsComponent {
 
   private emit(state: CreateSplitState): void {
     this.stateChange.emit(state);
+  }
+
+  private scrollFormToBottom(): void {
+    if (!this.scrollOnSplitInteraction() || typeof window === 'undefined') return;
+
+    requestAnimationFrame(() => {
+      if (!window.matchMedia('(max-width: 767px)').matches) return;
+
+      const form = this.host.nativeElement.closest('form');
+      form?.scrollIntoView({
+        behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth',
+        block: 'end',
+      });
+    });
   }
 }
