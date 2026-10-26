@@ -3,6 +3,7 @@ import { Component, computed, input, output } from '@angular/core';
 import { FieldTree, FormField } from '@angular/forms/signals';
 import { getCategoryMeta, getSubcategoryOptions } from '../../services/expense-state.service';
 import { normalizeDecimalInput, parseDecimalInput } from '../../utils/decimal-input';
+import { DateStepperComponent } from '../date-stepper/date-stepper.component';
 
 interface TransactionFieldsModel {
   date: string;
@@ -15,7 +16,7 @@ interface TransactionFieldsModel {
 @Component({
   selector: 'app-transaction-basic-fields',
   standalone: true,
-  imports: [CommonModule, FormField],
+  imports: [CommonModule, FormField, DateStepperComponent],
   host: { class: 'block' },
   template: `
     <div class="space-y-4">
@@ -72,12 +73,15 @@ interface TransactionFieldsModel {
 
       <div class="space-y-1.5">
         <label for="tx-date" class="text-xs font-medium text-gray-400">Date</label>
-        <input
-          id="tx-date"
-          type="date"
-          [formField]="dateField()"
-          class="w-full min-w-0 appearance-none scheme-dark bg-gray-800/60 border border-gray-800 rounded-xl px-3 py-2.5 text-sm text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/60"
-        />
+        <app-date-stepper>
+          <input
+            #dateInput
+            id="tx-date"
+            type="date"
+            [formField]="dateField()"
+            class="flex-1 min-w-0 appearance-none scheme-dark bg-gray-800/60 border border-gray-800 rounded-xl px-3 py-2.5 text-sm text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/60"
+          />
+        </app-date-stepper>
         @if (dateField()().touched() && dateField()().invalid()) {
           <span class="text-[11px] text-red-400">{{ dateField()().errors()[0]?.message }}</span>
         }

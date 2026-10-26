@@ -24,11 +24,12 @@ import {
 } from '../../services/expense-state.service';
 import { normalizeDecimalInput, parseDecimalInput } from '../../utils/decimal-input';
 import { resolvePendingCategoryOptions } from '../../services/transaction-service';
+import { DateStepperComponent } from '../date-stepper/date-stepper.component';
 
 @Component({
   selector: 'app-splitzes-modal',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, DateStepperComponent],
   templateUrl: './splitzes-modal.component.html',
 })
 export class SplitzesModalComponent {

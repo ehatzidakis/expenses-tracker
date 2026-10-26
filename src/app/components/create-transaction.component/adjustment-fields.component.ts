@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, input, output } from '@angular/core';
 import { FieldTree, FormField } from '@angular/forms/signals';
 import { normalizeDecimalInput, parseDecimalInput } from '../../utils/decimal-input';
+import { DateStepperComponent } from '../date-stepper/date-stepper.component';
 
 interface AdjustmentFieldsModel {
   description: string;
@@ -15,7 +16,7 @@ interface AdjustmentFieldsModel {
 @Component({
   selector: 'app-adjustment-fields',
   standalone: true,
-  imports: [CommonModule, FormField],
+  imports: [CommonModule, FormField, DateStepperComponent],
   host: { class: 'block' },
   template: `
     <div class="space-y-4">
@@ -119,12 +120,16 @@ interface AdjustmentFieldsModel {
     <div class="grid grid-cols-2 gap-3">
       <div class="space-y-1.5">
         <label for="adj-start-date" class="text-xs font-medium text-gray-400">Start Date</label
-        ><input
-          id="adj-start-date"
-          type="date"
-          [formField]="startDateField()"
-          class="w-full min-w-0 appearance-none scheme-dark bg-gray-800/60 border border-gray-800 rounded-xl px-3 py-2 text-xs text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/60"
-        />
+        >
+        <app-date-stepper size="sm">
+          <input
+            #dateInput
+            id="adj-start-date"
+            type="date"
+            [formField]="startDateField()"
+            class="flex-1 min-w-0 appearance-none scheme-dark bg-gray-800/60 border border-gray-800 rounded-xl px-2 py-2 text-xs text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/60"
+          />
+        </app-date-stepper>
         @if (startDateField()().touched() && startDateField()().invalid()) {
           <span class="text-[11px] text-red-400">{{
             startDateField()().errors()[0]?.message
@@ -133,12 +138,16 @@ interface AdjustmentFieldsModel {
       </div>
       <div class="space-y-1.5">
         <label for="adj-end-date" class="text-xs font-medium text-gray-400">End Date</label
-        ><input
-          id="adj-end-date"
-          type="date"
-          [formField]="endDateField()"
-          class="w-full min-w-0 appearance-none scheme-dark bg-gray-800/60 border border-gray-800 rounded-xl px-3 py-2 text-xs text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/60"
-        />
+        >
+        <app-date-stepper size="sm">
+          <input
+            #dateInput
+            id="adj-end-date"
+            type="date"
+            [formField]="endDateField()"
+            class="flex-1 min-w-0 appearance-none scheme-dark bg-gray-800/60 border border-gray-800 rounded-xl px-2 py-2 text-xs text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/60"
+          />
+        </app-date-stepper>
         @if (endDateField()().touched() && endDateField()().invalid()) {
           <span class="text-[11px] text-red-400">{{ endDateField()().errors()[0]?.message }}</span>
         }
