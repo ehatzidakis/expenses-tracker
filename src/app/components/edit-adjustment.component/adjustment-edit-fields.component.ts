@@ -1,11 +1,12 @@
 import { Component, input, output } from '@angular/core';
 import { FieldTree, FormField } from '@angular/forms/signals';
 import { EditAmountFieldComponent } from '../edit-form/edit-amount-field.component';
+import { DateStepperComponent } from '../date-stepper/date-stepper.component';
 
 @Component({
   selector: 'app-adjustment-edit-fields',
   standalone: true,
-  imports: [FormField, EditAmountFieldComponent],
+  imports: [FormField, EditAmountFieldComponent, DateStepperComponent],
   host: { class: 'block' },
   template: `
     <div class="space-y-4">
@@ -40,12 +41,15 @@ import { EditAmountFieldComponent } from '../edit-form/edit-amount-field.compone
           <label for="adj-edit-start-date" class="text-xs font-medium text-gray-400"
             >Start Date</label
           >
-          <input
-            id="adj-edit-start-date"
-            type="date"
-            [formField]="startDateField()"
-            class="w-full min-w-0 appearance-none scheme-dark bg-gray-800/60 border border-gray-800 rounded-xl px-3 py-2.5 text-xs text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/60"
-          />
+          <app-date-stepper size="sm">
+            <input
+              #dateInput
+              id="adj-edit-start-date"
+              type="date"
+              [formField]="startDateField()"
+              class="flex-1 min-w-0 appearance-none scheme-dark bg-gray-800/60 border border-gray-800 rounded-xl px-2 py-2.5 text-xs text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/60"
+            />
+          </app-date-stepper>
           @if (startDateField()().touched() && startDateField()().invalid()) {
             <span class="text-[11px] text-red-400">
               {{ startDateField()().errors()[0]?.message }}
@@ -55,12 +59,15 @@ import { EditAmountFieldComponent } from '../edit-form/edit-amount-field.compone
 
         <div class="space-y-1.5">
           <label for="adj-edit-end-date" class="text-xs font-medium text-gray-400">End Date</label>
-          <input
-            id="adj-edit-end-date"
-            type="date"
-            [formField]="endDateField()"
-            class="w-full min-w-0 appearance-none scheme-dark bg-gray-800/60 border border-gray-800 rounded-xl px-3 py-2.5 text-xs text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/60"
-          />
+          <app-date-stepper size="sm">
+            <input
+              #dateInput
+              id="adj-edit-end-date"
+              type="date"
+              [formField]="endDateField()"
+              class="flex-1 min-w-0 appearance-none scheme-dark bg-gray-800/60 border border-gray-800 rounded-xl px-2 py-2.5 text-xs text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/60"
+            />
+          </app-date-stepper>
           @if (endDateField()().touched() && endDateField()().invalid()) {
             <span class="text-[11px] text-red-400">
               {{ endDateField()().errors()[0]?.message }}

@@ -2,23 +2,27 @@ import { Component, input, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FieldTree, FormField } from '@angular/forms/signals';
 import { EditAmountFieldComponent } from '../edit-form/edit-amount-field.component';
+import { DateStepperComponent } from '../date-stepper/date-stepper.component';
 import { TransactionFormModel } from './edit-transaction.model';
 
 @Component({
   selector: 'app-transaction-edit-fields',
   standalone: true,
-  imports: [CommonModule, FormField, EditAmountFieldComponent],
+  imports: [CommonModule, FormField, EditAmountFieldComponent, DateStepperComponent],
   host: { class: 'block' },
   template: `
     <div class="space-y-4">
       <div class="space-y-1.5">
         <label for="tx-edit-date" class="text-xs font-medium text-gray-400">Date</label>
-        <input
-          id="tx-edit-date"
-          type="date"
-          [formField]="dateField()"
-          class="w-full min-w-0 appearance-none scheme-dark bg-gray-800/60 border border-gray-800 rounded-xl px-3 py-2.5 text-sm text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/60"
-        />
+        <app-date-stepper>
+          <input
+            #dateInput
+            id="tx-edit-date"
+            type="date"
+            [formField]="dateField()"
+            class="flex-1 min-w-0 appearance-none scheme-dark bg-gray-800/60 border border-gray-800 rounded-xl px-3 py-2.5 text-sm text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/60"
+          />
+        </app-date-stepper>
         @if (dateField()().touched() && dateField()().invalid()) {
           <span class="text-[11px] text-red-400">{{ dateField()().errors()[0]?.message }}</span>
         }

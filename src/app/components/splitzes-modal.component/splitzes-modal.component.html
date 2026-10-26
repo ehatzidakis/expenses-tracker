@@ -126,14 +126,17 @@
                               class="mb-1 block text-[10px] uppercase tracking-[0.12em] text-gray-400"
                               >Date</label
                             >
-                            <input
-                              type="date"
-                              [value]="pending.date"
-                              (input)="
-                                updatePendingDraft(pending.id, 'date', $any($event.target).value)
-                              "
-                              class="w-full min-w-0 appearance-none bg-gray-800/70 border border-gray-700 rounded-lg px-2 py-1.5 text-xs text-white"
-                            />
+                            <app-date-stepper size="sm">
+                              <input
+                                #dateInput
+                                type="date"
+                                [value]="pending.date"
+                                (input)="
+                                  updatePendingDraft(pending.id, 'date', $any($event.target).value)
+                                "
+                                class="flex-1 min-w-0 appearance-none bg-gray-800/70 border border-gray-700 rounded-lg px-2 py-1.5 text-xs text-white"
+                              />
+                            </app-date-stepper>
                           </div>
                         </div>
 
