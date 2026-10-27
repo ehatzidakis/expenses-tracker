@@ -18,6 +18,7 @@ import {
   type QueryConstraint,
   type QueryDocumentSnapshot,
 } from 'firebase/firestore/lite';
+import { injectQuery } from '@tanstack/angular-query-experimental';
 import { Transaction } from '../models/transaction.model';
 import { db } from '../firebase.config';
 import { CATEGORY_NAMES } from './expense-state.service';
@@ -150,6 +151,21 @@ export function normalizePendingSplitOverride<T extends Partial<NewTransactionIn
     splitType: 'split',
     customSplitAmounts: undefined,
   };
+}
+
+/**
+ * Kiosk entries get the default split on accept only when the reviewer
+ * didn't make a split choice; otherwise the reviewer's split is kept.
+ */
+export function resolvePendingAcceptSplit<T extends Partial<NewTransactionInput>>(
+  sourceRole: PendingTransaction['sourceRole'],
+  input: T,
+  overrides?: Partial<NewTransactionInput>,
+): T {
+  const reviewerChoseSplit = overrides?.isSplit !== undefined;
+  return sourceRole === 'kiosk' && !reviewerChoseSplit
+    ? normalizePendingSplitOverride(input)
+    : input;
 }
 
 export function normalizePendingForReview(input: PendingTransaction): PendingTransaction {
@@ -391,6 +407,13 @@ export class TransactionService {
     return tx;
   }
 
+  getPendingTransactionsQuery() {
+    return injectQuery(() => ({
+      queryKey: ['pendingTransactions'],
+      queryFn: () => this.fetchPendingTransactions(),
+    }));
+  }
+
   async fetchPendingTransactions(): Promise<PendingTransaction[]> {
     const snapshot = await getDocs(collection(db, 'adjustments-temp'));
 
@@ -508,8 +531,7 @@ export class TransactionService {
       adjustmentId: (overrides?.adjustmentId ?? data['adjustmentId']) as string | undefined,
       totalAmount: Number(overrides?.totalAmount ?? data['totalAmount'] ?? data['amount'] ?? 0),
     };
-    const resolvedInput =
-      sourceRole === 'kiosk' ? normalizePendingSplitOverride(pendingInput) : pendingInput;
+    const resolvedInput = resolvePendingAcceptSplit(sourceRole, pendingInput, overrides);
 
     const input: NewTransactionInput = {
       date: resolvedInput.date as string,

@@ -32,7 +32,7 @@ import { ConfirmModal } from '../confirm-modal/confirm-modal';
             [disabled]="formInvalid() || submitting() || deleting() || privacyDisabled()"
             class="w-full py-3 rounded-xl text-sm font-semibold text-white bg-linear-to-br from-indigo-500 to-violet-600 shadow-lg disabled:opacity-40 disabled:cursor-not-allowed active:scale-[0.99] transition-all"
           >
-            {{ submitting() ? 'Saving…' : 'Save Changes' }}
+            {{ submitting() ? submittingLabel() : submitLabel() }}
           </button>
 
           <button
@@ -41,7 +41,7 @@ import { ConfirmModal } from '../confirm-modal/confirm-modal';
             [disabled]="submitting() || deleting() || privacyDisabled()"
             class="w-full py-3 rounded-xl text-sm font-semibold text-red-400 bg-red-950/30 hover:bg-red-900/40 border border-red-800/50 disabled:opacity-40 disabled:cursor-not-allowed active:scale-[0.99] transition-all"
           >
-            {{ deleting() ? 'Deleting…' : deleteLabel() }}
+            {{ deleting() ? deletingLabel() : deleteLabel() }}
           </button>
         </div>
       </form>
@@ -51,7 +51,7 @@ import { ConfirmModal } from '../confirm-modal/confirm-modal';
       [isOpen]="showDeleteConfirm()"
       [title]="deleteTitle()"
       [message]="deleteMessage()"
-      confirmText="Delete"
+      [confirmText]="deleteConfirmText()"
       (confirmed)="deleteConfirmed.emit()"
       (cancelled)="deleteCancelled.emit()"
     />
@@ -68,6 +68,10 @@ export class EditFormShellComponent {
   readonly deleting = input.required<boolean>();
   readonly privacyDisabled = input.required<boolean>();
   readonly errorMessage = input<string | null>(null);
+  readonly submitLabel = input('Save Changes');
+  readonly submittingLabel = input('Saving…');
+  readonly deletingLabel = input('Deleting…');
+  readonly deleteConfirmText = input('Delete');
   readonly deleteLabel = input.required<string>();
   readonly deleteTitle = input.required<string>();
   readonly deleteMessage = input.required<string>();
