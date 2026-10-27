@@ -9,7 +9,7 @@ import { SplitzesModalComponent } from '../splitzes-modal.component/splitzes-mod
   host: { class: 'block' },
   imports: [SettingsModalComponent, SplitzesModalComponent],
   template: `
-    <header class="flex items-center justify-between pt-2">
+    <header class="flex items-center justify-between pt-2 pb-4">
       <div class="flex items-center gap-3">
         <img src="assets/favicon.svg" alt="Logo" class="w-10 h-10" />
         <div>
