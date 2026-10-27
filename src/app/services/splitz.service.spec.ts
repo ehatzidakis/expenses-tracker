@@ -7,6 +7,7 @@ import {
   comparePendingTransactionsByDate,
   getPendingTransactionTotalAmount,
   normalizePendingForReview,
+  resolvePendingAcceptSplit,
   type PendingTransaction,
 } from './transaction-service';
 
@@ -223,6 +224,31 @@ describe('splitz debt calculations', () => {
       splitBy: [1],
       splitType: 'split',
     });
+  });
+
+  it('applies the default kiosk split on accept only when no split was chosen', () => {
+    const stored = { amount: 20, isSplit: false, splitBy: [] as number[], totalAmount: 20 };
+
+    expect(resolvePendingAcceptSplit('kiosk', stored)).toMatchObject({
+      isSplit: true,
+      paidBy: 1,
+      splitBy: [1],
+    });
+
+    const chosen = {
+      ...stored,
+      amount: 8,
+      isSplit: true,
+      paidBy: 'me' as const,
+      splitBy: [1, 2],
+      splitType: 'custom' as const,
+      customSplitAmounts: { me: 8, 1: 6, 2: 6 },
+    };
+    expect(resolvePendingAcceptSplit('kiosk', chosen, chosen)).toEqual(chosen);
+
+    const off = { ...stored, isSplit: false };
+    expect(resolvePendingAcceptSplit('kiosk', off, { isSplit: false })).toEqual(off);
+    expect(resolvePendingAcceptSplit('admin', stored)).toEqual(stored);
   });
 
   it('uses the right category set for normal and linked pending transactions', () => {

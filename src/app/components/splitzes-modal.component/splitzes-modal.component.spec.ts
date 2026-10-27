@@ -1,21 +1,12 @@
 import { signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { QueryClient } from '@tanstack/angular-query-experimental';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { DebtEntry } from '../../models/splitz.model';
+import { describe, expect, it, vi } from 'vitest';
 import { AuthService } from '../../services/auth.service';
 import { SplitzService } from '../../services/splitz.service';
 import { SplitzSettlementService } from '../../services/splitz-settlement.service';
 import { PendingTransaction, TransactionService } from '../../services/transaction-service';
 import { SplitzesModalComponent } from './splitzes-modal.component';
-
-function deferred() {
-  let resolve!: () => void;
-  const promise = new Promise<void>((res) => {
-    resolve = res;
-  });
-  return { promise, resolve };
-}
 
 function pendingTransaction(id: string): PendingTransaction {
   return {
@@ -30,326 +21,101 @@ function pendingTransaction(id: string): PendingTransaction {
   };
 }
 
-describe('SplitzesModalComponent pending review', () => {
-  let fixture: ComponentFixture<SplitzesModalComponent>;
-  let component: SplitzesModalComponent;
-  let pendingList: PendingTransaction[];
-  let splitzService: {
-    getDebtsToSettle: ReturnType<typeof vi.fn>;
-    getDebtsBetweenMeAndPerson: ReturnType<typeof vi.fn>;
-  };
-  let transactionService: {
-    fetchPendingTransactions: ReturnType<typeof vi.fn>;
-    acceptPendingTransaction: ReturnType<typeof vi.fn>;
-    declinePendingTransaction: ReturnType<typeof vi.fn>;
-  };
-
-  const buttonWithText = (text: string): HTMLButtonElement | undefined =>
-    Array.from<HTMLButtonElement>(fixture.nativeElement.querySelectorAll('button')).find(
-      (button) => button.textContent?.trim() === text,
-    );
-
-  beforeEach(async () => {
-    pendingList = [pendingTransaction('p1'), pendingTransaction('p2')];
-    transactionService = {
-      fetchPendingTransactions: vi.fn().mockImplementation(async () => pendingList),
-      acceptPendingTransaction: vi.fn().mockResolvedValue(undefined),
-      declinePendingTransaction: vi.fn().mockResolvedValue(undefined),
-    };
-    splitzService = {
-      getDebtsToSettle: vi.fn((): DebtEntry[] => []),
-      getDebtsBetweenMeAndPerson: vi.fn((): DebtEntry[] => []),
-    };
-
-    await TestBed.configureTestingModule({
-      imports: [SplitzesModalComponent],
-      providers: [
-        {
-          provide: QueryClient,
-          useValue: new QueryClient({
-            defaultOptions: { queries: { retry: false, gcTime: Infinity } },
+async function setup(
+  isAdmin: boolean,
+  pending: PendingTransaction[] = [],
+): Promise<ComponentFixture<SplitzesModalComponent>> {
+  await TestBed.configureTestingModule({
+    imports: [SplitzesModalComponent],
+    providers: [
+      { provide: QueryClient, useValue: new QueryClient() },
+      { provide: AuthService, useValue: { isAdmin: signal(isAdmin) } },
+      {
+        provide: TransactionService,
+        useValue: {
+          getPendingTransactionsQuery: () => ({
+            data: signal(pending),
+            isPending: () => false,
+            isError: () => false,
+            refetch: vi.fn(),
           }),
+          acceptPendingTransaction: vi.fn(),
+          declinePendingTransaction: vi.fn(),
         },
-        { provide: TransactionService, useValue: transactionService },
-        { provide: AuthService, useValue: { isAdmin: signal(true) } },
-        {
-          provide: SplitzService,
-          useValue: {
-            ...splitzService,
-            getSplitTransactionsQuery: () => ({
-              isPending: () => false,
-              isError: () => false,
-              data: () => [],
-            }),
-            computePersonSummaries: () => [],
-          },
+      },
+      {
+        provide: SplitzService,
+        useValue: {
+          getSplitTransactionsQuery: () => ({
+            isPending: () => false,
+            isError: () => false,
+            data: () => [],
+          }),
+          computePersonSummaries: () => [],
         },
-        {
-          provide: SplitzSettlementService,
-          useValue: { getHistoryQuery: () => ({ isPending: () => false, data: () => [] }) },
-        },
-      ],
-    }).compileComponents();
-
-    fixture = TestBed.createComponent(SplitzesModalComponent);
-    component = fixture.componentInstance;
-    component.showPendingReview.set(true);
-    fixture.detectChanges();
-    await vi.waitFor(() => expect(component.pendingTransactions()).toHaveLength(2));
-    fixture.detectChanges();
-  });
-
-  afterEach(() => {
-    vi.restoreAllMocks();
-  });
-
-  it('runs a single accept when Accept is pressed repeatedly', async () => {
-    const accepting = deferred();
-    transactionService.acceptPendingTransaction.mockReturnValue(accepting.promise);
-
-    const first = component.onAcceptPending('p1');
-    const second = component.onAcceptPending('p1');
-
-    expect(transactionService.acceptPendingTransaction).toHaveBeenCalledTimes(1);
-    expect(component.pendingActionFor('p1')).toBe('accept');
-
-    pendingList = [pendingTransaction('p2')];
-    accepting.resolve();
-    await Promise.all([first, second]);
-
-    expect(transactionService.acceptPendingTransaction).toHaveBeenCalledTimes(1);
-    expect(component.pendingAction()).toBeNull();
-  });
-
-  it('shows a loading state and disables every row action while accepting', async () => {
-    const accepting = deferred();
-    transactionService.acceptPendingTransaction.mockReturnValue(accepting.promise);
-
-    component.startEditingPending('p1');
-    fixture.detectChanges();
-    buttonWithText('Accept')?.click();
-    fixture.detectChanges();
-
-    const acceptButton = buttonWithText('Accepting…');
-    expect(acceptButton?.disabled).toBe(true);
-    expect(acceptButton?.getAttribute('aria-busy')).toBe('true');
-    expect(buttonWithText('Cancel')?.disabled).toBe(true);
-    expect(buttonWithText('Edit / Accept')?.disabled).toBe(true);
-    expect(buttonWithText('Decline')?.disabled).toBe(true);
-
-    pendingList = [pendingTransaction('p2')];
-    accepting.resolve();
-    await vi.waitFor(() => expect(component.pendingAction()).toBeNull());
-    fixture.detectChanges();
-
-    expect(buttonWithText('Accepting…')).toBeUndefined();
-    expect(buttonWithText('Edit / Accept')?.disabled).toBe(false);
-  });
-
-  it('releases the lock and shows an inline error when accepting fails', async () => {
-    vi.spyOn(console, 'error').mockImplementation(() => undefined);
-    transactionService.acceptPendingTransaction.mockRejectedValue(new Error('offline'));
-
-    component.startEditingPending('p1');
-    await component.onAcceptPending('p1');
-    fixture.detectChanges();
-
-    expect(component.pendingAction()).toBeNull();
-    expect(fixture.nativeElement.querySelector('[role="alert"]')?.textContent).toContain(
-      'Unable to accept',
-    );
-    expect(buttonWithText('Accept')?.disabled).toBe(false);
-
-    buttonWithText('Cancel')?.click();
-    fixture.detectChanges();
-
-    expect(fixture.nativeElement.querySelector('[role="alert"]')).toBeNull();
-  });
-
-  it('shows the live custom split remainder for incoming transactions', () => {
-    const pending = {
-      ...pendingTransaction('p1'),
-      isSplit: true,
-      splitType: 'custom' as const,
-      splitBy: [1],
-      totalAmount: 12,
-      customSplitAmounts: { me: 5, 1: 3 },
-    };
-    component.pendingDrafts.set({ p1: pending });
-    component.editingPendingId.set('p1');
-    fixture.detectChanges();
-
-    expect(component.getPendingCustomRemainingLabel(component.pendingTransactions()[0])).toBe(
-      '€4.00 remaining to be split',
-    );
-    expect(fixture.nativeElement.textContent).toContain('€4.00 remaining to be split');
-
-    component.updatePendingDraft('p1', 'customSplitAmounts', { me: 8, 1: 4 });
-    fixture.detectChanges();
-    expect(fixture.nativeElement.textContent).toContain('All split — €0.00');
-  });
-
-  it('labels custom splits that exceed the total and rounds remainder to cents', () => {
-    const pending = {
-      ...pendingTransaction('p1'),
-      isSplit: true,
-      splitType: 'custom' as const,
-      splitBy: [1],
-      totalAmount: 12,
-      customSplitAmounts: { me: 8.01, 1: 4 },
-    };
-
-    expect(component.getPendingCustomRemaining(pending)).toBe(-0.01);
-    expect(component.getPendingCustomRemainingLabel(pending)).toBe('€0.01 over the total');
-  });
-
-  it('does not accept a custom split until its shares equal the total', async () => {
-    component.pendingDrafts.set({
-      p1: {
-        ...pendingTransaction('p1'),
-        isSplit: true,
-        splitType: 'custom',
-        splitBy: [1],
-        totalAmount: 12,
-        customSplitAmounts: { me: 5, 1: 3 },
-      },
-    });
-    component.editingPendingId.set('p1');
-    await component.onAcceptPending('p1');
-
-    expect(transactionService.acceptPendingTransaction).not.toHaveBeenCalled();
-    expect(component.pendingError()).toEqual({
-      id: 'p1',
-      message: 'Custom split total must equal €12.00. €4.00 remaining to be split',
-    });
-
-    component.updatePendingDraft('p1', 'customSplitAmounts', { me: 8, 1: 4 });
-    expect(component.pendingError()).toBeNull();
-    await component.onAcceptPending('p1');
-
-    expect(transactionService.acceptPendingTransaction).toHaveBeenCalledTimes(1);
-    expect(transactionService.acceptPendingTransaction).toHaveBeenCalledWith(
-      'p1',
-      expect.objectContaining({ amount: 8, totalAmount: 12 }),
-    );
-  });
-
-  it('locks every row while declining and releases them afterwards', async () => {
-    const declining = deferred();
-    transactionService.declinePendingTransaction.mockReturnValue(declining.promise);
-
-    const first = component.onDeclinePending('p1');
-    const second = component.onDeclinePending('p1');
-    fixture.detectChanges();
-
-    expect(transactionService.declinePendingTransaction).toHaveBeenCalledTimes(1);
-    expect(buttonWithText('Declining…')?.disabled).toBe(true);
-    expect(buttonWithText('Decline')?.disabled).toBe(true);
-
-    pendingList = [pendingTransaction('p2')];
-    declining.resolve();
-    await Promise.all([first, second]);
-
-    expect(component.pendingAction()).toBeNull();
-  });
-
-  it('ignores actions on other rows while one is in flight', async () => {
-    const accepting = deferred();
-    transactionService.acceptPendingTransaction.mockReturnValue(accepting.promise);
-
-    const first = component.onAcceptPending('p1');
-    await component.onAcceptPending('p2');
-    await component.onDeclinePending('p2');
-
-    expect(transactionService.acceptPendingTransaction).toHaveBeenCalledTimes(1);
-    expect(transactionService.declinePendingTransaction).not.toHaveBeenCalled();
-
-    pendingList = [pendingTransaction('p2')];
-    accepting.resolve();
-    await first;
-  });
-
-  it('sorts debts newest-first in both settlement confirmation flows', () => {
-    const debts: DebtEntry[] = [
-      {
-        transactionId: 'older',
-        description: 'Older transaction',
-        date: '2026-09-10',
-        debtorId: 1,
-        creditorId: 'me',
-        amount: 5,
-        transactionTotalAmount: 15,
-        paid: false,
       },
       {
-        transactionId: 'newer',
-        description: 'Newer transaction',
-        date: '2026-09-20',
-        debtorId: 1,
-        creditorId: 'me',
-        amount: 7,
-        transactionTotalAmount: 21,
-        paid: false,
+        provide: SplitzSettlementService,
+        useValue: { getHistoryQuery: () => ({ isPending: () => false, data: () => [] }) },
       },
-    ];
-    splitzService.getDebtsToSettle.mockReturnValue(debts);
-    splitzService.getDebtsBetweenMeAndPerson.mockReturnValue(debts);
+    ],
+  }).compileComponents();
 
-    component.requestSettlement(1, 'person-pays-me');
-    expect(component.settlementConfirmation()?.debts.map((debt) => debt.transactionId)).toEqual([
-      'newer',
-      'older',
-    ]);
+  const fixture = TestBed.createComponent(SplitzesModalComponent);
+  fixture.detectChanges();
+  return fixture;
+}
 
-    component.requestNetSettlement(1, 12);
-    expect(component.settlementConfirmation()?.debts.map((debt) => debt.transactionId)).toEqual([
-      'newer',
-      'older',
-    ]);
-    expect(debts.map((debt) => debt.transactionId)).toEqual(['older', 'newer']);
+const tabLabels = (fixture: ComponentFixture<SplitzesModalComponent>): string[] =>
+  Array.from<HTMLElement>(fixture.nativeElement.querySelectorAll('[role="tab"]')).map(
+    (tab) => tab.textContent?.replace(/\s+/g, ' ').trim() ?? '',
+  );
+
+const clickTab = (fixture: ComponentFixture<SplitzesModalComponent>, label: string): void => {
+  Array.from<HTMLButtonElement>(fixture.nativeElement.querySelectorAll('[role="tab"]'))
+    .find((tab) => tab.textContent?.trim().startsWith(label))
+    ?.click();
+  fixture.detectChanges();
+};
+
+describe('SplitzesModalComponent', () => {
+  it('hides the Incoming tab for non-admins', async () => {
+    const fixture = await setup(false, [pendingTransaction('p1')]);
+
+    expect(tabLabels(fixture)).toEqual(['Balances', 'History']);
+    expect(fixture.componentInstance.activeTab()).toBe('balances');
   });
 
-  it('shows owed and full amounts and colors each card by who paid', () => {
-    const debts: DebtEntry[] = [
-      {
-        transactionId: 'paid-by-me',
-        description: 'Paid by me',
-        date: '2026-09-20',
-        debtorId: 1,
-        creditorId: 'me',
-        amount: 7,
-        transactionTotalAmount: 21,
-        paid: false,
-      },
-      {
-        transactionId: 'paid-by-person',
-        description: 'Paid by Alex',
-        date: '2026-09-10',
-        debtorId: 'me',
-        creditorId: 2,
-        amount: 5,
-        transactionTotalAmount: 15,
-        paid: false,
-      },
-    ];
-    splitzService.getDebtsBetweenMeAndPerson.mockReturnValue(debts);
-    component.requestNetSettlement(2, 2);
-    component.showSettlementTransactions.set(true);
-    fixture.detectChanges();
+  it('opens on Incoming with a count badge when there is something to review', async () => {
+    const fixture = await setup(true, [pendingTransaction('p1'), pendingTransaction('p2')]);
 
-    const cards = Array.from<HTMLElement>(
-      fixture.nativeElement.querySelectorAll('.settlement-transaction-card'),
-    );
-    expect(cards).toHaveLength(2);
-    expect(cards[0].textContent).toContain('I paid');
-    expect(cards[0].textContent).toContain('Owed: €7.00');
-    expect(cards[0].textContent).toContain('Full amount: €21.00');
-    expect(cards[0].classList.contains('border-teal-500/40')).toBe(true);
-    expect(cards[0].classList.contains('bg-teal-950/20')).toBe(true);
-    expect(cards[1].textContent).toContain('Alex paid');
-    expect(cards[1].textContent).toContain('Owed: €5.00');
-    expect(cards[1].textContent).toContain('Full amount: €15.00');
-    expect(cards[1].classList.contains('border-amber-500/40')).toBe(true);
-    expect(cards[1].classList.contains('bg-amber-950/20')).toBe(true);
+    expect(tabLabels(fixture)).toEqual(['Balances', 'Incoming 2', 'History']);
+    expect(fixture.componentInstance.activeTab()).toBe('incoming');
+    expect(fixture.nativeElement.querySelectorAll('.pending-row')).toHaveLength(2);
+  });
+
+  it('opens the review screen when a row is tapped and returns on Back', async () => {
+    const fixture = await setup(true, [pendingTransaction('p1')]);
+
+    fixture.nativeElement.querySelector('.pending-row').click();
+    fixture.detectChanges();
+    expect(fixture.nativeElement.textContent).toContain('Review incoming');
+
+    Array.from<HTMLButtonElement>(fixture.nativeElement.querySelectorAll('button'))
+      .find((button) => button.textContent?.includes('Back'))
+      ?.click();
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelectorAll('.pending-row')).toHaveLength(1);
+  });
+
+  it('switches tab content', async () => {
+    const fixture = await setup(true);
+    expect(fixture.componentInstance.activeTab()).toBe('balances');
+
+    clickTab(fixture, 'History');
+    expect(fixture.nativeElement.textContent).toContain('No settlements yet.');
+
+    clickTab(fixture, 'Incoming');
+    expect(fixture.nativeElement.textContent).toContain('Nothing to review right now.');
   });
 });

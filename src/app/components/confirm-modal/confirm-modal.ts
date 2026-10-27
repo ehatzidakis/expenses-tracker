@@ -8,7 +8,7 @@ import { Component, ElementRef, effect, input, output, viewChild } from '@angula
       #dialog
       /* (click)="onBackdropClick($event)" */
       (cancel)="$event.preventDefault(); cancelled.emit()"
-      class="m-auto w-[calc(100%-2rem)] max-w-sm bg-transparent p-0 text-current backdrop:bg-black/75 backdrop:backdrop-blur-xs"
+      class="m-auto outline-none focus:outline-none w-[calc(100%-2rem)] max-w-sm bg-transparent p-0 text-current backdrop:bg-black/75 backdrop:backdrop-blur-xs"
     >
       <!-- Modal Card -->
       <div
