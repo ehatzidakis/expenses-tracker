@@ -234,6 +234,17 @@ export class TransactionService {
       .slice(0, 10);
   }
 
+  /** Every non-trip transaction in the given month ('November 2026'). */
+  async fetchMonthTransactions(monthName: string): Promise<Transaction[]> {
+    const snapshot = await getDocs(
+      query(collection(db, 'transactions'), where('monthName', '==', monthName)),
+    );
+
+    return snapshot.docs
+      .map((document) => this.mapTransaction(document.data(), document.id))
+      .filter((transaction) => !transaction.adjustmentId);
+  }
+
   private notifyTransactionChanged(): void {
     this.transactionRevision.update((revision) => revision + 1);
   }

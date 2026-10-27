@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, input, output } from '@angular/core';
+import { Component, computed, ElementRef, input, output, viewChild } from '@angular/core';
 import { FieldTree, FormField } from '@angular/forms/signals';
 import { getCategoryMeta, getSubcategoryOptions } from '../../services/expense-state.service';
 import { normalizeDecimalInput, parseDecimalInput } from '../../utils/decimal-input';
@@ -89,7 +89,9 @@ interface TransactionFieldsModel {
 
       <div class="space-y-1.5">
         <label for="tx-description" class="text-xs font-medium text-gray-400">Description</label>
+        <ng-content select="[descriptionExtras]" />
         <input
+          #descriptionInput
           id="tx-description"
           type="text"
           placeholder="Add transaction description"
@@ -134,9 +136,17 @@ interface TransactionFieldsModel {
             "
             class="w-full bg-gray-800/60 border border-gray-800 rounded-xl px-3 py-2.5 text-sm text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/60"
           >
-            <option value="">Select a subcategory</option>
+            <option value="" [selected]="model().subCategoryId == null">
+              Select a subcategory
+            </option>
+            <!-- [selected] per option: the select's own [value] runs before new options exist -->
             @for (subcategory of subcategories(); track subcategory.id) {
-              <option [value]="subcategory.id">{{ subcategory.label }}</option>
+              <option
+                [value]="subcategory.id"
+                [selected]="model().subCategoryId === subcategory.id"
+              >
+                {{ subcategory.label }}
+              </option>
             }
           </select>
           @if (subCategoryField()().touched() && subCategoryField()().invalid()) {
@@ -150,6 +160,7 @@ interface TransactionFieldsModel {
       <div class="space-y-1.5">
         <label for="tx-amount" class="text-xs font-medium text-gray-400">Amount</label>
         <input
+          #amountInput
           id="tx-amount"
           type="text"
           inputmode="decimal"
@@ -159,6 +170,15 @@ interface TransactionFieldsModel {
           (input)="onAmountInput($event)"
           class="w-full bg-gray-800/60 border border-gray-800 rounded-xl px-3 py-2.5 text-sm text-gray-100 placeholder:text-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/60 tabular-nums"
         />
+        @if (amountHint() != null && model().amount === 0) {
+          <button
+            type="button"
+            (click)="amountHintUse.emit(amountHint()!)"
+            class="text-[11px] text-indigo-300 hover:text-indigo-200 cursor-pointer tabular-nums"
+          >
+            Last month: €{{ amountHint()!.toFixed(2) }} · tap to use
+          </button>
+        }
         @if (amountField()().touched() && amountField()().invalid()) {
           <span class="text-[11px] text-red-400">{{ amountField()().errors()[0]?.message }}</span>
         }
@@ -177,14 +197,26 @@ export class TransactionBasicFieldsComponent {
   readonly categoryField = input.required<FieldTree<string>>();
   readonly subCategoryField = input.required<FieldTree<number | null>>();
   readonly amountField = input.required<FieldTree<number>>();
+  /** Last month's amount for the picked template, shown as a tappable hint. */
+  readonly amountHint = input<number | null>(null);
+
+  private readonly descriptionInput =
+    viewChild.required<ElementRef<HTMLInputElement>>('descriptionInput');
+  private readonly amountInput = viewChild.required<ElementRef<HTMLInputElement>>('amountInput');
 
   readonly linkChange = output<boolean>();
   readonly tripChange = output<string>();
   readonly categoryChange = output<string>();
   readonly subcategoryChange = output<number | null>();
   readonly amountChange = output<number>();
+  readonly amountHintUse = output<number>();
 
   readonly subcategories = computed(() => getSubcategoryOptions(this.model().category));
+
+  focusField(field: 'description' | 'amount'): void {
+    const target = field === 'description' ? this.descriptionInput() : this.amountInput();
+    target.nativeElement.focus({ preventScroll: true });
+  }
 
   categoryLabel(category: string): string {
     return `${getCategoryMeta(category).emoji} ${category}`;

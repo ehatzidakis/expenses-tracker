@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, effect, ElementRef, inject, signal } from '@angular/core';
+import { Component, computed, effect, ElementRef, inject, signal, viewChild } from '@angular/core';
 import { form, maxLength, required } from '@angular/forms/signals';
 import { QueryClient } from '@tanstack/angular-query-experimental';
 import { TransactionService } from '../../services/transaction-service';
@@ -17,6 +17,8 @@ import { TransactionBasicFieldsComponent } from './transaction-basic-fields.comp
 import { SplitFieldsComponent } from './split-fields.component';
 import { TransactionCommentFieldsComponent } from './transaction-comment-fields.component';
 import { SplitStateStore } from './split-state.store';
+import { RecurringTemplatesComponent, TemplatePick } from './recurring-templates.component';
+import { applyTemplate } from './recurring-templates.util';
 import {
   shouldSaveTransactionForApproval,
   TransactionFormModel,
@@ -36,6 +38,7 @@ import {
     TransactionBasicFieldsComponent,
     SplitFieldsComponent,
     TransactionCommentFieldsComponent,
+    RecurringTemplatesComponent,
   ],
   host: { class: 'block' },
   template: `
@@ -51,12 +54,25 @@ import {
         [categoryField]="transactionForm.category"
         [subCategoryField]="transactionForm.subCategoryId"
         [amountField]="transactionForm.amount"
+        [amountHint]="amountHint()"
         (linkChange)="toggleLinkWithAdjustment($event)"
         (tripChange)="selectedAdjustmentId.set($event)"
-        (categoryChange)="setCategory($event)"
+        (categoryChange)="setCategory($event); clearTemplate()"
         (subcategoryChange)="setSubcategory($event)"
         (amountChange)="transactionModel.update((model) => ({ ...model, amount: $event }))"
-      />
+        (amountHintUse)="transactionModel.update((model) => ({ ...model, amount: $event }))"
+      >
+        @if (!linkWithAdjustment() && !isKioskMode()) {
+          <app-recurring-templates
+            descriptionExtras
+            [targetDate]="transactionModel().date"
+            [activeId]="activeTemplateId()"
+            [disabled]="privacyService.isPrivacyMode()"
+            (picked)="onTemplatePicked($event)"
+            (batchDone)="showSuccessMessage($event)"
+          />
+        }
+      </app-transaction-basic-fields>
       @if (!isKioskMode()) {
         <app-split-fields
           [amount]="transactionModel().amount"
@@ -120,6 +136,10 @@ export class CreateTransactionFormComponent {
   readonly linkWithAdjustment = signal<boolean>(false);
   readonly selectedAdjustmentId = signal<string>('');
   readonly hasComment = signal<boolean>(false);
+  readonly activeTemplateId = signal<string | null>(null);
+  readonly amountHint = signal<number | null>(null);
+
+  private readonly basicFields = viewChild.required(TransactionBasicFieldsComponent);
 
   readonly transactionModel = signal<TransactionFormModel>(defaultTransactionModel());
 
@@ -219,7 +239,30 @@ export class CreateTransactionFormComponent {
     }));
   }
 
+  onTemplatePicked({ template, lastAmount }: TemplatePick): void {
+    this.transactionModel.update((model) => applyTemplate(model, template));
+    this.transactionForm().reset();
+    this.activeTemplateId.set(template.id);
+    this.amountHint.set(lastAmount);
+    this.errorMessage.set(null);
+
+    const focusTarget = !template.description
+      ? 'description'
+      : template.amount == null
+        ? 'amount'
+        : null;
+    if (focusTarget) {
+      requestAnimationFrame(() => this.basicFields().focusField(focusTarget));
+    }
+  }
+
+  clearTemplate(): void {
+    this.activeTemplateId.set(null);
+    this.amountHint.set(null);
+  }
+
   toggleLinkWithAdjustment(value: boolean): void {
+    this.clearTemplate();
     this.linkWithAdjustment.set(value);
     this.transactionModel.update((m) => ({ ...m, category: '' }));
     if (!value) {
@@ -254,9 +297,10 @@ export class CreateTransactionFormComponent {
   resetSplitFields(): void {
     this.splitStore.reset();
     this.hasComment.set(false);
+    this.clearTemplate();
   }
 
-  private showSuccessMessage(message: string): void {
+  showSuccessMessage(message: string): void {
     if (this.successMessageTimer) {
       clearTimeout(this.successMessageTimer);
     }
