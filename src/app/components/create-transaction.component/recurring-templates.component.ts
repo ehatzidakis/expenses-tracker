@@ -50,7 +50,7 @@ export interface TemplatePick {
         }
       </div>
 
-      @if (confirming()) {
+      <!-- @if (confirming()) {
         <div
           class="p-2.5 rounded-xl bg-gray-950/80 border border-gray-800 text-[11px] text-gray-300 space-y-2"
         >
@@ -81,7 +81,7 @@ export interface TemplatePick {
         >
           {{ saving() ? 'Adding…' : '➕ Add all monthly (' + remainingCount() + ')' }}
         </button>
-      }
+      } -->
 
       @if (errorMessage()) {
         <p class="text-[11px] text-red-400">{{ errorMessage() }}</p>
