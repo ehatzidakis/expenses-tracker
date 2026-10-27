@@ -62,7 +62,25 @@ import {
         (amountChange)="transactionModel.update((model) => ({ ...model, amount: $event }))"
         (amountHintUse)="transactionModel.update((model) => ({ ...model, amount: $event }))"
       >
-        @if (!linkWithAdjustment() && !isKioskMode()) {
+        @if (showRecurring()) {
+          <button
+            descriptionAction
+            type="button"
+            (click)="recurringOpen.set(!recurringOpen())"
+            [attr.aria-expanded]="recurringOpen()"
+            aria-label="Recurring transactions"
+            title="Recurring transactions"
+            class="flex items-center gap-1 px-2 py-0.5 rounded-lg text-[11px] font-semibold border transition-colors cursor-pointer"
+            [class.bg-indigo-500/20]="recurringOpen()"
+            [class.border-indigo-400/50]="recurringOpen()"
+            [class.text-indigo-200]="recurringOpen()"
+            [class.border-gray-700/60]="!recurringOpen()"
+            [class.text-gray-400]="!recurringOpen()"
+          >
+            🔁 Recurring
+          </button>
+        }
+        @if (showRecurring() && recurringOpen()) {
           <app-recurring-templates
             descriptionExtras
             [targetDate]="transactionModel().date"
@@ -137,6 +155,8 @@ export class CreateTransactionFormComponent {
   readonly selectedAdjustmentId = signal<string>('');
   readonly hasComment = signal<boolean>(false);
   readonly activeTemplateId = signal<string | null>(null);
+  readonly recurringOpen = signal(false);
+  readonly showRecurring = computed(() => !this.linkWithAdjustment() && !this.isKioskMode());
   readonly amountHint = signal<number | null>(null);
 
   private readonly basicFields = viewChild.required(TransactionBasicFieldsComponent);

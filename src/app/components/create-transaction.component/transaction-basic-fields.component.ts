@@ -88,7 +88,10 @@ interface TransactionFieldsModel {
       </div>
 
       <div class="space-y-1.5">
-        <label for="tx-description" class="text-xs font-medium text-gray-400">Description</label>
+        <div class="flex items-center justify-between gap-2">
+          <label for="tx-description" class="text-xs font-medium text-gray-400">Description</label>
+          <ng-content select="[descriptionAction]" />
+        </div>
         <ng-content select="[descriptionExtras]" />
         <input
           #descriptionInput
