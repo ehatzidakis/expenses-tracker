@@ -2,6 +2,8 @@ import { CommonModule } from '@angular/common';
 import { Component, computed, ElementRef, inject, input, output } from '@angular/core';
 import { normalizeDecimalInput, parseDecimalInput } from '../../utils/decimal-input';
 import { Person } from '../../models/splitz.model';
+import { Transaction } from '../../models/transaction.model';
+import { computeSplit, computeSplitDebtEntries } from '../../services/splitz.service';
 
 export interface CreateSplitState {
   goesSplitzes: boolean;
@@ -9,6 +11,20 @@ export interface CreateSplitState {
   paidById: 'me' | number;
   customSplitMode: boolean;
   customSplitAmounts: Partial<Record<'me' | number, number>>;
+}
+
+/** Builds the split-picker state from stored split fields. */
+export function toSplitState(
+  source: Pick<Transaction, 'isSplit' | 'splitBy' | 'paidBy' | 'splitType' | 'customSplitAmounts'>,
+): CreateSplitState {
+  const isSplit = Boolean(source.isSplit);
+  return {
+    goesSplitzes: isSplit,
+    splitWith: isSplit ? [...(source.splitBy ?? [])] : [],
+    paidById: isSplit ? (source.paidBy ?? 'me') : 'me',
+    customSplitMode: isSplit && source.splitType === 'custom',
+    customSplitAmounts: { ...(source.customSplitAmounts ?? {}) },
+  };
 }
 
 @Component({
@@ -98,12 +114,17 @@ export interface CreateSplitState {
               <p class="text-xs font-medium text-teal-400">Split preview</p>
               <p class="text-xs text-gray-400">
                 Your share:
-                <span class="text-white font-semibold"
-                  >€{{ (amount() / (state().splitWith.length + 1)).toFixed(2) }}</span
+                <span class="text-white font-semibold">€{{ myShare().toFixed(2) }}</span
                 ><span class="text-gray-500">
                   (1 of {{ state().splitWith.length + 1 }} people)</span
                 >
               </p>
+              @for (line of debtLines(); track $index) {
+                <p class="text-xs text-gray-400">
+                  {{ line.label }}
+                  <span class="text-white font-semibold">€{{ line.amount.toFixed(2) }}</span>
+                </p>
+              }
             </div>
           }
         }
@@ -206,6 +227,41 @@ export class SplitFieldsComponent {
       ) / 100,
   );
   readonly customValid = computed(() => Math.abs(this.remaining()) < 0.005);
+
+  /** Matches what is saved: I absorb the remainder cent. */
+  readonly myShare = computed(
+    () =>
+      computeSplit(Number(this.amount()) || 0, this.state().paidById, this.state().splitWith)
+        .myShare,
+  );
+
+  /** Who owes whom for an even split, using the same maths as the Splitzes balances. */
+  readonly debtLines = computed(() => {
+    const state = this.state();
+    const draft: Transaction = {
+      id: 'draft',
+      monthName: '',
+      date: '',
+      description: '',
+      amount: this.myShare(),
+      category: '',
+      createdAt: '',
+      isSplit: true,
+      paidBy: state.paidById,
+      splitBy: state.splitWith,
+      splitType: 'split',
+      totalAmount: Number(this.amount()) || 0,
+    };
+    return computeSplitDebtEntries(draft).map((debt) => ({
+      label:
+        debt.debtorId === 'me'
+          ? `You owe ${this.personName(debt.creditorId)}:`
+          : debt.creditorId === 'me'
+            ? `${this.personName(debt.debtorId)} owes you:`
+            : `${this.personName(debt.debtorId)} owes ${this.personName(debt.creditorId)}:`,
+      amount: debt.amount,
+    }));
+  });
 
   personName(id: 'me' | number): string {
     return id === 'me'

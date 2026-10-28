@@ -1,7 +1,7 @@
 import { Component, inject, input, output, signal, effect, computed } from '@angular/core';
 import { form, maxLength, required } from '@angular/forms/signals';
 import { QueryClient } from '@tanstack/angular-query-experimental';
-import { TransactionService } from '../../services/transaction-service';
+import { NewTransactionInput, TransactionService } from '../../services/transaction-service';
 import {
   CATEGORY_NAMES,
   categoryRequiresSubcategory,
@@ -11,10 +11,23 @@ import {
 import { Transaction } from '../../models/transaction.model';
 import { PEOPLE } from '../../models/splitz.model';
 import { PrivacyService } from '../../services/privacy.service';
-import { TransactionFormModel, buildTransactionFormModel } from './edit-transaction.model';
+import {
+  TransactionFormModel,
+  buildTransactionFormModel,
+  isSplitLocked,
+} from './edit-transaction.model';
 import { EditFormShellComponent } from '../edit-form/edit-form-shell.component';
 import { TransactionEditFieldsComponent } from './transaction-edit-fields.component';
-import { TransactionSplitDetailsComponent } from './transaction-split-details.component';
+import { TransactionSplitSummaryComponent } from './transaction-split-summary.component';
+import {
+  CreateSplitState,
+  SplitFieldsComponent,
+  toSplitState,
+} from '../create-transaction.component/split-fields.component';
+import {
+  BuildResult,
+  buildTransactionUpdatePayload,
+} from '../create-transaction.component/transaction-payload';
 
 @Component({
   selector: 'app-edit-transaction',
@@ -22,13 +35,13 @@ import { TransactionSplitDetailsComponent } from './transaction-split-details.co
   imports: [
     EditFormShellComponent,
     TransactionEditFieldsComponent,
-    TransactionSplitDetailsComponent,
+    TransactionSplitSummaryComponent,
+    SplitFieldsComponent,
   ],
   host: { class: 'block' },
   template: `
     <app-edit-form-shell
       title="Edit Transaction"
-      outerClass="space-y-4 border border-gray-800/80 rounded-2xl p-4 bg-gray-900/60 backdrop-blur-sm"
       [formInvalid]="transactionForm().invalid()"
       [submitting]="submitting()"
       [deleting]="deleting()"
@@ -55,17 +68,24 @@ import { TransactionSplitDetailsComponent } from './transaction-split-details.co
         [amountField]="transactionForm.amount"
         [commentField]="transactionForm.comment"
         [categoryLabel]="getCategoryOptionLabel"
+        [amountLabel]="split().goesSplitzes ? 'Total bill' : 'Amount'"
+        [amountReadonly]="locked()"
+        [privacyMode]="privacyService.isPrivacyMode()"
         (categoryChange)="setCategory($event)"
         (subcategoryChange)="setSubcategory($event)"
         (amountChange)="onAmountChange($event)"
       />
 
-      @if (splitMeta(); as split) {
-        <app-transaction-split-details
-          [details]="split"
-          [personName]="personNameForChild"
-          [splitWithNames]="splitWithNamesForChild"
-          [splitTypeLabel]="splitTypeLabelForChild"
+      @if (locked()) {
+        <app-transaction-split-summary [transaction]="transaction()" />
+      } @else {
+        <app-split-fields
+          [amount]="model().amount"
+          [people]="people"
+          [state]="split()"
+          [allowCustom]="true"
+          (stateChange)="split.set($event)"
+          (reset)="resetSplit()"
         />
       }
     </app-edit-form-shell>
@@ -84,7 +104,7 @@ export class EditTransactionComponent {
   readonly updated = output<void>();
   readonly deleted = output<void>();
 
-  // readonly categories = CATEGORY_NAMES;
+  readonly people = PEOPLE;
   readonly categories = computed(() => this.categoryOverride() ?? CATEGORY_NAMES);
 
   readonly model = signal<TransactionFormModel>({
@@ -97,37 +117,17 @@ export class EditTransactionComponent {
     amount: 0,
   });
 
-  readonly splitMeta = computed(() => {
-    const tx = this.transaction();
-    if (!tx?.isSplit) {
-      return null;
-    }
-
-    return {
-      isSplit: tx.isSplit,
-      paidBy: tx.paidBy,
-      splitBy: tx.splitBy ?? [],
-      splitType: tx.splitType ?? 'split',
-      totalAmount: tx.totalAmount ?? tx.amount,
-      splitPaidPersonIds: tx.splitPaidPersonIds ?? [],
-    };
-  });
-
-  readonly personNameForChild = (id: 'me' | number | undefined): string => this.getPersonName(id);
-  readonly splitWithNamesForChild = (ids: number[]): string => this.getSplitWithNames(ids);
-  readonly splitTypeLabelForChild = (type: 'split' | 'custom'): string =>
-    this.getSplitTypeLabel(type);
-
-  private hydrateModelFromTransaction(tx: Transaction): void {
-    this.model.set(buildTransactionFormModel(tx));
-  }
+  readonly split = signal<CreateSplitState>(toSplitState({}));
+  readonly locked = computed(() => isSplitLocked(this.transaction()));
 
   constructor() {
     // Populate form model when input transaction signal resolves
     effect(() => {
       const tx = this.transaction();
       if (tx) {
-        this.hydrateModelFromTransaction(tx);
+        this.model.set(buildTransactionFormModel(tx));
+        this.split.set(toSplitState(tx));
+        this.errorMessage.set(null);
       }
     });
   }
@@ -151,10 +151,10 @@ export class EditTransactionComponent {
   }
 
   setCategory(category: string): void {
+    // Match against the list the dropdown shows (trip categories for trip transactions).
+    const shown = this.categories();
     const normalizedCategory =
-      CATEGORY_NAMES.find((name) => name.toLowerCase() === category.trim().toLowerCase()) ??
-      CATEGORY_NAMES[0] ??
-      '';
+      shown.find((name) => name.toLowerCase() === category.trim().toLowerCase()) ?? '';
 
     const options = getSubcategoryOptions(normalizedCategory);
     const currentSelection = this.model().subCategoryId;
@@ -186,39 +186,47 @@ export class EditTransactionComponent {
   readonly deleting = signal(false);
   readonly errorMessage = signal<string | null>(null);
 
-  getPersonName(id: 'me' | number | undefined): string {
-    if (id === 'me' || id === undefined) {
-      return id === 'me' ? 'me' : 'Unknown';
-    }
-
-    const person = PEOPLE.find((entry) => entry.id === id);
-    return person?.name ?? `Person ${id}`;
-  }
-
-  getSplitWithNames(ids: number[] = []): string {
-    if (!ids.length) {
-      return 'None';
-    }
-
-    return ids.map((id) => this.getPersonName(id)).join(', ');
-  }
-
-  getSplitTypeLabel(type?: 'split' | 'custom'): string {
-    switch (type) {
-      case 'custom':
-        return 'Custom split';
-      case 'split':
-      default:
-        return 'Splitz';
-    }
-  }
-
   requestDelete(): void {
     this.showDeleteConfirm.set(true);
   }
 
   onAmountChange(amount: number): void {
+    if (this.locked()) return;
     this.model.update((value) => ({ ...value, amount }));
+    this.errorMessage.set(null);
+  }
+
+  resetSplit(): void {
+    this.split.set(toSplitState({}));
+  }
+
+  /**
+   * Locked splits keep their money untouched (no split keys → the service leaves them alone).
+   * Otherwise the form works like Create: amount is the full bill and my share is derived.
+   */
+  private buildPayload(): BuildResult<NewTransactionInput> {
+    const value = this.model();
+    const tx = this.transaction();
+
+    if (!this.locked()) {
+      return buildTransactionUpdatePayload(value, this.split(), tx.adjustmentId);
+    }
+
+    if (categoryRequiresSubcategory(value.category) && !value.subCategoryId) {
+      return { ok: false, error: 'Please select a valid subcategory for this transaction.' };
+    }
+    return {
+      ok: true,
+      payload: {
+        date: value.date,
+        description: value.description.trim(),
+        category: value.category,
+        subCategoryId: value.subCategoryId ?? undefined,
+        subCategory: value.subCategory,
+        comment: value.comment.trim() || undefined,
+        amount: tx.amount,
+      },
+    };
   }
 
   async onSubmit(event: Event): Promise<void> {
@@ -227,13 +235,14 @@ export class EditTransactionComponent {
       return;
     }
 
-    const value = this.model();
-    if (categoryRequiresSubcategory(value.category) && !value.subCategoryId) {
-      this.errorMessage.set('Please select a valid subcategory for this transaction.');
+    if (this.model().amount <= 0) {
+      this.errorMessage.set('Amount must be greater than 0');
       return;
     }
-    if (value.amount <= 0) {
-      this.errorMessage.set('Amount must be greater than 0');
+
+    const result = this.buildPayload();
+    if (!result.ok) {
+      this.errorMessage.set(result.error);
       return;
     }
 
@@ -241,15 +250,7 @@ export class EditTransactionComponent {
     this.errorMessage.set(null);
 
     try {
-      await this.transactionService.updateTransaction(this.transaction(), {
-        date: value.date,
-        description: value.description.trim(),
-        category: value.category,
-        subCategoryId: value.subCategoryId ?? undefined,
-        subCategory: value.subCategory,
-        comment: value.comment.trim() || undefined,
-        amount: value.amount,
-      });
+      await this.transactionService.updateTransaction(this.transaction(), result.payload);
 
       await this.queryClient.invalidateQueries({ queryKey: ['expenses'] });
       await this.queryClient.invalidateQueries({ queryKey: ['adjustments'] });

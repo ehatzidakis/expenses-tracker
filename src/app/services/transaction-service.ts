@@ -2,6 +2,7 @@ import { inject, Injectable, signal } from '@angular/core';
 import {
   collection,
   deleteDoc,
+  deleteField,
   doc,
   getDocs,
   getDoc,
@@ -62,13 +63,59 @@ export interface PendingTransaction extends NewTransactionInput {
   status: 'pending';
 }
 
-export function getPendingTransactionTotalAmount(
-  input: Pick<PendingTransaction, 'amount' | 'totalAmount' | 'isSplit'>,
+/** Full bill for a split, otherwise the amount itself. */
+export function getTransactionTotalAmount(
+  input: Pick<NewTransactionInput, 'amount' | 'totalAmount' | 'isSplit'>,
 ): number {
   const amount = Number(input.amount) || 0;
   const totalAmount = Number(input.totalAmount);
 
   return input.isSplit && Number.isFinite(totalAmount) && totalAmount > 0 ? totalAmount : amount;
+}
+
+export const getPendingTransactionTotalAmount = getTransactionTotalAmount;
+
+const SPLIT_FIELDS = [
+  'paidBy',
+  'splitBy',
+  'splitType',
+  'totalAmount',
+  'customSplitAmounts',
+  'splitPaidPersonIds',
+] as const;
+
+/**
+ * Split fields to write when a transaction is edited.
+ * `input.isSplit` undefined means "leave split data alone" (used when the split is locked).
+ */
+export function splitUpdateFields(
+  oldTx: Pick<Transaction, 'isSplit' | 'splitPaidPersonIds'>,
+  input: NewTransactionInput,
+): { set: Record<string, unknown>; clear: string[] } {
+  if (input.isSplit === true) {
+    const splitType = input.splitType ?? 'split';
+    const set: Record<string, unknown> = {
+      isSplit: true,
+      paidBy: input.paidBy ?? 'me',
+      splitBy: input.splitBy ?? [],
+      splitType,
+      totalAmount: input.totalAmount ?? input.amount,
+    };
+    if (!oldTx.isSplit) {
+      set['splitPaidPersonIds'] = [];
+    }
+    if (splitType === 'custom') {
+      set['customSplitAmounts'] = input.customSplitAmounts ?? {};
+      return { set, clear: [] };
+    }
+    return { set, clear: ['customSplitAmounts'] };
+  }
+
+  if (input.isSplit === false && oldTx.isSplit) {
+    return { set: { isSplit: false }, clear: [...SPLIT_FIELDS] };
+  }
+
+  return { set: {}, clear: [] };
 }
 
 export function comparePendingTransactionsByDate(
@@ -695,7 +742,7 @@ export class TransactionService {
 
     // 3. Update the transaction document itself
     const txRef = doc(db, 'transactions', oldTx.id);
-    const updateData: Record<string, string | number> = {
+    const updateData: Record<string, unknown> = {
       date: input.date,
       monthName: newMonthName,
       description: input.description,
@@ -713,9 +760,10 @@ export class TransactionService {
     if (oldTx.adjustmentId) {
       updateData['adjustmentId'] = oldTx.adjustmentId;
     }
-    if (oldTx.isSplit) {
-      const participants = (oldTx.splitBy?.length ?? 0) + 1;
-      updateData['totalAmount'] = Math.round(input.amount * participants * 100) / 100; // Round to 2 decimal places
+    const split = splitUpdateFields(oldTx, input);
+    Object.assign(updateData, split.set);
+    for (const field of split.clear) {
+      updateData[field] = deleteField();
     }
     batch.update(txRef, updateData);
 

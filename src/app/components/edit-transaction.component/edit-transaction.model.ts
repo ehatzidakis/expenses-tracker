@@ -5,6 +5,7 @@ import {
   getSubcategoryOptions,
   categoryRequiresSubcategory,
 } from '../../services/expense-state.service';
+import { getTransactionTotalAmount } from '../../services/transaction-service';
 
 export interface TransactionFormModel {
   date: string;
@@ -13,13 +14,13 @@ export interface TransactionFormModel {
   subCategoryId: number | null;
   subCategory: string;
   comment: string;
+  /** Full bill. For a split, my share is derived from it on save. */
   amount: number;
-  isSplit?: boolean;
-  paidBy?: 'me' | number;
-  splitBy?: number[];
-  splitPaidPersonIds?: number[];
-  splitType?: 'split' | 'custom';
-  totalAmount?: number;
+}
+
+/** Once anyone has settled, the money on a split can no longer change. */
+export function isSplitLocked(tx: Pick<Transaction, 'isSplit' | 'splitPaidPersonIds'>): boolean {
+  return Boolean(tx.isSplit && tx.splitPaidPersonIds?.length);
 }
 
 export function normalizeCategoryName(category?: string | null): string {
@@ -68,12 +69,6 @@ export function buildTransactionFormModel(tx: Transaction): TransactionFormModel
     subCategoryId: resolvedSubcategoryId,
     subCategory: resolvedSubcategory,
     comment: tx.comment ?? '',
-    amount: tx.amount ?? 0,
-    isSplit: tx.isSplit,
-    paidBy: tx.paidBy,
-    splitBy: tx.splitBy,
-    splitPaidPersonIds: tx.splitPaidPersonIds,
-    splitType: tx.splitType,
-    totalAmount: tx.totalAmount,
+    amount: getTransactionTotalAmount(tx),
   };
 }

@@ -110,6 +110,28 @@ export function buildTransactionPayload(
   return { ok: true, payload };
 }
 
+/**
+ * Payload for editing an existing transaction (or accepting a pending one).
+ * `model.amount` is the full bill; the stored amount becomes my share.
+ * A split that was turned off is sent as `isSplit: false` so the service clears it.
+ */
+export function buildTransactionUpdatePayload(
+  model: TransactionFormModel,
+  split: CreateSplitState,
+  adjustmentId?: string,
+): BuildResult<NewTransactionInput> {
+  const result = buildTransactionPayload(model, split, {
+    linked: Boolean(adjustmentId),
+    adjustmentId: adjustmentId ?? '',
+  });
+  if (!result.ok || result.payload.isSplit) return result;
+
+  return {
+    ok: true,
+    payload: { ...result.payload, isSplit: false, splitBy: [], totalAmount: model.amount },
+  };
+}
+
 export function buildKioskPayload(
   model: TransactionFormModel,
   link: AdjustmentLink,

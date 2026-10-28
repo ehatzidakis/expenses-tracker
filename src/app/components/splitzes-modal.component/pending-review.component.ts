@@ -73,6 +73,7 @@ import {
         [amountField]="reviewForm.amount"
         [commentField]="reviewForm.comment"
         [categoryLabel]="categoryLabel"
+        [amountLabel]="split().goesSplitzes ? 'Total bill' : 'Amount'"
         (categoryChange)="setCategory($event)"
         (subcategoryChange)="setSubcategory($event)"
         (amountChange)="setAmount($event)"

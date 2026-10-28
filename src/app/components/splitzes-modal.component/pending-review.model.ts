@@ -6,10 +6,13 @@ import {
   PendingTransaction,
 } from '../../services/transaction-service';
 import { TransactionFormModel } from '../create-transaction.component/create-transaction.models';
-import { CreateSplitState } from '../create-transaction.component/split-fields.component';
+import {
+  CreateSplitState,
+  toSplitState,
+} from '../create-transaction.component/split-fields.component';
 import {
   BuildResult,
-  buildTransactionPayload,
+  buildTransactionUpdatePayload,
 } from '../create-transaction.component/transaction-payload';
 
 export function pendingToFormModel(pending: PendingTransaction): TransactionFormModel {
@@ -26,15 +29,7 @@ export function pendingToFormModel(pending: PendingTransaction): TransactionForm
 }
 
 export function pendingToSplitState(pending: PendingTransaction): CreateSplitState {
-  const normalized = normalizePendingForReview(pending);
-  const isSplit = Boolean(normalized.isSplit);
-  return {
-    goesSplitzes: isSplit,
-    splitWith: isSplit ? [...(normalized.splitBy ?? [])] : [],
-    paidById: isSplit ? (normalized.paidBy ?? 'me') : 'me',
-    customSplitMode: isSplit && normalized.splitType === 'custom',
-    customSplitAmounts: { ...(normalized.customSplitAmounts ?? {}) },
-  };
+  return toSplitState(normalizePendingForReview(pending));
 }
 
 /**
@@ -47,18 +42,7 @@ export function buildPendingAcceptPayload(
   split: CreateSplitState,
   pending: PendingTransaction,
 ): BuildResult<NewTransactionInput> {
-  const result = buildTransactionPayload(model, split, {
-    linked: Boolean(pending.adjustmentId),
-    adjustmentId: pending.adjustmentId ?? '',
-  });
-  if (!result.ok) return result;
-
-  if (result.payload.isSplit) return result;
-
-  return {
-    ok: true,
-    payload: { ...result.payload, isSplit: false, splitBy: [], totalAmount: model.amount },
-  };
+  return buildTransactionUpdatePayload(model, split, pending.adjustmentId);
 }
 
 export function pendingSourceLabel(pending: PendingTransaction): string {
