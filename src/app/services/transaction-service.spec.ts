@@ -2,7 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { AuthService } from './auth.service';
 import { BudgetSettingsService } from './budget-settings.service';
-import { TransactionService } from './transaction-service';
+import { splitUpdateFields, TransactionService } from './transaction-service';
 
 type CommitInternals = { commitPendingTransaction: (id: string) => Promise<void> };
 
@@ -75,5 +75,77 @@ describe('TransactionService.acceptPendingTransaction', () => {
     await service.acceptPendingTransaction('p1');
 
     expect(commit).toHaveBeenCalledTimes(2);
+  });
+});
+
+describe('splitUpdateFields', () => {
+  const base = { date: '2026-10-01', description: 'Dinner', category: 'Food', amount: 3.34 };
+
+  it('writes the total that was sent instead of share × people', () => {
+    const { set, clear } = splitUpdateFields(
+      { isSplit: true, splitPaidPersonIds: [] },
+      {
+        ...base,
+        isSplit: true,
+        paidBy: 'me',
+        splitBy: [1, 2],
+        splitType: 'split',
+        totalAmount: 10,
+      },
+    );
+
+    expect(set).toEqual({
+      isSplit: true,
+      paidBy: 'me',
+      splitBy: [1, 2],
+      splitType: 'split',
+      totalAmount: 10,
+    });
+    expect(clear).toEqual(['customSplitAmounts']);
+  });
+
+  it('stores custom amounts for a custom split', () => {
+    const { set, clear } = splitUpdateFields(
+      { isSplit: true },
+      {
+        ...base,
+        amount: 5,
+        isSplit: true,
+        paidBy: 1,
+        splitBy: [1],
+        splitType: 'custom',
+        totalAmount: 20,
+        customSplitAmounts: { me: 5, 1: 15 },
+      },
+    );
+
+    expect(set['customSplitAmounts']).toEqual({ me: 5, 1: 15 });
+    expect(set['totalAmount']).toBe(20);
+    expect(clear).toEqual([]);
+  });
+
+  it('starts settlement tracking when a plain transaction becomes a split', () => {
+    const { set } = splitUpdateFields(
+      { isSplit: false },
+      { ...base, isSplit: true, splitBy: [1], totalAmount: 6.68 },
+    );
+
+    expect(set['splitPaidPersonIds']).toEqual([]);
+  });
+
+  it('clears all split fields when the split is turned off', () => {
+    const { set, clear } = splitUpdateFields({ isSplit: true }, { ...base, isSplit: false });
+
+    expect(set).toEqual({ isSplit: false });
+    expect(clear).toEqual(
+      expect.arrayContaining(['paidBy', 'splitBy', 'totalAmount', 'splitPaidPersonIds']),
+    );
+  });
+
+  it('leaves split data alone when isSplit is not sent (locked split)', () => {
+    expect(splitUpdateFields({ isSplit: true, splitPaidPersonIds: [1] }, base)).toEqual({
+      set: {},
+      clear: [],
+    });
   });
 });

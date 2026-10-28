@@ -10,16 +10,20 @@ import { normalizeDecimalInput, parseDecimalInput } from '../../utils/decimal-in
   host: { class: 'block' },
   template: `
     <div class="space-y-1.5">
-      <label [for]="inputId()" class="text-xs font-medium text-gray-400">Amount</label>
+      <label [for]="inputId()" class="text-xs font-medium text-gray-400">{{ label() }}</label>
       <input
         [id]="inputId()"
         type="text"
         inputmode="decimal"
         autocomplete="off"
+        [readOnly]="readonly()"
+        [attr.aria-readonly]="readonly()"
         [value]="amount() === 0 ? '' : amount().toString()"
         placeholder="0.00"
         (input)="onInput($event)"
         class="w-full bg-gray-800/60 border border-gray-800 rounded-xl px-3 py-2.5 text-sm text-gray-100 placeholder:text-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/60"
+        [class.text-gray-400]="readonly()"
+        [class.cursor-not-allowed]="readonly()"
         [class.blur-md]="privacyMode()"
         [class.select-none]="privacyMode()"
       />
@@ -36,6 +40,8 @@ export class EditAmountFieldComponent {
   readonly amount = input.required<number>();
   readonly amountField = input.required<FieldTree<number>>();
   readonly privacyMode = input(false);
+  readonly label = input('Amount');
+  readonly readonly = input(false);
 
   readonly amountChange = output<number>();
 

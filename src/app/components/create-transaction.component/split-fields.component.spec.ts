@@ -149,6 +149,21 @@ describe('SplitFieldsComponent', () => {
     expect(hostForm.scrollIntoView).not.toHaveBeenCalled();
   });
 
+  it('previews the share that is saved and who owes whom', () => {
+    fixture.componentRef.setInput('amount', 10);
+    fixture.componentRef.setInput('state', {
+      ...initialState,
+      goesSplitzes: true,
+      splitWith: [1, 2],
+    });
+    fixture.detectChanges();
+
+    const text = (fixture.nativeElement.textContent as string).replace(/\s+/g, ' ');
+    expect(text).toContain('Your share: €3.34');
+    expect(text).toContain('Stavi owes you: €3.33');
+    expect(text).toContain('Alex owes you: €3.33');
+  });
+
   it('does not auto-scroll on desktop widths', () => {
     matchMediaMock.mockImplementation((query: string) => ({
       matches: false,
