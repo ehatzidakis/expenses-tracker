@@ -277,8 +277,7 @@ export class TransactionService {
       .sort((a, b) => {
         const dateDifference = new Date(b.date).getTime() - new Date(a.date).getTime();
         return dateDifference || this.getTimestamp(b.createdAt) - this.getTimestamp(a.createdAt);
-      })
-      .slice(0, 10);
+      });
   }
 
   /** Every non-trip transaction in the given month ('November 2026'). */
