@@ -1,9 +1,11 @@
 import { CommonModule } from '@angular/common';
-import { Component, effect, inject, input, signal } from '@angular/core';
+import { Component, computed, effect, inject, input, signal, untracked } from '@angular/core';
 import { PEOPLE } from '../../models/splitz.model';
 import { Transaction } from '../../models/transaction.model';
 import { TransactionService } from '../../services/transaction-service';
 import { SensitiveDirective } from '../../utils/sensitive.directive';
+
+const PAGE_SIZE = 10;
 
 @Component({
   selector: 'app-recent-transactions',
@@ -21,7 +23,6 @@ import { SensitiveDirective } from '../../utils/sensitive.directive';
       >
         <span>
           <span class="text-sm font-semibold text-gray-200 block">Latest transactions</span>
-          <!-- <span class="text-[10px] text-gray-500">{{ transactions().length }} of 10 shown</span> -->
         </span>
         <span class="text-xs text-gray-400">{{ expanded() ? 'Hide' : 'Show' }}</span>
       </button>
@@ -40,7 +41,7 @@ import { SensitiveDirective } from '../../utils/sensitive.directive';
             <p class="text-xs text-gray-500">No transactions yet.</p>
           } @else {
             <div class="space-y-2">
-              @for (transaction of transactions(); track transaction.id) {
+              @for (transaction of visibleTransactions(); track transaction.id) {
                 <article class="rounded-xl border border-gray-800/80 bg-gray-950/30 px-3 py-2.5">
                   <div class="flex items-start justify-between gap-3">
                     <div class="min-w-0">
@@ -104,6 +105,18 @@ import { SensitiveDirective } from '../../utils/sensitive.directive';
                 </article>
               }
             </div>
+            <div class="mt-3 flex items-center justify-between text-[10px] text-gray-500">
+              <span>{{ visibleTransactions().length }} of {{ transactions().length }} shown</span>
+              @if (hasMore()) {
+                <button
+                  type="button"
+                  class="text-xs text-gray-400 hover:text-gray-200"
+                  (click)="showMore()"
+                >
+                  Show more
+                </button>
+              }
+            </div>
           }
         </div>
       }
@@ -119,14 +132,30 @@ export class RecentTransactionsComponent {
   readonly transactions = signal<Transaction[]>([]);
   readonly loading = signal(false);
   readonly error = signal(false);
+  readonly visibleCount = signal(PAGE_SIZE);
+  readonly visibleTransactions = computed(() =>
+    this.transactions().slice(0, this.visibleCount()),
+  );
+  readonly hasMore = computed(() => this.visibleCount() < this.transactions().length);
+
+  /** Month/trip key of the data currently loaded or loading; null when nothing valid is cached. */
+  private currentKey: string | null = null;
 
   constructor() {
+    // Only query Firestore once the card is open, and only when the month/trip changed.
     effect(() => {
+      if (!this.expanded()) return;
       const monthName = this.monthName();
       const adjustmentId = this.adjustmentId();
       if (!monthName && !adjustmentId) return;
-      void this.loadTransactions(monthName, adjustmentId);
+      const key = `${monthName ?? ''}|${adjustmentId ?? ''}`;
+      if (key === this.currentKey) return;
+      untracked(() => void this.loadTransactions(key, monthName, adjustmentId));
     });
+  }
+
+  showMore(): void {
+    this.visibleCount.update((count) => count + PAGE_SIZE);
   }
 
   personName(id: 'me' | number | undefined): string {
@@ -147,22 +176,29 @@ export class RecentTransactionsComponent {
   }
 
   private async loadTransactions(
+    key: string,
     monthName: string | null,
     adjustmentId: string | null,
   ): Promise<void> {
+    this.currentKey = key;
     this.loading.set(true);
     this.error.set(false);
     this.transactions.set([]);
+    this.visibleCount.set(PAGE_SIZE);
     try {
-      this.transactions.set(
-        await this.transactionService.fetchRecentTransactions({
-          monthName: monthName ?? undefined,
-          adjustmentId: adjustmentId ?? undefined,
-        }),
-      );
+      const transactions = await this.transactionService.fetchRecentTransactions({
+        monthName: monthName ?? undefined,
+        adjustmentId: adjustmentId ?? undefined,
+      });
+      // Ignore the response if the month/trip changed while it was in flight.
+      if (this.currentKey !== key) return;
+      this.transactions.set(transactions);
+      this.loading.set(false);
     } catch {
+      if (this.currentKey !== key) return;
+      // Clear the key so the next expand retries.
+      this.currentKey = null;
       this.error.set(true);
-    } finally {
       this.loading.set(false);
     }
   }
