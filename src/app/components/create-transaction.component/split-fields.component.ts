@@ -109,6 +109,7 @@ export function toSplitState(
             </div>
           </div>
 
+          <!-- Not blurred: these numbers come from the amount just typed in the form -->
           @if (!state().customSplitMode) {
             <div class="p-3 bg-teal-950/30 border border-teal-800/40 rounded-xl space-y-1">
               <p class="text-xs font-medium text-teal-400">Split preview</p>

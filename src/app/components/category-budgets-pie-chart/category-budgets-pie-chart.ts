@@ -6,12 +6,12 @@ import {
   dimColorForSelection,
   PieChartSlice,
 } from './category-budgets-pie-chart.util';
-import { PrivacyService } from '../../services/privacy.service';
+import { SensitiveDirective } from '../../utils/sensitive.directive';
 
 @Component({
   selector: 'app-category-budgets-pie-chart',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, SensitiveDirective],
   template: `
     <div class="space-y-5">
       @if (pieChartSlices().length === 0) {
@@ -30,11 +30,7 @@ import { PrivacyService } from '../../services/privacy.service';
                 class="absolute inset-8 rounded-full bg-gray-950/95 border border-gray-700/80 flex flex-col items-center justify-center text-center"
               >
                 <span class="text-[10px] uppercase tracking-[0.22em] text-gray-500">Total</span>
-                <span
-                  class="mt-1 text-lg font-bold text-white"
-                  [class.blur-md]="privacyService.isPrivacyMode()"
-                  [class.select-none]="privacyService.isPrivacyMode()"
-                >
+                <span class="mt-1 text-lg font-bold text-white" appSensitive>
                   €{{
                     pieChartSlices().reduce((sum, slice) => sum + slice.amount, 0) | number: '1.0-0'
                   }}
@@ -67,7 +63,9 @@ import { PrivacyService } from '../../services/privacy.service';
                   <div class="text-[11px] font-semibold text-white">
                     {{ slice.percentage | number: '1.0-1' }}%
                   </div>
-                  <div class="text-[10px] text-gray-400">€{{ slice.amount | number: '1.0-0' }}</div>
+                  <div class="text-[10px] text-gray-400" appSensitive>
+                    €{{ slice.amount | number: '1.0-0' }}
+                  </div>
                 </div>
               </button>
             }
@@ -79,7 +77,6 @@ import { PrivacyService } from '../../services/privacy.service';
 })
 export class CategoryBudgetsPieChartComponent {
   readonly state = inject(ExpenseStateService);
-  readonly privacyService = inject(PrivacyService);
 
   readonly selectedSlice = signal<string | null>(null);
 

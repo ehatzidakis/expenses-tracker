@@ -2,11 +2,12 @@ import { Component, input, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FieldTree } from '@angular/forms/signals';
 import { normalizeDecimalInput, parseDecimalInput } from '../../utils/decimal-input';
+import { SensitiveDirective } from '../../utils/sensitive.directive';
 
 @Component({
   selector: 'app-edit-amount-field',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, SensitiveDirective],
   host: { class: 'block' },
   template: `
     <div class="space-y-1.5">
@@ -24,8 +25,7 @@ import { normalizeDecimalInput, parseDecimalInput } from '../../utils/decimal-in
         class="w-full bg-gray-800/60 border border-gray-800 rounded-xl px-3 py-2.5 text-sm text-gray-100 placeholder:text-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/60"
         [class.text-gray-400]="readonly()"
         [class.cursor-not-allowed]="readonly()"
-        [class.blur-md]="privacyMode()"
-        [class.select-none]="privacyMode()"
+        appSensitive
       />
       @if (amountField()().touched() && amountField()().invalid()) {
         <span class="text-[11px] text-red-400">
@@ -39,7 +39,6 @@ export class EditAmountFieldComponent {
   readonly inputId = input.required<string>();
   readonly amount = input.required<number>();
   readonly amountField = input.required<FieldTree<number>>();
-  readonly privacyMode = input(false);
   readonly label = input('Amount');
   readonly readonly = input(false);
 

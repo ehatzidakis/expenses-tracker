@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, computed, input } from '@angular/core';
 import { Adjustment } from '../../models/adjustments.model';
 import { Expense } from '../../models/expenses.model';
+import { SensitiveDirective } from '../../utils/sensitive.directive';
 
 interface MonthSummary {
   name: string;
@@ -14,14 +15,14 @@ interface MonthSummary {
 @Component({
   selector: 'app-month-breakdown',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, SensitiveDirective],
   template: `
     <div class="space-y-2">
       @for (month of monthSummaries(); track month.name) {
         <article class="space-y-3 rounded-xl border border-gray-800/60 bg-amber-50/5 px-3 py-3">
           <div class="flex items-center justify-between gap-3">
             <h3 class="font-medium text-sm text-gray-200">{{ month.name }}</h3>
-            <span class="text-xs text-gray-500 tabular-nums">
+            <span class="text-xs text-gray-500 tabular-nums" appSensitive>
               Wage €{{ month.wage | number: '1.2-2' }}
             </span>
           </div>
@@ -32,13 +33,14 @@ interface MonthSummary {
                 class="saved-amount text-xl font-semibold tabular-nums"
                 [class.text-emerald-300]="month.saved >= 0"
                 [class.text-red-300]="month.saved < 0"
+                appSensitive
               >
                 €{{ month.saved | number: '1.2-2' }}
               </span>
             </div>
             <div class="text-right">
               <span class="block text-[10px] uppercase tracking-wider text-gray-500">Spend</span>
-              <span class="text-lg font-medium text-gray-200 tabular-nums">
+              <span class="text-lg font-medium text-gray-200 tabular-nums" appSensitive>
                 €{{ month.spend | number: '1.2-2' }}
               </span>
             </div>
@@ -56,7 +58,11 @@ interface MonthSummary {
                     [class.text-emerald-300]="adjustment.adjType"
                     [class.text-red-300]="!adjustment.adjType"
                   >
-                    {{ adjustment.adjType ? '+' : '-' }}€{{ adjustment.amount | number: '1.2-2' }}
+                    <span appSensitive
+                      >{{ adjustment.adjType ? '+' : '-' }}€{{
+                        adjustment.amount | number: '1.2-2'
+                      }}</span
+                    >
                     <span class="text-gray-500">{{ adjustment.endDate | date: 'dd/MM/yyyy' }}</span>
                   </span>
                 </div>

@@ -23,6 +23,7 @@ import { PEOPLE } from '../../models/splitz.model';
           <p class="text-[10px] uppercase font-bold tracking-[0.12em] text-violet-300">
             Stavi balance
           </p>
+          <!-- Not blurred: only the kiosk login sees this, and it is their own balance -->
           <p class="mt-1 text-sm font-semibold text-white">
             @if (netBalance() > 0) {
               You are owed €{{ netBalance().toFixed(2) }}

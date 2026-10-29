@@ -173,6 +173,7 @@ interface TransactionFieldsModel {
           (input)="onAmountInput($event)"
           class="w-full bg-gray-800/60 border border-gray-800 rounded-xl px-3 py-2.5 text-sm text-gray-100 placeholder:text-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/60 tabular-nums"
         />
+        <!-- Not blurred: the hint only appears after picking a recurring template, which is hidden in privacy mode -->
         @if (amountHint() != null && model().amount === 0) {
           <button
             type="button"

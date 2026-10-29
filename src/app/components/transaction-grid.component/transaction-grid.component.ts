@@ -3,11 +3,12 @@ import { CommonModule } from '@angular/common';
 import type { DocumentData, QueryDocumentSnapshot } from 'firebase/firestore/lite';
 import { TransactionService } from '../../services/transaction-service';
 import { Transaction } from '../../models/transaction.model';
+import { SensitiveDirective } from '../../utils/sensitive.directive';
 
 @Component({
   selector: 'app-transaction-grid',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, SensitiveDirective],
   host: { class: 'block' },
   template: `
     <div class="mt-3 pt-3 border-t border-gray-800/60 space-y-3">
@@ -55,7 +56,7 @@ import { Transaction } from '../../models/transaction.model';
                 tx.date | date: 'dd/MM/yyyy'
               }}</span>
             </div>
-            <span class="text-xs font-semibold text-white shrink-0 ml-2"
+            <span class="text-xs font-semibold text-white shrink-0 ml-2" appSensitive
               >€{{ tx.amount | number: '1.2-2' }}</span
             >
           </button>

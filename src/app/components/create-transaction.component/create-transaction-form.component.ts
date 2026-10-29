@@ -156,7 +156,10 @@ export class CreateTransactionFormComponent {
   readonly hasComment = signal<boolean>(false);
   readonly activeTemplateId = signal<string | null>(null);
   readonly recurringOpen = signal(false);
-  readonly showRecurring = computed(() => !this.linkWithAdjustment() && !this.isKioskMode());
+  // Hidden in privacy mode: templates fill in real amounts and last month's bills.
+  readonly showRecurring = computed(
+    () => !this.linkWithAdjustment() && !this.isKioskMode() && !this.privacyService.isPrivacyMode(),
+  );
   readonly amountHint = signal<number | null>(null);
 
   private readonly basicFields = viewChild.required(TransactionBasicFieldsComponent);

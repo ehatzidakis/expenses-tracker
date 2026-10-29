@@ -9,9 +9,6 @@ export class PrivacyService {
   readonly hasPassword = signal<boolean>(!!localStorage.getItem(this.HASH_KEY));
 
   constructor() {
-    // ⚠️ TEMPORARY: Un-comment this, load the app once on your phone, then delete this line!
-    // this.setPassword('1410').then(() => console.log('Password set!'));
-
     effect(() => {
       localStorage.setItem(this.STORAGE_KEY, String(this.isPrivacyMode()));
     });

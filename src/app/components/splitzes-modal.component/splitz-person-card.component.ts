@@ -1,5 +1,6 @@
 import { Component, computed, input, output } from '@angular/core';
 import { PersonSummary } from '../../models/splitz.model';
+import { SensitiveDirective } from '../../utils/sensitive.directive';
 
 const AVATAR_CLASSES: Record<number, string> = {
   1: 'bg-teal-600/20 border-teal-500/30 text-teal-400',
@@ -11,6 +12,7 @@ const DEFAULT_AVATAR = 'bg-gray-700/40 border-gray-600/40 text-gray-300';
 @Component({
   selector: 'app-splitz-person-card',
   standalone: true,
+  imports: [SensitiveDirective],
   host: { class: 'block' },
   template: `
     <article class="rounded-xl border border-gray-800/80 bg-gray-950/30 px-3 py-3 space-y-2">
@@ -33,6 +35,7 @@ const DEFAULT_AVATAR = 'bg-gray-700/40 border-gray-600/40 text-gray-300';
           [class.text-amber-400]="net() < 0"
           [class.bg-gray-700/60]="net() === 0"
           [class.text-gray-400]="net() === 0"
+          appSensitive
         >
           {{ balanceLabel() }}
         </span>
@@ -43,7 +46,7 @@ const DEFAULT_AVATAR = 'bg-gray-700/40 border-gray-600/40 text-gray-300';
           @for (peer of summary().peerDebts; track peer.creditor.id) {
             <div class="flex items-center justify-between text-xs">
               <span class="text-gray-500">Owes {{ peer.creditor.name }}</span>
-              <span class="font-medium text-amber-400 tabular-nums">
+              <span class="font-medium text-amber-400 tabular-nums" appSensitive>
                 €{{ peer.netOwed.toFixed(2) }}
               </span>
             </div>

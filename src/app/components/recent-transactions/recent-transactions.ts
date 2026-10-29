@@ -3,11 +3,12 @@ import { Component, effect, inject, input, signal } from '@angular/core';
 import { PEOPLE } from '../../models/splitz.model';
 import { Transaction } from '../../models/transaction.model';
 import { TransactionService } from '../../services/transaction-service';
+import { SensitiveDirective } from '../../utils/sensitive.directive';
 
 @Component({
   selector: 'app-recent-transactions',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, SensitiveDirective],
   host: { class: 'block' },
   template: `
     <section class="bg-gray-900/60 border border-gray-800/80 rounded-2xl p-4 backdrop-blur-sm">
@@ -66,12 +67,15 @@ import { TransactionService } from '../../services/transaction-service';
                         <span>{{ transaction.monthName }}</span>
                       </div>
                     </div>
-                    <span class="shrink-0 text-xs font-semibold text-white tabular-nums">
+                    <span
+                      class="shrink-0 text-xs font-semibold text-white tabular-nums"
+                      appSensitive
+                    >
                       €{{ transaction.amount | number: '1.2-2' }}
                     </span>
                   </div>
                   @if (transaction.isSplit) {
-                    <div class="mt-2 text-[10px] text-gray-500">
+                    <div class="mt-2 text-[10px] text-gray-500" appSensitive>
                       Total €{{ transaction.totalAmount ?? transaction.amount | number: '1.2-2' }} ·
                       Paid by {{ personName(transaction.paidBy) }} ·
                       {{ transaction.splitType === 'custom' ? 'Custom split' : 'Split' }}
@@ -83,7 +87,7 @@ import { TransactionService } from '../../services/transaction-service';
                       }
                     </div>
                     @if (transaction.customSplitAmounts) {
-                      <div class="mt-1 text-[10px] text-gray-500">
+                      <div class="mt-1 text-[10px] text-gray-500" appSensitive>
                         Shares:
                         @for (
                           share of splitShares(transaction.customSplitAmounts);

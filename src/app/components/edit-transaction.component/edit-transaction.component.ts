@@ -70,7 +70,6 @@ import {
         [categoryLabel]="getCategoryOptionLabel"
         [amountLabel]="split().goesSplitzes ? 'Total bill' : 'Amount'"
         [amountReadonly]="locked()"
-        [privacyMode]="privacyService.isPrivacyMode()"
         (categoryChange)="setCategory($event)"
         (subcategoryChange)="setSubcategory($event)"
         (amountChange)="onAmountChange($event)"

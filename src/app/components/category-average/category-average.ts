@@ -4,6 +4,7 @@ import { TransactionService } from '../../services/transaction-service';
 import { Transaction } from '../../models/transaction.model';
 import { CATEGORY_META, getSubcategoryOptions } from '../../services/expense-state.service';
 import { PagedEntriesListComponent } from '../paged-entries-list/paged-entries-list';
+import { SensitiveDirective } from '../../utils/sensitive.directive';
 
 interface CategoryAverage {
   key: string;
@@ -20,7 +21,7 @@ interface CategoryAverage {
 @Component({
   selector: 'app-category-average',
   standalone: true,
-  imports: [CommonModule, PagedEntriesListComponent],
+  imports: [CommonModule, PagedEntriesListComponent, SensitiveDirective],
   template: `
     <div
       class="bg-gray-900/60 border border-gray-800/80 rounded-2xl p-5 backdrop-blur-sm select-none"
@@ -90,7 +91,7 @@ interface CategoryAverage {
 
               <div class="text-right">
                 @if (item.count > 0) {
-                  <span class="block text-sm font-bold text-gray-100">
+                  <span class="block text-sm font-bold text-gray-100" appSensitive>
                     €{{ item.average | number: '1.2-2' }}
                   </span>
                   <span class="block text-[10px] text-gray-400 font-medium">/avg</span>

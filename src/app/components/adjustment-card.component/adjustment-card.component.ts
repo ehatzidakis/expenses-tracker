@@ -1,7 +1,7 @@
-import { Component, computed, inject, input, output, signal } from '@angular/core';
+import { Component, computed, input, output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Adjustment } from '../../models/adjustments.model';
-import { PrivacyService } from '../../services/privacy.service';
+import { SensitiveDirective } from '../../utils/sensitive.directive';
 
 function formatDateForInput(dateVal: Date | string): string {
   if (!dateVal) return '';
@@ -15,7 +15,7 @@ function formatDateForInput(dateVal: Date | string): string {
 @Component({
   selector: 'app-adjustment-card',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, SensitiveDirective],
   host: { class: 'block' },
   template: `
     <div
@@ -66,8 +66,7 @@ function formatDateForInput(dateVal: Date | string): string {
       <span
         class="text-sm font-semibold shrink-0"
         [class]="adjustment().isTrip || isAddition() ? 'text-emerald-400' : 'text-red-400'"
-        [class.blur-md]="privacyService.isPrivacyMode()"
-        [class.select-none]="privacyService.isPrivacyMode()"
+        appSensitive
       >
         €{{ adjustment().amount | number: '1.2-2' }}
       </span>
@@ -76,7 +75,6 @@ function formatDateForInput(dateVal: Date | string): string {
 })
 export class AdjustmentCardComponent {
   readonly adjustment = input.required<Adjustment>();
-  readonly privacyService = inject(PrivacyService);
 
   readonly cardClick = output<void>();
 

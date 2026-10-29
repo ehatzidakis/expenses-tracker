@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { TransactionService } from '../../services/transaction-service';
 import { Transaction } from '../../models/transaction.model';
 import { PagedEntriesListComponent } from '../paged-entries-list/paged-entries-list';
+import { SensitiveDirective } from '../../utils/sensitive.directive';
 
 interface UtilityAverage {
   id: string;
@@ -19,7 +20,7 @@ interface UtilityAverage {
 @Component({
   selector: 'app-utility-sum',
   standalone: true,
-  imports: [CommonModule, PagedEntriesListComponent],
+  imports: [CommonModule, PagedEntriesListComponent, SensitiveDirective],
   template: `
     <div
       class="bg-gray-900/60 border border-gray-800/80 rounded-2xl p-5 backdrop-blur-sm select-none"
@@ -95,8 +96,9 @@ interface UtilityAverage {
 
               <!-- Average Amount -->
               <div class="text-right">
+                <!-- Other (17) and Taxes (18) never show an average -->
                 @if (item.count > 0 && item.id !== '18' && item.id !== '17') {
-                  <span class="block text-sm font-bold text-gray-100">
+                  <span class="block text-sm font-bold text-gray-100" appSensitive>
                     €{{ item.average | number: '1.2-2' }}
                   </span>
                   <span class="block text-[10px] text-gray-400 font-medium">{{ item.freq }}</span>

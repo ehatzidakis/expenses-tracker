@@ -1,12 +1,12 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, input } from '@angular/core';
-import { PrivacyService } from '../../services/privacy.service';
+import { Component, input } from '@angular/core';
+import { SensitiveDirective } from '../../utils/sensitive.directive';
 
 @Component({
   selector: 'app-category-budget-summary',
   standalone: true,
   host: { class: 'block' },
-  imports: [CommonModule],
+  imports: [CommonModule, SensitiveDirective],
   template: `
     <div class="space-y-3">
       <div class="grid grid-cols-2 gap-3">
@@ -16,7 +16,7 @@ import { PrivacyService } from '../../services/privacy.service';
           <span class="text-xs font-semibold uppercase tracking-wider text-indigo-300"
             >Total Budgeted Sum</span
           >
-          <span class="text-lg font-bold text-indigo-200">
+          <span class="text-lg font-bold text-indigo-200" appSensitive>
             €{{ totalBudget() | number: '1.0-0' }}
           </span>
         </div>
@@ -26,11 +26,7 @@ import { PrivacyService } from '../../services/privacy.service';
           <span class="text-xs font-semibold uppercase tracking-wider text-indigo-300"
             >Monthly Savings</span
           >
-          <span
-            class="text-lg font-bold text-indigo-200"
-            [class.blur-md]="privacyService.isPrivacyMode()"
-            [class.select-none]="privacyService.isPrivacyMode()"
-          >
+          <span class="text-lg font-bold text-indigo-200" appSensitive>
             €{{ projectedSave() | number: '1.0-0' }}
           </span>
         </div>
@@ -39,7 +35,6 @@ import { PrivacyService } from '../../services/privacy.service';
   `,
 })
 export class CategoryBudgetSummaryComponent {
-  readonly privacyService = inject(PrivacyService);
   readonly totalBudget = input.required<number>();
   readonly projectedSave = input.required<number>();
 }
