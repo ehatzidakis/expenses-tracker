@@ -1,7 +1,7 @@
 import { Component, ElementRef, effect, input, output, signal, viewChild } from '@angular/core';
 import { DebtEntry } from '../../models/splitz.model';
 import { participantName } from './pending-review.model';
-
+import { SensitiveDirective } from '../../utils/sensitive.directive';
 export interface SettlementConfirmation {
   personId: number;
   debts: DebtEntry[];
@@ -11,6 +11,7 @@ export interface SettlementConfirmation {
 @Component({
   selector: 'app-splitz-settlement-dialog',
   standalone: true,
+  imports: [SensitiveDirective],
   template: `
     <dialog
       #dialog
@@ -40,7 +41,7 @@ export interface SettlementConfirmation {
           </div>
 
           <div class="p-4 rounded-xl bg-gray-950/60 border border-gray-800 text-center">
-            <p class="text-3xl font-bold tabular-nums text-white">
+            <p class="text-3xl font-bold tabular-nums text-white" appSensitive>
               €{{ abs(c.netWithMe).toFixed(2) }}
             </p>
             <p
@@ -84,10 +85,10 @@ export interface SettlementConfirmation {
                         </p>
                       </div>
                       <div class="shrink-0 text-right tabular-nums">
-                        <p class="text-xs font-semibold text-gray-100">
+                        <p class="text-xs font-semibold text-gray-100" appSensitive>
                           Owed: €{{ debt.amount.toFixed(2) }}
                         </p>
-                        <p class="mt-0.5 text-[10px] text-gray-500">
+                        <p class="mt-0.5 text-[10px] text-gray-500" appSensitive>
                           Full amount: €{{ debt.transactionTotalAmount.toFixed(2) }}
                         </p>
                       </div>

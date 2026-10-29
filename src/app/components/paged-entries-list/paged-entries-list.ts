@@ -3,13 +3,14 @@ import { Component, effect, inject, input, output, signal } from '@angular/core'
 import type { DocumentData, QueryDocumentSnapshot } from 'firebase/firestore/lite';
 import { Transaction } from '../../models/transaction.model';
 import { TransactionService } from '../../services/transaction-service';
+import { SensitiveDirective } from '../../utils/sensitive.directive';
 
 export type EntryListMode = 'category' | 'description';
 
 @Component({
   selector: 'app-paged-entries-list',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, SensitiveDirective],
   host: { class: 'block' },
   template: `
     <div class="mt-3 pt-3 border-t border-gray-800/60 space-y-3">
@@ -54,7 +55,7 @@ export type EntryListMode = 'category' | 'description';
                 {{ entry.date | date: 'dd/MM/yyyy' }}
               </span>
             </div>
-            <span class="text-xs font-semibold text-white shrink-0 ml-2 tabular-nums">
+            <span class="text-xs font-semibold text-white shrink-0 ml-2 tabular-nums" appSensitive>
               €{{ entry.amount | number: '1.2-2' }}
             </span>
           </button>

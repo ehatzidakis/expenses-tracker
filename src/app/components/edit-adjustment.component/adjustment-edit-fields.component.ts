@@ -32,7 +32,6 @@ import { DateStepperComponent } from '../date-stepper/date-stepper.component';
         inputId="adj-edit-amount"
         [amount]="amount()"
         [amountField]="amountField()"
-        [privacyMode]="privacyMode()"
         (amountChange)="amountChange.emit($event)"
       />
 
@@ -80,7 +79,6 @@ import { DateStepperComponent } from '../date-stepper/date-stepper.component';
 })
 export class AdjustmentEditFieldsComponent {
   readonly amount = input.required<number>();
-  readonly privacyMode = input.required<boolean>();
   readonly descriptionField = input.required<FieldTree<string>>();
   readonly amountField = input.required<FieldTree<number>>();
   readonly startDateField = input.required<FieldTree<string>>();

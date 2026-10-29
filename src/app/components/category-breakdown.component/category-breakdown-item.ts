@@ -2,11 +2,12 @@ import { CommonModule } from '@angular/common';
 import { Component, input, output } from '@angular/core';
 import { CategorySpend, getCategoryMeta } from '../../services/expense-state.service';
 import { CategoryBreakdownDetailsComponent } from './category-breakdown-details';
+import { SensitiveDirective } from '../../utils/sensitive.directive';
 
 @Component({
   selector: 'app-category-breakdown-item',
   standalone: true,
-  imports: [CommonModule, CategoryBreakdownDetailsComponent],
+  imports: [CommonModule, CategoryBreakdownDetailsComponent, SensitiveDirective],
   host: { class: 'block' },
   template: `
     <div class="space-y-1.5 border border-gray-800/60 px-3 py-1.5 rounded-xl bg-amber-50/5">
@@ -36,27 +37,31 @@ import { CategoryBreakdownDetailsComponent } from './category-breakdown-details'
             <div class="text-right">
               <div class="text-[13px] text-white-40 tabular-nums">
                 @if (!category().isAllTime && category().budget !== null) {
-                  <span>
+                  <span appSensitive>
                     €{{ category().amount | number: '1.2-2' }}
                     <span class="text-gray-500 text-xs">
                       / €{{ category().budget | number: '1.2-2' }}
                     </span>
                   </span>
                 } @else {
-                  <span>€{{ category().amount | number: '1.2-2' }}</span>
+                  <span appSensitive>€{{ category().amount | number: '1.2-2' }}</span>
                 }
               </div>
 
               @if (!category().isAllTime && category().budget !== null) {
                 @if (category().isOverBudget) {
-                  <div class="mt-1 text-[10px] font-medium text-red-400 tabular-nums">
+                  <div class="mt-1 text-[10px] font-medium text-red-400 tabular-nums" appSensitive>
                     €{{
                       (category().monthlyAverage ?? category().amount) - (category().budget ?? 0)
                         | number: '1.2-2'
                     }}
+                    over
                   </div>
                 } @else {
-                  <div class="mt-1 text-[11px] font-medium text-teal-300/90 tabular-nums">
+                  <div
+                    class="mt-1 text-[11px] font-medium text-teal-300/90 tabular-nums"
+                    appSensitive
+                  >
                     €{{
                       (category().budget ?? 0) - (category().monthlyAverage ?? category().amount)
                         | number: '1.2-2'
@@ -73,11 +78,13 @@ import { CategoryBreakdownDetailsComponent } from './category-breakdown-details'
           <div class="flex items-center justify-between text-xs w-full gap-2 py-0.5">
             <span
               class="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-0.5 rounded-md bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 tabular-nums"
+              appSensitive
             >
               €{{ category().budget | number: '1.2-2' }} / mo budget
             </span>
             <span
               class="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-0.5 rounded-md bg-indigo-500/15 text-indigo-300 border border-indigo-500/30 tabular-nums"
+              appSensitive
             >
               €{{ category().monthlyAverage | number: '1.2-2' }} / mo average
             </span>

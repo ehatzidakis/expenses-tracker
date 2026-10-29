@@ -1,14 +1,14 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, input } from '@angular/core';
-import { PrivacyService } from '../../services/privacy.service';
+import { Component, input } from '@angular/core';
 import { YearlyBreakdownEntry } from './overview-card.models';
+import { SensitiveDirective } from '../../utils/sensitive.directive';
 
 export type OverviewCardBreakdownMode = 'expenses' | 'saved';
 
 @Component({
   selector: 'app-overview-card-breakdown',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, SensitiveDirective],
   template: `
     <div
       class="grid overflow-hidden transition-[grid-template-rows,opacity,transform] duration-300 ease-out"
@@ -41,19 +41,13 @@ export type OverviewCardBreakdownMode = 'expenses' | 'saved';
                   @if (mode() === 'expenses') {
                     <div class="flex items-center justify-between gap-2 text-[11px]">
                       <span class="text-gray-500 text-[9px]">Monthly Expenses:</span>
-                      <span
-                        class="text-gray-300 font-medium tabular-nums"
-                        [class.blur-md]="privacyService.isPrivacyMode()"
-                        [class.select-none]="privacyService.isPrivacyMode()"
+                      <span class="text-gray-300 font-medium tabular-nums" appSensitive
                         >€{{ yearSummary.monthlyExpenses | number: '1.2-2' }}</span
                       >
                     </div>
                     <div class="flex items-center justify-between text-[11px]">
                       <span class="text-gray-500 text-[9px]">One-Off Expenses:</span>
-                      <span
-                        class="text-gray-300 font-medium tabular-nums"
-                        [class.blur-md]="privacyService.isPrivacyMode()"
-                        [class.select-none]="privacyService.isPrivacyMode()"
+                      <span class="text-gray-300 font-medium tabular-nums" appSensitive
                         >€{{ yearSummary.oneOffExpenses | number: '1.2-2' }}</span
                       >
                     </div>
@@ -61,10 +55,7 @@ export type OverviewCardBreakdownMode = 'expenses' | 'saved';
                       <span class="text-gray-500 text-[9px]"
                         >Total {{ yearSummary.year }} Expenses:</span
                       >
-                      <span
-                        class="text-gray-300 font-medium tabular-nums"
-                        [class.blur-md]="privacyService.isPrivacyMode()"
-                        [class.select-none]="privacyService.isPrivacyMode()"
+                      <span class="text-gray-300 font-medium tabular-nums" appSensitive
                         >€{{
                           yearSummary.monthlyExpenses + yearSummary.oneOffExpenses | number: '1.2-2'
                         }}</span
@@ -73,19 +64,13 @@ export type OverviewCardBreakdownMode = 'expenses' | 'saved';
                   } @else {
                     <div class="flex items-center justify-between gap-2 text-[11px]">
                       <span class="text-gray-500 text-[9px]">Monthly Saved:</span>
-                      <span
-                        class="text-gray-300 font-medium tabular-nums"
-                        [class.blur-md]="privacyService.isPrivacyMode()"
-                        [class.select-none]="privacyService.isPrivacyMode()"
+                      <span class="text-gray-300 font-medium tabular-nums" appSensitive
                         >€{{ yearSummary.monthlySaved | number: '1.2-2' }}</span
                       >
                     </div>
                     <div class="flex items-center justify-between gap-2 text-[11px]">
                       <span class="text-gray-500 text-[9px]">One-Off Bonuses:</span>
-                      <span
-                        class="text-gray-300 font-medium tabular-nums"
-                        [class.blur-md]="privacyService.isPrivacyMode()"
-                        [class.select-none]="privacyService.isPrivacyMode()"
+                      <span class="text-gray-300 font-medium tabular-nums" appSensitive
                         >€{{ yearSummary.oneOffBonuses | number: '1.2-2' }}</span
                       >
                     </div>
@@ -93,10 +78,7 @@ export type OverviewCardBreakdownMode = 'expenses' | 'saved';
                       <span class="text-gray-500 text-[9px]"
                         >Total {{ yearSummary.year }} Saved:</span
                       >
-                      <span
-                        class="text-emerald-400 font-medium tabular-nums"
-                        [class.blur-md]="privacyService.isPrivacyMode()"
-                        [class.select-none]="privacyService.isPrivacyMode()"
+                      <span class="text-emerald-400 font-medium tabular-nums" appSensitive
                         >€{{
                           yearSummary.oneOffBonuses +
                             yearSummary.monthlySaved -
@@ -122,10 +104,7 @@ export type OverviewCardBreakdownMode = 'expenses' | 'saved';
                 <span class="text-gray-500">{{
                   mode() === 'expenses' ? 'Monthly Expenses:' : 'Monthly Saved:'
                 }}</span>
-                <span
-                  class="text-gray-300 font-medium tabular-nums"
-                  [class.blur-md]="privacyService.isPrivacyMode()"
-                  [class.select-none]="privacyService.isPrivacyMode()"
+                <span class="text-gray-300 font-medium tabular-nums" appSensitive
                   >€{{ monthlyValue() | number: '1.2-2' }}</span
                 >
               </div>
@@ -142,10 +121,7 @@ export type OverviewCardBreakdownMode = 'expenses' | 'saved';
                 <span class="text-gray-500">{{
                   mode() === 'expenses' ? 'One-Off Expenses:' : 'One-Off Bonuses:'
                 }}</span>
-                <span
-                  class="text-gray-300 font-medium tabular-nums"
-                  [class.blur-md]="privacyService.isPrivacyMode()"
-                  [class.select-none]="privacyService.isPrivacyMode()"
+                <span class="text-gray-300 font-medium tabular-nums" appSensitive
                   >€{{ oneOffValue() | number: '1.2-2' }}</span
                 >
               </div>
@@ -163,6 +139,4 @@ export class OverviewCardBreakdownComponent {
   readonly yearlyBreakdown = input<YearlyBreakdownEntry[]>([]);
   readonly monthlyValue = input<number | null>(null);
   readonly oneOffValue = input<number | null>(null);
-
-  readonly privacyService = inject(PrivacyService);
 }

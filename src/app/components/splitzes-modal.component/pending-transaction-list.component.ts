@@ -5,11 +5,12 @@ import {
   PendingTransaction,
 } from '../../services/transaction-service';
 import { pendingSourceLabel } from './pending-review.model';
+import { SensitiveDirective } from '../../utils/sensitive.directive';
 
 @Component({
   selector: 'app-pending-transaction-list',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, SensitiveDirective],
   host: { class: 'block' },
   template: `
     <div class="space-y-3">
@@ -68,7 +69,7 @@ import { pendingSourceLabel } from './pending-review.model';
                   </div>
                 </div>
                 <div class="flex items-center gap-2 shrink-0">
-                  <span class="text-xs font-semibold text-white tabular-nums">
+                  <span class="text-xs font-semibold text-white tabular-nums" appSensitive>
                     €{{ totalAmount(pending) | number: '1.2-2' }}
                   </span>
                   <span class="text-gray-500" aria-hidden="true">›</span>

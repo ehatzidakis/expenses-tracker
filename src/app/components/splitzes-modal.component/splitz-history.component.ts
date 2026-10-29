@@ -2,11 +2,12 @@ import { CommonModule } from '@angular/common';
 import { Component, computed, inject } from '@angular/core';
 import { SplitzSettlementService } from '../../services/splitz-settlement.service';
 import { participantName } from './pending-review.model';
+import { SensitiveDirective } from '../../utils/sensitive.directive';
 
 @Component({
   selector: 'app-splitz-history',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, SensitiveDirective],
   host: { class: 'block' },
   template: `
     @if (historyQuery.isPending()) {
@@ -36,7 +37,7 @@ import { participantName } from './pending-review.model';
                   }
                 </div>
               </div>
-              <span class="shrink-0 text-xs font-semibold text-white tabular-nums">
+              <span class="shrink-0 text-xs font-semibold text-white tabular-nums" appSensitive>
                 €{{ record.amount | number: '1.2-2' }}
               </span>
             </div>

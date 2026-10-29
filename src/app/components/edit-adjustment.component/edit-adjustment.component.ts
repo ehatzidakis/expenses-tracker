@@ -54,7 +54,6 @@ function formatDateForInput(dateVal: Date | string): string {
     >
       <app-adjustment-edit-fields
         [amount]="adjustmentModel().amount"
-        [privacyMode]="privacyService.isPrivacyMode()"
         [descriptionField]="adjustmentForm.description"
         [amountField]="adjustmentForm.amount"
         [startDateField]="adjustmentForm.startDate"

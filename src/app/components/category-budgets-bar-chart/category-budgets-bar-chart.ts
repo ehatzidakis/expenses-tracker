@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
-import { PrivacyService } from '../../services/privacy.service';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { SensitiveDirective } from '../../utils/sensitive.directive';
 
 export interface MonthlyTrendItem {
   id: string;
@@ -13,7 +13,7 @@ export interface MonthlyTrendItem {
 @Component({
   selector: 'app-category-budgets-bar-chart',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, SensitiveDirective],
   template: `
     <div class="space-y-4">
       @if (monthlyTrends.length === 0) {
@@ -37,7 +37,7 @@ export interface MonthlyTrendItem {
                   class="text-xs font-bold"
                   [class.text-red-400]="active.total > active.wage"
                   [class.text-indigo-300]="active.total <= active.wage"
-                  [class.blur-md]="privacyService.isPrivacyMode()"
+                  appSensitive
                 >
                   €{{ active.total | number: '1.2-2' }}
                 </span>
@@ -45,10 +45,7 @@ export interface MonthlyTrendItem {
 
               <div class="border-l border-gray-800 pl-4">
                 <span class="text-[10px] text-gray-400 block">Wage</span>
-                <span
-                  class="text-xs font-bold text-emerald-400"
-                  [class.blur-md]="privacyService.isPrivacyMode()"
-                >
+                <span class="text-xs font-bold text-emerald-400" appSensitive>
                   €{{ active.wage | number: '1.0-0' }}
                 </span>
               </div>
@@ -107,8 +104,6 @@ export interface MonthlyTrendItem {
   `,
 })
 export class CategoryBudgetsBarChartComponent {
-  readonly privacyService = inject(PrivacyService);
-
   @Input() monthlyTrends: MonthlyTrendItem[] = [];
   @Input() activeMonth: MonthlyTrendItem | null = null;
   @Input() maxTrendSpend = 2000;

@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, input, output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { SensitiveDirective } from '../../utils/sensitive.directive';
 
 export interface BudgetCardItem {
   category: string;
@@ -12,7 +13,7 @@ export interface BudgetCardItem {
   selector: 'app-category-budget-cards',
   standalone: true,
   host: { class: 'block' },
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, SensitiveDirective],
   template: `
     <div class="grid grid-cols-4 gap-1">
       @for (item of budgets(); track item.category) {
@@ -50,7 +51,7 @@ export interface BudgetCardItem {
               }
             </label>
           } @else {
-            <span class="text-base font-semibold text-gray-100 mt-1">
+            <span class="text-base font-semibold text-gray-100 mt-1" appSensitive>
               €{{ item.budget | number: '1.0-0' }}
             </span>
           }

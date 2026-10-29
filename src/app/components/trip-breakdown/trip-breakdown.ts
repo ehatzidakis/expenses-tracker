@@ -8,6 +8,7 @@ import { Transaction } from '../../models/transaction.model';
 import { PEOPLE } from '../../models/splitz.model';
 import { AdjustmentCardComponent } from '../adjustment-card.component/adjustment-card.component';
 import { EditAdjustmentComponent } from '../edit-adjustment.component/edit-adjustment.component';
+import { SensitiveDirective } from '../../utils/sensitive.directive';
 
 interface TripCategoryRow {
   name: string;
@@ -23,6 +24,7 @@ interface TripCategoryRow {
     EditTransactionComponent,
     AdjustmentCardComponent,
     EditAdjustmentComponent,
+    SensitiveDirective,
   ],
   host: { class: 'block' },
   template: `
@@ -94,7 +96,7 @@ interface TripCategoryRow {
                       }}%)
                     </span>
                   </div>
-                  <span class="font-semibold text-white tabular-nums">
+                  <span class="font-semibold text-white tabular-nums" appSensitive>
                     €{{ row.amount | number: '1.2-2' }}
                   </span>
                 </div>
@@ -148,7 +150,7 @@ interface TripCategoryRow {
                             tx.date | date: 'dd/MM/yyyy'
                           }}</span>
                         </div>
-                        <span class="text-xs font-semibold text-white shrink-0 ml-2">
+                        <span class="text-xs font-semibold text-white shrink-0 ml-2" appSensitive>
                           €{{ tx.amount | number: '1.2-2' }}
                         </span>
                       </button>

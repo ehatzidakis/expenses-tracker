@@ -101,7 +101,6 @@ import { TransactionFormModel } from './edit-transaction.model';
         [amountField]="amountField()"
         [label]="amountLabel()"
         [readonly]="amountReadonly()"
-        [privacyMode]="privacyMode()"
         (amountChange)="amountChange.emit($event)"
       />
 
@@ -134,7 +133,6 @@ export class TransactionEditFieldsComponent {
   readonly categoryLabel = input.required<(category: string) => string>();
   readonly amountLabel = input('Amount');
   readonly amountReadonly = input(false);
-  readonly privacyMode = input(false);
 
   readonly categoryChange = output<string>();
   readonly subcategoryChange = output<number | null>();

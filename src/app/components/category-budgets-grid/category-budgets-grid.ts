@@ -8,6 +8,7 @@ import { BudgetSettingsService } from '../../services/budget-settings.service';
 import { BudgetCardItem, CategoryBudgetCardsComponent } from './category-budget-cards';
 import { CategoryBudgetEditControlsComponent } from './category-budget-edit-controls';
 import { CategoryBudgetSummaryComponent } from './category-budget-summary';
+import { PrivacyService } from '../../services/privacy.service';
 
 @Component({
   selector: 'app-category-budgets-grid',
@@ -29,7 +30,7 @@ import { CategoryBudgetSummaryComponent } from './category-budget-summary';
             </h3>
           </div>
 
-          @if (!isEditing) {
+          @if (!isEditing && !privacyService.isPrivacyMode()) {
             <button
               type="button"
               class="rounded-lg border border-indigo-500/40 bg-indigo-500/10 px-2.5 py-1 text-[10px] font-medium uppercase tracking-wide text-indigo-200 transition hover:bg-indigo-500/20"
@@ -65,6 +66,7 @@ import { CategoryBudgetSummaryComponent } from './category-budget-summary';
 export class CategoryBudgetsGrid implements OnInit {
   private readonly expenseState = inject(ExpenseStateService);
   private readonly budgetSettingsService = inject(BudgetSettingsService);
+  readonly privacyService = inject(PrivacyService);
 
   budgets: BudgetCardItem[] = [];
   totalBudget = 0;
@@ -80,6 +82,11 @@ export class CategoryBudgetsGrid implements OnInit {
     effect(() => {
       const settings = this.budgetSettingsService.settings();
       this.syncDisplayState(settings.categoryBudgets, settings.defaultTotalWage);
+    });
+
+    // Edit mode shows the wage and budgets in plain inputs, so close it when privacy turns on.
+    effect(() => {
+      if (this.privacyService.isPrivacyMode() && this.isEditing) this.cancelEditing();
     });
   }
 
