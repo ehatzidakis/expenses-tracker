@@ -12,6 +12,7 @@ import {
 import { Adjustment } from '../models/adjustments.model';
 import { db } from '../firebase.config';
 import { AuthService } from './auth.service';
+import { SyncMarkerService } from './sync-marker.service';
 
 export interface NewAdjustmentInput {
   description: string;
@@ -28,6 +29,7 @@ export interface NewAdjustmentInput {
 })
 export class AdjustmentService {
   private readonly authService = inject(AuthService);
+  private readonly syncMarker = inject(SyncMarkerService);
 
   getAdjustmentsQuery() {
     return injectQuery(() => {
@@ -91,6 +93,7 @@ export class AdjustmentService {
       isTrip: input.isTrip ?? false,
       isSelectable: input.isSelectable ?? false,
     });
+    await this.syncMarker.bump();
     return adjustmentRef.id;
   }
 
@@ -106,11 +109,13 @@ export class AdjustmentService {
       isTrip: input.isTrip ?? false,
       isSelectable: input.isSelectable ?? false,
     });
+    await this.syncMarker.bump();
   }
 
   async deleteAdjustment(target: string | Adjustment): Promise<void> {
     const adjId = typeof target === 'string' ? target : target.id;
     const adjRef = doc(db, 'adjustments', adjId);
     await deleteDoc(adjRef);
+    await this.syncMarker.bump();
   }
 }

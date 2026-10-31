@@ -2,12 +2,14 @@ import { Injectable, inject } from '@angular/core';
 import { injectQuery } from '@tanstack/angular-query-experimental';
 import { collection, doc, getDocs, query, setDoc, where } from 'firebase/firestore/lite';
 import { AuthService } from './auth.service';
+import { SyncMarkerService } from './sync-marker.service';
 import { db } from '../firebase.config';
 import { DebtEntry, SplitzParticipant, SplitzSettlementRecord } from '../models/splitz.model';
 
 @Injectable({ providedIn: 'root' })
 export class SplitzSettlementService {
   private readonly authService = inject(AuthService);
+  private readonly syncMarker = inject(SyncMarkerService);
 
   getHistoryQuery() {
     return injectQuery(() => {
@@ -54,6 +56,7 @@ export class SplitzSettlementService {
         return setDoc(doc(db, 'splitzSettlements', id), record, { merge: true });
       }),
     );
+    await this.syncMarker.bump();
   }
 
   private recordId(type: 'settlement', debt: DebtEntry): string {

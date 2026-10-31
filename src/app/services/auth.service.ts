@@ -1,4 +1,4 @@
-import { Injectable, computed, signal } from '@angular/core';
+import { Injectable, Injector, computed, inject, signal } from '@angular/core';
 import {
   createUserWithEmailAndPassword,
   onAuthStateChanged,
@@ -8,6 +8,7 @@ import {
 } from 'firebase/auth';
 import { doc, getDoc, setDoc } from 'firebase/firestore/lite';
 import { auth, db } from '../firebase.config';
+import { QueryPersistenceService } from './query-persistence';
 
 export type UserRole = 'admin' | 'kiosk';
 
@@ -16,6 +17,7 @@ export type UserRole = 'admin' | 'kiosk';
 })
 export class AuthService {
   private readonly adminUid = 'YnKzDa3eDIbeeYrRYEdJJikB7wu2';
+  private readonly injector = inject(Injector);
 
   readonly user = signal<User | null>(null);
   readonly currentRole = signal<UserRole | null>(null);
@@ -98,6 +100,8 @@ export class AuthService {
   async signOutUser(): Promise<void> {
     this.currentRole.set(null);
     await signOut(auth);
+    // Don't leave this account's data on the device. Looked up lazily to keep tests simple.
+    await this.injector.get(QueryPersistenceService).clear();
   }
 
   async signOut(): Promise<void> {

@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { signal } from '@angular/core';
+import { QueryClient, provideTanStackQuery } from '@tanstack/angular-query-experimental';
 import { vi } from 'vitest';
 
 import { CategoryBreakdownComponent } from './category-breakdown.component';
@@ -18,26 +18,43 @@ const categories = [
   },
 ];
 
+const tx = (id: string, category: string, adjustmentId?: string) => ({
+  id,
+  monthName: 'August 2026',
+  date: '2026-08-01',
+  description: id,
+  amount: 10,
+  category,
+  createdAt: '',
+  adjustmentId,
+});
+
+/** TanStack Query delivers results on a timer tick; wait for it, then for Angular. */
+async function settle(fixture: { whenStable: () => Promise<unknown> }): Promise<void> {
+  for (let i = 0; i < 3; i++) {
+    await new Promise((resolve) => setTimeout(resolve));
+    await fixture.whenStable();
+  }
+}
+
 describe('CategoryBreakdownComponent', () => {
   let component: CategoryBreakdownComponent;
   let fixture: ComponentFixture<CategoryBreakdownComponent>;
-  let transactionRevision: ReturnType<typeof signal<number>>;
-  let countTransactionsByCategory: ReturnType<typeof vi.fn>;
+  let queryClient: QueryClient;
+  let fetchMonthTransactions: ReturnType<typeof vi.fn>;
 
   beforeEach(async () => {
-    transactionRevision = signal(0);
-    countTransactionsByCategory = vi
+    queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+    fetchMonthTransactions = vi
       .fn()
-      .mockResolvedValueOnce({ Utilities: 1 })
-      .mockResolvedValueOnce({ Utilities: 2 });
+      .mockResolvedValueOnce([tx('a', 'Utilities'), tx('b', 'Gym'), tx('c', 'Utilities', 'trip')])
+      .mockResolvedValueOnce([tx('a', 'Utilities')]);
 
     await TestBed.configureTestingModule({
       imports: [CategoryBreakdownComponent],
       providers: [
-        {
-          provide: TransactionService,
-          useValue: { transactionRevision, countTransactionsByCategory },
-        },
+        provideTanStackQuery(queryClient),
+        { provide: TransactionService, useValue: { fetchMonthTransactions } },
       ],
     }).compileComponents();
 
@@ -67,20 +84,32 @@ describe('CategoryBreakdownComponent', () => {
     expect(component.budgetTitle()).toBe('All-Time Budget');
   });
 
-  it('reloads counts after an external transaction change', async () => {
+  it('does not load anything without a month', async () => {
+    fixture.componentRef.setInput('categories', categories);
+    await fixture.whenStable();
+
+    expect(fetchMonthTransactions).not.toHaveBeenCalled();
+    expect(component.transactionCounts()).toEqual({});
+  });
+
+  it('counts the month transactions per category, trip ones included', async () => {
     fixture.componentRef.setInput('categories', categories);
     fixture.componentRef.setInput('monthName', 'August 2026');
-    fixture.detectChanges();
-    await fixture.whenStable();
+    await settle(fixture);
 
+    expect(fetchMonthTransactions).toHaveBeenCalledWith('August 2026');
+    expect(component.transactionCounts()).toEqual({ Utilities: 2, Gym: 1 });
+  });
+
+  it('recounts after a save invalidates the expenses queries', async () => {
+    fixture.componentRef.setInput('categories', categories);
+    fixture.componentRef.setInput('monthName', 'August 2026');
+    await settle(fixture);
+
+    await queryClient.invalidateQueries({ queryKey: ['expenses'] });
+    await settle(fixture);
+
+    expect(fetchMonthTransactions).toHaveBeenCalledTimes(2);
     expect(component.transactionCounts()).toEqual({ Utilities: 1 });
-    expect(countTransactionsByCategory).toHaveBeenCalledTimes(1);
-
-    transactionRevision.set(1);
-    fixture.detectChanges();
-    await fixture.whenStable();
-
-    expect(component.transactionCounts()).toEqual({ Utilities: 2 });
-    expect(countTransactionsByCategory).toHaveBeenCalledTimes(2);
   });
 });

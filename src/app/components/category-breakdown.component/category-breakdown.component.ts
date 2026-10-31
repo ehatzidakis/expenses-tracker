@@ -1,9 +1,10 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, effect, inject, input, signal } from '@angular/core';
+import { Component, computed, inject, input, signal } from '@angular/core';
+import { injectQuery } from '@tanstack/angular-query-experimental';
 import { Adjustment } from '../../models/adjustments.model';
 import { Expense } from '../../models/expenses.model';
 import { CategorySpend } from '../../services/expense-state.service';
-import { TransactionService } from '../../services/transaction-service';
+import { TransactionService, monthTransactionsKey } from '../../services/transaction-service';
 import { CategoryBreakdownItemComponent } from './category-breakdown-item';
 import { MonthBreakdownComponent } from '../month-breakdown/month-breakdown.component';
 
@@ -54,7 +55,6 @@ import { MonthBreakdownComponent } from '../month-breakdown/month-breakdown.comp
               [transactionCount]="transactionCounts()[category.name] ?? 0"
               [expanded]="expandedCategory() === category.name"
               (toggle)="toggleCategory(category.name)"
-              (changed)="onEditFinished()"
             />
           }
         </div>
@@ -85,62 +85,26 @@ export class CategoryBreakdownComponent {
   });
 
   readonly expandedCategory = signal<string | null>(null);
-  readonly transactionCounts = signal<Record<string, number>>({});
-  private readonly transactionCountCache = new Map<string, Record<string, number>>();
-  private transactionCountRequestId = 0;
-  private lastTransactionRevision = -1;
 
-  constructor() {
-    effect(() => {
-      const month = this.monthName();
-      const currentCategories = this.categories();
-      const transactionRevision = this.transactionService.transactionRevision();
+  // Shares the cached month query with Recent Transactions and the Create tab's quick-picks,
+  // so counting costs no extra reads. Saves refresh it through the ['expenses'] invalidation.
+  private readonly monthQuery = injectQuery(() => ({
+    queryKey: monthTransactionsKey(this.monthName()),
+    enabled: !!this.monthName() && this.categories().length > 0,
+    queryFn: () => this.transactionService.fetchMonthTransactions(this.monthName()),
+  }));
 
-      if (transactionRevision !== this.lastTransactionRevision) {
-        this.transactionCountCache.delete(month);
-        this.lastTransactionRevision = transactionRevision;
-      }
-
-      if (!month || currentCategories.length === 0) {
-        this.transactionCounts.set({});
-        return;
-      }
-
-      void this.loadTransactionCounts(month, currentCategories);
-    });
-  }
-
-  private async loadTransactionCounts(
-    month: string,
-    currentCategories: CategorySpend[],
-  ): Promise<void> {
-    const requestId = ++this.transactionCountRequestId;
-    const categoryNames = currentCategories.map((category) => category.name);
-    const cachedCounts = this.transactionCountCache.get(month);
-
-    if (cachedCounts && categoryNames.every((name) => name in cachedCounts)) {
-      this.transactionCounts.set(cachedCounts);
-      return;
+  /** Transactions per category for the month, trip ones included (matches the transaction grid). */
+  readonly transactionCounts = computed<Record<string, number>>(() => {
+    if (!this.monthName()) return {};
+    const counts: Record<string, number> = {};
+    for (const transaction of this.monthQuery.data() ?? []) {
+      counts[transaction.category] = (counts[transaction.category] ?? 0) + 1;
     }
-
-    const counts = await this.transactionService.countTransactionsByCategory(month, categoryNames);
-
-    this.transactionCountCache.set(month, counts);
-    if (requestId !== this.transactionCountRequestId) {
-      return;
-    }
-    this.transactionCounts.set(counts);
-  }
+    return counts;
+  });
 
   toggleCategory(name: string): void {
     this.expandedCategory.update((current) => (current === name ? null : name));
-  }
-
-  onEditFinished(): void {
-    const month = this.monthName();
-    const currentCategories = this.categories();
-
-    this.transactionCountCache.delete(month);
-    void this.loadTransactionCounts(month, currentCategories);
   }
 }
