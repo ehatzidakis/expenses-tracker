@@ -49,6 +49,32 @@ export function pendingSourceLabel(pending: PendingTransaction): string {
   return pending.sourceRole === 'admin' ? 'Eftihis' : 'Kiosk';
 }
 
+/** A request the admin sent that the kiosk hasn't answered yet. */
+export function isAwaitingKiosk(pending: PendingTransaction): boolean {
+  return pending.requestStatus === 'awaiting-kiosk';
+}
+
+/** Items the admin has to act on: kiosk submissions and replies, and declined requests. */
+export function needsAdminAttention(pending: PendingTransaction): boolean {
+  return pending.sourceRole === 'kiosk' || pending.requestStatus === 'declined';
+}
+
+/** Extra label for request items, or null for ordinary pending items. */
+export function pendingStatusLabel(pending: PendingTransaction): string | null {
+  switch (pending.requestStatus) {
+    case 'awaiting-kiosk':
+      return 'Waiting for kiosk';
+    case 'answered':
+      return 'Kiosk reply';
+    case 'declined':
+      return pending.requestNote
+        ? `Kiosk couldn't fill: ${pending.requestNote}`
+        : "Kiosk couldn't fill";
+    default:
+      return null;
+  }
+}
+
 export function participantName(id: 'me' | number | undefined): string {
   if (id === 'me') return 'Me';
   if (id === undefined) return 'Unknown';

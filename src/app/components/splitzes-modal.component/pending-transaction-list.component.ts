@@ -1,10 +1,10 @@
 import { CommonModule } from '@angular/common';
-import { Component, input, output } from '@angular/core';
+import { Component, computed, input, output } from '@angular/core';
 import {
   getPendingTransactionTotalAmount,
   PendingTransaction,
 } from '../../services/transaction-service';
-import { pendingSourceLabel } from './pending-review.model';
+import { isAwaitingKiosk, pendingSourceLabel, pendingStatusLabel } from './pending-review.model';
 import { SensitiveDirective } from '../../utils/sensitive.directive';
 
 @Component({
@@ -15,7 +15,7 @@ import { SensitiveDirective } from '../../utils/sensitive.directive';
   template: `
     <div class="space-y-3">
       <div class="flex items-center justify-between">
-        <p class="text-xs text-gray-400">{{ items().length }} waiting for review</p>
+        <p class="text-xs text-gray-400">{{ reviewCount() }} waiting for review</p>
         <button
           type="button"
           (click)="refresh.emit()"
@@ -66,6 +66,16 @@ import { SensitiveDirective } from '../../utils/sensitive.directive';
                     <span>{{ pending.date | date: 'dd/MM/yyyy' }}</span>
                     <span>{{ pending.category }}</span>
                     <span class="text-amber-300/80">{{ sourceLabel(pending) }}</span>
+                    @if (statusLabel(pending); as status) {
+                      <span
+                        class="truncate max-w-full"
+                        [class.text-sky-300]="pending.requestStatus === 'awaiting-kiosk'"
+                        [class.text-emerald-300]="pending.requestStatus === 'answered'"
+                        [class.text-red-300]="pending.requestStatus === 'declined'"
+                      >
+                        {{ status }}
+                      </span>
+                    }
                   </div>
                 </div>
                 <div class="flex items-center gap-2 shrink-0">
@@ -93,4 +103,7 @@ export class PendingTransactionListComponent {
 
   readonly totalAmount = getPendingTransactionTotalAmount;
   readonly sourceLabel = pendingSourceLabel;
+  readonly statusLabel = pendingStatusLabel;
+  // Requests still with the kiosk are listed but aren't waiting for the admin.
+  readonly reviewCount = computed(() => this.items().filter((p) => !isAwaitingKiosk(p)).length);
 }

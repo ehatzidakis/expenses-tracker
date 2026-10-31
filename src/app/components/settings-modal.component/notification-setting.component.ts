@@ -1,4 +1,5 @@
 import { Component, computed, inject, signal } from '@angular/core';
+import { AuthService } from '../../services/auth.service';
 import { PushNotificationService } from '../../services/push-notification.service';
 
 @Component({
@@ -10,9 +11,7 @@ import { PushNotificationService } from '../../services/push-notification.servic
       <div class="flex items-center justify-between gap-3">
         <div class="space-y-0.5">
           <span class="text-sm font-medium text-gray-200 block">Notifications</span>
-          <span class="text-[11px] text-gray-400 block">
-            When the kiosk adds a pending transaction
-          </span>
+          <span class="text-[11px] text-gray-400 block">{{ subtitle() }}</span>
         </div>
 
         @if (canToggle()) {
@@ -70,6 +69,11 @@ import { PushNotificationService } from '../../services/push-notification.servic
 })
 export class NotificationSettingComponent {
   readonly push = inject(PushNotificationService);
+  private readonly isKiosk = inject(AuthService).isKiosk;
+
+  readonly subtitle = computed(() =>
+    this.isKiosk() ? 'When you get a new request' : 'When the kiosk adds a pending transaction',
+  );
 
   readonly busy = signal(false);
   readonly message = signal<string | null>(null);

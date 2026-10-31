@@ -89,12 +89,73 @@ export interface NewTransactionInput {
   customSplitAmounts?: Partial<Record<'me' | number, number>>;
 }
 
+/**
+ * Requests the admin sends to the kiosk to fill in. They live in `adjustments-temp`:
+ * - `awaiting-kiosk`: sent by the admin (`sourceRole: 'admin'`), shown on the kiosk's Requests tab.
+ * - `answered`: filled in by the kiosk, now a normal kiosk item (`sourceRole: 'kiosk'`).
+ * - `declined`: the kiosk couldn't fill it (`sourceRole: 'admin'`, reason in `requestNote`).
+ */
+export type KioskRequestStatus = 'awaiting-kiosk' | 'answered' | 'declined';
+
+export const KIOSK_REQUEST_NOTE_MAX = 120;
+
 export interface PendingTransaction extends NewTransactionInput {
   id: string;
   createdAt: string;
   createdByUid?: string;
   sourceRole: 'kiosk' | 'admin';
   status: 'pending';
+  requestStatus?: KioskRequestStatus;
+  requestNote?: string;
+  requestedByUid?: string;
+  respondedAt?: string;
+}
+
+/** What the kiosk can change before sending a request back. */
+export type KioskRequestAnswer = Pick<
+  NewTransactionInput,
+  'date' | 'description' | 'category' | 'subCategoryId' | 'subCategory' | 'comment' | 'amount'
+>;
+
+/**
+ * Fields written when the kiosk sends a request back. It becomes a normal kiosk item
+ * (default kiosk split on review), so any split or trip data left over is cleared.
+ */
+export function kioskAnswerFields(
+  answer: KioskRequestAnswer,
+  kioskUid: string,
+  now: string,
+): { set: Record<string, unknown>; clear: string[] } {
+  const set: Record<string, unknown> = {
+    date: answer.date,
+    description: answer.description.trim(),
+    category: answer.category,
+    amount: answer.amount,
+    totalAmount: answer.amount,
+    isSplit: false,
+    splitBy: [],
+    sourceRole: 'kiosk',
+    requestStatus: 'answered',
+    createdByUid: kioskUid,
+    respondedAt: now,
+  };
+  const clear = ['paidBy', 'splitType', 'customSplitAmounts', 'adjustmentId', 'requestNote'];
+
+  const optional = {
+    subCategoryId: answer.subCategoryId ?? undefined,
+    subCategory: answer.subCategory || undefined,
+    comment: answer.comment?.trim() || undefined,
+  };
+  for (const [field, value] of Object.entries(optional)) {
+    if (value === undefined) clear.push(field);
+    else set[field] = value;
+  }
+
+  return { set, clear };
+}
+
+function isNotFound(error: unknown): boolean {
+  return (error as { code?: string } | null)?.code === 'not-found';
 }
 
 /** Full bill for a split, otherwise the amount itself. */
@@ -256,6 +317,43 @@ export function normalizePendingForReview(input: PendingTransaction): PendingTra
 }
 
 const PAGE_SIZE = 10;
+
+const REQUEST_STATUSES: readonly KioskRequestStatus[] = ['awaiting-kiosk', 'answered', 'declined'];
+
+function toPendingTransaction(docSnap: QueryDocumentSnapshot<DocumentData>): PendingTransaction {
+  const data = docSnap.data();
+  const sourceRole = data['sourceRole'] === 'admin' ? 'admin' : 'kiosk';
+  const requestStatus = REQUEST_STATUSES.find((status) => status === data['requestStatus']);
+  const base: PendingTransaction = {
+    id: docSnap.id,
+    date: data['date'] as string,
+    description: data['description'] as string,
+    category: data['category'] as string,
+    subCategoryId: data['subCategoryId'] != null ? Number(data['subCategoryId']) : undefined,
+    subCategory: (data['subCategory'] as string | undefined) ?? undefined,
+    comment: normalizeComment(data['comment']),
+    amount: Number(data['amount']) || 0,
+    adjustmentId: (data['adjustmentId'] as string | undefined) ?? undefined,
+    isSplit: Boolean(data['isSplit']),
+    paidBy: data['paidBy'] as 'me' | number | undefined,
+    splitBy: (data['splitBy'] as number[]) ?? [],
+    splitType: (data['splitType'] as 'split' | 'custom') ?? 'split',
+    totalAmount: Number(data['totalAmount']) || 0,
+    customSplitAmounts:
+      (data['customSplitAmounts'] as Partial<Record<'me' | number, number>> | undefined) ??
+      undefined,
+    createdAt: (data['createdAt'] as string) ?? new Date().toISOString(),
+    createdByUid: (data['createdByUid'] as string | undefined) ?? undefined,
+    sourceRole,
+    status: (data['status'] as 'pending') ?? 'pending',
+    requestStatus,
+    requestNote: (data['requestNote'] as string | undefined) ?? undefined,
+    requestedByUid: (data['requestedByUid'] as string | undefined) ?? undefined,
+    respondedAt: (data['respondedAt'] as string | undefined) ?? undefined,
+  };
+
+  return normalizePendingForReview(base);
+}
 
 function stripUndefinedFields<T extends Record<string, unknown>>(value: T): T {
   return Object.fromEntries(
@@ -475,45 +573,74 @@ export class TransactionService {
 
   async fetchPendingTransactions(): Promise<PendingTransaction[]> {
     const snapshot = await getDocs(collection(db, 'adjustments-temp'));
+    return snapshot.docs.map((docSnap) => toPendingTransaction(docSnap));
+  }
 
-    return snapshot.docs.map((docSnap) => {
-      const data = docSnap.data();
-      const sourceRole = data['sourceRole'] === 'admin' ? 'admin' : 'kiosk';
-      const base: PendingTransaction = {
-        id: docSnap.id,
-        date: data['date'] as string,
-        description: data['description'] as string,
-        category: data['category'] as string,
-        subCategoryId: data['subCategoryId'] != null ? Number(data['subCategoryId']) : undefined,
-        subCategory: (data['subCategory'] as string | undefined) ?? undefined,
-        comment: normalizeComment(data['comment']),
-        amount: Number(data['amount']) || 0,
-        adjustmentId: (data['adjustmentId'] as string | undefined) ?? undefined,
-        isSplit: Boolean(data['isSplit']),
-        paidBy: data['paidBy'] as 'me' | number | undefined,
-        splitBy: (data['splitBy'] as number[]) ?? [],
-        splitType: (data['splitType'] as 'split' | 'custom') ?? 'split',
-        totalAmount: Number(data['totalAmount']) || 0,
-        customSplitAmounts:
-          (data['customSplitAmounts'] as Partial<Record<'me' | number, number>> | undefined) ??
-          undefined,
-        createdAt: (data['createdAt'] as string) ?? new Date().toISOString(),
-        createdByUid: (data['createdByUid'] as string | undefined) ?? undefined,
-        sourceRole,
-        status: (data['status'] as 'pending') ?? 'pending',
-      };
+  /** Kiosk only: the requests the admin sent that are still waiting to be filled in. */
+  getKioskRequestsQuery() {
+    return injectQuery(() => ({
+      queryKey: ['kioskRequests'],
+      staleTime: PENDING_STALE_TIME,
+      queryFn: () => this.fetchKioskRequests(),
+    }));
+  }
 
-      return normalizePendingForReview(base);
+  async fetchKioskRequests(): Promise<PendingTransaction[]> {
+    const snapshot = await getDocs(
+      query(collection(db, 'adjustments-temp'), where('requestStatus', '==', 'awaiting-kiosk')),
+    );
+    return snapshot.docs.map((docSnap) => toPendingTransaction(docSnap));
+  }
+
+  /** Admin: sends a transaction to the kiosk to fill in. The amount may be 0. */
+  async createKioskRequest(input: NewTransactionInput): Promise<string> {
+    const uid = this.authService.user()?.uid;
+    return this.createPendingTransaction(
+      { ...input, isSplit: false, splitBy: [], adjustmentId: undefined },
+      'admin',
+      { requestStatus: 'awaiting-kiosk', requestedByUid: uid },
+    );
+  }
+
+  /** Kiosk: fills in a request and sends it back for the admin to review. */
+  async answerKioskRequest(id: string, answer: KioskRequestAnswer): Promise<void> {
+    const uid = this.authService.user()?.uid;
+    if (!uid) throw new Error('You are signed out. Please sign in again.');
+
+    const { set, clear } = kioskAnswerFields(answer, uid, new Date().toISOString());
+    const update: Record<string, unknown> = { ...set };
+    for (const field of clear) update[field] = deleteField();
+
+    await this.updateRequest(id, update);
+  }
+
+  /** Kiosk: sends a request back without filling it in, with a reason. */
+  async declineKioskRequest(id: string, note: string): Promise<void> {
+    await this.updateRequest(id, {
+      requestStatus: 'declined',
+      requestNote: note.trim().slice(0, KIOSK_REQUEST_NOTE_MAX),
+      respondedAt: new Date().toISOString(),
     });
+  }
+
+  private async updateRequest(id: string, update: Record<string, unknown>): Promise<void> {
+    try {
+      await updateDoc(doc(db, 'adjustments-temp', id), update);
+    } catch (error) {
+      // The admin cancelled or already handled it.
+      if (isNotFound(error)) throw new Error('This request was cancelled.');
+      throw error;
+    }
   }
 
   async createPendingTransaction(
     input: NewTransactionInput,
     sourceRole: PendingTransaction['sourceRole'] = 'kiosk',
+    extra: Pick<PendingTransaction, 'requestStatus' | 'requestedByUid'> = {},
   ): Promise<string> {
     const currentUser = this.authService.user();
     if (!currentUser?.uid) {
-      throw new Error('Kiosk user is not authenticated. Please sign in again.');
+      throw new Error('You are signed out. Please sign in again.');
     }
 
     const pendingRef = doc(collection(db, 'adjustments-temp'));
@@ -526,6 +653,7 @@ export class TransactionService {
       createdByUid: currentUser.uid,
       sourceRole,
       status: 'pending' as const,
+      ...extra,
     });
 
     await setDoc(pendingRef, pendingData);

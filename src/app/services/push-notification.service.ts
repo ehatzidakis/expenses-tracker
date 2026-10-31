@@ -80,20 +80,30 @@ export class PushNotificationService {
     return this.post<PushSendResult>('/test', {});
   }
 
-  /**
-   * Tells the admin's phone about a new kiosk submission. Never throws: the transaction is
-   * already saved, and a missed notification shouldn't look like a failed save.
-   */
-  async notifyNewPending(item: Pick<NewTransactionInput, 'amount' | 'description' | 'category'>) {
-    const body = [`€${item.amount.toFixed(2)}`, item.description, item.category]
-      .map((part) => part?.trim())
-      .filter(Boolean)
-      .join(' · ');
+  // The notify methods below never throw: the data is already saved, and a missed
+  // notification shouldn't look like a failed save.
 
+  /** Kiosk → admin: a new kiosk submission, or a request sent back filled in. */
+  notifyNewPending(item: NotificationItem): Promise<void> {
+    return this.notify('/notify', { body: summarize(item) });
+  }
+
+  /** Kiosk → admin: a request the kiosk couldn't fill, with the reason. */
+  notifyRequestDeclined(item: NotificationItem, reason: string): Promise<void> {
+    const body = [summarize({ ...item, amount: 0 }), reason.trim()].filter(Boolean).join(' — ');
+    return this.notify('/notify', { type: 'request-declined', body });
+  }
+
+  /** Admin → kiosk: a new request to fill in. The amount is left out when it's 0. */
+  notifyKioskRequest(item: NotificationItem): Promise<void> {
+    return this.notify('/request', { body: summarize(item) });
+  }
+
+  private async notify(path: string, body: unknown): Promise<void> {
     try {
-      await this.post('/notify', { body });
+      await this.post(path, body);
     } catch (error) {
-      console.warn('Could not send the pending notification:', error);
+      console.warn('Could not send the notification:', error);
     }
   }
 
@@ -113,6 +123,17 @@ export class PushNotificationService {
     }
     return data as T;
   }
+}
+
+type NotificationItem = Pick<NewTransactionInput, 'amount' | 'description' | 'category'>;
+
+/** "€12.50 · Lidl · Supermarket". A 0 amount (not filled in yet) is left out. */
+function summarize(item: NotificationItem): string {
+  const amount = item.amount > 0 ? `€${item.amount.toFixed(2)}` : '';
+  return [amount, item.description, item.category]
+    .map((part) => part?.trim())
+    .filter(Boolean)
+    .join(' · ');
 }
 
 function readPermission(): NotificationPermission {

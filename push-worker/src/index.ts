@@ -30,7 +30,8 @@ class HttpError extends Error {
 interface Caller {
   uid: string;
   isAdmin: boolean;
-  canNotify: boolean;
+  // The admin or a kiosk account. Nobody else can use any route.
+  isKnown: boolean;
 }
 
 interface StoredSubscription {
@@ -86,7 +87,7 @@ async function route(request: Request, env: Env): Promise<Response> {
 
     case 'POST /subscribe': {
       const caller = await authenticate(request, env);
-      requireAdmin(caller);
+      requireKnown(caller);
       const subscription = parseSubscription(await readJson(request));
       const stored: StoredSubscription = {
         subscription,
@@ -100,18 +101,24 @@ async function route(request: Request, env: Env): Promise<Response> {
 
     case 'POST /unsubscribe': {
       const caller = await authenticate(request, env);
-      requireAdmin(caller);
+      requireKnown(caller);
       const body = await readJson(request);
       const endpoint = typeof body['endpoint'] === 'string' ? body['endpoint'] : '';
       if (!endpoint) throw new HttpError(400, 'Missing endpoint');
-      await env.SUBSCRIPTIONS.delete(await storageKey(endpoint));
+      const key = await storageKey(endpoint);
+      const stored = await env.SUBSCRIPTIONS.get<StoredSubscription>(key, 'json');
+      if (stored && stored.uid !== caller.uid && !caller.isAdmin) {
+        throw new HttpError(403, "You can't remove another person's notifications");
+      }
+      await env.SUBSCRIPTIONS.delete(key);
       return json({ ok: true });
     }
 
     case 'POST /test': {
+      // Goes only to the caller's own phones.
       const caller = await authenticate(request, env);
-      requireAdmin(caller);
-      const result = await sendToAll(env, {
+      requireKnown(caller);
+      const result = await sendTo(env, [caller.uid], {
         kind: 'test',
         title: 'Test notification',
         body: 'Notifications are working.',
@@ -120,14 +127,29 @@ async function route(request: Request, env: Env): Promise<Response> {
     }
 
     case 'POST /notify': {
+      // Kiosk → admin: a new pending transaction, or a request the kiosk couldn't fill.
       const caller = await authenticate(request, env);
-      if (!caller.canNotify) throw new HttpError(403, 'This account cannot send notifications');
+      requireKnown(caller);
       const body = await readJson(request);
-      const text = typeof body['body'] === 'string' ? body['body'].trim() : '';
-      const result = await sendToAll(env, {
+      const declined = body['type'] === 'request-declined';
+      const result = await sendTo(env, [env.ADMIN_UID], {
         kind: 'pending',
-        title: 'New pending transaction',
-        body: text ? text.slice(0, MAX_BODY_LENGTH) : 'Tap to review it.',
+        title: declined ? "Kiosk couldn't fill a request" : 'New pending transaction',
+        body: readText(body) || 'Tap to review it.',
+      });
+      return json(result);
+    }
+
+    case 'POST /request': {
+      // Admin → kiosk: a transaction for the kiosk to fill in.
+      const caller = await authenticate(request, env);
+      requireAdmin(caller);
+      const body = await readJson(request);
+      const result = await sendTo(env, kioskUids(env), {
+        kind: 'request',
+        title: 'New request',
+        body: readText(body) || 'Tap to fill it in.',
+        url: '/?tab=requests',
       });
       return json(result);
     }
@@ -157,23 +179,39 @@ async function authenticate(request: Request, env: Env): Promise<Caller> {
   if (!uid) throw new HttpError(401, 'Invalid sign-in token');
 
   const isAdmin = uid === env.ADMIN_UID;
-  return { uid, isAdmin, canNotify: isAdmin || splitList(env.NOTIFY_UIDS).includes(uid) };
+  return { uid, isAdmin, isKnown: isAdmin || kioskUids(env).includes(uid) };
 }
 
 function requireAdmin(caller: Caller): void {
   if (!caller.isAdmin) throw new HttpError(403, 'Only the admin account can do this');
 }
 
-// ---- Sending ----
-
-// `kind` lets the app's service worker tell pushes apart (only 'pending' bumps the badge).
-interface OutgoingNotification {
-  kind: 'pending' | 'test';
-  title: string;
-  body: string;
+function requireKnown(caller: Caller): void {
+  if (!caller.isKnown) throw new HttpError(403, 'This account cannot use notifications');
 }
 
-async function sendToAll(env: Env, notification: OutgoingNotification): Promise<SendResult> {
+// NOTIFY_UIDS holds the kiosk accounts.
+function kioskUids(env: Env): string[] {
+  return splitList(env.NOTIFY_UIDS);
+}
+
+// ---- Sending ----
+
+// `kind` lets the app's service worker tell pushes apart ('pending' and 'request' bump the badge).
+interface OutgoingNotification {
+  kind: 'pending' | 'request' | 'test';
+  title: string;
+  body: string;
+  // Where tapping the notification opens the app.
+  url?: string;
+}
+
+/** Sends to every phone subscribed by one of `uids`. */
+async function sendTo(
+  env: Env,
+  uids: string[],
+  notification: OutgoingNotification,
+): Promise<SendResult> {
   const vapid = {
     subject: env.VAPID_SUBJECT,
     publicKey: env.VAPID_PUBLIC_KEY,
@@ -186,7 +224,7 @@ async function sendToAll(env: Env, notification: OutgoingNotification): Promise<
   await Promise.all(
     keys.map(async ({ name }) => {
       const stored = await env.SUBSCRIPTIONS.get<StoredSubscription>(name, 'json');
-      if (!stored) return;
+      if (!stored || !uids.includes(stored.uid)) return;
 
       try {
         const payload = await buildPushPayload(
@@ -221,7 +259,7 @@ async function sendToAll(env: Env, notification: OutgoingNotification): Promise<
 
 // Angular's service worker shows a push only if it has this shape.
 // Tapping the notification focuses the open app, or opens it.
-function angularNotification({ kind, title, body }: OutgoingNotification) {
+function angularNotification({ kind, title, body, url = '/' }: OutgoingNotification) {
   return {
     notification: {
       title,
@@ -230,7 +268,7 @@ function angularNotification({ kind, title, body }: OutgoingNotification) {
       data: {
         kind,
         onActionClick: {
-          default: { operation: 'navigateLastFocusedOrOpen', url: '/' },
+          default: { operation: 'navigateLastFocusedOrOpen', url },
         },
       },
     },
@@ -272,6 +310,12 @@ async function readJson(request: Request): Promise<Record<string, unknown>> {
     // fall through
   }
   throw new HttpError(400, 'Request body must be JSON');
+}
+
+// The notification text the app sent, trimmed to a lock-screen-friendly length.
+function readText(body: Record<string, unknown>): string {
+  const text = typeof body['body'] === 'string' ? body['body'].trim() : '';
+  return text.slice(0, MAX_BODY_LENGTH);
 }
 
 function corsHeaders(origin: string | null, env: Env): Record<string, string> {

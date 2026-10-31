@@ -1,24 +1,31 @@
 # Push worker
 
-A small Cloudflare Worker that sends push notifications to the admin's phone when the kiosk adds a pending transaction. Firebase stays as it is. This only delivers notifications.
+A small Cloudflare Worker that sends push notifications between the admin and the kiosk. Firebase stays as it is. This only delivers notifications.
 
 ```
 Kiosk saves pending transaction ──► Firestore (as before)
-                                └─► POST /notify ──► Apple push ──► admin's phone
+                                └─► POST /notify  ──► Apple push ──► admin's phone
+Admin sends a request          ──► Firestore
+                                └─► POST /request ──► Apple push ──► kiosk's phone
 ```
 
 ## Routes
+
+"Known users" are `ADMIN_UID` and the kiosk accounts in `NOTIFY_UIDS`. Everyone else gets 403.
 
 | Route | Who | What |
 |---|---|---|
 | `GET /` | anyone | Health check |
 | `GET /vapid-public-key` | anyone | Public push key the app needs to subscribe |
-| `POST /subscribe` | admin | Saves this phone's push subscription |
-| `POST /unsubscribe` | admin | Removes it |
-| `POST /test` | admin | Sends a test notification to every saved phone |
-| `POST /notify` | kiosk UIDs in `NOTIFY_UIDS`, or admin | Sends "New pending transaction" |
+| `POST /subscribe` | known users | Saves this phone's push subscription under the caller |
+| `POST /unsubscribe` | known users | Removes it (only your own, unless you're admin) |
+| `POST /test` | known users | Sends a test notification to the caller's own phones |
+| `POST /notify` | known users | To the admin: "New pending transaction", or "Kiosk couldn't fill a request" with `type: 'request-declined'` |
+| `POST /request` | admin | To the kiosk: "New request". Tapping opens the Requests tab |
 
 Every POST needs `Authorization: Bearer <Firebase ID token>`. The Worker checks the token against Google's public keys, so nobody else can subscribe or send notifications.
+
+Pushes carry `data.kind` (`pending`, `request` or `test`). The app's service worker (`public/push-sw.js`) raises the Home Screen badge for `pending` and `request`.
 
 ## Config
 

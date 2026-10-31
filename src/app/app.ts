@@ -21,6 +21,7 @@ import { CategoryAverageComponent } from './components/category-average/category
 import { RecentTransactionsComponent } from './components/recent-transactions/recent-transactions';
 import { AuthService } from './services/auth.service';
 import { PendingBadgeService } from './services/pending-badge.service';
+import { KioskShellComponent } from './components/kiosk-shell/kiosk-shell.component';
 import { SinglesViewComponent } from './components/singles-view/singles-view';
 import type { SinglesType } from './components/singles-view/singles-view.util';
 
@@ -52,6 +53,7 @@ export interface YearlyBreakdownEntry {
     CategoryAverageComponent,
     RecentTransactionsComponent,
     SinglesViewComponent,
+    KioskShellComponent,
   ],
   templateUrl: './app.html',
 })
@@ -91,10 +93,11 @@ export class AppComponent {
       this.swUpdate.checkForUpdate();
     }
 
-    // The Home Screen badge counts kiosk items waiting for the admin.
-    // Looked up lazily so kiosk sessions and tests never create it.
+    // The Home Screen badge: items to review for the admin, requests to fill in for the kiosk.
+    // Looked up lazily so signed-out sessions and tests never create it.
     effect(() => {
-      if (this.isAdmin()) this.injector.get(PendingBadgeService).start();
+      const role = this.currentRole();
+      if (role) this.injector.get(PendingBadgeService).start(role);
     });
   }
 
@@ -209,9 +212,5 @@ export class AppComponent {
     } finally {
       this.isSigningIn.set(false);
     }
-  }
-
-  async signOut(): Promise<void> {
-    await this.authService.signOut();
   }
 }

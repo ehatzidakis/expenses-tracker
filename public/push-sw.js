@@ -15,7 +15,8 @@ self.addEventListener('push', (event) => {
   } catch {
     return;
   }
-  if (kind === 'pending') {
+  // 'pending' reaches the admin, 'request' reaches the kiosk. Test pushes don't count.
+  if (kind === 'pending' || kind === 'request') {
     event.waitUntil(bumpBadge());
   }
 });

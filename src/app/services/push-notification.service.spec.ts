@@ -133,6 +133,34 @@ describe('PushNotificationService', () => {
     ).resolves.toBeUndefined();
   });
 
+  it('sends a request to the kiosk, leaving out an amount that is not filled in', async () => {
+    fetchMock.mockResolvedValue(jsonResponse({ sent: 1, removed: 0, failed: 0 }));
+    const service = setup();
+
+    await service.notifyKioskRequest({ amount: 0, description: 'Electricity', category: 'Bills' });
+
+    const [url, init] = fetchMock.mock.calls[0];
+    expect(url).toBe(`${PUSH_WORKER_URL}/request`);
+    expect(JSON.parse(init.body)).toEqual({ body: 'Electricity · Bills' });
+  });
+
+  it('tells the admin when the kiosk declines a request, with the reason', async () => {
+    fetchMock.mockResolvedValue(jsonResponse({ sent: 1, removed: 0, failed: 0 }));
+    const service = setup();
+
+    await service.notifyRequestDeclined(
+      { amount: 20, description: 'Taxi', category: 'Transport' },
+      ' Not mine ',
+    );
+
+    const [url, init] = fetchMock.mock.calls[0];
+    expect(url).toBe(`${PUSH_WORKER_URL}/notify`);
+    expect(JSON.parse(init.body)).toEqual({
+      type: 'request-declined',
+      body: 'Taxi · Transport — Not mine',
+    });
+  });
+
   it('reports unsupported when there is no service worker', () => {
     swPush.isEnabled = false;
     const service = setup();

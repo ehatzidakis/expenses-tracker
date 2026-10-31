@@ -1,6 +1,8 @@
 import { Injectable, inject } from '@angular/core';
 import { SwPush } from '@angular/service-worker';
 import { QueryClient } from '@tanstack/angular-query-experimental';
+import { needsAdminAttention } from '../components/splitzes-modal.component/pending-review.model';
+import type { UserRole } from './auth.service';
 import {
   PENDING_STALE_TIME,
   TransactionService,
@@ -22,34 +24,55 @@ type BadgeNavigator = Navigator & {
   clearAppBadge(): Promise<void>;
 };
 
-/** Kiosk items waiting for review. The admin's own scheduled items don't count. */
-export function countKioskPending(pending: PendingTransaction[] | undefined): number {
-  return pending?.filter((item) => item.sourceRole === 'kiosk').length ?? 0;
+/**
+ * Admin: what needs their attention (kiosk submissions and replies, declined requests).
+ * Their own scheduled items and requests still with the kiosk don't count.
+ */
+export function countAdminBadge(pending: PendingTransaction[] | undefined): number {
+  return pending?.filter(needsAdminAttention).length ?? 0;
+}
+
+interface BadgeSource {
+  queryKey: string;
+  fetch: () => Promise<PendingTransaction[]>;
+  count: (items: PendingTransaction[] | undefined) => number;
 }
 
 /**
- * Keeps the red badge on the Home Screen icon equal to the number of kiosk items
- * waiting for review. Admin only.
+ * Keeps the red badge on the Home Screen icon equal to what's waiting for this user:
+ * items to review for the admin, requests to fill in for the kiosk.
  */
 @Injectable({ providedIn: 'root' })
 export class PendingBadgeService {
   private readonly queryClient = inject(QueryClient);
   private readonly transactionService = inject(TransactionService);
   private readonly swPush = inject(SwPush, { optional: true });
-  private started = false;
+  private source: BadgeSource | null = null;
 
-  start(): void {
-    if (this.started || !supportsBadge()) return;
-    this.started = true;
+  start(role: UserRole): void {
+    if (this.source || !supportsBadge()) return;
+    this.source =
+      role === 'admin'
+        ? {
+            queryKey: 'pendingTransactions',
+            fetch: () => this.transactionService.fetchPendingTransactions(),
+            count: countAdminBadge,
+          }
+        : {
+            queryKey: 'kioskRequests',
+            fetch: () => this.transactionService.fetchKioskRequests(),
+            count: (items) => items?.length ?? 0,
+          };
+    const source = this.source;
 
-    // Whenever the pending list loads or changes (accept, decline, refresh), match it.
+    // Whenever the list loads or changes (accept, decline, send back, refresh), match it.
     this.queryClient.getQueryCache().subscribe((event) => {
       if (
         event.type === 'updated' &&
         event.action.type === 'success' &&
-        event.query.queryKey[0] === 'pendingTransactions'
+        event.query.queryKey[0] === source.queryKey
       ) {
-        void this.show(countKioskPending(event.query.state.data as PendingTransaction[]));
+        void this.show(source.count(event.query.state.data as PendingTransaction[]));
       }
     });
 
@@ -63,16 +86,19 @@ export class PendingBadgeService {
   }
 
   private async refresh(): Promise<void> {
+    const source = this.source;
+    if (!source) return;
+
     try {
       if ((await readState()).dirty) {
-        await this.queryClient.invalidateQueries({ queryKey: ['pendingTransactions'] });
+        await this.queryClient.invalidateQueries({ queryKey: [source.queryKey] });
       }
-      const pending = await this.queryClient.fetchQuery({
-        queryKey: ['pendingTransactions'],
-        queryFn: () => this.transactionService.fetchPendingTransactions(),
+      const items = await this.queryClient.fetchQuery({
+        queryKey: [source.queryKey],
+        queryFn: source.fetch,
         staleTime: PENDING_STALE_TIME,
       });
-      await this.show(countKioskPending(pending));
+      await this.show(source.count(items));
     } catch (error) {
       console.warn('Could not update the app badge:', error);
     }

@@ -20,35 +20,37 @@ interface TransactionFieldsModel {
   host: { class: 'block' },
   template: `
     <div class="space-y-4">
-      <div class="space-y-1.5">
-        <label class="text-xs font-medium text-gray-400">Link with Trip</label>
-        <div class="grid grid-cols-2 gap-2 p-1 bg-gray-950/80 rounded-xl border border-gray-800">
-          <button
-            type="button"
-            (click)="linkChange.emit(true)"
-            class="py-2 rounded-lg text-xs font-semibold transition-all duration-150 flex items-center justify-center gap-1 cursor-pointer"
-            [class.bg-sky-500/20]="linked()"
-            [class.text-sky-400]="linked()"
-            [class.border]="linked()"
-            [class.border-sky-500/30]="linked()"
-            [class.text-gray-400]="!linked()"
-          >
-            🛫 Yes
-          </button>
-          <button
-            type="button"
-            (click)="linkChange.emit(false)"
-            class="py-2 rounded-lg text-xs font-semibold transition-all duration-150 flex items-center justify-center gap-1 cursor-pointer"
-            [class.bg-gray-700/60]="!linked()"
-            [class.text-gray-200]="!linked()"
-            [class.border]="!linked()"
-            [class.border-gray-600/40]="!linked()"
-            [class.text-gray-400]="linked()"
-          >
-            No
-          </button>
+      @if (showTripLink()) {
+        <div class="space-y-1.5">
+          <label class="text-xs font-medium text-gray-400">Link with Trip</label>
+          <div class="grid grid-cols-2 gap-2 p-1 bg-gray-950/80 rounded-xl border border-gray-800">
+            <button
+              type="button"
+              (click)="linkChange.emit(true)"
+              class="py-2 rounded-lg text-xs font-semibold transition-all duration-150 flex items-center justify-center gap-1 cursor-pointer"
+              [class.bg-sky-500/20]="linked()"
+              [class.text-sky-400]="linked()"
+              [class.border]="linked()"
+              [class.border-sky-500/30]="linked()"
+              [class.text-gray-400]="!linked()"
+            >
+              🛫 Yes
+            </button>
+            <button
+              type="button"
+              (click)="linkChange.emit(false)"
+              class="py-2 rounded-lg text-xs font-semibold transition-all duration-150 flex items-center justify-center gap-1 cursor-pointer"
+              [class.bg-gray-700/60]="!linked()"
+              [class.text-gray-200]="!linked()"
+              [class.border]="!linked()"
+              [class.border-gray-600/40]="!linked()"
+              [class.text-gray-400]="linked()"
+            >
+              No
+            </button>
+          </div>
         </div>
-      </div>
+      }
 
       @if (linked()) {
         <div class="space-y-1.5">
@@ -194,6 +196,8 @@ export class TransactionBasicFieldsComponent {
   readonly model = input.required<TransactionFieldsModel>();
   readonly categories = input.required<ReadonlyArray<string>>();
   readonly linked = input.required<boolean>();
+  // Off for requests sent to the kiosk, which can't link trips.
+  readonly showTripLink = input(true);
   readonly trips = input.required<ReadonlyArray<{ id: string; title: string }>>();
   readonly selectedTripId = input.required<string>();
   readonly dateField = input.required<FieldTree<string>>();

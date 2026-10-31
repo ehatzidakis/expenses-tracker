@@ -3,6 +3,9 @@ import { PendingTransaction } from '../../services/transaction-service';
 import { CreateSplitState } from '../create-transaction.component/split-fields.component';
 import {
   buildPendingAcceptPayload,
+  isAwaitingKiosk,
+  needsAdminAttention,
+  pendingStatusLabel,
   pendingToFormModel,
   pendingToSplitState,
 } from './pending-review.model';
@@ -145,5 +148,32 @@ describe('pending review model', () => {
     const p = pending({ adjustmentId: 'trip-1', category: 'Food' });
     const result = buildPendingAcceptPayload(pendingToFormModel(p), noSplit, p);
     expect(result.ok && result.payload.adjustmentId).toBe('trip-1');
+  });
+});
+
+describe('request status helpers', () => {
+  it('labels each request state and leaves ordinary pending items alone', () => {
+    expect(pendingStatusLabel(pending())).toBeNull();
+    expect(pendingStatusLabel(pending({ requestStatus: 'awaiting-kiosk' }))).toBe(
+      'Waiting for kiosk',
+    );
+    expect(pendingStatusLabel(pending({ sourceRole: 'kiosk', requestStatus: 'answered' }))).toBe(
+      'Kiosk reply',
+    );
+    expect(
+      pendingStatusLabel(pending({ requestStatus: 'declined', requestNote: 'Not mine' })),
+    ).toBe("Kiosk couldn't fill: Not mine");
+  });
+
+  it('only flags items the admin has to act on', () => {
+    expect(needsAdminAttention(pending())).toBe(false);
+    expect(needsAdminAttention(pending({ requestStatus: 'awaiting-kiosk' }))).toBe(false);
+    expect(needsAdminAttention(pending({ sourceRole: 'kiosk' }))).toBe(true);
+    expect(needsAdminAttention(pending({ requestStatus: 'declined' }))).toBe(true);
+  });
+
+  it('knows when a request is still with the kiosk', () => {
+    expect(isAwaitingKiosk(pending({ requestStatus: 'awaiting-kiosk' }))).toBe(true);
+    expect(isAwaitingKiosk(pending({ requestStatus: 'declined' }))).toBe(false);
   });
 });

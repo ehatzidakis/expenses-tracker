@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { AuthService } from './auth.service';
 import { BudgetSettingsService } from './budget-settings.service';
 import { SyncMarkerService } from './sync-marker.service';
-import { splitUpdateFields, TransactionService } from './transaction-service';
+import { kioskAnswerFields, splitUpdateFields, TransactionService } from './transaction-service';
 
 type CommitInternals = { commitPendingTransaction: (id: string) => Promise<void> };
 
@@ -149,5 +149,62 @@ describe('splitUpdateFields', () => {
       set: {},
       clear: [],
     });
+  });
+});
+
+describe('kioskAnswerFields', () => {
+  const answer = {
+    date: '2026-11-01',
+    description: ' Lidl ',
+    category: 'Supermarket',
+    amount: 12.5,
+  };
+
+  it('turns the request into a kiosk item with the entered amount', () => {
+    const { set } = kioskAnswerFields(answer, 'kiosk-uid', '2026-11-01T10:00:00.000Z');
+
+    expect(set).toMatchObject({
+      description: 'Lidl',
+      amount: 12.5,
+      totalAmount: 12.5,
+      isSplit: false,
+      splitBy: [],
+      sourceRole: 'kiosk',
+      requestStatus: 'answered',
+      createdByUid: 'kiosk-uid',
+      respondedAt: '2026-11-01T10:00:00.000Z',
+    });
+  });
+
+  it('clears leftover split and trip data, and optional fields left empty', () => {
+    const { set, clear } = kioskAnswerFields(answer, 'kiosk-uid', 'now');
+
+    expect(clear).toEqual(
+      expect.arrayContaining([
+        'paidBy',
+        'splitType',
+        'customSplitAmounts',
+        'adjustmentId',
+        'subCategoryId',
+        'subCategory',
+        'comment',
+      ]),
+    );
+    expect(set).not.toHaveProperty('comment');
+  });
+
+  it('keeps optional fields that were filled in', () => {
+    const { set, clear } = kioskAnswerFields(
+      { ...answer, subCategoryId: 3, subCategory: 'Weekly', comment: ' receipt in bag ' },
+      'kiosk-uid',
+      'now',
+    );
+
+    expect(set).toMatchObject({
+      subCategoryId: 3,
+      subCategory: 'Weekly',
+      comment: 'receipt in bag',
+    });
+    expect(clear).not.toContain('comment');
   });
 });
