@@ -37,20 +37,23 @@ import { SensitiveDirective } from '../../utils/sensitive.directive';
             <div class="text-right">
               <div class="text-[13px] text-white-40 tabular-nums">
                 @if (!category().isAllTime && category().budget !== null) {
-                  <span appSensitive>
+                  <span appSensitive="xs">
                     €{{ category().amount | number: '1.2-2' }}
                     <span class="text-gray-500 text-xs">
                       / €{{ category().budget | number: '1.2-2' }}
                     </span>
                   </span>
                 } @else {
-                  <span appSensitive>€{{ category().amount | number: '1.2-2' }}</span>
+                  <span appSensitive="xs">€{{ category().amount | number: '1.2-2' }}</span>
                 }
               </div>
 
               @if (!category().isAllTime && category().budget !== null) {
                 @if (category().isOverBudget) {
-                  <div class="mt-1 text-[10px] font-medium text-red-400 tabular-nums" appSensitive>
+                  <div
+                    class="mt-1 text-[10px] font-medium text-red-400 tabular-nums"
+                    appSensitive="xs"
+                  >
                     €{{
                       (category().monthlyAverage ?? category().amount) - (category().budget ?? 0)
                         | number: '1.2-2'
@@ -60,7 +63,7 @@ import { SensitiveDirective } from '../../utils/sensitive.directive';
                 } @else {
                   <div
                     class="mt-1 text-[11px] font-medium text-teal-300/90 tabular-nums"
-                    appSensitive
+                    appSensitive="xs"
                   >
                     €{{
                       (category().budget ?? 0) - (category().monthlyAverage ?? category().amount)
@@ -78,13 +81,13 @@ import { SensitiveDirective } from '../../utils/sensitive.directive';
           <div class="flex items-center justify-between text-xs w-full gap-2 py-0.5">
             <span
               class="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-0.5 rounded-md bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 tabular-nums"
-              appSensitive
+              appSensitive="xs"
             >
               €{{ category().budget | number: '1.2-2' }} / mo budget
             </span>
             <span
               class="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-0.5 rounded-md bg-indigo-500/15 text-indigo-300 border border-indigo-500/30 tabular-nums"
-              appSensitive
+              appSensitive="xs"
             >
               €{{ category().monthlyAverage | number: '1.2-2' }} / mo average
             </span>
