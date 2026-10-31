@@ -1,4 +1,4 @@
-import { inject, Injectable, isDevMode } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import {
   collection,
   count,
@@ -335,67 +335,7 @@ export class TransactionService {
         return [categoryStatKey(group), stat] as const;
       }),
     );
-    const stats = Object.fromEntries(entries);
-
-    if (isDevMode()) {
-      void this.devCompareCategoryStats(groups, stats);
-    }
-
-    return stats;
-  }
-
-  /**
-   * TEMPORARY, development builds only: recalculates the totals from the full documents the
-   * old way and logs any difference. Firestore's sum skips amounts stored as text and its
-   * filters don't match subCategoryId stored as text, so this catches old data in that shape.
-   * Remove once the Charts numbers are confirmed.
-   */
-  private async devCompareCategoryStats(
-    groups: CategoryStatGroup[],
-    stats: Record<string, CategoryStat>,
-  ): Promise<void> {
-    const categories = [...new Set(groups.map((group) => group.category))];
-    const snapshot = await getDocs(
-      query(collection(db, 'transactions'), where('category', 'in', categories)),
-    );
-    const docs = snapshot.docs.map((d) => ({ id: d.id, data: d.data() }));
-
-    const textShaped = docs.filter(
-      ({ data }) =>
-        typeof data['amount'] !== 'number' ||
-        (data['subCategoryId'] != null && typeof data['subCategoryId'] !== 'number'),
-    );
-    if (textShaped.length > 0) {
-      console.warn(
-        `[stats check] ${textShaped.length} transaction(s) store amount or subCategoryId as text:`,
-        textShaped.map(({ id, data }) => ({
-          id,
-          amount: data['amount'],
-          subCategoryId: data['subCategoryId'],
-        })),
-      );
-    }
-
-    for (const group of groups) {
-      const matches = docs.filter(
-        ({ data }) =>
-          data['category'] === group.category &&
-          (group.subCategoryId == null || Number(data['subCategoryId']) === group.subCategoryId),
-      );
-      const expected = {
-        count: matches.length,
-        sum: matches.reduce((total, { data }) => total + (Number(data['amount']) || 0), 0),
-      };
-      const actual = stats[categoryStatKey(group)];
-      if (
-        !actual ||
-        actual.count !== expected.count ||
-        Math.abs(actual.sum - expected.sum) > 0.005
-      ) {
-        console.warn(`[stats check] ${categoryStatKey(group)} differs`, { expected, actual });
-      }
-    }
-    console.info(`[stats check] compared ${groups.length} rows against ${docs.length} documents`);
+    return Object.fromEntries(entries);
   }
 
   async fetchPage(
