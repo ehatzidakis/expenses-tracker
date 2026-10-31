@@ -1,6 +1,7 @@
 import { Component, computed, inject, input, output, signal } from '@angular/core';
 import { injectQuery, QueryClient } from '@tanstack/angular-query-experimental';
-import { TransactionService } from '../../services/transaction-service';
+import { TransactionService, monthTransactionsKey } from '../../services/transaction-service';
+import { Transaction } from '../../models/transaction.model';
 import { RECURRING_TEMPLATES, RecurringTemplate } from './recurring-templates';
 import {
   buildMonthlyBatch,
@@ -110,23 +111,26 @@ export class RecurringTemplatesComponent {
   readonly monthName = computed(() => monthNameFromDate(this.targetDate()));
   private readonly prevMonthName = computed(() => previousMonthName(this.targetDate()));
 
-  // Keys start with 'expenses' so the existing ['expenses'] invalidation refreshes them.
+  // Shared month cache (also used by the Monthly tab); saves refresh it via ['expenses'].
   private readonly monthQuery = injectQuery(() => ({
-    queryKey: ['expenses', 'month-tx', this.monthName()],
+    queryKey: monthTransactionsKey(this.monthName()),
     enabled: !!this.monthName(),
     queryFn: () => this.transactionService.fetchMonthTransactions(this.monthName()),
   }));
   private readonly prevMonthQuery = injectQuery(() => ({
-    queryKey: ['expenses', 'month-tx', this.prevMonthName()],
+    queryKey: monthTransactionsKey(this.prevMonthName()),
     enabled: !!this.prevMonthName(),
     queryFn: () => this.transactionService.fetchMonthTransactions(this.prevMonthName()),
   }));
+  // The month data includes trip transactions; quick-picks only look at regular ones.
+  private readonly monthTxs = computed(() => withoutTrips(this.monthQuery.data()));
+  private readonly prevMonthTxs = computed(() => withoutTrips(this.prevMonthQuery.data()));
   private readonly pendingQuery = this.transactionService.getPendingTransactionsQuery();
 
   readonly loading = computed(() => this.monthQuery.isPending() || this.pendingQuery.isPending());
 
   readonly chips = computed(() => {
-    const monthTxs = this.monthQuery.data() ?? [];
+    const monthTxs = this.monthTxs();
     const pending = this.pendingQuery.data() ?? [];
     const monthName = this.monthName();
     return (
@@ -169,7 +173,7 @@ export class RecurringTemplatesComponent {
 
   pick(template: RecurringTemplate): void {
     const lastAmount =
-      template.amount == null ? lastAmountFor(template, this.prevMonthQuery.data() ?? []) : null;
+      template.amount == null ? lastAmountFor(template, this.prevMonthTxs()) : null;
     this.picked.emit({ template, lastAmount });
   }
 
@@ -213,4 +217,8 @@ export class RecurringTemplatesComponent {
       this.saving.set(false);
     }
   }
+}
+
+function withoutTrips(transactions: Transaction[] | undefined): Transaction[] {
+  return (transactions ?? []).filter((transaction) => !transaction.adjustmentId);
 }

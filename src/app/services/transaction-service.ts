@@ -1,9 +1,11 @@
-import { inject, Injectable, signal } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import {
   collection,
+  count,
   deleteDoc,
   deleteField,
   doc,
+  getAggregate,
   getDocs,
   getDoc,
   increment,
@@ -12,6 +14,7 @@ import {
   query,
   setDoc,
   startAfter,
+  sum,
   updateDoc,
   where,
   writeBatch,
@@ -25,6 +28,7 @@ import { db } from '../firebase.config';
 import { CATEGORY_NAMES } from './expense-state.service';
 import { AuthService } from './auth.service';
 import { BudgetSettingsService } from './budget-settings.service';
+import { SyncMarkerService } from './sync-marker.service';
 
 export interface TransactionPage {
   items: Transaction[];
@@ -32,9 +36,35 @@ export interface TransactionPage {
   hasMore: boolean;
 }
 
-export interface RecentTransactionsFilter {
-  monthName?: string;
-  adjustmentId?: string;
+/** One row of a server-side total: e.g. all Utilities with subCategoryId 12. */
+export interface CategoryStatGroup {
+  category: string;
+  subCategoryId?: number;
+}
+
+export interface CategoryStat {
+  count: number;
+  sum: number;
+}
+
+/** 'Utilities' or 'Utilities:12'. */
+export function categoryStatKey(group: CategoryStatGroup): string {
+  return group.subCategoryId == null ? group.category : `${group.category}:${group.subCategoryId}`;
+}
+
+// Keys start with 'expenses' so the existing ['expenses'] invalidation after saves refreshes them.
+export const monthTransactionsKey = (monthName: string) => ['expenses', 'month-tx', monthName];
+export const tripTransactionsKey = (adjustmentId: string) => ['expenses', 'trip-tx', adjustmentId];
+
+function timestampOf(value: string | undefined): number {
+  const timestamp = value ? new Date(value).getTime() : 0;
+  return Number.isNaN(timestamp) ? 0 : timestamp;
+}
+
+/** Sort comparator: newest date first, then newest createdAt. */
+export function compareNewestFirst(a: Transaction, b: Transaction): number {
+  const dateDifference = new Date(b.date).getTime() - new Date(a.date).getTime();
+  return dateDifference || timestampOf(b.createdAt) - timestampOf(a.createdAt);
 }
 
 export interface NewTransactionInput {
@@ -261,38 +291,51 @@ export class TransactionService {
   private readonly authService = inject(AuthService);
   private readonly budgetSettingsService = inject(BudgetSettingsService);
   private readonly acceptingPendingIds = new Set<string>();
+  private readonly syncMarker = inject(SyncMarkerService);
 
-  readonly transactionRevision = signal(0);
-
-  async fetchRecentTransactions(filter: RecentTransactionsFilter): Promise<Transaction[]> {
-    const transactionsRef = collection(db, 'transactions');
-    const constraint = filter.adjustmentId
-      ? where('adjustmentId', '==', filter.adjustmentId)
-      : where('monthName', '==', filter.monthName ?? '');
-    const snapshot = await getDocs(query(transactionsRef, constraint));
-
-    return snapshot.docs
-      .map((document) => this.mapTransaction(document.data(), document.id))
-      .filter((transaction) => filter.adjustmentId || !transaction.adjustmentId)
-      .sort((a, b) => {
-        const dateDifference = new Date(b.date).getTime() - new Date(a.date).getTime();
-        return dateDifference || this.getTimestamp(b.createdAt) - this.getTimestamp(a.createdAt);
-      });
-  }
-
-  /** Every non-trip transaction in the given month ('November 2026'). */
+  /**
+   * Every transaction in the given month ('November 2026'), trip ones included.
+   * Shared by several screens through monthTransactionsKey; callers filter what they need.
+   */
   async fetchMonthTransactions(monthName: string): Promise<Transaction[]> {
     const snapshot = await getDocs(
       query(collection(db, 'transactions'), where('monthName', '==', monthName)),
     );
 
-    return snapshot.docs
-      .map((document) => this.mapTransaction(document.data(), document.id))
-      .filter((transaction) => !transaction.adjustmentId);
+    return snapshot.docs.map((document) => this.mapTransaction(document.data(), document.id));
   }
 
-  private notifyTransactionChanged(): void {
-    this.transactionRevision.update((revision) => revision + 1);
+  /** Every transaction linked to a trip. */
+  async fetchTripTransactions(adjustmentId: string): Promise<Transaction[]> {
+    const snapshot = await getDocs(
+      query(collection(db, 'transactions'), where('adjustmentId', '==', adjustmentId)),
+    );
+
+    return snapshot.docs.map((document) => this.mapTransaction(document.data(), document.id));
+  }
+
+  /**
+   * Count and total amount per group, calculated by Firestore.
+   * Costs about 1 read per group instead of 1 read per transaction.
+   */
+  async fetchCategoryStats(groups: CategoryStatGroup[]): Promise<Record<string, CategoryStat>> {
+    const transactionsRef = collection(db, 'transactions');
+    const entries = await Promise.all(
+      groups.map(async (group) => {
+        const filters = [where('category', '==', group.category)];
+        if (group.subCategoryId != null) {
+          filters.push(where('subCategoryId', '==', group.subCategoryId));
+        }
+        const snapshot = await getAggregate(query(transactionsRef, ...filters), {
+          count: count(),
+          sum: sum('amount'),
+        });
+        const data = snapshot.data();
+        const stat: CategoryStat = { count: data.count, sum: Number(data.sum) || 0 };
+        return [categoryStatKey(group), stat] as const;
+      }),
+    );
+    return Object.fromEntries(entries);
   }
 
   async fetchPage(
@@ -318,47 +361,6 @@ export class TransactionService {
     }
 
     return this.fetchPagedTransactions(filters, cursor, sortByAmount);
-  }
-
-  async countTransactions(monthName: string, category: string): Promise<number> {
-    if (!monthName || !category) {
-      return 0;
-    }
-
-    const transactionsRef = collection(db, 'transactions');
-    const snapshot = await getDocs(
-      query(
-        transactionsRef,
-        where('monthName', '==', monthName),
-        where('category', '==', category),
-      ),
-    );
-
-    return snapshot.size;
-  }
-
-  async countTransactionsByCategory(
-    monthName: string,
-    categories: string[],
-  ): Promise<Record<string, number>> {
-    const counts = Object.fromEntries(categories.map((category) => [category, 0]));
-
-    if (!monthName || categories.length === 0) {
-      return counts;
-    }
-
-    const transactionsRef = collection(db, 'transactions');
-    const snapshot = await getDocs(query(transactionsRef, where('monthName', '==', monthName)));
-    const categorySet = new Set(categories);
-
-    for (const transaction of snapshot.docs) {
-      const category = transaction.data()['category'];
-      if (typeof category === 'string' && categorySet.has(category)) {
-        counts[category] += 1;
-      }
-    }
-
-    return counts;
   }
 
   async fetchPageByDescription(
@@ -429,11 +431,6 @@ export class TransactionService {
     };
   }
 
-  private getTimestamp(value: string | undefined): number {
-    const timestamp = value ? new Date(value).getTime() : 0;
-    return Number.isNaN(timestamp) ? 0 : timestamp;
-  }
-
   private mapTransaction(data: DocumentData, id: string): Transaction {
     const tx: Transaction = {
       id,
@@ -467,6 +464,8 @@ export class TransactionService {
   getPendingTransactionsQuery() {
     return injectQuery(() => ({
       queryKey: ['pendingTransactions'],
+      // Kiosk users add these from other devices without bumping the sync marker.
+      staleTime: 1000 * 60 * 5,
       queryFn: () => this.fetchPendingTransactions(),
     }));
   }
@@ -684,8 +683,7 @@ export class TransactionService {
     batch.set(transactionRef, txData);
 
     await batch.commit();
-
-    this.notifyTransactionChanged();
+    await this.syncMarker.bump();
 
     return transactionRef.id;
   }
@@ -767,8 +765,7 @@ export class TransactionService {
     batch.update(txRef, updateData);
 
     await batch.commit();
-
-    this.notifyTransactionChanged();
+    await this.syncMarker.bump();
   }
 
   async deleteTransaction(target: string | Transaction): Promise<void> {
@@ -827,8 +824,7 @@ export class TransactionService {
     batch.delete(transactionRef);
 
     await batch.commit();
-
-    this.notifyTransactionChanged();
+    await this.syncMarker.bump();
   }
 
   async fetchAllByAdjustmentId(adjustmentId: string): Promise<Transaction[]> {
@@ -876,10 +872,7 @@ export class TransactionService {
 
     return snapshot.docs
       .map((document) => this.mapTransaction(document.data(), document.id))
-      .sort((a, b) => {
-        const dateDifference = new Date(b.date).getTime() - new Date(a.date).getTime();
-        return dateDifference || this.getTimestamp(b.createdAt) - this.getTimestamp(a.createdAt);
-      });
+      .sort(compareNewestFirst);
   }
 
   async fetchAllSplitTransactions(): Promise<Transaction[]> {
@@ -911,65 +904,9 @@ export class TransactionService {
     });
   }
 
-  async fetchAllUtilityTransactions(): Promise<Transaction[]> {
-    const transactionsRef = collection(db, 'transactions');
-    const snapshot = await getDocs(query(transactionsRef, where('category', '==', 'Utilities')));
-
-    return snapshot.docs.map((d) => {
-      const data = d.data();
-      const tx: Transaction = {
-        id: d.id,
-        monthName: data['monthName'] as string,
-        date: data['date'] as string,
-        description: data['description'] as string,
-        category: data['category'] as string,
-        subCategoryId: data['subCategoryId'] != null ? Number(data['subCategoryId']) : undefined,
-        subCategory: (data['subCategory'] as string | undefined) ?? undefined,
-        amount: Number(data['amount']) || 0,
-        createdAt: data['createdAt'] as string,
-        adjustmentId: (data['adjustmentId'] as string) ?? undefined,
-      };
-
-      // Only apply split properties if the transaction actually is a split
-      if (data['isSplit']) {
-        tx.isSplit = true;
-        tx.paidBy = data['paidBy'] as 'me' | number;
-        tx.splitBy = (data['splitBy'] as number[]) ?? [];
-        tx.splitType = (data['splitType'] as 'split' | 'custom') ?? 'split';
-        tx.totalAmount = Number(data['totalAmount']) || 0;
-        tx.customSplitAmounts =
-          (data['customSplitAmounts'] as Partial<Record<'me' | number, number>> | undefined) ??
-          undefined;
-        tx.splitPaidPersonIds = (data['splitPaidPersonIds'] as number[]) ?? [];
-      }
-
-      return tx;
-    });
-  }
-
-  async fetchTransactionsByCategories(categories: string[]): Promise<Transaction[]> {
-    const transactionsRef = collection(db, 'transactions');
-    const snapshot = await getDocs(query(transactionsRef, where('category', 'in', categories)));
-
-    return snapshot.docs.map((d) => {
-      const data = d.data();
-      return {
-        id: d.id,
-        monthName: data['monthName'] as string,
-        date: data['date'] as string,
-        description: data['description'] as string,
-        category: data['category'] as string,
-        subCategoryId: data['subCategoryId'] != null ? Number(data['subCategoryId']) : undefined,
-        subCategory: (data['subCategory'] as string | undefined) ?? undefined,
-        amount: Number(data['amount']) || 0,
-        createdAt: data['createdAt'] as string,
-        adjustmentId: (data['adjustmentId'] as string) ?? undefined,
-      } as Transaction;
-    });
-  }
-
   async updateSplitPaidPersons(transactionId: string, paidPersonIds: number[]): Promise<void> {
     const txRef = doc(db, 'transactions', transactionId);
     await updateDoc(txRef, { splitPaidPersonIds: paidPersonIds });
+    await this.syncMarker.bump();
   }
 }

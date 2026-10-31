@@ -1,99 +1,64 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { QueryClient, provideTanStackQuery } from '@tanstack/angular-query-experimental';
+import { vi } from 'vitest';
 import { UtilitySumComponent } from './utility-sum-component';
 import { TransactionService } from '../../services/transaction-service';
+
+/** TanStack Query delivers results on a timer tick; wait for it, then for Angular. */
+async function settle(fixture: { whenStable: () => Promise<unknown> }): Promise<void> {
+  for (let i = 0; i < 3; i++) {
+    await new Promise((resolve) => setTimeout(resolve));
+    await fixture.whenStable();
+  }
+}
 
 describe('UtilitySumComponent', () => {
   let fixture: ComponentFixture<UtilitySumComponent>;
   let component: UtilitySumComponent;
+  const fetchCategoryStats = vi.fn();
 
   beforeEach(async () => {
+    fetchCategoryStats.mockReset();
+    // Internet: 80 + 60 over 2 bills; Water: 3 bills of 90; Energy: one bill of 50.
+    fetchCategoryStats.mockResolvedValue({
+      'Utilities:14': { count: 2, sum: 140 },
+      'Utilities:16': { count: 3, sum: 270 },
+      'Utilities:12': { count: 1, sum: 50 },
+    });
+
     await TestBed.configureTestingModule({
       imports: [UtilitySumComponent],
       providers: [
-        {
-          provide: TransactionService,
-          useValue: {
-            fetchAllUtilityTransactions: async () => [
-              {
-                id: '1',
-                date: '2024-01-05',
-                monthName: 'January 2024',
-                description: 'Provider invoice',
-                category: 'Utilities',
-                subCategoryId: 14,
-                subCategory: 'internet',
-                amount: 80,
-              },
-              {
-                id: '2',
-                date: '2024-03-05',
-                monthName: 'March 2024',
-                description: 'Provider invoice',
-                category: 'Utilities',
-                subCategoryId: 14,
-                subCategory: 'internet',
-                amount: 60,
-              },
-              {
-                id: '3',
-                date: '2024-01-07',
-                monthName: 'January 2024',
-                description: 'Water bill',
-                category: 'Utilities',
-                subCategoryId: 16,
-                subCategory: 'water',
-                amount: 90,
-              },
-              {
-                id: '4',
-                date: '2024-04-07',
-                monthName: 'April 2024',
-                description: 'Water bill',
-                category: 'Utilities',
-                subCategoryId: 16,
-                subCategory: 'water',
-                amount: 90,
-              },
-              {
-                id: '5',
-                date: '2024-07-07',
-                monthName: 'July 2024',
-                description: 'Water bill',
-                category: 'Utilities',
-                subCategoryId: 16,
-                subCategory: 'water',
-                amount: 90,
-              },
-              {
-                id: '6',
-                date: '2024-01-12',
-                monthName: 'January 2024',
-                description: 'Electricity bill',
-                category: 'Utilities',
-                subCategoryId: 12,
-                subCategory: 'electricity',
-                amount: 50,
-              },
-            ],
-          },
-        },
+        provideTanStackQuery(new QueryClient({ defaultOptions: { queries: { retry: false } } })),
+        { provide: TransactionService, useValue: { fetchCategoryStats } },
       ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(UtilitySumComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
-    await fixture.whenStable();
+    await settle(fixture);
+  });
+
+  it('asks Firestore for one total per utility subcategory', () => {
+    expect(fetchCategoryStats).toHaveBeenCalledTimes(1);
+    const groups = fetchCategoryStats.mock.calls[0][0];
+    expect(groups).toContainEqual({ category: 'Utilities', subCategoryId: 14 });
+    expect(groups.every((group: { category: string }) => group.category === 'Utilities')).toBe(
+      true,
+    );
   });
 
   it('shows monthly equivalents by default and supports per-bill averages', () => {
     const internet = component.utilityAverages().find((item) => item.label === 'Internet');
     const water = component.utilityAverages().find((item) => item.label === 'Water');
     const energy = component.utilityAverages().find((item) => item.label === 'Energy');
+    const mobile = component.utilityAverages().find((item) => item.label === 'Mobile');
 
     expect(internet?.average).toBe(35);
     expect(water?.average).toBe(30);
     expect(energy?.average).toBe(50);
+    expect(mobile).toMatchObject({ average: 0, count: 0 });
 
     component.viewMode.set('bill');
 

@@ -2,6 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { AuthService } from './auth.service';
 import { BudgetSettingsService } from './budget-settings.service';
+import { SyncMarkerService } from './sync-marker.service';
 import { splitUpdateFields, TransactionService } from './transaction-service';
 
 type CommitInternals = { commitPendingTransaction: (id: string) => Promise<void> };
@@ -18,6 +19,7 @@ describe('TransactionService.acceptPendingTransaction', () => {
         TransactionService,
         { provide: AuthService, useValue: {} },
         { provide: BudgetSettingsService, useValue: {} },
+        { provide: SyncMarkerService, useValue: { bump: vi.fn() } },
       ],
     });
     service = TestBed.inject(TransactionService);

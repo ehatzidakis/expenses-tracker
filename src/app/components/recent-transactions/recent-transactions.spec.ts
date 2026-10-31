@@ -1,13 +1,23 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { QueryClient, provideTanStackQuery } from '@tanstack/angular-query-experimental';
 import { vi } from 'vitest';
 import { RecentTransactionsComponent } from './recent-transactions';
 import { TransactionService } from '../../services/transaction-service';
 import { Transaction } from '../../models/transaction.model';
 
+/** TanStack Query delivers results on a timer tick; wait for it, then for Angular. */
+async function settle(fixture: { whenStable: () => Promise<unknown> }): Promise<void> {
+  for (let i = 0; i < 3; i++) {
+    await new Promise((resolve) => setTimeout(resolve));
+    await fixture.whenStable();
+  }
+}
+
 describe('RecentTransactionsComponent', () => {
   let component: RecentTransactionsComponent;
   let fixture: ComponentFixture<RecentTransactionsComponent>;
-  const fetchRecentTransactions = vi.fn();
+  const fetchMonthTransactions = vi.fn();
+  const fetchTripTransactions = vi.fn();
 
   const transaction: Transaction = {
     id: 'tx-1',
@@ -29,15 +39,25 @@ describe('RecentTransactionsComponent', () => {
   const toggle = async () => {
     const button = fixture.nativeElement.querySelector('button') as HTMLButtonElement;
     button.click();
-    await fixture.whenStable();
+    await settle(fixture);
   };
 
   beforeEach(async () => {
-    fetchRecentTransactions.mockReset();
-    fetchRecentTransactions.mockResolvedValue([transaction]);
+    fetchMonthTransactions.mockReset();
+    fetchMonthTransactions.mockResolvedValue([transaction]);
+    fetchTripTransactions.mockReset();
     await TestBed.configureTestingModule({
       imports: [RecentTransactionsComponent],
-      providers: [{ provide: TransactionService, useValue: { fetchRecentTransactions } }],
+      providers: [
+        // Same cache time as the app, so re-opening the card reuses the cached month.
+        provideTanStackQuery(
+          new QueryClient({ defaultOptions: { queries: { retry: false, staleTime: 300_000 } } }),
+        ),
+        {
+          provide: TransactionService,
+          useValue: { fetchMonthTransactions, fetchTripTransactions },
+        },
+      ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(RecentTransactionsComponent);
@@ -48,17 +68,14 @@ describe('RecentTransactionsComponent', () => {
 
   it('starts collapsed and does not query until expanded', async () => {
     expect(component.expanded()).toBe(false);
-    expect(fetchRecentTransactions).not.toHaveBeenCalled();
+    expect(fetchMonthTransactions).not.toHaveBeenCalled();
     expect(fixture.nativeElement.querySelector('[aria-expanded="false"]')).toBeTruthy();
     expect(fixture.nativeElement.textContent).not.toContain('Dinner');
 
     await toggle();
 
-    expect(fetchRecentTransactions).toHaveBeenCalledTimes(1);
-    expect(fetchRecentTransactions).toHaveBeenCalledWith({
-      monthName: 'September 2026',
-      adjustmentId: undefined,
-    });
+    expect(fetchMonthTransactions).toHaveBeenCalledTimes(1);
+    expect(fetchMonthTransactions).toHaveBeenCalledWith('September 2026');
   });
 
   it('expands to show transaction values without edit controls', async () => {
@@ -78,7 +95,7 @@ describe('RecentTransactionsComponent', () => {
     await toggle();
     await toggle();
 
-    expect(fetchRecentTransactions).toHaveBeenCalledTimes(1);
+    expect(fetchMonthTransactions).toHaveBeenCalledTimes(1);
   });
 
   it('does not fetch a new month while collapsed, only on the next expand', async () => {
@@ -87,15 +104,12 @@ describe('RecentTransactionsComponent', () => {
     fixture.componentRef.setInput('monthName', 'October 2026');
     await fixture.whenStable();
 
-    expect(fetchRecentTransactions).toHaveBeenCalledTimes(1);
+    expect(fetchMonthTransactions).toHaveBeenCalledTimes(1);
 
     await toggle();
 
-    expect(fetchRecentTransactions).toHaveBeenCalledTimes(2);
-    expect(fetchRecentTransactions).toHaveBeenLastCalledWith({
-      monthName: 'October 2026',
-      adjustmentId: undefined,
-    });
+    expect(fetchMonthTransactions).toHaveBeenCalledTimes(2);
+    expect(fetchMonthTransactions).toHaveBeenLastCalledWith('October 2026');
   });
 
   it('pages through transactions 10 at a time without refetching', async () => {
@@ -104,13 +118,14 @@ describe('RecentTransactionsComponent', () => {
       id: `tx-${i}`,
       description: `Item ${i}`,
     }));
-    fetchRecentTransactions.mockResolvedValue(many);
+    fetchMonthTransactions.mockResolvedValue(many);
     await toggle();
 
     const articles = () => fixture.nativeElement.querySelectorAll('article').length;
     const showMore = () =>
-      Array.from(fixture.nativeElement.querySelectorAll('button') as NodeListOf<HTMLButtonElement>)
-        .find((button) => button.textContent?.includes('Show more'));
+      Array.from(
+        fixture.nativeElement.querySelectorAll('button') as NodeListOf<HTMLButtonElement>,
+      ).find((button) => button.textContent?.includes('Show more'));
 
     expect(articles()).toBe(10);
     expect(fixture.nativeElement.textContent).toContain('10 of 25 shown');
@@ -123,13 +138,37 @@ describe('RecentTransactionsComponent', () => {
     await fixture.whenStable();
     expect(articles()).toBe(25);
     expect(showMore()).toBeUndefined();
-    expect(fetchRecentTransactions).toHaveBeenCalledTimes(1);
+    expect(fetchMonthTransactions).toHaveBeenCalledTimes(1);
   });
 
   it('shows the empty state', async () => {
-    fetchRecentTransactions.mockResolvedValue([]);
+    fetchMonthTransactions.mockResolvedValue([]);
     await toggle();
 
     expect(fixture.nativeElement.textContent).toContain('No transactions yet.');
+  });
+
+  it('hides trip transactions in month mode and sorts newest first', async () => {
+    fetchMonthTransactions.mockResolvedValue([
+      { ...transaction, id: 'old', description: 'Older', date: '2026-09-01' },
+      { ...transaction, id: 'trip', description: 'Trip lunch', adjustmentId: 'trip-1' },
+      { ...transaction, id: 'new', description: 'Newer', date: '2026-09-28' },
+    ]);
+    await toggle();
+
+    expect(component.transactions().map((item) => item.id)).toEqual(['new', 'old']);
+  });
+
+  it('loads the trip list in trip mode', async () => {
+    fetchTripTransactions.mockResolvedValue([
+      { ...transaction, id: 'trip', description: 'Trip lunch', adjustmentId: 'trip-1' },
+    ]);
+    fixture.componentRef.setInput('monthName', null);
+    fixture.componentRef.setInput('adjustmentId', 'trip-1');
+    await toggle();
+
+    expect(fetchTripTransactions).toHaveBeenCalledWith('trip-1');
+    expect(fetchMonthTransactions).not.toHaveBeenCalled();
+    expect(fixture.nativeElement.textContent).toContain('Trip lunch');
   });
 });

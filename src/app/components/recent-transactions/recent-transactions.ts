@@ -2,7 +2,13 @@ import { CommonModule } from '@angular/common';
 import { Component, computed, effect, inject, input, signal, untracked } from '@angular/core';
 import { PEOPLE } from '../../models/splitz.model';
 import { Transaction } from '../../models/transaction.model';
-import { TransactionService } from '../../services/transaction-service';
+import { injectQuery } from '@tanstack/angular-query-experimental';
+import {
+  TransactionService,
+  compareNewestFirst,
+  monthTransactionsKey,
+  tripTransactionsKey,
+} from '../../services/transaction-service';
 import { SensitiveDirective } from '../../utils/sensitive.directive';
 
 const PAGE_SIZE = 10;
@@ -129,28 +135,43 @@ export class RecentTransactionsComponent {
   readonly monthName = input<string | null>(null);
   readonly adjustmentId = input<string | null>(null);
   readonly expanded = signal(false);
-  readonly transactions = signal<Transaction[]>([]);
-  readonly loading = signal(false);
-  readonly error = signal(false);
   readonly visibleCount = signal(PAGE_SIZE);
-  readonly visibleTransactions = computed(() =>
-    this.transactions().slice(0, this.visibleCount()),
-  );
+
+  // Only query once the card is open. Month mode shares the cached month query with the
+  // category counts and the Create tab; saves refresh both through ['expenses'] invalidation.
+  private readonly listQuery = injectQuery(() => {
+    const adjustmentId = this.adjustmentId();
+    const monthName = this.monthName() ?? '';
+    return adjustmentId
+      ? {
+          queryKey: tripTransactionsKey(adjustmentId),
+          enabled: this.expanded(),
+          queryFn: () => this.transactionService.fetchTripTransactions(adjustmentId),
+        }
+      : {
+          queryKey: monthTransactionsKey(monthName),
+          enabled: this.expanded() && !!monthName,
+          queryFn: () => this.transactionService.fetchMonthTransactions(monthName),
+        };
+  });
+
+  readonly transactions = computed<Transaction[]>(() => {
+    const tripMode = !!this.adjustmentId();
+    return (this.listQuery.data() ?? [])
+      .filter((transaction) => tripMode || !transaction.adjustmentId)
+      .sort(compareNewestFirst);
+  });
+  readonly loading = computed(() => this.listQuery.isPending());
+  readonly error = computed(() => this.listQuery.isError());
+  readonly visibleTransactions = computed(() => this.transactions().slice(0, this.visibleCount()));
   readonly hasMore = computed(() => this.visibleCount() < this.transactions().length);
 
-  /** Month/trip key of the data currently loaded or loading; null when nothing valid is cached. */
-  private currentKey: string | null = null;
-
   constructor() {
-    // Only query Firestore once the card is open, and only when the month/trip changed.
+    // Start from the first page whenever the month or trip changes.
     effect(() => {
-      if (!this.expanded()) return;
-      const monthName = this.monthName();
-      const adjustmentId = this.adjustmentId();
-      if (!monthName && !adjustmentId) return;
-      const key = `${monthName ?? ''}|${adjustmentId ?? ''}`;
-      if (key === this.currentKey) return;
-      untracked(() => void this.loadTransactions(key, monthName, adjustmentId));
+      this.monthName();
+      this.adjustmentId();
+      untracked(() => this.visibleCount.set(PAGE_SIZE));
     });
   }
 
@@ -173,33 +194,5 @@ export class RecentTransactionsComponent {
       id === 'me' ? 'me' : Number(id),
       Number(amount) || 0,
     ]);
-  }
-
-  private async loadTransactions(
-    key: string,
-    monthName: string | null,
-    adjustmentId: string | null,
-  ): Promise<void> {
-    this.currentKey = key;
-    this.loading.set(true);
-    this.error.set(false);
-    this.transactions.set([]);
-    this.visibleCount.set(PAGE_SIZE);
-    try {
-      const transactions = await this.transactionService.fetchRecentTransactions({
-        monthName: monthName ?? undefined,
-        adjustmentId: adjustmentId ?? undefined,
-      });
-      // Ignore the response if the month/trip changed while it was in flight.
-      if (this.currentKey !== key) return;
-      this.transactions.set(transactions);
-      this.loading.set(false);
-    } catch {
-      if (this.currentKey !== key) return;
-      // Clear the key so the next expand retries.
-      this.currentKey = null;
-      this.error.set(true);
-      this.loading.set(false);
-    }
   }
 }
