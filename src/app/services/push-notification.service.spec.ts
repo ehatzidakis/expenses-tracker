@@ -108,6 +108,31 @@ describe('PushNotificationService', () => {
     expect(fetchMock).not.toHaveBeenCalled();
   });
 
+  it('sends the amount, description and category for a new pending item', async () => {
+    fetchMock.mockResolvedValue(jsonResponse({ sent: 1, removed: 0, failed: 0 }));
+    const service = setup();
+
+    await service.notifyNewPending({
+      amount: 12.5,
+      description: ' Lidl ',
+      category: 'Supermarket',
+    });
+
+    const [url, init] = fetchMock.mock.calls[0];
+    expect(url).toBe(`${PUSH_WORKER_URL}/notify`);
+    expect(JSON.parse(init.body)).toEqual({ body: '€12.50 · Lidl · Supermarket' });
+  });
+
+  it('never throws when the pending notification fails', async () => {
+    fetchMock.mockRejectedValue(new Error('offline'));
+    vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+    const service = setup();
+
+    await expect(
+      service.notifyNewPending({ amount: 3, description: '', category: 'Coffee' }),
+    ).resolves.toBeUndefined();
+  });
+
   it('reports unsupported when there is no service worker', () => {
     swPush.isEnabled = false;
     const service = setup();

@@ -112,6 +112,7 @@ async function route(request: Request, env: Env): Promise<Response> {
       const caller = await authenticate(request, env);
       requireAdmin(caller);
       const result = await sendToAll(env, {
+        kind: 'test',
         title: 'Test notification',
         body: 'Notifications are working.',
       });
@@ -124,6 +125,7 @@ async function route(request: Request, env: Env): Promise<Response> {
       const body = await readJson(request);
       const text = typeof body['body'] === 'string' ? body['body'].trim() : '';
       const result = await sendToAll(env, {
+        kind: 'pending',
         title: 'New pending transaction',
         body: text ? text.slice(0, MAX_BODY_LENGTH) : 'Tap to review it.',
       });
@@ -164,10 +166,14 @@ function requireAdmin(caller: Caller): void {
 
 // ---- Sending ----
 
-async function sendToAll(
-  env: Env,
-  notification: { title: string; body: string },
-): Promise<SendResult> {
+// `kind` lets the app's service worker tell pushes apart (only 'pending' bumps the badge).
+interface OutgoingNotification {
+  kind: 'pending' | 'test';
+  title: string;
+  body: string;
+}
+
+async function sendToAll(env: Env, notification: OutgoingNotification): Promise<SendResult> {
   const vapid = {
     subject: env.VAPID_SUBJECT,
     publicKey: env.VAPID_PUBLIC_KEY,
@@ -215,13 +221,14 @@ async function sendToAll(
 
 // Angular's service worker shows a push only if it has this shape.
 // Tapping the notification focuses the open app, or opens it.
-function angularNotification({ title, body }: { title: string; body: string }) {
+function angularNotification({ kind, title, body }: OutgoingNotification) {
   return {
     notification: {
       title,
       body,
       icon: '/icons/icon-192x192.png',
       data: {
+        kind,
         onActionClick: {
           default: { operation: 'navigateLastFocusedOrOpen', url: '/' },
         },

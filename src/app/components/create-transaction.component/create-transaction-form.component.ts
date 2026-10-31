@@ -12,6 +12,7 @@ import {
 import { AdjustmentService } from '../../services/adjustment-service';
 import { PrivacyService } from '../../services/privacy.service';
 import { AuthService } from '../../services/auth.service';
+import { PushNotificationService } from '../../services/push-notification.service';
 import { PEOPLE, Person } from '../../models/splitz.model';
 import { TransactionBasicFieldsComponent } from './transaction-basic-fields.component';
 import { SplitFieldsComponent } from './split-fields.component';
@@ -143,6 +144,7 @@ export class CreateTransactionFormComponent {
   private adjustmentService = inject(AdjustmentService);
   private queryClient = inject(QueryClient);
   private authService = inject(AuthService);
+  private pushNotifications = inject(PushNotificationService);
   readonly privacyService = inject(PrivacyService);
   readonly splitStore = inject(SplitStateStore);
   readonly isKioskMode = this.authService.isKiosk;
@@ -414,6 +416,8 @@ export class CreateTransactionFormComponent {
       }
 
       await this.transactionService.createPendingTransaction(result.payload);
+      // Not awaited: the save is done, and the notification shouldn't slow down or fail it.
+      void this.pushNotifications.notifyNewPending(result.payload);
 
       await this.queryClient.invalidateQueries({ queryKey: ['pendingTransactions'] });
 

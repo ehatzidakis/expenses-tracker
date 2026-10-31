@@ -67,6 +67,10 @@ export function compareNewestFirst(a: Transaction, b: Transaction): number {
   return dateDifference || timestampOf(b.createdAt) - timestampOf(a.createdAt);
 }
 
+// Kiosk users add pending items from other devices without bumping the sync marker,
+// so the pending list goes stale sooner than the rest.
+export const PENDING_STALE_TIME = 1000 * 60 * 5;
+
 export interface NewTransactionInput {
   date: string; // 'YYYY-MM-DD'
   description: string;
@@ -464,8 +468,7 @@ export class TransactionService {
   getPendingTransactionsQuery() {
     return injectQuery(() => ({
       queryKey: ['pendingTransactions'],
-      // Kiosk users add these from other devices without bumping the sync marker.
-      staleTime: 1000 * 60 * 5,
+      staleTime: PENDING_STALE_TIME,
       queryFn: () => this.fetchPendingTransactions(),
     }));
   }

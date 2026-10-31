@@ -2,6 +2,7 @@ import { Injectable, computed, inject, signal } from '@angular/core';
 import { SwPush } from '@angular/service-worker';
 import { firstValueFrom } from 'rxjs';
 import { AuthService } from './auth.service';
+import type { NewTransactionInput } from './transaction-service';
 
 // The Cloudflare Worker that sends the pushes (see push-worker/). Nothing here is secret.
 export const PUSH_WORKER_URL = 'https://expenses-push.expenses-push-worker.workers.dev';
@@ -77,6 +78,23 @@ export class PushNotificationService {
 
   sendTest(): Promise<PushSendResult> {
     return this.post<PushSendResult>('/test', {});
+  }
+
+  /**
+   * Tells the admin's phone about a new kiosk submission. Never throws: the transaction is
+   * already saved, and a missed notification shouldn't look like a failed save.
+   */
+  async notifyNewPending(item: Pick<NewTransactionInput, 'amount' | 'description' | 'category'>) {
+    const body = [`€${item.amount.toFixed(2)}`, item.description, item.category]
+      .map((part) => part?.trim())
+      .filter(Boolean)
+      .join(' · ');
+
+    try {
+      await this.post('/notify', { body });
+    } catch (error) {
+      console.warn('Could not send the pending notification:', error);
+    }
   }
 
   private async post<T = unknown>(path: string, body: unknown): Promise<T> {
