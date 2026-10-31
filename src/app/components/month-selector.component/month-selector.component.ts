@@ -1,5 +1,16 @@
 import { Component, ElementRef, computed, inject, input, output, signal } from '@angular/core';
 import { Expense } from '../../models/expenses.model';
+import {
+  CALENDAR_ICON_PATH,
+  PICKER_ACTIVE,
+  PICKER_BASE,
+  PICKER_CONNECTOR,
+  PICKER_IDLE,
+  SEGMENT,
+  SEGMENT_ACTIVE,
+  SEGMENT_GROUP,
+  SEGMENT_IDLE,
+} from '../../utils/pill-styles';
 
 const MONTHS = [
   'January',
@@ -33,9 +44,6 @@ interface GridCell {
 
 const QUICK_COUNT = 3;
 
-const ACTIVE_PILL = 'bg-indigo-600 text-white font-medium border-indigo-500';
-const IDLE_PILL = 'bg-gray-900 text-gray-400 border-gray-800 hover:border-gray-700';
-
 @Component({
   selector: 'app-month-selector',
   standalone: true,
@@ -46,31 +54,46 @@ const IDLE_PILL = 'bg-gray-900 text-gray-400 border-gray-800 hover:border-gray-7
   },
   template: `
     <section class="flex items-center gap-2">
-      @for (item of quickMonths(); track item.id) {
-        <button
-          type="button"
-          (click)="onSelect(item.id)"
-          [class]="selectedId() === item.id ? activePill : idlePill"
-          [attr.aria-pressed]="selectedId() === item.id"
-          [attr.aria-label]="item.label"
-          class="px-4 py-2 rounded-xl text-xs whitespace-nowrap border transition-all duration-150 shrink-0"
-        >
-          {{ item.shortLabel }}
-        </button>
-      }
+      <!-- Recent months: one segmented strip -->
+      <div role="group" aria-label="Recent months" [class]="segmentGroup">
+        @for (item of quickMonths(); track item.id) {
+          <button
+            type="button"
+            data-testid="month-pill"
+            (click)="onSelect(item.id)"
+            [class]="segment + ' ' + (selectedId() === item.id ? segmentActive : segmentIdle)"
+            [attr.aria-pressed]="selectedId() === item.id"
+            [attr.aria-label]="item.label"
+          >
+            {{ item.shortLabel }}
+          </button>
+        }
+      </div>
 
       @if (showPicker()) {
-        <div class="relative ml-auto">
+        <!-- Connector: links the recent months to the picker of older ones -->
+        <span data-testid="month-connector" [class]="pickerConnector" aria-hidden="true"></span>
+
+        <div class="relative shrink-0">
           <button
             type="button"
             data-testid="month-picker-toggle"
             (click)="togglePicker()"
-            [class]="olderSelected() ? activePill : idlePill"
+            [class]="pickerBase + ' ' + (olderSelected() ? pickerActive : pickerIdle)"
             aria-haspopup="dialog"
             [attr.aria-expanded]="pickerOpen()"
-            class="px-4 py-2 rounded-xl text-xs whitespace-nowrap border transition-all duration-150 shrink-0 flex items-center gap-1"
           >
-            {{ olderSelected()?.shortLabel ?? 'More' }}
+            @if (!olderSelected()) {
+              <svg
+                class="w-3 h-3 shrink-0"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+                aria-hidden="true"
+              >
+                <path fill-rule="evenodd" clip-rule="evenodd" [attr.d]="calendarIcon" />
+              </svg>
+            }
+            <span class="min-w-0 truncate">{{ olderSelected()?.shortLabel ?? 'More' }}</span>
             <svg
               class="w-3 h-3 transition-transform duration-150"
               [class.rotate-180]="pickerOpen()"
@@ -155,8 +178,15 @@ export class MonthSelectorComponent {
   selectedId = input<string | null>(null);
   monthSelected = output<string>();
 
-  protected readonly activePill = ACTIVE_PILL;
-  protected readonly idlePill = IDLE_PILL;
+  protected readonly segmentGroup = SEGMENT_GROUP;
+  protected readonly segment = SEGMENT;
+  protected readonly segmentActive = SEGMENT_ACTIVE;
+  protected readonly segmentIdle = SEGMENT_IDLE;
+  protected readonly pickerBase = PICKER_BASE;
+  protected readonly pickerActive = PICKER_ACTIVE;
+  protected readonly pickerIdle = PICKER_IDLE;
+  protected readonly calendarIcon = CALENDAR_ICON_PATH;
+  protected readonly pickerConnector = PICKER_CONNECTOR;
 
   readonly pickerOpen = signal(false);
   readonly viewYear = signal(new Date().getFullYear());

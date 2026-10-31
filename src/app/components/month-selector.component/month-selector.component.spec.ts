@@ -53,7 +53,7 @@ describe('MonthSelectorComponent', () => {
     Array.from(el.querySelectorAll<HTMLButtonElement>('[data-testid="month-cell"]'));
   const cell = (short: string) => cells().find((c) => c.textContent?.trim() === short)!;
   const quickPills = () =>
-    Array.from(el.querySelectorAll<HTMLButtonElement>('section > button')).map((b) =>
+    Array.from(el.querySelectorAll<HTMLButtonElement>('[data-testid="month-pill"]')).map((b) =>
       b.textContent?.trim(),
     );
 
