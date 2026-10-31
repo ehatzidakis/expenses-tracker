@@ -1,4 +1,4 @@
-import { Component, computed, effect, inject, output, signal } from '@angular/core';
+import { Component, computed, inject, output, signal } from '@angular/core';
 import { AuthService } from '../../services/auth.service';
 import { TransactionService } from '../../services/transaction-service';
 import { SplitzBalancesComponent } from './splitz-balances.component';
@@ -60,21 +60,10 @@ export class SplitzesModalComponent {
     this.isAdmin() ? (this.pendingQuery.data()?.length ?? 0) : 0,
   );
 
+  // Always opens on Balances; pending items show as a count badge on the Incoming tab.
   readonly activeTab = signal<SplitzesTab>('balances');
-  // private tabChosen = false;
-
-  // constructor() {
-  //   // Open on Incoming when there is something to review, unless a tab was already picked.
-  //   effect(() => {
-  //     if (!this.tabChosen && this.incomingCount() > 0) {
-  //       this.tabChosen = true;
-  //       this.activeTab.set('incoming');
-  //     }
-  //   });
-  // }
 
   selectTab(tab: SplitzesTab): void {
-    // this.tabChosen = true;
     this.activeTab.set(tab);
   }
 }

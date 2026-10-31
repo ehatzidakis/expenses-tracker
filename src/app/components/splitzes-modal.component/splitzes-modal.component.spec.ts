@@ -86,16 +86,19 @@ describe('SplitzesModalComponent', () => {
     expect(fixture.componentInstance.activeTab()).toBe('balances');
   });
 
-  it('opens on Incoming with a count badge when there is something to review', async () => {
+  it('opens on Balances and badges Incoming with the pending count', async () => {
     const fixture = await setup(true, [pendingTransaction('p1'), pendingTransaction('p2')]);
 
     expect(tabLabels(fixture)).toEqual(['Balances', 'Incoming 2', 'History']);
-    expect(fixture.componentInstance.activeTab()).toBe('incoming');
+    expect(fixture.componentInstance.activeTab()).toBe('balances');
+
+    clickTab(fixture, 'Incoming');
     expect(fixture.nativeElement.querySelectorAll('.pending-row')).toHaveLength(2);
   });
 
   it('opens the review screen when a row is tapped and returns on Back', async () => {
     const fixture = await setup(true, [pendingTransaction('p1')]);
+    clickTab(fixture, 'Incoming');
 
     fixture.nativeElement.querySelector('.pending-row').click();
     fixture.detectChanges();

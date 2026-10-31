@@ -11,7 +11,6 @@ import { HeaderComponent } from './components/header.component/header.component'
 import { MonthSelectorComponent } from './components/month-selector.component/month-selector.component';
 import { CategoryBreakdownComponent } from './components/category-breakdown.component/category-breakdown.component';
 import { TabBarComponent } from './components/tab-bar.component/tab-bar.component';
-import { AdjustmentCardComponent } from './components/adjustment-card.component/adjustment-card.component';
 import { CreateTransactionComponent } from './components/create-transaction.component/create-transaction.component';
 import { Adjustment } from './models/adjustments.model';
 import { EditAdjustmentComponent } from './components/edit-adjustment.component/edit-adjustment.component';
@@ -21,6 +20,8 @@ import { UtilitySumComponent } from './components/utility-sum-component/utility-
 import { CategoryAverageComponent } from './components/category-average/category-average';
 import { RecentTransactionsComponent } from './components/recent-transactions/recent-transactions';
 import { AuthService } from './services/auth.service';
+import { SinglesViewComponent } from './components/singles-view/singles-view';
+import type { SinglesType } from './components/singles-view/singles-view.util';
 
 export interface YearlyBreakdownEntry {
   year: number;
@@ -40,7 +41,6 @@ export interface YearlyBreakdownEntry {
     MonthSelectorComponent,
     CategoryBreakdownComponent,
     TabBarComponent,
-    AdjustmentCardComponent,
     EditAdjustmentComponent,
     CreateTransactionComponent,
     CategoryBudgetsGrid,
@@ -50,6 +50,7 @@ export interface YearlyBreakdownEntry {
     UtilitySumComponent,
     CategoryAverageComponent,
     RecentTransactionsComponent,
+    SinglesViewComponent,
   ],
   templateUrl: './app.html',
 })
@@ -61,6 +62,9 @@ export class AppComponent {
 
   readonly editingAdjustment = signal<Adjustment | null>(null);
   readonly selectedTripId = signal<string | null>(null);
+  // Lives here so the filters survive opening and closing the edit view.
+  readonly singlesType = signal<SinglesType | null>(null);
+  readonly singlesYear = signal<number | null>(null);
   readonly email = signal('');
   readonly password = signal('');
   readonly authError = signal<string | null>(null);
