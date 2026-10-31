@@ -1,15 +1,14 @@
 import { Component, ElementRef, computed, inject, input, output, signal } from '@angular/core';
 import { Expense } from '../../models/expenses.model';
 import {
+  ACTIVE_PILL,
   CALENDAR_ICON_PATH,
+  IDLE_PILL,
   PICKER_ACTIVE,
   PICKER_BASE,
-  PICKER_CONNECTOR,
   PICKER_IDLE,
-  SEGMENT,
-  SEGMENT_ACTIVE,
-  SEGMENT_GROUP,
-  SEGMENT_IDLE,
+  PICKER_WRAPPER,
+  QUICK_PILL,
 } from '../../utils/pill-styles';
 
 const MONTHS = [
@@ -54,14 +53,14 @@ const QUICK_COUNT = 3;
   },
   template: `
     <section class="flex items-center gap-2">
-      <!-- Recent months: one segmented strip -->
-      <div role="group" aria-label="Recent months" [class]="segmentGroup">
+      <!-- Recent months: separate pills laid out directly in the row -->
+      <div role="group" aria-label="Recent months" class="contents">
         @for (item of quickMonths(); track item.id) {
           <button
             type="button"
             data-testid="month-pill"
             (click)="onSelect(item.id)"
-            [class]="segment + ' ' + (selectedId() === item.id ? segmentActive : segmentIdle)"
+            [class]="quickPill + ' ' + (selectedId() === item.id ? activePill : idlePill)"
             [attr.aria-pressed]="selectedId() === item.id"
             [attr.aria-label]="item.label"
           >
@@ -71,10 +70,7 @@ const QUICK_COUNT = 3;
       </div>
 
       @if (showPicker()) {
-        <!-- Connector: links the recent months to the picker of older ones -->
-        <span data-testid="month-connector" [class]="pickerConnector" aria-hidden="true"></span>
-
-        <div class="relative shrink-0">
+        <div [class]="pickerWrapper">
           <button
             type="button"
             data-testid="month-picker-toggle"
@@ -178,15 +174,14 @@ export class MonthSelectorComponent {
   selectedId = input<string | null>(null);
   monthSelected = output<string>();
 
-  protected readonly segmentGroup = SEGMENT_GROUP;
-  protected readonly segment = SEGMENT;
-  protected readonly segmentActive = SEGMENT_ACTIVE;
-  protected readonly segmentIdle = SEGMENT_IDLE;
+  protected readonly quickPill = QUICK_PILL;
+  protected readonly activePill = ACTIVE_PILL;
+  protected readonly idlePill = IDLE_PILL;
+  protected readonly pickerWrapper = PICKER_WRAPPER;
   protected readonly pickerBase = PICKER_BASE;
   protected readonly pickerActive = PICKER_ACTIVE;
   protected readonly pickerIdle = PICKER_IDLE;
   protected readonly calendarIcon = CALENDAR_ICON_PATH;
-  protected readonly pickerConnector = PICKER_CONNECTOR;
 
   readonly pickerOpen = signal(false);
   readonly viewYear = signal(new Date().getFullYear());
