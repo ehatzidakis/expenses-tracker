@@ -1,22 +1,38 @@
 import { TestBed } from '@angular/core/testing';
-import { afterEach, describe, expect, it, vi } from 'vitest';
-import { readInitialKioskTab } from './kiosk-shell.component';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { takeOpenTab } from './kiosk-shell.component';
 import { KioskTabBarComponent } from './kiosk-tab-bar.component';
 
-describe('readInitialKioskTab', () => {
-  afterEach(() => history.replaceState(null, '', '/'));
+describe('takeOpenTab', () => {
+  // Minimal stand-in for the Cache API, which jsdom doesn't have.
+  let store: Map<string, string>;
 
-  it('opens the Requests tab when coming from a request notification, then tidies the URL', () => {
-    history.replaceState(null, '', '/?tab=requests&keep=1');
-
-    expect(readInitialKioskTab()).toBe('requests');
-    expect(window.location.search).toBe('?keep=1');
+  beforeEach(() => {
+    store = new Map();
+    const cache = {
+      match: async (key: string) => (store.has(key) ? new Response(store.get(key)) : undefined),
+      delete: async (key: string) => store.delete(key),
+    };
+    vi.stubGlobal('caches', { open: async () => cache });
   });
 
-  it('opens the New tab otherwise', () => {
-    history.replaceState(null, '', '/');
+  afterEach(() => vi.unstubAllGlobals());
 
-    expect(readInitialKioskTab()).toBe('new');
+  it('opens Requests after a request notification was tapped, only once', async () => {
+    store.set('/__open-tab', JSON.stringify({ tab: 'requests', at: 1_000 }));
+
+    expect(await takeOpenTab(2_000)).toBe('requests');
+    expect(await takeOpenTab(2_000)).toBeNull();
+  });
+
+  it('ignores a tap from long ago', async () => {
+    store.set('/__open-tab', JSON.stringify({ tab: 'requests', at: 0 }));
+
+    expect(await takeOpenTab(10 * 60 * 1000)).toBeNull();
+  });
+
+  it('does nothing when no notification was tapped', async () => {
+    expect(await takeOpenTab()).toBeNull();
   });
 });
 

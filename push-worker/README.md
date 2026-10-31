@@ -21,7 +21,7 @@ Admin sends a request          ──► Firestore
 | `POST /unsubscribe` | known users | Removes it (only your own, unless you're admin) |
 | `POST /test` | known users | Sends a test notification to the caller's own phones |
 | `POST /notify` | known users | To the admin: "New pending transaction", or "Kiosk couldn't fill a request" with `type: 'request-declined'` |
-| `POST /request` | admin | To the kiosk: "New request". Tapping opens the Requests tab |
+| `POST /request` | admin | To the kiosk: "New request". Tapping opens the Requests tab (via `public/push-sw.js`) |
 
 Every POST needs `Authorization: Bearer <Firebase ID token>`. The Worker checks the token against Google's public keys, so nobody else can subscribe or send notifications.
 

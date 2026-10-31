@@ -1,4 +1,4 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, DestroyRef, inject, signal } from '@angular/core';
 import { AuthService } from '../../services/auth.service';
 import { TransactionService } from '../../services/transaction-service';
 import { CreateTransactionComponent } from '../create-transaction.component/create-transaction.component';
@@ -107,22 +107,45 @@ export class KioskShellComponent {
   private readonly authService = inject(AuthService);
   private readonly requestsQuery = inject(TransactionService).getKioskRequestsQuery();
 
-  readonly activeTab = signal<KioskTab>(readInitialKioskTab());
+  readonly activeTab = signal<KioskTab>('new');
   readonly showNotifications = signal(false);
   readonly requestCount = computed(() => this.requestsQuery.data()?.length ?? 0);
+
+  constructor() {
+    // Tapping a request notification opens (or reloads) the app. Also check when it comes
+    // back to the front, in case the phone just focused the open app.
+    const openFromNotification = () =>
+      void takeOpenTab().then((tab) => tab && this.activeTab.set(tab));
+    const onVisible = () => document.visibilityState === 'visible' && openFromNotification();
+
+    openFromNotification();
+    document.addEventListener('visibilitychange', onVisible);
+    inject(DestroyRef).onDestroy(() => document.removeEventListener('visibilitychange', onVisible));
+  }
 
   signOut(): Promise<void> {
     return this.authService.signOut();
   }
 }
 
-/** Tapping a request notification opens `/?tab=requests`. Read it once, then tidy the URL. */
-export function readInitialKioskTab(): KioskTab {
-  if (typeof window === 'undefined') return 'new';
-  const url = new URL(window.location.href);
-  if (url.searchParams.get('tab') !== 'requests') return 'new';
+// Written by public/push-sw.js when a request notification is tapped.
+const OPEN_TAB_CACHE = 'app-badge';
+const OPEN_TAB_KEY = '/__open-tab';
+const OPEN_TAB_MAX_AGE = 2 * 60 * 1000;
 
-  url.searchParams.delete('tab');
-  history.replaceState(history.state, '', url.pathname + url.search + url.hash);
-  return 'requests';
+/** Reads and clears the tab a tapped notification asked for. Old taps are ignored. */
+export async function takeOpenTab(now = Date.now()): Promise<KioskTab | null> {
+  if (typeof caches === 'undefined') return null;
+  try {
+    const cache = await caches.open(OPEN_TAB_CACHE);
+    const saved = await cache.match(OPEN_TAB_KEY);
+    if (!saved) return null;
+    await cache.delete(OPEN_TAB_KEY);
+
+    const { tab, at } = (await saved.json()) as { tab?: string; at?: number };
+    const fresh = typeof at === 'number' && now - at < OPEN_TAB_MAX_AGE;
+    return fresh && tab === 'requests' ? 'requests' : null;
+  } catch {
+    return null;
+  }
 }

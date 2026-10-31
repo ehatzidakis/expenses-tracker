@@ -149,7 +149,6 @@ async function route(request: Request, env: Env): Promise<Response> {
         kind: 'request',
         title: 'New request',
         body: readText(body) || 'Tap to fill it in.',
-        url: '/?tab=requests',
       });
       return json(result);
     }
@@ -197,13 +196,12 @@ function kioskUids(env: Env): string[] {
 
 // ---- Sending ----
 
-// `kind` lets the app's service worker tell pushes apart ('pending' and 'request' bump the badge).
+// `kind` lets the app's service worker tell pushes apart: 'pending' and 'request' bump the
+// badge, and tapping a 'request' opens the kiosk's Requests tab.
 interface OutgoingNotification {
   kind: 'pending' | 'request' | 'test';
   title: string;
   body: string;
-  // Where tapping the notification opens the app.
-  url?: string;
 }
 
 /** Sends to every phone subscribed by one of `uids`. */
@@ -258,8 +256,10 @@ async function sendTo(
 }
 
 // Angular's service worker shows a push only if it has this shape.
-// Tapping the notification focuses the open app, or opens it.
-function angularNotification({ kind, title, body, url = '/' }: OutgoingNotification) {
+// Tapping the notification opens the app at '/'. Always '/': navigating to any other address
+// (we tried '/?tab=requests') left the kiosk iPhone on a blank screen.
+function angularNotification({ kind, title, body }: OutgoingNotification) {
+  const url = '/';
   return {
     notification: {
       title,
