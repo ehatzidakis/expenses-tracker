@@ -7,13 +7,10 @@ import {
   IDLE_PILL,
   PICKER_ACTIVE,
   PICKER_BASE,
-  PICKER_CONNECTOR,
   PICKER_IDLE,
+  PICKER_WRAPPER,
   PILL_BASE,
-  SEGMENT,
-  SEGMENT_ACTIVE,
-  SEGMENT_GROUP,
-  SEGMENT_IDLE,
+  QUICK_PILL,
 } from '../../utils/pill-styles';
 
 const QUICK_TRIPS = 2;
@@ -43,14 +40,14 @@ const QUICK_TRIPS = 2;
       @if (quickTrips().length) {
         <span class="w-px self-stretch my-1 bg-gray-800 shrink-0" aria-hidden="true"></span>
 
-        <!-- Recent trips: one segmented strip -->
-        <div role="group" aria-label="Recent trips" [class]="segmentGroup">
+        <!-- Recent trips: separate pills laid out directly in the row -->
+        <div role="group" aria-label="Recent trips" class="contents">
           @for (trip of quickTrips(); track trip.id) {
             <button
               type="button"
               data-testid="trip-pill"
               (click)="onSelect(trip.id)"
-              [class]="segment + ' ' + (selectedId() === trip.id ? segmentActive : segmentIdle)"
+              [class]="quickPill + ' ' + (selectedId() === trip.id ? activePill : idlePill)"
               [attr.aria-pressed]="selectedId() === trip.id"
               [attr.title]="trip.title"
             >
@@ -62,10 +59,7 @@ const QUICK_TRIPS = 2;
       }
 
       @if (showPicker()) {
-        <!-- Connector: links the recent trips to the picker of older ones -->
-        <span data-testid="trip-connector" [class]="pickerConnector" aria-hidden="true"></span>
-
-        <div class="relative shrink-0">
+        <div [class]="pickerWrapper">
           <button
             type="button"
             data-testid="trip-picker-toggle"
@@ -165,7 +159,7 @@ const QUICK_TRIPS = 2;
     </section>
 
     <!-- Separates the trip navigation from the content below -->
-    <div class="h-px mt-4 bg-gray-800" aria-hidden="true"></div>
+    <!-- <div class="h-px mt-4 bg-gray-800" aria-hidden="true"></div> -->
   `,
 })
 export class AdjustmentSelectorComponent {
@@ -180,15 +174,12 @@ export class AdjustmentSelectorComponent {
   protected readonly pillBase = PILL_BASE;
   protected readonly activePill = ACTIVE_PILL;
   protected readonly idlePill = IDLE_PILL;
-  protected readonly segmentGroup = SEGMENT_GROUP;
-  protected readonly segment = SEGMENT;
-  protected readonly segmentActive = SEGMENT_ACTIVE;
-  protected readonly segmentIdle = SEGMENT_IDLE;
+  protected readonly quickPill = QUICK_PILL;
+  protected readonly pickerWrapper = PICKER_WRAPPER;
   protected readonly pickerBase = PICKER_BASE;
   protected readonly pickerActive = PICKER_ACTIVE;
   protected readonly pickerIdle = PICKER_IDLE;
   protected readonly calendarIcon = CALENDAR_ICON_PATH;
-  protected readonly pickerConnector = PICKER_CONNECTOR;
 
   readonly pickerOpen = signal(false);
   readonly viewYear = signal(new Date().getFullYear());

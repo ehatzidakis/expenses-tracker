@@ -124,7 +124,7 @@ describe('AdjustmentSelectorComponent', () => {
     await setup(ADJUSTMENTS, 't4');
     expect(query('trip-picker-toggle')?.textContent?.trim()).toBe('Berlin');
     expect(query('trip-picker-toggle')!.className).not.toContain('border-dashed');
-    expect(query('trip-picker-toggle')!.className).toContain('bg-teal-600');
+    expect(query('trip-picker-toggle')!.className).toContain('bg-indigo-600');
     expect(all('trip-pill').every((b) => b.getAttribute('aria-pressed') === 'false')).toBe(true);
 
     await click(query('trip-picker-toggle'));
