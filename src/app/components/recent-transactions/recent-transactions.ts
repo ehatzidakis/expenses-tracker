@@ -76,7 +76,7 @@ const PAGE_SIZE = 10;
                     </div>
                     <span
                       class="shrink-0 text-xs font-semibold text-white tabular-nums"
-                      appSensitive
+                      appSensitive="xs"
                     >
                       €{{ transaction.amount | number: '1.2-2' }}
                     </span>
