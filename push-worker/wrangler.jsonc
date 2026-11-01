@@ -1,0 +1,30 @@
+{
+	"$schema": "node_modules/wrangler/config-schema.json",
+	"name": "expenses-push",
+	"main": "src/index.ts",
+	"compatibility_date": "2026-10-01",
+	"observability": {
+		"enabled": true
+	},
+	// Stores the phone push subscriptions. "remote" makes local dev use the real store too.
+	"kv_namespaces": [
+		{
+			"binding": "SUBSCRIPTIONS",
+			"id": "ac1e71a4eee648419bd9767cb26f7e0c",
+			"remote": true
+		}
+	],
+	"vars": {
+		"FIREBASE_PROJECT_ID": "expenses-tracker-hatz",
+		// The admin account: the only one that can subscribe a phone or send a test push.
+		"ADMIN_UID": "YnKzDa3eDIbeeYrRYEdJJikB7wu2",
+		// Kiosk accounts allowed to trigger a notification (comma-separated Firebase UIDs).
+		"NOTIFY_UIDS": "Kk8rcN0I63f6gGrZ3W5whoMN0AN2",
+		// Sites allowed to call this Worker (comma-separated).
+		"ALLOWED_ORIGINS": "https://expenses-tracker-nine-tan.vercel.app,https://expenses-tracker-ehatzidakis.vercel.app,http://localhost:4200",
+		// Public half of the push keys (the private half is a secret, see README).
+		"VAPID_PUBLIC_KEY": "BFv6qGseP-QTdp6SpOsHFvwuuZHfKW73P600TetFgYSaf8aG6pC4GXnnaPwxf2noVk7w_2bnAb4Q7u9t6Tm71Eg",
+		// Contact URL sent to Apple/Google with each push. Your app's address works.
+		"VAPID_SUBJECT": "https://expenses-tracker-nine-tan.vercel.app"
+	}
+}

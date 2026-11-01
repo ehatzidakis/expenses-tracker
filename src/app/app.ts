@@ -1,4 +1,4 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, effect, inject, Injector, signal } from '@angular/core';
 import { SwUpdate } from '@angular/service-worker';
 import { FormsModule } from '@angular/forms';
 import { filter } from 'rxjs';
@@ -20,6 +20,8 @@ import { UtilitySumComponent } from './components/utility-sum-component/utility-
 import { CategoryAverageComponent } from './components/category-average/category-average';
 import { RecentTransactionsComponent } from './components/recent-transactions/recent-transactions';
 import { AuthService } from './services/auth.service';
+import { PendingBadgeService } from './services/pending-badge.service';
+import { KioskShellComponent } from './components/kiosk-shell/kiosk-shell.component';
 import { SinglesViewComponent } from './components/singles-view/singles-view';
 import type { SinglesType } from './components/singles-view/singles-view.util';
 
@@ -51,6 +53,7 @@ export interface YearlyBreakdownEntry {
     CategoryAverageComponent,
     RecentTransactionsComponent,
     SinglesViewComponent,
+    KioskShellComponent,
   ],
   templateUrl: './app.html',
 })
@@ -59,6 +62,7 @@ export class AppComponent {
   private adjustmentService = inject(AdjustmentService);
   private authService = inject(AuthService);
   private swUpdate = inject(SwUpdate);
+  private injector = inject(Injector);
 
   readonly editingAdjustment = signal<Adjustment | null>(null);
   readonly selectedTripId = signal<string | null>(null);
@@ -88,6 +92,13 @@ export class AppComponent {
 
       this.swUpdate.checkForUpdate();
     }
+
+    // The Home Screen badge: items to review for the admin, requests to fill in for the kiosk.
+    // Looked up lazily so signed-out sessions and tests never create it.
+    effect(() => {
+      const role = this.currentRole();
+      if (role) this.injector.get(PendingBadgeService).start(role);
+    });
   }
 
   adjustmentsQuery = this.adjustmentService.getAdjustmentsQuery();
@@ -201,9 +212,5 @@ export class AppComponent {
     } finally {
       this.isSigningIn.set(false);
     }
-  }
-
-  async signOut(): Promise<void> {
-    await this.authService.signOut();
   }
 }

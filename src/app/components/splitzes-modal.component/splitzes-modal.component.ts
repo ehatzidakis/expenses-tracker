@@ -56,6 +56,8 @@ export class SplitzesModalComponent {
 
   readonly isAdmin = inject(AuthService).isAdmin;
   readonly pendingQuery = this.transactionService.getPendingTransactionsQuery();
+  // Everything listed under Incoming, including requests still with the kiosk.
+  // (The app icon badge counts only what needs the admin's attention.)
   readonly incomingCount = computed(() =>
     this.isAdmin() ? (this.pendingQuery.data()?.length ?? 0) : 0,
   );

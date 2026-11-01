@@ -21,7 +21,9 @@ import { TransactionEditFieldsComponent } from '../edit-transaction.component/tr
 import {
   buildPendingAcceptPayload,
   formatPendingDate,
+  isAwaitingKiosk,
   pendingSourceLabel,
+  pendingStatusLabel,
   pendingToFormModel,
   pendingToSplitState,
 } from './pending-review.model';
@@ -41,11 +43,11 @@ import {
       [errorMessage]="errorMessage()"
       submitLabel="Accept transaction"
       submittingLabel="Accepting…"
-      deleteLabel="Decline"
-      deletingLabel="Declining…"
-      deleteTitle="Decline transaction?"
-      deleteMessage="This removes the incoming transaction. It can't be undone."
-      deleteConfirmText="Decline"
+      [deleteLabel]="declineText().label"
+      [deletingLabel]="declineText().busy"
+      [deleteTitle]="declineText().title"
+      [deleteMessage]="declineText().message"
+      [deleteConfirmText]="declineText().label"
       [showDeleteConfirm]="showDeclineConfirm()"
       (back)="back.emit()"
       (submitted)="onAccept($event)"
@@ -61,6 +63,24 @@ import {
         </span>
         <span class="text-gray-500 truncate">{{ addedOn() }}</span>
       </div>
+      @if (statusLabel(); as status) {
+        <p
+          class="rounded-xl border px-3 py-2 text-[11px]"
+          [class.border-sky-500/30]="pending().requestStatus === 'awaiting-kiosk'"
+          [class.text-sky-300]="pending().requestStatus === 'awaiting-kiosk'"
+          [class.border-emerald-500/30]="pending().requestStatus === 'answered'"
+          [class.text-emerald-300]="pending().requestStatus === 'answered'"
+          [class.border-red-500/30]="pending().requestStatus === 'declined'"
+          [class.text-red-300]="pending().requestStatus === 'declined'"
+        >
+          {{ status }}
+          @if (pending().requestStatus === 'awaiting-kiosk') {
+            <span class="block text-gray-500"
+              >You can still fill it in and accept it yourself.</span
+            >
+          }
+        </p>
+      }
 
       <app-transaction-edit-fields
         [model]="model()"
@@ -129,6 +149,23 @@ export class PendingReviewComponent {
   );
   readonly subcategories = computed(() => getSubcategoryOptions(this.model().category));
   readonly sourceLabel = computed(() => pendingSourceLabel(this.pending()));
+  readonly statusLabel = computed(() => pendingStatusLabel(this.pending()));
+  // A request still with the kiosk is cancelled rather than declined.
+  readonly declineText = computed(() =>
+    isAwaitingKiosk(this.pending())
+      ? {
+          label: 'Cancel request',
+          busy: 'Cancelling…',
+          title: 'Cancel request?',
+          message: "This removes the request from the kiosk too. It can't be undone.",
+        }
+      : {
+          label: 'Decline',
+          busy: 'Declining…',
+          title: 'Decline transaction?',
+          message: "This removes the incoming transaction. It can't be undone.",
+        },
+  );
   readonly addedOn = computed(() => formatPendingDate(this.pending().date));
 
   readonly categoryLabel = (category: string): string =>

@@ -12,6 +12,7 @@ import {
 import { AdjustmentService } from '../../services/adjustment-service';
 import { PrivacyService } from '../../services/privacy.service';
 import { AuthService } from '../../services/auth.service';
+import { PushNotificationService } from '../../services/push-notification.service';
 import { PEOPLE, Person } from '../../models/splitz.model';
 import { TransactionBasicFieldsComponent } from './transaction-basic-fields.component';
 import { SplitFieldsComponent } from './split-fields.component';
@@ -47,6 +48,7 @@ import {
         [model]="transactionModel()"
         [categories]="activeCategories()"
         [linked]="linkWithAdjustment()"
+        [showTripLink]="!sendToKiosk()"
         [trips]="selectableTrips()"
         [selectedTripId]="selectedAdjustmentId()"
         [dateField]="transactionForm.date"
@@ -91,7 +93,7 @@ import {
           />
         }
       </app-transaction-basic-fields>
-      @if (!isKioskMode()) {
+      @if (!isKioskMode() && !sendToKiosk()) {
         <app-split-fields
           [amount]="transactionModel().amount"
           [people]="allPeople"
@@ -107,17 +109,42 @@ import {
         [commentField]="transactionForm.comment"
         (commentToggle)="setHasComment($event)"
       />
+      @if (!isKioskMode()) {
+        <label
+          class="flex items-center justify-between gap-3 rounded-xl border px-3 py-2.5 cursor-pointer transition-colors"
+          [class.border-indigo-500/40]="sendToKiosk()"
+          [class.bg-indigo-500/10]="sendToKiosk()"
+          [class.border-gray-800]="!sendToKiosk()"
+          [class.bg-gray-950/60]="!sendToKiosk()"
+        >
+          <span class="space-y-0.5">
+            <span class="block text-xs font-semibold text-gray-200">Send to kiosk</span>
+            <!-- <span class="block text-[11px] text-gray-500">
+              They fill in the amount and send it back. Amount is optional.
+            </span> -->
+          </span>
+          <input
+            type="checkbox"
+            class="h-4 w-4 shrink-0 accent-indigo-500 cursor-pointer"
+            [checked]="sendToKiosk()"
+            (change)="setSendToKiosk($any($event.target).checked)"
+          />
+        </label>
+      }
       <button
         type="submit"
         [disabled]="
           transactionForm().invalid() ||
           submitting() ||
           privacyService.isPrivacyMode() ||
-          (splitStore.goesSplitzes() && splitStore.customSplitMode() && !customSplitOk())
+          (!sendToKiosk() &&
+            splitStore.goesSplitzes() &&
+            splitStore.customSplitMode() &&
+            !customSplitOk())
         "
         class="w-full py-3 rounded-xl text-sm font-semibold text-white bg-linear-to-br from-indigo-500 to-violet-600 shadow-lg disabled:opacity-40 disabled:cursor-not-allowed active:scale-[0.99] transition-all cursor-pointer"
       >
-        {{ submitting() ? 'Adding…' : 'Add Transaction' }}
+        {{ submitLabel() }}
       </button>
     </form>
 
@@ -143,6 +170,7 @@ export class CreateTransactionFormComponent {
   private adjustmentService = inject(AdjustmentService);
   private queryClient = inject(QueryClient);
   private authService = inject(AuthService);
+  private pushNotifications = inject(PushNotificationService);
   readonly privacyService = inject(PrivacyService);
   readonly splitStore = inject(SplitStateStore);
   readonly isKioskMode = this.authService.isKiosk;
@@ -156,10 +184,20 @@ export class CreateTransactionFormComponent {
   readonly hasComment = signal<boolean>(false);
   readonly activeTemplateId = signal<string | null>(null);
   readonly recurringOpen = signal(false);
+  // Admin only: save as a request for the kiosk to fill in, instead of a transaction.
+  readonly sendToKiosk = signal(false);
   // Hidden in privacy mode: templates fill in real amounts and last month's bills.
   readonly showRecurring = computed(
-    () => !this.linkWithAdjustment() && !this.isKioskMode() && !this.privacyService.isPrivacyMode(),
+    () =>
+      !this.linkWithAdjustment() &&
+      !this.isKioskMode() &&
+      !this.sendToKiosk() &&
+      !this.privacyService.isPrivacyMode(),
   );
+  readonly submitLabel = computed(() => {
+    if (this.sendToKiosk()) return this.submitting() ? 'Sending…' : 'Send to kiosk';
+    return this.submitting() ? 'Adding…' : 'Add Transaction';
+  });
   readonly amountHint = signal<number | null>(null);
 
   private readonly basicFields = viewChild.required(TransactionBasicFieldsComponent);
@@ -293,6 +331,16 @@ export class CreateTransactionFormComponent {
     }
   }
 
+  setSendToKiosk(value: boolean): void {
+    this.sendToKiosk.set(value);
+    if (!value) return;
+
+    // The kiosk can't fill in trips or splits, so drop them.
+    if (this.linkWithAdjustment()) this.toggleLinkWithAdjustment(false);
+    this.recurringOpen.set(false);
+    this.splitStore.reset();
+  }
+
   setHasComment(value: boolean): void {
     this.hasComment.set(value);
     if (!value) {
@@ -348,6 +396,10 @@ export class CreateTransactionFormComponent {
       this.submitKioskTransaction();
       return;
     }
+    if (this.sendToKiosk()) {
+      this.submitKioskRequest();
+      return;
+    }
 
     this.submitting.set(true);
     this.successMessage.set(null);
@@ -397,6 +449,39 @@ export class CreateTransactionFormComponent {
     }
   }
 
+  private async submitKioskRequest(): Promise<void> {
+    this.submitting.set(true);
+    this.successMessage.set(null);
+    this.errorMessage.set(null);
+
+    try {
+      const result = buildTransactionPayload(this.transactionModel(), this.splitStore.state(), {
+        linked: false,
+        adjustmentId: '',
+      });
+      if (!result.ok) {
+        this.errorMessage.set(result.error);
+        return;
+      }
+
+      await this.transactionService.createKioskRequest(result.payload);
+      // Not awaited: the request is saved, and the notification shouldn't slow down or fail it.
+      void this.pushNotifications.notifyKioskRequest(result.payload);
+      await this.queryClient.invalidateQueries({ queryKey: ['pendingTransactions'] });
+
+      this.transactionModel.set(defaultTransactionModel());
+      this.transactionForm().reset();
+      this.resetSplitFields();
+      this.sendToKiosk.set(false);
+      this.showSuccessMessage('Request sent to kiosk');
+    } catch (err) {
+      console.error('Sending the request to the kiosk failed:', err);
+      this.errorMessage.set('Unable to send the request. Please try again.');
+    } finally {
+      this.submitting.set(false);
+    }
+  }
+
   private async submitKioskTransaction(): Promise<void> {
     this.submitting.set(true);
     this.successMessage.set(null);
@@ -414,6 +499,8 @@ export class CreateTransactionFormComponent {
       }
 
       await this.transactionService.createPendingTransaction(result.payload);
+      // Not awaited: the save is done, and the notification shouldn't slow down or fail it.
+      void this.pushNotifications.notifyNewPending(result.payload);
 
       await this.queryClient.invalidateQueries({ queryKey: ['pendingTransactions'] });
 

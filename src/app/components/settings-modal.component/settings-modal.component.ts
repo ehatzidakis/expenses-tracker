@@ -13,6 +13,7 @@ import { SignOutActionComponent } from './sign-out-action.component';
 import { StealthModeSettingComponent } from './stealth-mode-setting.component';
 import { StealthPasscodeSettingComponent } from './stealth-passcode-setting.component';
 import { DataExportSettingComponent } from './data-export-setting.component';
+import { NotificationSettingComponent } from './notification-setting.component';
 
 type PinAction = 'none' | 'set' | 'remove' | 'unlock-to-disable';
 
@@ -28,6 +29,7 @@ type PinAction = 'none' | 'set' | 'remove' | 'unlock-to-disable';
     StealthModeSettingComponent,
     StealthPasscodeSettingComponent,
     DataExportSettingComponent,
+    NotificationSettingComponent,
   ],
   template: `
     <div
@@ -90,6 +92,10 @@ type PinAction = 'none' | 'set' | 'remove' | 'unlock-to-disable';
             (cancel)="resetForm()"
             (submitted)="handleRemovePin()"
           />
+        }
+
+        @if (authService.isAdmin()) {
+          <app-notification-setting />
         }
 
         <app-data-export-setting />

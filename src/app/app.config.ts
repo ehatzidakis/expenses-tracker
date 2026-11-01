@@ -37,7 +37,8 @@ export const appConfig: ApplicationConfig = {
       await persistence.restore();
       syncMarker.watch();
     }),
-    provideServiceWorker('ngsw-worker.js', {
+    // push-sw.js wraps Angular's ngsw-worker.js and adds the Home Screen badge.
+    provideServiceWorker('push-sw.js', {
       enabled: !isDevMode(),
       registrationStrategy: 'registerImmediately',
     }),
