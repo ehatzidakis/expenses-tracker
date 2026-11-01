@@ -119,9 +119,9 @@ import {
         >
           <span class="space-y-0.5">
             <span class="block text-xs font-semibold text-gray-200">Send to kiosk</span>
-            <span class="block text-[11px] text-gray-500">
+            <!-- <span class="block text-[11px] text-gray-500">
               They fill in the amount and send it back. Amount is optional.
-            </span>
+            </span> -->
           </span>
           <input
             type="checkbox"

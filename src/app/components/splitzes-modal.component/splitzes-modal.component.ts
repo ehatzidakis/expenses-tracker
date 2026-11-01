@@ -1,7 +1,6 @@
 import { Component, computed, inject, output, signal } from '@angular/core';
 import { AuthService } from '../../services/auth.service';
 import { TransactionService } from '../../services/transaction-service';
-import { isAwaitingKiosk } from './pending-review.model';
 import { SplitzBalancesComponent } from './splitz-balances.component';
 import { SplitzHistoryComponent } from './splitz-history.component';
 import { SplitzIncomingComponent } from './splitz-incoming.component';
@@ -57,9 +56,10 @@ export class SplitzesModalComponent {
 
   readonly isAdmin = inject(AuthService).isAdmin;
   readonly pendingQuery = this.transactionService.getPendingTransactionsQuery();
-  // Requests still with the kiosk aren't waiting for the admin, so they don't count.
+  // Everything listed under Incoming, including requests still with the kiosk.
+  // (The app icon badge counts only what needs the admin's attention.)
   readonly incomingCount = computed(() =>
-    this.isAdmin() ? (this.pendingQuery.data() ?? []).filter((p) => !isAwaitingKiosk(p)).length : 0,
+    this.isAdmin() ? (this.pendingQuery.data()?.length ?? 0) : 0,
   );
 
   // Always opens on Balances; pending items show as a count badge on the Incoming tab.

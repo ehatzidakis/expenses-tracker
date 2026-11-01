@@ -15,7 +15,12 @@ import { SensitiveDirective } from '../../utils/sensitive.directive';
   template: `
     <div class="space-y-3">
       <div class="flex items-center justify-between">
-        <p class="text-xs text-gray-400">{{ reviewCount() }} waiting for review</p>
+        <p class="text-xs text-gray-400">
+          {{ items().length }} pending
+          @if (withKioskCount() > 0) {
+            <span class="text-sky-300/80">· {{ withKioskCount() }} with kiosk</span>
+          }
+        </p>
         <button
           type="button"
           (click)="refresh.emit()"
@@ -104,6 +109,5 @@ export class PendingTransactionListComponent {
   readonly totalAmount = getPendingTransactionTotalAmount;
   readonly sourceLabel = pendingSourceLabel;
   readonly statusLabel = pendingStatusLabel;
-  // Requests still with the kiosk are listed but aren't waiting for the admin.
-  readonly reviewCount = computed(() => this.items().filter((p) => !isAwaitingKiosk(p)).length);
+  readonly withKioskCount = computed(() => this.items().filter(isAwaitingKiosk).length);
 }
