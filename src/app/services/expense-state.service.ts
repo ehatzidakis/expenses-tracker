@@ -344,16 +344,21 @@ export class ExpenseStateService {
     const totalMonthsCount = rawList.length;
     const isAllTime = expense.id === 'ALL';
 
+    // The monthly average leaves out the calendar month in progress, since it is incomplete.
+    // If that month has no record yet, every month counts.
+    const now = new Date();
+    const currentMonthName = `${now.toLocaleString('en-US', { month: 'long' })} ${now.getFullYear()}`;
+    const currentMonthExpense = rawList.find((e) => e.MonthName === currentMonthName) ?? null;
+
     const excludedKeys = ['id', 'MonthName', 'TotalWage'];
     const entries = Object.entries(expense).filter(([key]) => !excludedKeys.includes(key));
     const total = entries.reduce((sum, [_, val]) => sum + (Number(val) || 0), 0);
 
     return entries.map(([name, val]) => {
       const amount = Number(val) || 0;
-      const lastMonthExpense = this.latestMonthExpense();
-      const currentMonthValue = Number(lastMonthExpense?.[name as keyof Expense] ?? 0);
+      const currentMonthValue = Number(currentMonthExpense?.[name as keyof Expense] ?? 0);
       const amountExcludingCurrent = isAllTime ? Math.max(0, amount - currentMonthValue) : amount;
-      const monthsExcludingCurrent = Math.max(0, totalMonthsCount - 1);
+      const monthsExcludingCurrent = Math.max(0, totalMonthsCount - (currentMonthExpense ? 1 : 0));
       const monthlyAverage =
         isAllTime && monthsExcludingCurrent > 0
           ? Math.ceil(amountExcludingCurrent / monthsExcludingCurrent / 5) * 5
