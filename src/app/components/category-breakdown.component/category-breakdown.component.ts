@@ -7,57 +7,75 @@ import { CategorySpend } from '../../services/expense-state.service';
 import { TransactionService, monthTransactionsKey } from '../../services/transaction-service';
 import { CategoryBreakdownItemComponent } from './category-breakdown-item';
 import { MonthBreakdownComponent } from '../month-breakdown/month-breakdown.component';
+import { EditTransactionComponent } from '../edit-transaction.component/edit-transaction.component';
+import { Transaction } from '../../models/transaction.model';
 
 @Component({
   selector: 'app-category-breakdown',
   standalone: true,
-  imports: [CommonModule, CategoryBreakdownItemComponent, MonthBreakdownComponent],
+  imports: [
+    CommonModule,
+    CategoryBreakdownItemComponent,
+    EditTransactionComponent,
+    MonthBreakdownComponent,
+  ],
   host: { class: 'block' },
   template: `
     <section
       class="bg-gray-900/60 border border-gray-800/80 rounded-2xl p-2 space-y-4 backdrop-blur-sm"
     >
-      @if (showMonthView()) {
-        <div class="flex justify-center">
-          <div class="inline-flex rounded-full border border-gray-700/80 bg-gray-950/60 p-1">
-            <button
-              type="button"
-              class="rounded-full px-4 py-1.5 text-xs font-medium transition-colors"
-              [class.bg-gray-700]="viewMode() === 'category'"
-              [class.text-white]="viewMode() === 'category'"
-              [class.text-gray-400]="viewMode() !== 'category'"
-              (click)="viewMode.set('category')"
-            >
-              Category
-            </button>
-            <button
-              type="button"
-              class="rounded-full px-4 py-1.5 text-xs font-medium transition-colors"
-              [class.bg-gray-700]="viewMode() === 'month'"
-              [class.text-white]="viewMode() === 'month'"
-              [class.text-gray-400]="viewMode() !== 'month'"
-              (click)="viewMode.set('month')"
-            >
-              Month
-            </button>
-          </div>
-        </div>
-      }
-
-      @if (viewMode() === 'month' && showMonthView()) {
-        <app-month-breakdown [months]="months()" [adjustments]="adjustments()" />
+      @if (selectedTransaction(); as transaction) {
+        <!-- Editing replaces the whole list, like the trip breakdown. -->
+        <app-edit-transaction
+          [transaction]="transaction"
+          (back)="selectedTransaction.set(null)"
+          (updated)="selectedTransaction.set(null)"
+          (deleted)="selectedTransaction.set(null)"
+        />
       } @else {
-        <div class="space-y-2">
-          @for (category of categories(); track category.name) {
-            <app-category-breakdown-item
-              [category]="category"
-              [monthName]="monthName()"
-              [transactionCount]="transactionCounts()[category.name] ?? 0"
-              [expanded]="expandedCategory() === category.name"
-              (toggle)="toggleCategory(category.name)"
-            />
-          }
-        </div>
+        @if (showMonthView()) {
+          <div class="flex justify-center">
+            <div class="inline-flex rounded-full border border-gray-700/80 bg-gray-950/60 p-1">
+              <button
+                type="button"
+                class="rounded-full px-4 py-1.5 text-xs font-medium transition-colors"
+                [class.bg-gray-700]="viewMode() === 'category'"
+                [class.text-white]="viewMode() === 'category'"
+                [class.text-gray-400]="viewMode() !== 'category'"
+                (click)="viewMode.set('category')"
+              >
+                Category
+              </button>
+              <button
+                type="button"
+                class="rounded-full px-4 py-1.5 text-xs font-medium transition-colors"
+                [class.bg-gray-700]="viewMode() === 'month'"
+                [class.text-white]="viewMode() === 'month'"
+                [class.text-gray-400]="viewMode() !== 'month'"
+                (click)="viewMode.set('month')"
+              >
+                Month
+              </button>
+            </div>
+          </div>
+        }
+
+        @if (viewMode() === 'month' && showMonthView()) {
+          <app-month-breakdown [months]="months()" [adjustments]="adjustments()" />
+        } @else {
+          <div class="space-y-2">
+            @for (category of categories(); track category.name) {
+              <app-category-breakdown-item
+                [category]="category"
+                [monthName]="monthName()"
+                [transactionCount]="transactionCounts()[category.name] ?? 0"
+                [expanded]="expandedCategory() === category.name"
+                (toggle)="toggleCategory(category.name)"
+                (selectTransaction)="selectedTransaction.set($event)"
+              />
+            }
+          </div>
+        }
       }
     </section>
   `,
@@ -85,6 +103,7 @@ export class CategoryBreakdownComponent {
   });
 
   readonly expandedCategory = signal<string | null>(null);
+  readonly selectedTransaction = signal<Transaction | null>(null);
 
   // Shares the cached month query with Recent Transactions and the Create tab's quick-picks,
   // so counting costs no extra reads. Saves refresh it through the ['expenses'] invalidation.
