@@ -1,31 +1,26 @@
-import { Component, input, output, signal } from '@angular/core';
+import { Component, computed, inject, input, output } from '@angular/core';
+import { injectQuery } from '@tanstack/angular-query-experimental';
 import { CategorySpend } from '../../services/expense-state.service';
 import { Transaction } from '../../models/transaction.model';
-import { EditTransactionComponent } from '../edit-transaction.component/edit-transaction.component';
-import { TransactionGridComponent } from '../transaction-grid.component/transaction-grid.component';
+import { TransactionService, monthTransactionsKey } from '../../services/transaction-service';
+import { TransactionListComponent } from '../transaction-list/transaction-list';
 import { YearlyCategorySumsComponent } from '../yearly-category-sums/yearly-category-sums';
 
 @Component({
   selector: 'app-category-breakdown-details',
   standalone: true,
-  imports: [EditTransactionComponent, TransactionGridComponent, YearlyCategorySumsComponent],
+  imports: [TransactionListComponent, YearlyCategorySumsComponent],
   host: { class: 'block' },
   template: `
     @defer (on immediate) {
       @if (category().isAllTime) {
         <app-yearly-category-sums [category]="category().name" />
-      } @else if (selectedTransaction(); as transaction) {
-        <app-edit-transaction
-          [transaction]="transaction"
-          (back)="selectedTransaction.set(null)"
-          (updated)="finishEdit()"
-          (deleted)="finishEdit()"
-        />
       } @else {
-        <app-transaction-grid
-          [monthName]="monthName()"
-          [category]="category().name"
-          (selectTransaction)="selectedTransaction.set($event)"
+        <app-transaction-list
+          [transactions]="transactions()"
+          [loading]="monthQuery.isPending()"
+          [error]="monthQuery.isError()"
+          (selectTransaction)="selectTransaction.emit($event)"
         />
       }
     } @loading {
@@ -34,14 +29,23 @@ import { YearlyCategorySumsComponent } from '../yearly-category-sums/yearly-cate
   `,
 })
 export class CategoryBreakdownDetailsComponent {
+  private readonly transactionService = inject(TransactionService);
+
   readonly category = input.required<CategorySpend>();
   readonly monthName = input.required<string>();
 
-  readonly changed = output<void>();
-  readonly selectedTransaction = signal<Transaction | null>(null);
+  readonly selectTransaction = output<Transaction>();
 
-  finishEdit(): void {
-    this.selectedTransaction.set(null);
-    this.changed.emit();
-  }
+  // Same query the breakdown already runs for its counts, so opening a category reads
+  // nothing new from Firestore. Saves refresh it through the ['expenses'] invalidation.
+  protected readonly monthQuery = injectQuery(() => ({
+    queryKey: monthTransactionsKey(this.monthName()),
+    enabled: !!this.monthName() && !this.category().isAllTime,
+    queryFn: () => this.transactionService.fetchMonthTransactions(this.monthName()),
+  }));
+
+  /** This category's transactions for the month, trip ones included (matches the counts). */
+  readonly transactions = computed<Transaction[]>(() =>
+    (this.monthQuery.data() ?? []).filter((tx) => tx.category === this.category().name),
+  );
 }

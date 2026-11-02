@@ -1,14 +1,24 @@
-import { Component, computed, effect, inject, input, output, signal } from '@angular/core';
+import {
+  Component,
+  computed,
+  effect,
+  inject,
+  input,
+  output,
+  signal,
+  untracked,
+} from '@angular/core';
+import { injectQuery } from '@tanstack/angular-query-experimental';
 import { EditTransactionComponent } from '../edit-transaction.component/edit-transaction.component';
 import { CommonModule } from '@angular/common';
-import { TransactionService } from '../../services/transaction-service';
+import { TransactionService, tripTransactionsKey } from '../../services/transaction-service';
 import { Adjustment } from '../../models/adjustments.model';
 import { TRIP_CATEGORY_NAMES } from '../../services/expense-state.service';
 import { Transaction } from '../../models/transaction.model';
-import { PEOPLE } from '../../models/splitz.model';
 import { AdjustmentCardComponent } from '../adjustment-card.component/adjustment-card.component';
 import { EditAdjustmentComponent } from '../edit-adjustment.component/edit-adjustment.component';
 import { SensitiveDirective } from '../../utils/sensitive.directive';
+import { TransactionListComponent } from '../transaction-list/transaction-list';
 
 interface TripCategoryRow {
   name: string;
@@ -25,6 +35,7 @@ interface TripCategoryRow {
     AdjustmentCardComponent,
     EditAdjustmentComponent,
     SensitiveDirective,
+    TransactionListComponent,
   ],
   host: { class: 'block' },
   template: `
@@ -61,8 +72,8 @@ interface TripCategoryRow {
           [transaction]="tx"
           [categoryOverride]="tripCategories"
           (back)="selectedTransaction.set(null)"
-          (updated)="onEditFinished()"
-          (deleted)="onEditFinished()"
+          (updated)="selectedTransaction.set(null)"
+          (deleted)="selectedTransaction.set(null)"
         />
       } @else {
         <!-- Category breakdown -->
@@ -117,45 +128,10 @@ interface TripCategoryRow {
 
                 <!-- Expanded transactions -->
                 @if (expandedCategory() === row.name) {
-                  <div class="mt-3 pt-3 border-t border-gray-800/60 space-y-2">
-                    @for (tx of row.transactions; track tx.id) {
-                      <button
-                        type="button"
-                        (click)="selectedTransaction.set(tx)"
-                        class="w-full text-left bg-gray-800/40 border border-gray-800/80 rounded-xl px-3 py-2 flex items-center justify-between hover:border-gray-700 transition-colors cursor-pointer"
-                      >
-                        <div class="min-w-0">
-                          <span
-                            class="text-xs font-medium text-gray-200 truncate flex items-center gap-1.5"
-                          >
-                            <span class="truncate">{{ tx.description }}</span>
-                            @if (tx.isSplit) {
-                              <span
-                                aria-label="Split transaction"
-                                title="Split transaction"
-                                class="text-[11px] leading-none"
-                                >✂️</span
-                              >
-                            }
-                            @if (tx.comment) {
-                              <span
-                                aria-label="Transaction has a comment"
-                                title="Transaction has a comment"
-                                class="text-[11px] leading-none"
-                                >💬</span
-                              >
-                            }
-                          </span>
-                          <span class="text-[10px] text-gray-500 block mt-0.5">{{
-                            tx.date | date: 'dd/MM/yyyy'
-                          }}</span>
-                        </div>
-                        <span class="text-xs font-semibold text-white shrink-0 ml-2" appSensitive>
-                          €{{ tx.amount | number: '1.2-2' }}
-                        </span>
-                      </button>
-                    }
-                  </div>
+                  <app-transaction-list
+                    [transactions]="row.transactions"
+                    (selectTransaction)="selectedTransaction.set($event)"
+                  />
                 }
               </div>
             }
@@ -176,9 +152,16 @@ export class TripBreakdownComponent {
 
   readonly tripCategories = TRIP_CATEGORY_NAMES;
 
-  readonly transactions = signal<Transaction[]>([]);
-  readonly loading = signal(true);
-  readonly error = signal(false);
+  // Shares the trip cache with Recent Transactions, so the trip is read once. Saves refresh
+  // it through the ['expenses'] invalidation, so there is no manual reload after an edit.
+  private readonly tripQuery = injectQuery(() => ({
+    queryKey: tripTransactionsKey(this.trip().id),
+    queryFn: () => this.transactionService.fetchTripTransactions(this.trip().id),
+  }));
+
+  readonly transactions = computed<Transaction[]>(() => this.tripQuery.data() ?? []);
+  readonly loading = computed(() => this.tripQuery.isPending());
+  readonly error = computed(() => this.tripQuery.isError());
   readonly expandedCategory = signal<string | null>(null);
   readonly selectedTransaction = signal<Transaction | null>(null);
 
@@ -212,24 +195,14 @@ export class TripBreakdownComponent {
   });
 
   constructor() {
+    // Collapse the open category only when switching trips, not after an edit.
     effect(() => {
-      const tripId = this.trip().id;
-      this.loadTransactions(tripId);
+      this.trip().id;
+      untracked(() => {
+        this.expandedCategory.set(null);
+        this.selectedTransaction.set(null);
+      });
     });
-  }
-
-  private async loadTransactions(adjustmentId: string): Promise<void> {
-    this.loading.set(true);
-    this.error.set(false);
-    this.expandedCategory.set(null);
-    try {
-      const items = await this.transactionService.fetchAllByAdjustmentId(adjustmentId);
-      this.transactions.set(items);
-    } catch {
-      this.error.set(true);
-    } finally {
-      this.loading.set(false);
-    }
   }
 
   formatPercent(value: number): string {
@@ -237,39 +210,7 @@ export class TripBreakdownComponent {
     return rounded.endsWith('.0') ? rounded.slice(0, -2) : rounded;
   }
 
-  getPersonName(id: 'me' | number | undefined): string {
-    if (id === 'me' || id === undefined) {
-      return id === 'me' ? 'me' : 'Unknown';
-    }
-
-    const person = PEOPLE.find((entry) => entry.id === id);
-    return person?.name ?? `Person ${id}`;
-  }
-
-  getSplitWithNames(ids: number[] = []): string {
-    if (!ids.length) {
-      return 'None';
-    }
-
-    return ids.map((id) => this.getPersonName(id)).join(', ');
-  }
-
-  getSplitTypeLabel(type?: 'split' | 'custom'): string {
-    switch (type) {
-      case 'custom':
-        return 'Custom split';
-      case 'split':
-      default:
-        return 'Splitz';
-    }
-  }
-
   toggleCategory(name: string): void {
     this.expandedCategory.update((cur) => (cur === name ? null : name));
-  }
-
-  onEditFinished(): void {
-    this.selectedTransaction.set(null);
-    this.loadTransactions(this.trip().id);
   }
 }

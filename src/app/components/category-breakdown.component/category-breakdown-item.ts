@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, input, output } from '@angular/core';
 import { CategorySpend, getCategoryMeta } from '../../services/expense-state.service';
+import { Transaction } from '../../models/transaction.model';
 import { CategoryBreakdownDetailsComponent } from './category-breakdown-details';
 import { SensitiveDirective } from '../../utils/sensitive.directive';
 
@@ -120,7 +121,7 @@ import { SensitiveDirective } from '../../utils/sensitive.directive';
         <app-category-breakdown-details
           [category]="category()"
           [monthName]="monthName()"
-          (changed)="changed.emit()"
+          (selectTransaction)="selectTransaction.emit($event)"
         />
       }
     </div>
@@ -133,7 +134,7 @@ export class CategoryBreakdownItemComponent {
   readonly expanded = input(false);
 
   readonly toggle = output<void>();
-  readonly changed = output<void>();
+  readonly selectTransaction = output<Transaction>();
 
   categoryMeta(name: string): { emoji: string; classes: string } {
     return getCategoryMeta(name);

@@ -44,7 +44,10 @@ describe('CategoryBreakdownComponent', () => {
   let fetchMonthTransactions: ReturnType<typeof vi.fn>;
 
   beforeEach(async () => {
-    queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+    // Fresh for a while like the app's cache, so a second observer reuses the data.
+    queryClient = new QueryClient({
+      defaultOptions: { queries: { retry: false, staleTime: 300_000 } },
+    });
     fetchMonthTransactions = vi
       .fn()
       .mockResolvedValueOnce([tx('a', 'Utilities'), tx('b', 'Gym'), tx('c', 'Utilities', 'trip')])
@@ -111,5 +114,20 @@ describe('CategoryBreakdownComponent', () => {
 
     expect(fetchMonthTransactions).toHaveBeenCalledTimes(2);
     expect(component.transactionCounts()).toEqual({ Utilities: 1 });
+  });
+
+  it('lists an opened category from the cached month without another fetch', async () => {
+    fixture.componentRef.setInput('categories', categories);
+    fixture.componentRef.setInput('monthName', 'August 2026');
+    await settle(fixture);
+
+    component.toggleCategory('Utilities');
+    await settle(fixture);
+
+    const text = fixture.nativeElement.textContent as string;
+    expect(fetchMonthTransactions).toHaveBeenCalledTimes(1);
+    expect(text).toContain('a');
+    expect(text).toContain('c');
+    expect(fixture.nativeElement.querySelectorAll('app-transaction-list button').length).toBe(2);
   });
 });

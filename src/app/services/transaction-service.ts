@@ -440,17 +440,6 @@ export class TransactionService {
     return Object.fromEntries(entries);
   }
 
-  async fetchPage(
-    monthName: string,
-    category: string,
-    cursor: QueryDocumentSnapshot<DocumentData> | null,
-  ): Promise<TransactionPage> {
-    return this.fetchPagedTransactions(
-      [where('monthName', '==', monthName), where('category', '==', category)],
-      cursor,
-    );
-  }
-
   async fetchPageByCategory(
     category: string,
     cursor: QueryDocumentSnapshot<DocumentData> | null,
@@ -956,46 +945,6 @@ export class TransactionService {
 
     await batch.commit();
     await this.syncMarker.bump();
-  }
-
-  async fetchAllByAdjustmentId(adjustmentId: string): Promise<Transaction[]> {
-    const transactionsRef = collection(db, 'transactions');
-    const snapshot = await getDocs(
-      query(transactionsRef, where('adjustmentId', '==', adjustmentId)),
-    );
-    const sortedTransactions = snapshot.docs.sort(
-      (a, b) => new Date(b.data()['date']).getTime() - new Date(a.data()['date']).getTime(),
-    );
-
-    return sortedTransactions.map((d) => {
-      const data = d.data();
-      const tx: Transaction = {
-        id: d.id,
-        monthName: data['monthName'] as string,
-        date: data['date'] as string,
-        description: data['description'] as string,
-        category: data['category'] as string,
-        subCategoryId: data['subCategoryId'] != null ? Number(data['subCategoryId']) : undefined,
-        subCategory: (data['subCategory'] as string | undefined) ?? undefined,
-        amount: Number(data['amount']) || 0,
-        createdAt: (data['createdAt'] as string) ?? new Date().toISOString(),
-        adjustmentId: (data['adjustmentId'] as string) ?? undefined,
-      };
-
-      if (data['isSplit']) {
-        tx.isSplit = true;
-        tx.paidBy = data['paidBy'] as 'me' | number;
-        tx.splitBy = (data['splitBy'] as number[]) ?? [];
-        tx.splitType = (data['splitType'] as 'split' | 'custom') ?? 'split';
-        tx.totalAmount = Number(data['totalAmount']) || 0;
-        tx.customSplitAmounts =
-          (data['customSplitAmounts'] as Partial<Record<'me' | number, number>> | undefined) ??
-          undefined;
-        tx.splitPaidPersonIds = (data['splitPaidPersonIds'] as number[]) ?? [];
-      }
-
-      return tx;
-    });
   }
 
   async fetchAllTransactionsForExport(): Promise<Transaction[]> {
