@@ -4,15 +4,16 @@ import { AdjustmentService } from '../../services/adjustment-service';
 import { TransactionService } from '../../services/transaction-service';
 import { ExportAdjustment, ExportTransaction } from '../../models/export.model';
 import { Transaction } from '../../models/transaction.model';
+import { BUTTON_SECONDARY } from '../../utils/pill-styles';
 
 @Component({
   selector: 'app-data-export-setting',
   standalone: true,
   template: `
-    <section class="space-y-3 border-t border-raised pt-4">
+    <section class="flex flex-col gap-3">
       <div>
-        <h3 class="text-sm font-semibold text-ink">Data export</h3>
-        <p class="mt-1 text-xs text-ink-3">Downloads existing data without changing it.</p>
+        <h3 class="text-[15px] font-medium text-ink">Data export</h3>
+        <p class="mt-0.5 text-[12px] text-ink-2">Downloads existing data without changing it.</p>
       </div>
 
       <div class="grid grid-cols-2 gap-2">
@@ -20,7 +21,7 @@ import { Transaction } from '../../models/transaction.model';
           type="button"
           (click)="downloadTransactions('csv')"
           [disabled]="loading()"
-          class="rounded-xl border border-edge bg-raised/70 px-3 py-2 text-xs text-ink transition hover:bg-edge disabled:opacity-50"
+          [class]="secondary"
         >
           Transactions CSV
         </button>
@@ -28,7 +29,7 @@ import { Transaction } from '../../models/transaction.model';
           type="button"
           (click)="downloadTransactions('json')"
           [disabled]="loading()"
-          class="rounded-xl border border-edge bg-raised/70 px-3 py-2 text-xs text-ink transition hover:bg-edge disabled:opacity-50"
+          [class]="secondary"
         >
           Transactions JSON
         </button>
@@ -36,7 +37,7 @@ import { Transaction } from '../../models/transaction.model';
           type="button"
           (click)="downloadAdjustments('csv')"
           [disabled]="loading()"
-          class="rounded-xl border border-edge bg-raised/70 px-3 py-2 text-xs text-ink transition hover:bg-edge disabled:opacity-50"
+          [class]="secondary"
         >
           One-offs CSV
         </button>
@@ -44,17 +45,17 @@ import { Transaction } from '../../models/transaction.model';
           type="button"
           (click)="downloadAdjustments('json')"
           [disabled]="loading()"
-          class="rounded-xl border border-edge bg-raised/70 px-3 py-2 text-xs text-ink transition hover:bg-edge disabled:opacity-50"
+          [class]="secondary"
         >
           One-offs JSON
         </button>
       </div>
 
       @if (loading()) {
-        <p class="text-xs text-ink-3">Preparing download...</p>
+        <p class="text-[12px] text-ink-3">Preparing download...</p>
       }
       @if (message(); as message) {
-        <p class="text-xs" [class.text-avocado-ink]="!error()" [class.text-cherry]="error()">
+        <p class="text-[12px]" [class.text-avocado-ink]="!error()" [class.text-cherry]="error()">
           {{ message }}
         </p>
       }
@@ -62,6 +63,8 @@ import { Transaction } from '../../models/transaction.model';
   `,
 })
 export class DataExportSettingComponent {
+  protected readonly secondary = BUTTON_SECONDARY;
+
   private readonly exportService = inject(ExportService);
   private readonly adjustmentService = inject(AdjustmentService);
   private readonly transactionService = inject(TransactionService);

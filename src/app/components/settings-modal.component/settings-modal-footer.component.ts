@@ -5,9 +5,7 @@ import { Component, input } from '@angular/core';
   standalone: true,
   host: { class: 'block' },
   template: `
-    <div class="pt-1 text-[11px] uppercase tracking-[0.18em] text-ink-3 text-left">
-      v{{ version() }}
-    </div>
+    <p class="text-center text-[12px] text-ink-3">Version {{ version() }}</p>
   `,
 })
 export class SettingsModalFooterComponent {

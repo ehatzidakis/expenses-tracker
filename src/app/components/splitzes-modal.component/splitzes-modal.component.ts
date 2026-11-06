@@ -4,30 +4,25 @@ import { TransactionService } from '../../services/transaction-service';
 import { SplitzBalancesComponent } from './splitz-balances.component';
 import { SplitzHistoryComponent } from './splitz-history.component';
 import { SplitzIncomingComponent } from './splitz-incoming.component';
-import { SplitzesModalHeaderComponent } from './splitzes-modal-header.component';
 import { SplitzesTab, SplitzesTabsComponent } from './splitzes-tabs.component';
+import { SheetComponent } from '../sheet/sheet';
 
 @Component({
   selector: 'app-splitzes-modal',
   standalone: true,
-  imports: [
+  imports: [SheetComponent, 
     SplitzBalancesComponent,
     SplitzHistoryComponent,
     SplitzIncomingComponent,
-    SplitzesModalHeaderComponent,
     SplitzesTabsComponent,
   ],
   template: `
-    <div
-      class="fixed inset-0 z-100 bg-black/60 backdrop-blur-sm flex items-end justify-center sm:items-center overflow-hidden"
-      (click)="close.emit()"
-    >
-      <div
-        class="w-full max-w-md max-h-[85vh] overflow-y-auto bg-panel border border-raised/80 rounded-t-3xl sm:rounded-3xl p-6 space-y-5 shadow-2xl text-ink"
-        (click)="$event.stopPropagation()"
-      >
-        <app-splitzes-modal-header (close)="close.emit()" />
+    <app-sheet label="Splitzes" (closed)="close.emit()">
+      <h2 class="type-wide text-[18px] font-semibold text-ink">Splitzes</h2>
+      <p class="mt-1 text-[13px] text-ink-2">Who owes whom, and what's waiting for you</p>
 
+      <!-- A steady height keeps the tabs under the thumb whichever tab is open. -->
+      <div class="mt-4 flex min-h-[min(560px,72dvh)] flex-col gap-5">
         <app-splitzes-tabs
           [activeTab]="activeTab()"
           [showIncoming]="isAdmin()"
@@ -47,7 +42,7 @@ import { SplitzesTab, SplitzesTabsComponent } from './splitzes-tabs.component';
           }
         }
       </div>
-    </div>
+    </app-sheet>
   `,
 })
 export class SplitzesModalComponent {

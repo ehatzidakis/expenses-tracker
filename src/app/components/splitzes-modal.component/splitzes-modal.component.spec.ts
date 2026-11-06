@@ -56,7 +56,7 @@ async function setup(
       },
       {
         provide: SplitzSettlementService,
-        useValue: { getHistoryQuery: () => ({ isPending: () => false, data: () => [] }) },
+        useValue: { getHistoryQuery: () => ({ isPending: () => false, isError: () => false, data: () => [] }) },
       },
     ],
   }).compileComponents();

@@ -1,4 +1,13 @@
-import { Component, ElementRef, computed, inject, input, model, output, signal } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  computed,
+  inject,
+  input,
+  model,
+  output,
+  signal,
+} from '@angular/core';
 import { DecimalPipe } from '@angular/common';
 import type { Adjustment } from '../../models/adjustments.model';
 import { AdjustmentCardComponent } from '../adjustment-card.component/adjustment-card.component';
@@ -19,55 +28,62 @@ import { SinglesType, filterSingles, singleYears, singlesTotals } from './single
     @if (adjustments().length) {
       <!-- Totals for the current filters -->
       @if (filtered().length) {
-      <section
-        data-testid="singles-totals"
-        aria-label="One-offs summary"
-        class="rounded-2xl border border-ink/10 bg-panel px-5 py-4 shadow-[inset_0_1px_0_rgb(241_230_210/0.06)]"
-      >
-        <p class="text-[13px] text-ink-2">
-          {{ totals().count }} one-off{{ totals().count !== 1 ? 's' : '' }} · {{ year() ?? 'all years' }}
-        </p>
-        @switch (type()) {
-          @case ('addition') {
-            <p class="mt-2 type-wide text-[32px] font-bold leading-none text-avocado" appSensitive>
-              +€{{ totals().incoming | number: '1.2-2' }}
-            </p>
-            <p class="mt-1.5 text-[12px] text-ink-3">Income</p>
+        <section
+          data-testid="singles-totals"
+          aria-label="One-offs summary"
+          class="rounded-2xl border border-ink/10 bg-panel px-5 py-4 shadow-[inset_0_1px_0_rgb(241_230_210/0.06)]"
+        >
+          <p class="text-[13px] text-ink-2">
+            {{ totals().count }} one-off{{ totals().count !== 1 ? 's' : '' }} ·
+            {{ year() ?? 'all years' }}
+          </p>
+          @switch (type()) {
+            @case ('addition') {
+              <p
+                class="mt-2 type-wide text-[32px] font-bold leading-none text-avocado"
+                appSensitive
+              >
+                +€{{ totals().incoming | number: '1.2-2' }}
+              </p>
+              <p class="mt-1.5 text-[12px] text-ink-3">Income</p>
+            }
+            @case ('subtraction') {
+              <p class="mt-2 type-wide text-[32px] font-bold leading-none text-ink" appSensitive>
+                €{{ totals().outgoing | number: '1.2-2' }}
+              </p>
+              <p class="mt-1.5 text-[12px] text-ink-3">Spent</p>
+            }
+            @default {
+              <dl class="mt-3 grid grid-cols-3 gap-3">
+                <div>
+                  <dt class="text-[12px] text-ink-3">In</dt>
+                  <dd
+                    class="mt-1 type-wide text-[15px] font-semibold text-avocado"
+                    appSensitive="sm"
+                  >
+                    €{{ totals().incoming | number: '1.2-2' }}
+                  </dd>
+                </div>
+                <div>
+                  <dt class="text-[12px] text-ink-3">Out</dt>
+                  <dd class="mt-1 type-wide text-[15px] font-semibold text-ink" appSensitive="sm">
+                    €{{ totals().outgoing | number: '1.2-2' }}
+                  </dd>
+                </div>
+                <div>
+                  <dt class="text-[12px] text-ink-3">Net</dt>
+                  <dd
+                    class="mt-1 type-wide text-[15px] font-semibold"
+                    [class]="totals().net >= 0 ? 'text-avocado' : 'text-cherry'"
+                    appSensitive="sm"
+                  >
+                    {{ totals().net < 0 ? '−' : '' }}€{{ absNet() | number: '1.2-2' }}
+                  </dd>
+                </div>
+              </dl>
+            }
           }
-          @case ('subtraction') {
-            <p class="mt-2 type-wide text-[32px] font-bold leading-none text-ink" appSensitive>
-              €{{ totals().outgoing | number: '1.2-2' }}
-            </p>
-            <p class="mt-1.5 text-[12px] text-ink-3">Spent</p>
-          }
-          @default {
-            <dl class="mt-3 grid grid-cols-3 gap-3">
-              <div>
-                <dt class="text-[12px] text-ink-3">In</dt>
-                <dd class="mt-1 type-wide text-[15px] font-semibold text-avocado" appSensitive="sm">
-                  €{{ totals().incoming | number: '1.2-2' }}
-                </dd>
-              </div>
-              <div>
-                <dt class="text-[12px] text-ink-3">Out</dt>
-                <dd class="mt-1 type-wide text-[15px] font-semibold text-ink" appSensitive="sm">
-                  €{{ totals().outgoing | number: '1.2-2' }}
-                </dd>
-              </div>
-              <div>
-                <dt class="text-[12px] text-ink-3">Net</dt>
-                <dd
-                  class="mt-1 type-wide text-[15px] font-semibold"
-                  [class]="totals().net >= 0 ? 'text-avocado' : 'text-cherry'"
-                  appSensitive="sm"
-                >
-                  {{ totals().net < 0 ? '−' : '' }}€{{ absNet() | number: '1.2-2' }}
-                </dd>
-              </div>
-            </dl>
-          }
-        }
-      </section>
+        </section>
       }
 
       <!-- Filters -->
@@ -78,7 +94,11 @@ import { SinglesType, filterSingles, singleYears, singlesTotals } from './single
               type="button"
               [attr.data-testid]="option.testId"
               class="min-h-11 rounded-[10px] px-3.5 text-[13px] font-medium transition-colors cursor-pointer"
-              [class]="type() === option.value ? 'bg-ember/20 text-ink ring-1 ring-inset ring-ember/60' : 'text-ink-3 hover:text-ink'"
+              [class]="
+                type() === option.value
+                  ? 'bg-ember/20 text-ink ring-1 ring-inset ring-ember/60'
+                  : 'text-ink-3 hover:text-ink'
+              "
               [attr.aria-pressed]="type() === option.value"
               (click)="type.set(option.value)"
             >
@@ -93,7 +113,11 @@ import { SinglesType, filterSingles, singleYears, singlesTotals } from './single
             data-testid="year-toggle"
             (click)="toggleYearMenu()"
             class="flex min-h-11 items-center gap-1 rounded-xl border px-3.5 text-[13px] font-medium transition-colors cursor-pointer"
-            [class]="year() !== null ? 'border-ember text-ember-ink' : 'border-edge text-ink-2 hover:text-ink'"
+            [class]="
+              year() !== null
+                ? 'border-ember text-ember-ink'
+                : 'border-edge text-ink-2 hover:text-ink'
+            "
             aria-haspopup="menu"
             [attr.aria-expanded]="yearMenuOpen()"
           >
@@ -114,7 +138,11 @@ import { SinglesType, filterSingles, singleYears, singlesTotals } from './single
           </button>
 
           @if (yearMenuOpen()) {
-            <div role="menu" data-testid="year-menu" [class]="menuPanel + ' !w-40 flex flex-col gap-1 !p-2'">
+            <div
+              role="menu"
+              data-testid="year-menu"
+              [class]="menuPanel + ' !w-40 flex flex-col gap-1 !p-2'"
+            >
               <button
                 type="button"
                 role="menuitemradio"

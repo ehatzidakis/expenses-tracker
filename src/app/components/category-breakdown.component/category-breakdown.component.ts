@@ -10,6 +10,7 @@ import { EditTransactionComponent } from '../edit-transaction.component/edit-tra
 import { SheetComponent } from '../sheet/sheet';
 import { Transaction } from '../../models/transaction.model';
 import { STATUS_RANK, budgetStatus, categoryLabel } from '../../utils/period-pace';
+import { SEGMENT_BASE, SEGMENT_FRAME, SEGMENT_OFF, SEGMENT_ON } from '../../utils/pill-styles';
 
 @Component({
   selector: 'app-category-breakdown',
@@ -27,13 +28,12 @@ import { STATUS_RANK, budgetStatus, categoryLabel } from '../../utils/period-pac
           <div
             role="group"
             aria-label="Group by"
-            class="inline-flex rounded-xl border border-edge p-0.5"
+            [class]="segmentFrame + ' grid-cols-2'"
           >
             @for (mode of modes; track mode.id) {
               <button
                 type="button"
-                class="min-h-11 rounded-[10px] px-3.5 text-[13px] font-medium transition-colors cursor-pointer"
-                [class]="viewMode() === mode.id ? 'bg-ember/20 text-ink ring-1 ring-inset ring-ember/60' : 'text-ink-3 hover:text-ink'"
+                [class]="segment(viewMode() === mode.id) + ' px-3.5'"
                 [attr.aria-pressed]="viewMode() === mode.id"
                 (click)="viewMode.set(mode.id)"
               >
@@ -118,6 +118,12 @@ import { STATUS_RANK, budgetStatus, categoryLabel } from '../../utils/period-pac
   `,
 })
 export class CategoryBreakdownComponent {
+  protected readonly segmentFrame = SEGMENT_FRAME;
+
+  segment(active: boolean): string {
+    return `${SEGMENT_BASE} ${active ? SEGMENT_ON : SEGMENT_OFF}`;
+  }
+
   private readonly transactionService = inject(TransactionService);
 
   readonly categories = input.required<CategorySpend[]>();
@@ -134,17 +140,6 @@ export class CategoryBreakdownComponent {
   ];
 
   readonly showMonthView = computed(() => this.months().length > 0);
-
-  readonly budgetTitle = computed(() => {
-    const month = this.monthName().trim();
-
-    if (!month || month.toLowerCase() === 'all time') {
-      return 'All-Time Budget';
-    }
-
-    const monthOnly = month.replace(/\s+\d{4}\s*$/, '').trim();
-    return `${monthOnly}'s Budget`;
-  });
 
   readonly expandedCategory = signal<string | null>(null);
   readonly selectedTransaction = signal<Transaction | null>(null);

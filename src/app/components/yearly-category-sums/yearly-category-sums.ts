@@ -14,27 +14,22 @@ interface YearlyCategorySum {
   standalone: true,
   imports: [CommonModule, SensitiveDirective],
   host: { class: 'block' },
-  template: `<div class="mt-3 pt-3 border-t border-raised/60 space-y-1">
+  template: `
     @if (yearlyTotals().length) {
-      @for (entry of yearlyTotals(); track entry.year) {
-        <div
-          class="w-full text-left p-3.5 border border-raised/80 bg-panel/60 rounded-xl flex items-center justify-between transition-colors"
-        >
-          <div class="min-w-0">
-            <span class="text-xs font-medium text-ink truncate block"
-              >Total spend for {{ entry.year }}</span
-            >
-            <!-- <span class="text-[11px] text-ink-3 block mt-0.5">Category total</span> -->
-          </div>
-          <span class="text-xs font-semibold text-ink shrink-0 ml-2 tabular-nums" appSensitive>
-            €{{ entry.total | number: '1.2-2' }}
-          </span>
-        </div>
-      }
+      <ul class="divide-y divide-ink/10 border-y border-ink/10">
+        @for (entry of yearlyTotals(); track entry.year) {
+          <li class="flex min-h-11 items-center justify-between gap-3 py-2.5">
+            <span class="text-[14px] text-ink">Spent in {{ entry.year }}</span>
+            <span class="shrink-0 text-[13px] font-medium text-ink tabular-nums" appSensitive="xs">
+              €{{ entry.total | number: '1.2-2' }}
+            </span>
+          </li>
+        }
+      </ul>
     } @else {
-      <div class="text-center text-xs text-ink-3 py-4">No yearly data found.</div>
+      <p class="py-4 text-[13px] text-ink-3">No yearly data yet.</p>
     }
-  </div> `,
+  `,
 })
 export class YearlyCategorySumsComponent {
   private readonly expenseState = inject(ExpenseStateService);

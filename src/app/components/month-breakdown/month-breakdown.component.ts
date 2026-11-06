@@ -17,66 +17,54 @@ interface MonthSummary {
   standalone: true,
   imports: [CommonModule, SensitiveDirective],
   template: `
-    <div class="space-y-2">
+    <ul class="divide-y divide-ink/10 border-y border-ink/10">
       @for (month of monthSummaries(); track month.name) {
-        <article class="space-y-3 rounded-xl border border-raised/60 bg-ember-soft/5 px-3 py-3">
-          <div class="flex items-center justify-between gap-3">
-            <h3 class="font-medium text-sm text-ink">{{ month.name }}</h3>
-            <span class="text-xs text-ink-3 tabular-nums" appSensitive>
-              Wage €{{ month.wage | number: '1.2-2' }}
+        <li class="py-3">
+          <div class="flex items-baseline justify-between gap-3">
+            <h3 class="text-[15px] font-medium text-ink">{{ month.name }}</h3>
+            <span
+              class="saved-amount shrink-0 text-[14px] font-medium tabular-nums"
+              [class.text-avocado-ink]="month.saved >= 0"
+              [class.text-cherry]="month.saved < 0"
+              appSensitive="xs"
+            >
+              {{ month.saved < 0 ? '−' : '' }}€{{ abs(month.saved) | number: '1.2-2' }} saved
             </span>
           </div>
-          <div class="grid grid-cols-2 gap-3">
-            <div>
-              <span class="block text-[11px] uppercase tracking-wider text-ink-3">Saved</span>
-              <span
-                class="saved-amount text-xl font-semibold tabular-nums"
-                [class.text-avocado-ink]="month.saved >= 0"
-                [class.text-cherry]="month.saved < 0"
-                appSensitive
-              >
-                €{{ month.saved | number: '1.2-2' }}
-              </span>
-            </div>
-            <div class="text-right">
-              <span class="block text-[11px] uppercase tracking-wider text-ink-3">Spend</span>
-              <span class="text-lg font-medium text-ink tabular-nums" appSensitive>
-                €{{ month.spend | number: '1.2-2' }}
-              </span>
-            </div>
-          </div>
+          <p class="mt-0.5 text-[12px] text-ink-3 tabular-nums" appSensitive="xs">
+            Spent €{{ month.spend | number: '1.2-2' }} · Wage €{{ month.wage | number: '1.2-2' }}
+          </p>
           @if (month.adjustments.length) {
-            <div class="space-y-1 border-t border-raised/60 pt-2">
-              <span class="text-[11px] uppercase tracking-wider text-ink-3">
-                One-off adjustments
-              </span>
+            <ul class="mt-1.5 space-y-0.5">
               @for (adjustment of month.adjustments; track adjustment.id) {
-                <div class="flex items-center justify-between gap-2 text-xs">
-                  <span class="min-w-0 truncate text-ink-2">{{ adjustment.title }}</span>
+                <li class="flex items-baseline justify-between gap-2 text-[12px]">
+                  <span class="min-w-0 truncate text-ink-2">
+                    {{ adjustment.title }}
+                    <span class="text-ink-3">· {{ adjustment.endDate | date: 'd MMM' }}</span>
+                  </span>
                   <span
                     class="shrink-0 tabular-nums"
-                    [class.text-avocado-ink]="adjustment.adjType"
-                    [class.text-cherry]="!adjustment.adjType"
+                    [class]="adjustment.adjType ? 'text-avocado-ink' : 'text-ink-2'"
+                    appSensitive="xs"
                   >
-                    <span appSensitive
-                      >{{ adjustment.adjType ? '+' : '-' }}€{{
-                        adjustment.amount | number: '1.2-2'
-                      }}</span
-                    >
-                    <span class="text-ink-3">{{ adjustment.endDate | date: 'dd/MM/yyyy' }}</span>
+                    {{ adjustment.adjType ? '+' : '−' }}€{{ adjustment.amount | number: '1.2-2' }}
                   </span>
-                </div>
+                </li>
               }
-            </div>
+            </ul>
           }
-        </article>
+        </li>
       } @empty {
-        <p class="py-4 text-center text-xs text-ink-3">No completed months yet.</p>
+        <li class="py-6 text-[13px] text-ink-3">No completed months yet.</li>
       }
-    </div>
+    </ul>
   `,
 })
 export class MonthBreakdownComponent {
+  abs(value: number): number {
+    return Math.abs(value);
+  }
+
   private static readonly monthIndexes: Record<string, number> = {
     January: 0,
     February: 1,

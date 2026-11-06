@@ -68,7 +68,7 @@ describe('EditTransactionComponent', () => {
     expect(amountInput().readOnly).toBe(true);
     expect(fixture.nativeElement.querySelector('app-split-fields')).toBeNull();
     expect(fixture.nativeElement.textContent).toContain('amounts locked');
-    expect(fixture.nativeElement.textContent).toContain('✓ settled');
+    expect(fixture.nativeElement.querySelector('.debt-settled')?.textContent).toContain('Settled');
   });
 
   it('keeps a trip-only category when it is picked on a trip transaction', async () => {

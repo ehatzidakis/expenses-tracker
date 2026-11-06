@@ -2,6 +2,8 @@ import { Component, input, output } from '@angular/core';
 import { FieldTree, FormField } from '@angular/forms/signals';
 import { EditAmountFieldComponent } from '../edit-form/edit-amount-field.component';
 import { DateStepperComponent } from '../date-stepper/date-stepper.component';
+import { FIELD, FIELD_ERROR, FIELD_LABEL } from '../../utils/pill-styles';
+import { friendlyDate } from '../../utils/period-pace';
 
 @Component({
   selector: 'app-adjustment-edit-fields',
@@ -11,7 +13,7 @@ import { DateStepperComponent } from '../date-stepper/date-stepper.component';
   template: `
     <div class="space-y-4">
       <div class="space-y-1.5">
-        <label for="adj-edit-description" class="text-xs font-medium text-ink-2"
+        <label for="adj-edit-description" [class]="fieldLabel"
           >Description</label
         >
         <input
@@ -19,10 +21,10 @@ import { DateStepperComponent } from '../date-stepper/date-stepper.component';
           type="text"
           placeholder="e.g. Annual Bonus"
           [formField]="descriptionField()"
-          class="w-full bg-raised/60 border border-raised rounded-xl px-3 py-2.5 text-sm text-ink placeholder:text-ink-4 focus:outline-none focus:ring-2 focus:ring-ember/60"
+          [class]="field"
         />
         @if (descriptionField()().touched() && descriptionField()().invalid()) {
-          <span class="text-[11px] text-cherry">
+          <span [class]="fieldError">
             {{ descriptionField()().errors()[0]?.message }}
           </span>
         }
@@ -37,38 +39,52 @@ import { DateStepperComponent } from '../date-stepper/date-stepper.component';
 
       <div class="grid grid-cols-1 gap-3">
         <div class="space-y-1.5">
-          <label for="adj-edit-start-date" class="text-xs font-medium text-ink-2"
-            >Start Date</label
+          <label for="adj-edit-start-date" [class]="fieldLabel"
+            >Start date</label
           >
           <app-date-stepper size="sm">
-            <input
-              #dateInput
-              id="adj-edit-start-date"
-              type="date"
-              [formField]="startDateField()"
-              class="flex-1 min-w-0 appearance-none scheme-dark bg-raised/60 border border-raised rounded-xl px-2 py-2.5 text-xs text-ink focus:outline-none focus:ring-2 focus:ring-ember/60"
-            />
+            <div class="relative min-w-0 flex-1">
+              <input
+                #dateInput
+                id="adj-edit-start-date"
+                type="date"
+                [formField]="startDateField()"
+                [class]="field + ' scheme-dark text-transparent [-webkit-text-fill-color:transparent]'"
+              />
+              <span
+                class="pointer-events-none absolute inset-0 flex items-center px-3.5 text-[15px] text-ink"
+                aria-hidden="true"
+                >{{ dateLabel(startDateField()().value()) }}</span
+              >
+            </div>
           </app-date-stepper>
           @if (startDateField()().touched() && startDateField()().invalid()) {
-            <span class="text-[11px] text-cherry">
+            <span [class]="fieldError">
               {{ startDateField()().errors()[0]?.message }}
             </span>
           }
         </div>
 
         <div class="space-y-1.5">
-          <label for="adj-edit-end-date" class="text-xs font-medium text-ink-2">End Date</label>
+          <label for="adj-edit-end-date" [class]="fieldLabel">End date</label>
           <app-date-stepper size="sm">
-            <input
-              #dateInput
-              id="adj-edit-end-date"
-              type="date"
-              [formField]="endDateField()"
-              class="flex-1 min-w-0 appearance-none scheme-dark bg-raised/60 border border-raised rounded-xl px-2 py-2.5 text-xs text-ink focus:outline-none focus:ring-2 focus:ring-ember/60"
-            />
+            <div class="relative min-w-0 flex-1">
+              <input
+                #dateInput
+                id="adj-edit-end-date"
+                type="date"
+                [formField]="endDateField()"
+                [class]="field + ' scheme-dark text-transparent [-webkit-text-fill-color:transparent]'"
+              />
+              <span
+                class="pointer-events-none absolute inset-0 flex items-center px-3.5 text-[15px] text-ink"
+                aria-hidden="true"
+                >{{ dateLabel(endDateField()().value()) }}</span
+              >
+            </div>
           </app-date-stepper>
           @if (endDateField()().touched() && endDateField()().invalid()) {
-            <span class="text-[11px] text-cherry">
+            <span [class]="fieldError">
               {{ endDateField()().errors()[0]?.message }}
             </span>
           }
@@ -78,6 +94,14 @@ import { DateStepperComponent } from '../date-stepper/date-stepper.component';
   `,
 })
 export class AdjustmentEditFieldsComponent {
+  dateLabel(isoDate: string): string {
+    return friendlyDate(isoDate) || 'Pick a date';
+  }
+
+  protected readonly field = FIELD;
+  protected readonly fieldLabel = FIELD_LABEL;
+  protected readonly fieldError = FIELD_ERROR;
+
   readonly amount = input.required<number>();
   readonly descriptionField = input.required<FieldTree<string>>();
   readonly amountField = input.required<FieldTree<number>>();

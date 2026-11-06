@@ -8,6 +8,7 @@ import {
   SplitzSettlementDialogComponent,
 } from './splitz-settlement-dialog.component';
 import { SplitzPersonCardComponent } from './splitz-person-card.component';
+import { BUTTON_SECONDARY, ERROR_WELL, SUCCESS_WELL } from '../../utils/pill-styles';
 
 @Component({
   selector: 'app-splitz-balances',
@@ -17,32 +18,27 @@ import { SplitzPersonCardComponent } from './splitz-person-card.component';
   template: `
     <div class="space-y-3">
       @if (message(); as text) {
-        <p
-          role="status"
-          class="p-3 rounded-xl text-xs border"
-          [class.bg-ember-deep/30]="!messageIsError()"
-          [class.border-ember-deep/40]="!messageIsError()"
-          [class.text-ember-ink]="!messageIsError()"
-          [class.bg-cherry-deep/40]="messageIsError()"
-          [class.border-cherry-deep/60]="messageIsError()"
-          [class.text-cherry]="messageIsError()"
-        >
+        <p [attr.role]="messageIsError() ? 'alert' : 'status'" [class]="messageIsError() ? errorWell : successWell">
           {{ text }}
         </p>
       }
 
       @if (splitTxQuery.isPending()) {
-        <div class="space-y-2 animate-pulse">
+        <ul class="animate-pulse divide-y divide-ink/10" aria-label="Loading balances">
           @for (item of [1, 2, 3]; track item) {
-            <div class="h-16 rounded-xl bg-raised/60"></div>
+            <li class="flex items-center gap-3 py-3">
+              <span class="size-9 rounded-full bg-raised"></span>
+              <span class="h-4 w-24 rounded bg-raised"></span>
+            </li>
           }
-        </div>
+        </ul>
       } @else if (splitTxQuery.isError()) {
-        <p class="p-3 bg-cherry-deep/40 border border-cherry-deep/60 text-cherry rounded-xl text-xs">
-          Unable to load split data.
-        </p>
+        <div class="flex flex-col items-start gap-3">
+          <p role="alert" [class]="errorWell">Couldn't load the balances. Check your connection and try again.</p>
+          <button type="button" [class]="secondary" (click)="splitTxQuery.refetch()">Try again</button>
+        </div>
       } @else {
-        <div class="space-y-2">
+        <div class="divide-y divide-ink/10 border-y border-ink/10">
           @for (summary of personSummaries(); track summary.person.id) {
             <app-splitz-person-card
               [summary]="summary"
@@ -65,6 +61,10 @@ import { SplitzPersonCardComponent } from './splitz-person-card.component';
   `,
 })
 export class SplitzBalancesComponent {
+  protected readonly errorWell = ERROR_WELL;
+  protected readonly secondary = BUTTON_SECONDARY;
+  protected readonly successWell = SUCCESS_WELL;
+
   private readonly splitzService = inject(SplitzService);
   private readonly settlementService = inject(SplitzSettlementService);
   private readonly queryClient = inject(QueryClient);

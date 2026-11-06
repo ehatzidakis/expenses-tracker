@@ -1,7 +1,17 @@
 import { Component, ElementRef, effect, input, output, signal, viewChild } from '@angular/core';
+import { DatePipe } from '@angular/common';
 import { DebtEntry } from '../../models/splitz.model';
 import { participantName } from './pending-review.model';
 import { SensitiveDirective } from '../../utils/sensitive.directive';
+import {
+  BUTTON_PRIMARY,
+  DIALOG,
+  DIALOG_PANEL,
+  ERROR_WELL,
+  FIELD,
+  FIELD_LABEL,
+  BUTTON_SECONDARY_LG,
+} from '../../utils/pill-styles';
 export interface SettlementConfirmation {
   personId: number;
   debts: DebtEntry[];
@@ -11,126 +21,123 @@ export interface SettlementConfirmation {
 @Component({
   selector: 'app-splitz-settlement-dialog',
   standalone: true,
-  imports: [SensitiveDirective],
+  imports: [DatePipe, SensitiveDirective],
   template: `
     <dialog
       #dialog
       (cancel)="$event.preventDefault(); cancelled.emit()"
       aria-labelledby="settlement-title"
-      class="m-auto outline-none focus:outline-none w-[calc(100%-2rem)] max-w-md max-h-[85vh] bg-transparent p-0 text-current backdrop:bg-black/75 backdrop:backdrop-blur-xs"
+      [class]="dialogClass"
     >
       @if (confirmation(); as c) {
-        <div
-          class="bg-panel border border-raised/90 rounded-2xl p-5 space-y-4 shadow-2xl animate-fade-in"
-        >
+        <div [class]="panelClass + ' max-h-[85dvh] overflow-y-auto'">
           <div class="flex items-start justify-between gap-3">
-            <div>
-              <h3 id="settlement-title" class="text-sm font-semibold text-ink">
+            <div class="min-w-0">
+              <h3 id="settlement-title" class="type-wide text-[18px] font-semibold text-ink">
                 Settle up with {{ name(c.personId) }}
               </h3>
-              <p class="text-xs text-ink-2 mt-1">Marks every open split between you as paid.</p>
+              <p class="mt-1 text-[14px] text-ink-2">Marks every open split between you as paid.</p>
             </div>
             <button
               type="button"
               (click)="cancelled.emit()"
               aria-label="Close settlement confirmation"
-              class="h-8 w-8 shrink-0 rounded-full bg-raised hover:bg-edge text-ink-2 hover:text-ink flex items-center justify-center text-sm cursor-pointer transition-colors"
+              class="-mr-2 -mt-1 flex size-11 shrink-0 items-center justify-center rounded-full text-ink-2 transition-colors hover:text-ink cursor-pointer"
             >
-              ✕
+              <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
+                <path d="M6 6l12 12M18 6L6 18" />
+              </svg>
             </button>
           </div>
 
-          <div class="p-4 rounded-xl bg-ground/60 border border-raised text-center">
-            <p class="text-3xl font-bold tabular-nums text-ink" appSensitive>
+          <div class="mt-5">
+            <p class="type-wide text-[clamp(30px,9vw,40px)] font-bold leading-none tracking-[-0.02em] text-ink" appSensitive>
               €{{ abs(c.netWithMe).toFixed(2) }}
             </p>
-            <p
-              class="mt-1 text-xs font-medium"
-              [class.text-avocado-ink]="c.netWithMe > 0"
-              [class.text-ember-soft]="c.netWithMe < 0"
-            >
+            <p class="mt-2 text-[13px]" [class]="c.netWithMe > 0 ? 'font-medium text-avocado-ink' : 'text-ink-2'">
               {{ c.netWithMe > 0 ? name(c.personId) + ' owes you' : 'You owe ' + name(c.personId) }}
             </p>
           </div>
 
-          <div class="rounded-xl border border-raised/80 bg-ground/30 p-3">
+          <div class="mt-4 border-y border-ink/10">
             <button
               type="button"
               (click)="showTransactions.update((value) => !value)"
               [attr.aria-expanded]="showTransactions()"
-              class="w-full flex items-center justify-between text-left text-xs font-medium text-ink cursor-pointer"
+              class="flex min-h-12 w-full items-center justify-between gap-3 text-left cursor-pointer"
             >
-              <span>Transactions included ({{ c.debts.length }})</span>
-              <span class="text-ink-2">{{ showTransactions() ? 'Hide' : 'Show' }}</span>
+              <span class="text-[14px] font-medium text-ink-2">Transactions included ({{ c.debts.length }})</span>
+              <svg
+                class="size-3.5 shrink-0 text-ink-3 transition-transform duration-200"
+                [class.rotate-180]="showTransactions()"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+                aria-hidden="true"
+              >
+                <path
+                  fill-rule="evenodd"
+                  clip-rule="evenodd"
+                  d="M5.23 7.21a.75.75 0 011.06.02L10 11.17l3.71-3.94a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z"
+                />
+              </svg>
             </button>
 
             @if (showTransactions()) {
-              <div class="mt-3 max-h-60 overflow-y-auto space-y-2 border-t border-raised/70 pt-3">
+              <ul class="max-h-60 divide-y divide-ink/10 overflow-y-auto border-t border-ink/10">
                 @for (
                   debt of c.debts;
                   track debt.transactionId + '-' + debt.debtorId + '-' + debt.creditorId
                 ) {
-                  <div
-                    class="settlement-transaction-card rounded-lg border px-3 py-2"
-                    [class.border-avocado/40]="debt.creditorId === 'me'"
-                    [class.bg-avocado-deep/30]="debt.creditorId === 'me'"
-                    [class.border-ember/40]="debt.creditorId !== 'me'"
-                    [class.bg-ember-deep/30]="debt.creditorId !== 'me'"
+                  <li
+                    class="settlement-debt-row flex items-start justify-between gap-3 py-2.5"
+                    [attr.data-payer]="debt.creditorId === 'me' ? 'me' : 'them'"
                   >
-                    <div class="flex items-start justify-between gap-3">
-                      <div class="min-w-0">
-                        <p class="truncate text-xs text-ink">{{ debt.description }}</p>
-                        <p class="mt-0.5 text-[11px] text-ink-3">
-                          {{ debt.date }} · {{ payerLabel(debt.creditorId) }} paid
-                        </p>
-                      </div>
-                      <div class="shrink-0 text-right tabular-nums">
-                        <p class="text-xs font-semibold text-ink" appSensitive>
-                          Owed: €{{ debt.amount.toFixed(2) }}
-                        </p>
-                        <p class="mt-0.5 text-[11px] text-ink-3" appSensitive>
-                          Full amount: €{{ debt.transactionTotalAmount.toFixed(2) }}
-                        </p>
-                      </div>
+                    <div class="min-w-0">
+                      <p class="truncate text-[14px] text-ink">{{ debt.description }}</p>
+                      <p class="mt-0.5 text-[12px] text-ink-3">
+                        {{ debt.date | date: 'd MMM' }} · {{ payerLabel(debt.creditorId) }} paid
+                      </p>
                     </div>
-                  </div>
+                    <div class="shrink-0 text-right tabular-nums">
+                      <p
+                        class="settlement-owed text-[13px] font-medium"
+                        [class]="debt.creditorId === 'me' ? 'text-avocado-ink' : 'text-ink'"
+                        appSensitive="xs"
+                      >
+                        {{ debt.creditorId === 'me' ? 'Owes you' : 'You owe' }} €{{ debt.amount.toFixed(2) }}
+                      </p>
+                      <p class="mt-0.5 text-[12px] text-ink-3" appSensitive="xs">
+                        Full amount: €{{ debt.transactionTotalAmount.toFixed(2) }}
+                      </p>
+                    </div>
+                  </li>
                 }
-              </div>
+              </ul>
             }
           </div>
 
-          <textarea
-            rows="2"
-            [value]="note()"
-            (input)="note.set($any($event.target).value)"
-            placeholder="Optional note"
-            class="w-full bg-raised/60 border border-raised rounded-xl px-3 py-2.5 text-sm text-ink placeholder:text-ink-4 focus:outline-none focus:ring-2 focus:ring-ember/60 resize-none"
-          ></textarea>
+          <div class="mt-4 flex flex-col gap-1.5">
+            <label for="settlement-note" [class]="fieldLabel">Note (optional)</label>
+            <textarea
+              id="settlement-note"
+              rows="2"
+              [value]="note()"
+              (input)="note.set($any($event.target).value)"
+              placeholder="For example: paid by bank transfer"
+              [class]="field + ' resize-none py-3'"
+            ></textarea>
+          </div>
 
           @if (error()) {
-            <p
-              role="alert"
-              class="p-3 bg-cherry-deep/40 border border-cherry-deep/60 text-cherry rounded-xl text-xs"
-            >
-              {{ error() }}
-            </p>
+            <p role="alert" [class]="errorWell + ' mt-4'">{{ error() }}</p>
           }
 
-          <div class="flex items-center gap-2">
-            <button
-              type="button"
-              (click)="cancelled.emit()"
-              class="flex-1 py-2.5 rounded-xl text-xs font-semibold text-ink-2 bg-raised border border-edge/80 active:scale-[0.98] transition-all cursor-pointer"
-            >
+          <div class="mt-5 grid grid-cols-2 gap-3">
+            <button type="button" [class]="secondaryLg" (click)="cancelled.emit()">
               Cancel
             </button>
-            <button
-              type="button"
-              (click)="confirmed.emit(note())"
-              [disabled]="busy()"
-              class="flex-1 py-2.5 rounded-xl text-xs font-semibold text-ground bg-ember shadow-lg disabled:opacity-40 disabled:cursor-not-allowed active:scale-[0.98] transition-all cursor-pointer"
-            >
-              {{ busy() ? 'Settling…' : 'Confirm settlement' }}
+            <button type="button" [class]="primary" [disabled]="busy()" (click)="confirmed.emit(note())">
+              {{ busy() ? 'Settling…' : 'Confirm' }}
             </button>
           </div>
         </div>
@@ -139,6 +146,14 @@ export interface SettlementConfirmation {
   `,
 })
 export class SplitzSettlementDialogComponent {
+  protected readonly secondaryLg = BUTTON_SECONDARY_LG;
+  protected readonly dialogClass = DIALOG;
+  protected readonly panelClass = DIALOG_PANEL;
+  protected readonly field = FIELD;
+  protected readonly fieldLabel = FIELD_LABEL;
+  protected readonly errorWell = ERROR_WELL;
+  protected readonly primary = BUTTON_PRIMARY;
+
   readonly confirmation = input<SettlementConfirmation | null>(null);
   readonly busy = input(false);
   readonly error = input<string | null>(null);

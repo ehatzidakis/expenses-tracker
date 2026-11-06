@@ -1,4 +1,5 @@
 import { Component, computed, input, output } from '@angular/core';
+import { SEGMENT_BASE, SEGMENT_FRAME, SEGMENT_OFF, SEGMENT_ON } from '../../utils/pill-styles';
 
 export type SplitzesTab = 'balances' | 'incoming' | 'history';
 
@@ -7,39 +8,35 @@ export type SplitzesTab = 'balances' | 'incoming' | 'history';
   standalone: true,
   host: { class: 'block' },
   template: `
-    <div
-      class="relative flex bg-ground/80 p-1 rounded-xl border border-raised/80"
-      role="tablist"
-    >
+    <div role="tablist" aria-label="Splitzes" [class]="frame + ' ' + (tabs().length === 3 ? 'grid-cols-3' : 'grid-cols-2')">
       @for (tab of tabs(); track tab.id) {
         <button
           type="button"
           role="tab"
           [attr.aria-selected]="activeTab() === tab.id"
+          [class]="segment(activeTab() === tab.id) + ' flex items-center justify-center gap-1.5'"
           (click)="tabChange.emit(tab.id)"
-          class="relative z-10 flex-1 py-1.5 text-xs font-semibold transition-colors duration-200 text-center rounded-lg cursor-pointer flex items-center justify-center gap-1.5"
-          [class.text-ink]="activeTab() === tab.id"
-          [class.text-ink-2]="activeTab() !== tab.id"
         >
           {{ tab.label }}
           @if (tab.id === 'incoming' && incomingCount() > 0) {
             <span
-              class="min-w-4 h-4 px-1 rounded-full bg-ember text-[11px] leading-4 text-ground tabular-nums"
+              class="min-w-5 rounded-full bg-cherry-fill px-1.5 text-[11px] font-semibold leading-5 text-ink tabular-nums"
             >
               {{ incomingCount() }}
             </span>
           }
         </button>
       }
-      <div
-        class="absolute top-1 bottom-1 left-1 bg-ember/90 rounded-lg transition-transform duration-200 ease-out"
-        [style.width]="indicatorWidth()"
-        [style.transform]="indicatorTransform()"
-      ></div>
     </div>
   `,
 })
 export class SplitzesTabsComponent {
+  protected readonly frame = SEGMENT_FRAME;
+
+  segment(active: boolean): string {
+    return `${SEGMENT_BASE} ${active ? SEGMENT_ON : SEGMENT_OFF}`;
+  }
+
   readonly activeTab = input.required<SplitzesTab>();
   readonly showIncoming = input(false);
   readonly incomingCount = input(0);
@@ -51,12 +48,4 @@ export class SplitzesTabsComponent {
     { id: 'history', label: 'History' },
   ]);
 
-  readonly indicatorWidth = computed(() => `calc((100% - 8px) / ${this.tabs().length})`);
-  readonly indicatorTransform = computed(() => {
-    const index = Math.max(
-      0,
-      this.tabs().findIndex((tab) => tab.id === this.activeTab()),
-    );
-    return `translateX(${index * 100}%)`;
-  });
 }

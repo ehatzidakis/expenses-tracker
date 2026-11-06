@@ -148,17 +148,27 @@ import {
                       <p class="text-[13px] text-ink-3">No open trips. Open one from the One-off tab.</p>
                     } @else {
                       <label for="tx-trip" class="sr-only">Which trip</label>
-                      <select
-                        id="tx-trip"
-                        [value]="selectedAdjustmentId()"
-                        (change)="selectedAdjustmentId.set($any($event.target).value)"
-                        [class]="field"
-                      >
-                        <option value="">Pick a trip</option>
-                        @for (trip of selectableTrips(); track trip.id) {
-                          <option [value]="trip.id">{{ trip.title }}</option>
-                        }
-                      </select>
+                      <div class="relative">
+                        <select
+                          id="tx-trip"
+                          [value]="selectedAdjustmentId()"
+                          (change)="selectedAdjustmentId.set($any($event.target).value)"
+                          [class]="field + ' appearance-none pr-10'"
+                        >
+                          <option value="">Pick a trip</option>
+                          @for (trip of selectableTrips(); track trip.id) {
+                            <option [value]="trip.id">{{ trip.title }}</option>
+                          }
+                        </select>
+                        <svg
+                          class="pointer-events-none absolute right-3.5 top-1/2 size-4 -translate-y-1/2 text-ink-3"
+                          viewBox="0 0 20 20"
+                          fill="currentColor"
+                          aria-hidden="true"
+                        >
+                          <path fill-rule="evenodd" clip-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.17l3.71-3.94a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" />
+                        </svg>
+                      </div>
                     }
                   }
                 </div>

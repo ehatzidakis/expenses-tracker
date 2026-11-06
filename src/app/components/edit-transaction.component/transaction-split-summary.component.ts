@@ -18,31 +18,27 @@ function personName(id: 'me' | number | undefined): string {
   host: { class: 'block' },
   template: `
     <div class="space-y-1.5">
-      <div class="flex items-center justify-between gap-2">
-        <span class="text-xs font-medium text-ink-2">Splitzes</span>
-        <span class="text-[11px] text-ember-soft">🔒 Partly settled — amounts locked</span>
+      <div class="flex items-baseline justify-between gap-2">
+        <span class="text-[13px] font-medium text-ink-2">Splitzes</span>
+        <span class="text-[12px] text-ink-3">Partly settled · amounts locked</span>
       </div>
 
-      <div
-        class="bg-raised/40 border border-raised rounded-xl px-3 py-2.5 text-sm text-ink-2 space-y-2"
-      >
-        <div class="flex items-center justify-between gap-3">
+      <div class="divide-y divide-ink/10 border-y border-ink/10 text-[13px] text-ink-2">
+        <div class="flex items-center justify-between gap-3 py-2.5">
           <span class="text-ink-2">{{ typeLabel() }} · paid by {{ paidByLabel() }}</span>
           <span class="tabular-nums" appSensitive>€{{ total().toFixed(2) }}</span>
         </div>
-        <div class="flex items-center justify-between gap-3">
+        <div class="flex items-center justify-between gap-3 py-2.5">
           <span class="text-ink-2">Your share</span>
           <span class="tabular-nums" appSensitive>€{{ transaction().amount.toFixed(2) }}</span>
         </div>
 
         @for (debt of debts(); track $index) {
-          <div
-            class="flex items-center justify-between gap-3 border-t border-raised pt-2 text-xs"
-          >
+          <div class="flex items-center justify-between gap-3 py-2.5">
             <span [class.text-ink-3]="debt.paid">
               {{ debt.label }}
               @if (debt.paid) {
-                <span class="text-ember-ink">✓ settled</span>
+                <span class="debt-settled ml-1 text-avocado-ink">· Settled</span>
               }
             </span>
             <span class="tabular-nums" [class.text-ink-3]="debt.paid" appSensitive

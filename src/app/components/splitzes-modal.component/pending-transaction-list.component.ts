@@ -13,86 +13,109 @@ import { SensitiveDirective } from '../../utils/sensitive.directive';
   imports: [CommonModule, SensitiveDirective],
   host: { class: 'block' },
   template: `
-    <div class="space-y-3">
-      <div class="flex items-center justify-between">
-        <p class="text-xs text-ink-2">
+    <div class="flex flex-col gap-2">
+      <div class="flex items-center justify-between gap-3">
+        <p class="text-[13px] text-ink-2">
           {{ items().length }} pending
           @if (withKioskCount() > 0) {
-            <span class="text-ember-ink/80">· {{ withKioskCount() }} with kiosk</span>
+            <span class="text-ink-3">· {{ withKioskCount() }} with kiosk</span>
           }
         </p>
         <button
           type="button"
-          (click)="refresh.emit()"
+          class="-mr-2 min-h-11 rounded-xl px-2 text-[13px] font-medium text-ink-2 transition-colors hover:text-ink disabled:cursor-not-allowed disabled:opacity-40 cursor-pointer"
           [disabled]="refreshing()"
-          class="text-xs font-medium text-ink-2 hover:text-ink disabled:opacity-50 disabled:cursor-not-allowed transition-colors cursor-pointer"
+          (click)="refresh.emit()"
         >
-          {{ refreshing() ? 'Refreshing…' : '↻ Refresh' }}
+          {{ refreshing() ? 'Refreshing…' : 'Refresh' }}
         </button>
       </div>
 
       @if (loading()) {
-        <div class="space-y-2 animate-pulse">
+        <ul class="animate-pulse divide-y divide-ink/10" aria-label="Loading incoming">
           @for (item of [1, 2, 3]; track item) {
-            <div class="h-14 rounded-xl bg-raised/60"></div>
+            <li class="py-3"><span class="block h-4 w-44 rounded bg-raised"></span></li>
           }
-        </div>
+        </ul>
       } @else if (error()) {
-        <p class="p-3 bg-cherry-deep/40 border border-cherry-deep/60 text-cherry rounded-xl text-xs">
-          Unable to load incoming transactions.
+        <p role="alert" class="rounded-xl border border-cherry/30 bg-cherry-deep/60 px-3.5 py-3 text-[13px] text-cherry">
+          Couldn't load incoming items. Check your connection and try again.
         </p>
       } @else if (items().length === 0) {
-        <div class="py-8 text-center space-y-1">
-          <p class="text-2xl">📭</p>
-          <p class="text-xs text-ink-3">Nothing to review right now.</p>
-        </div>
+        <p class="border-y border-ink/10 py-6 text-[13px] text-ink-3">Nothing to review right now.</p>
       } @else {
-        <div class="space-y-2">
+        <ul class="divide-y divide-ink/10 border-y border-ink/10">
           @for (pending of items(); track pending.id) {
-            <button
-              type="button"
-              (click)="select.emit(pending)"
-              class="pending-row w-full text-left rounded-xl border border-raised/80 bg-ground/30 px-3 py-2.5 hover:border-edge hover:bg-raised/40 transition-colors cursor-pointer"
-            >
-              <div class="flex items-center justify-between gap-3">
-                <div class="min-w-0">
-                  <div class="flex items-center gap-1.5">
-                    <span class="truncate text-xs font-medium text-ink">
-                      {{ pending.description }}
-                    </span>
+            <li>
+              <button
+                type="button"
+                class="pending-row flex min-h-14 w-full items-center justify-between gap-3 py-2.5 text-left cursor-pointer"
+                (click)="select.emit(pending)"
+              >
+                <span class="min-w-0">
+                  <span class="flex items-center gap-1.5 text-[14px] text-ink">
+                    <span class="truncate">{{ pending.description }}</span>
                     @if (pending.isSplit || pending.sourceRole === 'kiosk') {
-                      <span title="Split transaction" aria-label="Split transaction">✂️</span>
+                      <svg
+                        class="size-3.5 shrink-0 text-ink-3"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.8"
+                        stroke-linecap="round"
+                        role="img"
+                        aria-label="Split transaction"
+                      >
+                        <circle cx="6" cy="6" r="3" />
+                        <circle cx="6" cy="18" r="3" />
+                        <path d="M20 4 8.1 15.9M14.5 14.5 20 20M8.1 8.1 12 12" />
+                      </svg>
                     }
                     @if (pending.comment) {
-                      <span title="Has comment" aria-label="Has comment">💬</span>
+                      <svg
+                        class="size-3.5 shrink-0 text-ink-3"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.8"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        role="img"
+                        aria-label="Has comment"
+                      >
+                        <path d="M4 5h16v11H9l-5 4z" />
+                      </svg>
                     }
-                  </div>
-                  <div class="mt-1 flex flex-wrap gap-x-2 gap-y-0.5 text-[11px] text-ink-3">
-                    <span>{{ pending.date | date: 'dd/MM/yyyy' }}</span>
-                    <span>{{ pending.category }}</span>
-                    <span class="text-ember-soft/80">{{ sourceLabel(pending) }}</span>
+                  </span>
+                  <span class="mt-0.5 block truncate text-[12px] text-ink-3">
+                    {{ pending.date | date: 'd MMM' }} · {{ pending.category }} · {{ sourceLabel(pending) }}
                     @if (statusLabel(pending); as status) {
+                      ·
                       <span
-                        class="truncate max-w-full"
-                        [class.text-ember-ink]="pending.requestStatus === 'awaiting-kiosk'"
+                        [class.text-ink-2]="pending.requestStatus === 'awaiting-kiosk'"
                         [class.text-avocado-ink]="pending.requestStatus === 'answered'"
                         [class.text-cherry]="pending.requestStatus === 'declined'"
+                        >{{ status }}</span
                       >
-                        {{ status }}
-                      </span>
                     }
-                  </div>
-                </div>
-                <div class="flex items-center gap-2 shrink-0">
-                  <span class="text-xs font-semibold text-ink tabular-nums" appSensitive>
+                  </span>
+                </span>
+                <span class="flex shrink-0 items-center gap-2">
+                  <span class="text-[13px] font-medium text-ink tabular-nums" appSensitive="xs">
                     €{{ totalAmount(pending) | number: '1.2-2' }}
                   </span>
-                  <span class="text-ink-3" aria-hidden="true">›</span>
-                </div>
-              </div>
-            </button>
+                  <svg class="size-4 text-ink-3" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                    <path
+                      fill-rule="evenodd"
+                      clip-rule="evenodd"
+                      d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z"
+                    />
+                  </svg>
+                </span>
+              </button>
+            </li>
           }
-        </div>
+        </ul>
       }
     </div>
   `,

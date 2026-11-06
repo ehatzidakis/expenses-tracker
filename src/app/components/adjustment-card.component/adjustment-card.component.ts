@@ -31,9 +31,19 @@ function formatDateForInput(dateVal: Date | string): string {
           [class]="isAddition() ? 'text-avocado' : 'text-ink-3'"
           aria-hidden="true"
         >
-          <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <svg
+            class="size-5"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
             @if (adjustment().isTrip) {
-              <path d="M2.5 19h19M3.6 12.6l2.4 2.3 5.2-1.4L6 6.5l2.2-.6 6.9 5.4 4.2-1.1a1.6 1.6 0 0 1 .8 3.1l-13 3.5-3.6-3.4z" />
+              <path
+                d="M2.5 19h19M3.6 12.6l2.4 2.3 5.2-1.4L6 6.5l2.2-.6 6.9 5.4 4.2-1.1a1.6 1.6 0 0 1 .8 3.1l-13 3.5-3.6-3.4z"
+              />
             } @else if (isAddition()) {
               <path d="M12 19V5M6 11l6-6 6 6" />
             } @else {
@@ -47,7 +57,11 @@ function formatDateForInput(dateVal: Date | string): string {
             @if (adjustment().isTrip) {
               <span
                 class="shrink-0 rounded-md border px-1.5 py-px text-[11px] font-medium"
-                [class]="adjustment().isSelectable ? 'border-avocado/40 text-avocado' : 'border-edge text-ink-3'"
+                [class]="
+                  adjustment().isSelectable
+                    ? 'border-avocado/40 text-avocado'
+                    : 'border-edge text-ink-3'
+                "
               >
                 {{ adjustment().isSelectable ? 'Open' : 'Closed' }}
               </span>
@@ -57,7 +71,8 @@ function formatDateForInput(dateVal: Date | string): string {
             @if (isSameDay()) {
               {{ adjustment().startDate | date: 'd MMM y' }}
             } @else {
-              {{ adjustment().startDate | date: 'd MMM' }} – {{ adjustment().endDate | date: 'd MMM y' }}
+              {{ adjustment().startDate | date: 'd MMM' }} –
+              {{ adjustment().endDate | date: 'd MMM y' }}
             }
           </span>
         </span>
@@ -67,7 +82,7 @@ function formatDateForInput(dateVal: Date | string): string {
         [class]="isAddition() ? 'text-avocado' : 'text-ink'"
         appSensitive
       >
-        {{ isAddition() ? '+' : '' }}€{{ adjustment().amount | number: '1.2-2' }}
+        {{ isAddition() ? '+' : '-' }}€{{ adjustment().amount | number: '1.2-2' }}
       </span>
     </button>
   `,

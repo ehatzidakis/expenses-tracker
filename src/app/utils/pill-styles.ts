@@ -44,3 +44,29 @@ export const FIELD =
   'w-full min-h-12 rounded-xl border border-edge bg-panel px-3.5 text-ink placeholder:text-ink-4 transition-colors focus:border-ember focus-visible:outline-none';
 export const FIELD_LABEL = 'text-[13px] font-medium text-ink-2';
 export const FIELD_ERROR = 'text-[12px] text-cherry';
+
+/** Buttons. Primary is the one main action; secondary is a quiet outline; danger is a cherry outline, never a solid red fill. */
+export const BUTTON_PRIMARY =
+  'min-h-12 rounded-xl bg-ember px-4 text-[15px] font-semibold text-ground transition-[background-color,transform] duration-150 hover:bg-ember-ink active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-40 cursor-pointer';
+export const BUTTON_SECONDARY =
+  'min-h-11 rounded-xl border border-edge px-4 text-[13px] font-medium text-ink-2 transition-colors duration-150 hover:border-ink-4 hover:text-ink disabled:cursor-not-allowed disabled:opacity-40 cursor-pointer';
+/** Secondary at form size, for a Cancel beside a 48px primary or danger button. */
+export const BUTTON_SECONDARY_LG =
+  'min-h-12 rounded-xl border border-edge px-4 text-[15px] font-medium text-ink-2 transition-colors duration-150 hover:border-ink-4 hover:text-ink disabled:cursor-not-allowed disabled:opacity-40 cursor-pointer';
+/** Danger at row size, beside a 44px secondary button in a settings row. */
+export const BUTTON_DANGER_SM =
+  'min-h-11 rounded-xl border border-cherry/35 px-4 text-[13px] font-medium text-cherry transition-colors duration-150 hover:bg-cherry-deep/50 disabled:cursor-not-allowed disabled:opacity-40 cursor-pointer';
+export const BUTTON_DANGER =
+  'min-h-12 rounded-xl border border-cherry/35 px-4 text-[15px] font-medium text-cherry transition-colors duration-150 hover:bg-cherry-deep/50 disabled:cursor-not-allowed disabled:opacity-40 cursor-pointer';
+
+/** Message wells for a failed or finished action. */
+export const ERROR_WELL =
+  'rounded-xl border border-cherry/30 bg-cherry-deep/60 px-3.5 py-3 text-[13px] text-cherry';
+export const SUCCESS_WELL =
+  'rounded-xl border border-avocado/30 bg-avocado-deep/60 px-3.5 py-3 text-[13px] text-avocado-ink';
+
+/** A centred confirmation dialog on the same walnut scrim as the sheet. Pair with DIALOG_PANEL inside. */
+export const DIALOG =
+  'm-auto w-[calc(100%-2rem)] max-w-sm bg-transparent p-0 text-ink outline-none backdrop:bg-[rgb(8_5_4/0.72)] backdrop:backdrop-blur-[3px]';
+export const DIALOG_PANEL =
+  'animate-fade-in rounded-2xl border border-edge bg-panel p-5 shadow-[0_24px_60px_-20px_rgb(0_0_0/0.8)]';

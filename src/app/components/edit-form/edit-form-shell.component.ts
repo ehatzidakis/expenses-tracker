@@ -39,6 +39,7 @@ import { ConfirmModal } from '../confirm-modal/confirm-modal';
           </div>
         }
 
+        @if (showActions()) {
         <div class="pt-2 space-y-2">
           <button
             type="submit"
@@ -57,6 +58,7 @@ import { ConfirmModal } from '../confirm-modal/confirm-modal';
             {{ deleting() ? deletingLabel() : deleteLabel() }}
           </button>
         </div>
+        }
       </form>
     </div>
 
@@ -75,6 +77,8 @@ export class EditFormShellComponent {
   readonly outerClass = input('space-y-4');
   /** Show a Back button; off inside a sheet, which has its own close button. */
   readonly showBack = input(false);
+  /** Off while a screen shows its own actions instead (the kiosk's decline area). */
+  readonly showActions = input(true);
   readonly backClass = input(
     '-ml-2 flex min-h-11 items-center gap-1 px-2 text-[14px] font-medium text-ink-2 hover:text-ink transition-colors cursor-pointer',
   );
@@ -83,7 +87,7 @@ export class EditFormShellComponent {
   readonly deleting = input.required<boolean>();
   readonly privacyDisabled = input.required<boolean>();
   readonly errorMessage = input<string | null>(null);
-  readonly submitLabel = input('Save Changes');
+  readonly submitLabel = input('Save changes');
   readonly submittingLabel = input('Saving…');
   readonly deletingLabel = input('Deleting…');
   readonly deleteConfirmText = input('Delete');

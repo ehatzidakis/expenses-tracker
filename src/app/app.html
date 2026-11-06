@@ -4,7 +4,7 @@
   >
     <div
       role="status"
-      class="rounded-full border border-ink/10 bg-raised px-3.5 py-1.5 text-[12px] font-medium text-ink shadow-[0_10px_30px_-10px_rgb(0_0_0/0.8)]"
+      class="rounded-xl border border-ink/10 bg-raised px-3.5 py-2 text-[12px] font-medium text-ink shadow-[0_10px_30px_-10px_rgb(0_0_0/0.8)]"
     >
       Updating to the latest version…
     </div>
@@ -37,7 +37,7 @@
             autocomplete="email"
             [(ngModel)]="email"
             name="email"
-            class="min-h-12 rounded-xl border border-edge bg-panel px-3.5 text-[16px] text-ink outline-none focus:border-ember"
+            class="w-full min-h-12 rounded-xl border border-edge bg-panel px-3.5 text-ink placeholder:text-ink-4 transition-colors focus:border-ember focus-visible:outline-none"
             placeholder="you@example.com"
           />
         </label>
@@ -49,7 +49,7 @@
             autocomplete="current-password"
             [(ngModel)]="password"
             name="password"
-            class="min-h-12 rounded-xl border border-edge bg-panel px-3.5 text-[16px] text-ink outline-none focus:border-ember"
+            class="w-full min-h-12 rounded-xl border border-edge bg-panel px-3.5 text-ink placeholder:text-ink-4 transition-colors focus:border-ember focus-visible:outline-none"
           />
         </label>
 
@@ -61,7 +61,7 @@
 
         <button
           type="submit"
-          class="mt-2 min-h-12 rounded-xl bg-ember px-4 text-[15px] font-semibold text-ground transition-colors hover:bg-ember-ink disabled:cursor-not-allowed disabled:opacity-60 cursor-pointer"
+          class="mt-2 min-h-12 rounded-xl bg-ember px-4 text-[15px] font-semibold text-ground transition-colors hover:bg-ember-ink active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-40 cursor-pointer"
           [disabled]="isSigningIn()"
         >
           {{ isSigningIn() ? 'Signing in…' : 'Sign in' }}

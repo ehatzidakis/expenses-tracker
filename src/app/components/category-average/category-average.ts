@@ -18,8 +18,6 @@ interface CategoryAverage {
   label: string;
   average: number;
   count: number;
-  iconColorClass: string;
-  bgColorClass: string;
   emoji: string;
 }
 
@@ -151,8 +149,6 @@ export class CategoryAverageComponent {
       category: cfg.category,
       label: cfg.label,
       ...this.statFor(cfg.category),
-      iconColorClass: cfg.iconColor,
-      bgColorClass: cfg.bgColor,
       emoji: CATEGORY_META[cfg.category]?.emoji ?? '📌',
     }));
 
@@ -177,8 +173,6 @@ export class CategoryAverageComponent {
         subCategoryId: option.id,
         label: this.stripEmojiPrefix(option.label),
         ...this.statFor('Tickets', option.id),
-        iconColorClass: 'text-ember-ink',
-        bgColorClass: 'bg-ember/15 border-ember/30',
         emoji: subcategoryEmojiMap[option.name] ?? '🎟️',
       } satisfies CategoryAverage;
     });
@@ -190,8 +184,6 @@ export class CategoryAverageComponent {
         subCategoryId: option.id,
         label: this.stripEmojiPrefix(option.label),
         ...this.statFor('Gaming', option.id),
-        iconColorClass: 'text-ember-ink',
-        bgColorClass: 'bg-ember/15 border-ember/30',
         emoji: subcategoryEmojiMap[option.name] ?? '🎮',
       } satisfies CategoryAverage;
     });
@@ -212,20 +204,14 @@ const FOOD_CONFIGS = [
   {
     category: 'Supermarket',
     label: 'Supermarket Visit',
-    iconColor: 'text-avocado-ink',
-    bgColor: 'bg-avocado/15 border-avocado/30',
   },
   {
     category: 'EatingOut',
     label: 'Restaurant',
-    iconColor: 'text-cherry',
-    bgColor: 'bg-cherry-fill/15 border-cherry-fill/30',
   },
   {
     category: 'Takeaway',
     label: 'Takeaway Order',
-    iconColor: 'text-ember-soft',
-    bgColor: 'bg-ember/15 border-ember/30',
   },
 ];
 

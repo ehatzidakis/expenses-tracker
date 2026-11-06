@@ -71,22 +71,6 @@ describe('CategoryBreakdownComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should use the selected month without the year in the budget title', () => {
-    fixture.componentRef.setInput('categories', []);
-    fixture.componentRef.setInput('monthName', 'August 2026');
-    fixture.detectChanges();
-
-    expect(component.budgetTitle()).toBe("August's Budget");
-  });
-
-  it('should use an all-time title when no month is selected', () => {
-    fixture.componentRef.setInput('categories', []);
-    fixture.componentRef.setInput('monthName', '');
-    fixture.detectChanges();
-
-    expect(component.budgetTitle()).toBe('All-Time Budget');
-  });
-
   it('does not load anything without a month', async () => {
     fixture.componentRef.setInput('categories', categories);
     await fixture.whenStable();

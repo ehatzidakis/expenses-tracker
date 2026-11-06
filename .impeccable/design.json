@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-11-06T21:00:00Z",
+  "generatedAt": "2026-11-06T23:30:00Z",
   "title": "Design System: Expenses Tracker",
   "extensions": {
     "colorMeta": {
@@ -320,7 +320,7 @@
       },
       "title": {
         "displayName": "Title",
-        "purpose": "Trip name, days-to-go count, secondary panel figures, the 18px saved figure beside the average month (18–20px; one-off In and Spent at 32px)."
+        "purpose": "Sheet and dialog titles (Settings, Splitzes, Budgets and wage, confirmations), trip name, days-to-go count, secondary panel figures, the 18px saved figure beside the average month (18–20px; one-off In and Spent at 32px)."
       },
       "figure": {
         "displayName": "Figure",
@@ -332,11 +332,11 @@
       },
       "section-heading": {
         "displayName": "Section Heading",
-        "purpose": "Uppercase wide list headings: Categories, Recent, Month by month, Typical month, Typical costs."
+        "purpose": "Uppercase wide list headings: Categories, Recent, Month by month, Typical month, Typical costs, the kiosk's Requests. Never a kicker."
       },
       "body-lg": {
         "displayName": "Body Large",
-        "purpose": "Row labels, primary button labels, the friendly date label, the selected month's name on Charts, sub-section titles (Bills, Per purchase)."
+        "purpose": "Row labels, setting and switch labels, primary, large secondary and destructive button labels, the friendly date label, the selected month on Charts, sub-section titles."
       },
       "field": {
         "displayName": "Field",
@@ -352,7 +352,7 @@
       },
       "caption": {
         "displayName": "Caption",
-        "purpose": "Row status lines, a tile's EUR left figure, field errors, labels under panel figures."
+        "purpose": "Row status lines, captions under setting rows, a tile's EUR left figure, field errors, labels under panel figures, the version line."
       },
       "micro": {
         "displayName": "Micro",
@@ -376,6 +376,11 @@
         "purpose": "Bottom sheet, cast upward."
       },
       {
+        "name": "dialog",
+        "value": "0 24px 60px -20px rgb(0 0 0 / 0.8)",
+        "purpose": "The centred dialog, cast downward."
+      },
+      {
         "name": "toast",
         "value": "0 10px 30px -10px rgb(0 0 0 / 0.8)",
         "purpose": "The update notice."
@@ -388,7 +393,7 @@
       {
         "name": "sheet-backdrop",
         "value": "background: rgb(8 5 4 / 0.72); backdrop-filter: blur(3px)",
-        "purpose": "Scrim behind the bottom sheet."
+        "purpose": "Scrim behind the bottom sheet and the centred dialog."
       },
       {
         "name": "label-knockout",
@@ -420,12 +425,12 @@
       {
         "name": "fade-in",
         "value": "translateY(8px) scale(0.98) and opacity 0 to rest, 240ms ease-out-expo",
-        "purpose": "Dialog cards settling in."
+        "purpose": "Centred dialogs settling in."
       },
       {
         "name": "state-colour",
         "value": "150ms",
-        "purpose": "Colour, border and opacity changes on pills, segments, tiles, fields, tabs, buttons and month chart columns."
+        "purpose": "Colour, border and opacity changes on pills, segments, tiles, fields, tabs, buttons and month chart columns; the switch thumb slides in the same 150ms."
       },
       {
         "name": "chevron-turn",
@@ -474,17 +479,17 @@
       "name": "Secondary Button",
       "kind": "button",
       "refersTo": "button-secondary",
-      "description": "Outline action: Try again, Edit trip, Splitz.",
+      "description": "Outline row action: Settle up, Set passcode, data export, Try again. A 48px Secondary Large (15px) is its own style for a Cancel beside a 48px action.",
       "html": "<button class=\"ds-btn-secondary\">Try again</button>",
-      "css": ".ds-btn-secondary { min-height: 44px; padding: 0 14px; border: 1px solid var(--color-edge, #3d2f25); border-radius: 12px; background: transparent; color: var(--color-ink-2, #d3c6b1); font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif; font-size: 13px; font-weight: 500; cursor: pointer; transition: color 150ms, border-color 150ms; } .ds-btn-secondary:hover { border-color: var(--color-ink-4, #95836f); color: var(--color-ink, #f1e6d2); } .ds-btn-secondary:focus-visible { outline: 2px solid var(--color-ember, #e5703a); outline-offset: 2px; }"
+      "css": ".ds-btn-secondary { min-height: 44px; padding: 0 16px; border: 1px solid var(--color-edge, #3d2f25); border-radius: 12px; background: transparent; color: var(--color-ink-2, #d3c6b1); font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif; font-size: 13px; font-weight: 500; cursor: pointer; transition: color 150ms, border-color 150ms; } .ds-btn-secondary:hover { border-color: var(--color-ink-4, #95836f); color: var(--color-ink, #f1e6d2); } .ds-btn-secondary:focus-visible { outline: 2px solid var(--color-ember, #e5703a); outline-offset: 2px; } .ds-btn-secondary:disabled { opacity: 0.4; cursor: not-allowed; }"
     },
     {
       "name": "Destructive Button",
       "kind": "button",
       "refersTo": "button-danger",
-      "description": "Delete in edit forms: a cherry outline, never a solid red fill.",
+      "description": "Delete, Sign out, Send reason: a cherry outline, never a solid red fill. A 44px, 13px Destructive Small is its own style for setting rows.",
       "html": "<button class=\"ds-btn-danger\">Delete expense</button>",
-      "css": ".ds-btn-danger { min-height: 48px; padding: 0 16px; border: 1px solid rgb(240 86 107 / 0.35); border-radius: 12px; background: transparent; color: var(--color-cherry, #f0566b); font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif; font-size: 15px; font-weight: 600; cursor: pointer; transition: background-color 150ms; } .ds-btn-danger:hover { background: rgb(58 20 24 / 0.5); } .ds-btn-danger:focus-visible { outline: 2px solid var(--color-ember, #e5703a); outline-offset: 2px; }"
+      "css": ".ds-btn-danger { min-height: 48px; padding: 0 16px; border: 1px solid rgb(240 86 107 / 0.35); border-radius: 12px; background: transparent; color: var(--color-cherry, #f0566b); font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif; font-size: 15px; font-weight: 500; cursor: pointer; transition: background-color 150ms;  } .ds-btn-danger:hover { background: rgb(58 20 24 / 0.5); } .ds-btn-danger:focus-visible { outline: 2px solid var(--color-ember, #e5703a); outline-offset: 2px; } .ds-btn-danger:disabled { opacity: 0.4; cursor: not-allowed; }"
     },
     {
       "name": "Period Pills",
@@ -565,6 +570,22 @@
       "description": "Ranked categories by monthly average on one shared EUR scale: an ember bar (cherry when over) and a cream budget tick cut out by a ground ring. Eases 500ms on expo-out when the range changes.",
       "html": "<ul class=\"ds-tm\"><li><div class=\"ds-tm-top\"><span class=\"ds-tm-name\"><i aria-hidden=\"true\">🛒</i>Groceries</span><span class=\"ds-tm-amt\">€240.00 <em>/ €280</em></span></div><div class=\"ds-tm-bar\" aria-hidden=\"true\"><span class=\"ds-tm-track\"></span><span class=\"ds-tm-fill\" style=\"width:86%\"></span><span class=\"ds-tm-tick\" style=\"left:100%\"></span></div></li><li><div class=\"ds-tm-top\"><span class=\"ds-tm-name\"><i aria-hidden=\"true\">🚆</i>Travel</span><span class=\"ds-tm-amt\">€60.00 <em>/ €30</em></span></div><div class=\"ds-tm-bar\" aria-hidden=\"true\"><span class=\"ds-tm-track\"></span><span class=\"ds-tm-fill ds-tm-over\" style=\"width:21%\"></span><span class=\"ds-tm-tick\" style=\"left:11%\"></span></div><p class=\"ds-tm-warn\">€30.00 over budget on average</p></li><li><div class=\"ds-tm-top\"><span class=\"ds-tm-name\"><i aria-hidden=\"true\">🐈</i>Pets</span><span class=\"ds-tm-amt\">€40.00 <em>/ €50</em></span></div><div class=\"ds-tm-bar\" aria-hidden=\"true\"><span class=\"ds-tm-track\"></span><span class=\"ds-tm-fill\" style=\"width:14%\"></span><span class=\"ds-tm-tick\" style=\"left:18%\"></span></div></li></ul>",
       "css": ".ds-tm { max-width: 360px; margin: 0; padding: 0; list-style: none; border-top: 1px solid rgb(241 230 210 / 0.1); font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif; } .ds-tm li { padding: 10px 0; border-bottom: 1px solid rgb(241 230 210 / 0.1); } .ds-tm-top { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; } .ds-tm-name { display: flex; align-items: baseline; gap: 8px; font-size: 15px; font-weight: 500; color: var(--color-ink, #f1e6d2); } .ds-tm-name i { width: 20px; font-style: normal; font-size: 13px; opacity: 0.6; filter: grayscale(40%); } .ds-tm-amt { font-size: 13px; font-variant-numeric: tabular-nums; color: var(--color-ink, #f1e6d2); } .ds-tm-amt em { font-style: normal; color: var(--color-ink-3, #b0a08c); } .ds-tm-bar { position: relative; height: 12px; margin: 6px 0 0 28px; } .ds-tm-track, .ds-tm-fill { position: absolute; left: 0; top: 4px; height: 4px; border-radius: 9999px; } .ds-tm-track { right: 0; background: rgb(241 230 210 / 0.07); } .ds-tm-fill { background: var(--color-ember, #e5703a); transition: width 500ms cubic-bezier(0.16, 1, 0.3, 1); } .ds-tm-over { background: var(--color-cherry, #f0566b); } .ds-tm-tick { position: absolute; top: 0; width: 2px; height: 12px; transform: translateX(-50%); border-radius: 9999px; background: var(--color-ink, #f1e6d2); box-shadow: 0 0 0 2px var(--color-ground, #120d0a); transition: left 500ms cubic-bezier(0.16, 1, 0.3, 1); } .ds-tm-warn { margin: 4px 0 0 28px; font-size: 12px; font-weight: 600; color: var(--color-cherry, #f0566b); }"
+    },
+    {
+      "name": "Setting Rows with Switch",
+      "kind": "custom",
+      "refersTo": "setting-row",
+      "description": "The Settings ledger: 56px hairline rows with a 15px label and 12px caption. An on/off row is one role=\"switch\" control with a 48x28 track, ember when on, raised-hi with a teak edge when off; a navigation row ends in a chevron.",
+      "html": "<div class=\"ds-set\"><button type=\"button\" class=\"ds-set-row\" role=\"switch\" aria-checked=\"true\" onclick=\"this.setAttribute('aria-checked', this.getAttribute('aria-checked') !== 'true')\"><span><span class=\"ds-set-label\">Stealth mode</span><span class=\"ds-set-cap\">Hides amounts on this device</span></span><span class=\"ds-switch\" aria-hidden=\"true\"><span class=\"ds-thumb\"></span></span></button><button type=\"button\" class=\"ds-set-row\" role=\"switch\" aria-checked=\"false\" onclick=\"this.setAttribute('aria-checked', this.getAttribute('aria-checked') !== 'true')\"><span><span class=\"ds-set-label\">Notifications</span><span class=\"ds-set-cap\">Requests and splits on this phone</span></span><span class=\"ds-switch\" aria-hidden=\"true\"><span class=\"ds-thumb\"></span></span></button><button type=\"button\" class=\"ds-set-row\"><span><span class=\"ds-set-label\">Budgets and wage</span><span class=\"ds-set-cap\">Your wage and each category's monthly budget</span></span><span class=\"ds-chev\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 20 20\" fill=\"currentColor\" aria-hidden=\"true\"><path fill-rule=\"evenodd\" clip-rule=\"evenodd\" d=\"M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z\"/></svg></span></button></div>",
+      "css": ".ds-set { max-width: 360px; border-top: 1px solid rgb(241 230 210 / 0.1); font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif; } .ds-set-row { display: flex; width: 100%; min-height: 56px; align-items: center; justify-content: space-between; gap: 16px; padding: 10px 0; border: none; border-bottom: 1px solid rgb(241 230 210 / 0.1); background: transparent; text-align: left; cursor: pointer; } .ds-set-row:focus-visible { outline: 2px solid var(--color-ember, #e5703a); outline-offset: 2px; } .ds-set-label { display: block; font-size: 15px; font-weight: 500; color: var(--color-ink, #f1e6d2); } .ds-set-cap { display: block; margin-top: 2px; font-size: 12px; color: var(--color-ink-2, #d3c6b1); } .ds-chev { display: inline-flex; flex-shrink: 0; color: var(--color-ink-3, #b0a08c); } .ds-switch { position: relative; display: inline-flex; flex-shrink: 0; align-items: center; width: 48px; height: 28px; border-radius: 9999px; border: 1px solid var(--color-edge, #3d2f25); background: var(--color-raised-hi, #30251d); transition: background-color 150ms, border-color 150ms; } .ds-thumb { position: absolute; left: 2px; width: 22px; height: 22px; border-radius: 9999px; background: var(--color-ink-3, #b0a08c); transition: transform 150ms, background-color 150ms; } [aria-checked=\"true\"] .ds-switch { border-color: var(--color-ember, #e5703a); background: var(--color-ember, #e5703a); } [aria-checked=\"true\"] .ds-thumb { transform: translateX(20px); background: var(--color-ink, #f1e6d2); }"
+    },
+    {
+      "name": "Centred Dialog",
+      "kind": "custom",
+      "refersTo": "dialog",
+      "description": "Confirmations on the walnut scrim: 16px corners, teak edge, black dialog shadow, a wide 18px title, Cancel first as the 48px secondary, then a cherry-outline or ember confirm. Stacks above an open sheet.",
+      "html": "<div class=\"ds-scrim\"><div class=\"ds-dlg\" role=\"dialog\" aria-labelledby=\"ds-dlg-t\"><h3 id=\"ds-dlg-t\" class=\"ds-dlg-title\">Delete expense?</h3><p class=\"ds-dlg-msg\">This action cannot be undone.</p><div class=\"ds-dlg-actions\"><button type=\"button\" class=\"ds-dlg-cancel\">Cancel</button><button type=\"button\" class=\"ds-dlg-danger\">Delete</button></div></div></div>",
+      "css": ".ds-scrim { display: grid; place-items: center; padding: 24px 16px; background: rgb(8 5 4 / 0.72); backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px); } .ds-dlg { width: 100%; max-width: 384px; padding: 20px; border: 1px solid var(--color-edge, #3d2f25); border-radius: 16px; background: var(--color-panel, #1c1511); box-shadow: 0 24px 60px -20px rgb(0 0 0 / 0.8); font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif; } .ds-dlg-title { margin: 0; font-family: 'Archivo', ui-sans-serif, system-ui, sans-serif; font-stretch: 125%; font-size: 18px; font-weight: 600; color: var(--color-ink, #f1e6d2); } .ds-dlg-msg { margin: 8px 0 0; font-size: 14px; line-height: 1.625; color: var(--color-ink-2, #d3c6b1); } .ds-dlg-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 20px; } .ds-dlg-cancel, .ds-dlg-danger { min-height: 48px; padding: 0 16px; border-radius: 12px; background: transparent; font-family: inherit; font-size: 15px; font-weight: 500; cursor: pointer; transition: color 150ms, border-color 150ms, background-color 150ms; } .ds-dlg-cancel { border: 1px solid var(--color-edge, #3d2f25); color: var(--color-ink-2, #d3c6b1); } .ds-dlg-cancel:hover { border-color: var(--color-ink-4, #95836f); color: var(--color-ink, #f1e6d2); } .ds-dlg-danger { border: 1px solid rgb(240 86 107 / 0.35); color: var(--color-cherry, #f0566b); } .ds-dlg-danger:hover { background: rgb(58 20 24 / 0.5); } .ds-dlg-cancel:focus-visible, .ds-dlg-danger:focus-visible { outline: 2px solid var(--color-ember, #e5703a); outline-offset: 2px; }"
     }
   ],
   "narrative": {
@@ -613,6 +634,11 @@
         "name": "The Float Earns The Shadow Rule",
         "body": "Only sheets, dialogs, dropdowns and the toast cast a shadow, and it is always black. Nothing in the page flow casts one, and no shadow, halo or wash is ever coloured.",
         "section": "elevation"
+      },
+      {
+        "name": "The Own Constant Rule",
+        "body": "A sized variant is its own named style. Never append a class to a shared button style to override its height, type size or padding; add a variant instead. Appending layout only (full width, a margin) is fine.",
+        "section": "components"
       }
     ],
     "dos": [
@@ -622,7 +648,9 @@
       "Do keep every tappable thing at least 44px in its smallest dimension, and every field 48px.",
       "Do set money headlines and panel figures in wide Archivo, and every amount in tabular figures as € with two decimals.",
       "Do mark every amount that stealth mode should hide with the sensitive directive.",
-      "Do use the shared pill, segment and field styles for selectors and fields instead of restyling them.",
+      "Do use the shared pill, segment, field, button, well and dialog styles instead of restyling them; when a new size is needed, add it as its own named style.",
+      "Do make an on/off setting the shared switch, with the whole row as the control.",
+      "Do open secondary surfaces in the shared bottom sheet, step into a sub-view inside the same sheet, and confirm in the centred dialog with Cancel first.",
       "Do sort category rows by what they measure, largest first (spent on Budget, average on Typical month, budget in the budgets sheet), and fold categories with nothing spent into one quiet line.",
       "Do give every chart a single keyboard stop and a screen-reader table, and label its lines in place rather than in a legend.",
       "Do give a new surface a black shadow only if it floats over the page."
@@ -636,6 +664,9 @@
       "Don't use a gradient fill on a button, tab, pill or bar.",
       "Don't add an entrance animation to in-flow content other than an opted-in headline bar, and never animate row bars.",
       "Don't set a form field below 16px, except the display-size amount.",
+      "Don't append a class to a shared button style to change its size; use or add a sized variant.",
+      "Don't fill a destructive button with solid red; it is always the cherry outline.",
+      "Don't open a sheet on top of a sheet; only a centred dialog may stack above one.",
       "Don't set a text colour below cream 4, or dim text with opacity, except for the dimming of sibling rows behind an expanded one."
     ]
   }

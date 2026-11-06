@@ -1,22 +1,16 @@
 import { Component, output } from '@angular/core';
+import { BUTTON_DANGER } from '../../utils/pill-styles';
 
 @Component({
   selector: 'app-sign-out-action',
   standalone: true,
   host: { class: 'block mt-3' },
   template: `
-    <div class="space-y-3">
-      <button
-        type="button"
-        (click)="signOut.emit()"
-        class="w-full flex items-center justify-center gap-2 rounded-2xl border border-cherry-fill/80 bg-cherry-deep/40 px-3 py-2.5 text-sm font-medium text-cherry transition hover:bg-cherry-deep/50 cursor-pointer"
-      >
-        <span>↩</span>
-        Sign out
-      </button>
-    </div>
+    <button type="button" [class]="danger + ' w-full'" (click)="signOut.emit()">Sign out</button>
   `,
 })
 export class SignOutActionComponent {
+  protected readonly danger = BUTTON_DANGER;
+
   readonly signOut = output<void>();
 }

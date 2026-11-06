@@ -410,11 +410,6 @@ export class ExpenseStateService {
     };
   });
 
-  readonly topCategory = computed(() => {
-    const breakdown = this.categoryBreakdown();
-    return breakdown.length > 0 ? breakdown[0] : null;
-  });
-
   selectMonth(id: string): void {
     this.selectedExpenseId.set(id);
     if (id !== 'ALL') {

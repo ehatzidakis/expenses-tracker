@@ -5,12 +5,13 @@ import { CreateTransactionComponent } from '../create-transaction.component/crea
 import { NotificationSettingComponent } from '../settings-modal.component/notification-setting.component';
 import { KioskRequestsComponent } from './kiosk-requests.component';
 import { KioskTab, KioskTabBarComponent } from './kiosk-tab-bar.component';
+import { SheetComponent } from '../sheet/sheet';
 
 /** Everything the kiosk user sees: header, the New/Requests tabs, and notification settings. */
 @Component({
   selector: 'app-kiosk-shell',
   standalone: true,
-  imports: [
+  imports: [SheetComponent, 
     CreateTransactionComponent,
     KioskRequestsComponent,
     KioskTabBarComponent,
@@ -73,30 +74,12 @@ import { KioskTab, KioskTabBarComponent } from './kiosk-tab-bar.component';
     />
 
     @if (showNotifications()) {
-      <div
-        class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4"
-        (click)="showNotifications.set(false)"
-      >
-        <div
-          role="dialog"
-          aria-label="Notifications"
-          class="bg-panel border border-raised rounded-3xl p-5 w-full max-w-sm shadow-2xl space-y-4 text-ink"
-          (click)="$event.stopPropagation()"
-        >
-          <div class="flex items-center justify-between">
-            <h2 class="text-base font-semibold text-ink">Notifications</h2>
-            <button
-              type="button"
-              (click)="showNotifications.set(false)"
-              aria-label="Close"
-              class="h-8 w-8 flex items-center justify-center rounded-full text-ink-2 hover:text-ink cursor-pointer"
-            >
-              ✕
-            </button>
-          </div>
-          <app-notification-setting />
+      <app-sheet label="Notifications" (closed)="showNotifications.set(false)">
+        <h2 class="type-wide text-[18px] font-semibold text-ink">Notifications</h2>
+        <div class="mt-2 border-y border-ink/10">
+          <app-notification-setting label="New request alerts" />
         </div>
-      </div>
+      </app-sheet>
     }
   `,
 })

@@ -28,8 +28,8 @@ Built around one household's real routine rather than generic finance software: 
 
 - Used mostly as the installed home-screen PWA on iPhone, at home and in private.
 - Mobile-first, single-column layout; larger screens are a secondary concern.
-- Admin navigation is five tabs: Monthly, SumUp, Create, OneOffs, Charts. Settings and Splitzes open as modals.
-- The kiosk user submits from their own phone; items land in Pending review for the admin to accept, edit or decline. The admin can also send requests to the kiosk.
+- Admin navigation is four tabs: Budget (with a Month | Trips | One-offs switch), All time, Add and Charts. Settings and Splitzes open as bottom sheets. Budgets and the wage are edited in Settings › Budgets and wage.
+- The kiosk user submits from their own phone; items land in Splitzes › Incoming (the pending review queue) for the admin to accept, edit or decline. The admin can also send requests to the kiosk.
 - Push notifications go through a Cloudflare Worker (`push-worker/`) so the phones get notified of kiosk submissions and requests; the Home Screen badge shows the pending count.
 - Deployed on Vercel; data in Firebase (Firestore lite SDK, Auth).
 
@@ -37,7 +37,7 @@ Built around one household's real routine rather than generic finance software: 
 
 - **Money:** euros, shown as `€` with two decimals.
 - **Categories:** a fixed set stored as counters on one document per month (Supermarket, Medical, Personal, EatingOut, Utilities, Takeaway, Tickets, Gaming, Cats, Travel, Subscriptions, Gym), plus `TotalWage`.
-- **Terminology used in the product:** transactions; one-offs and trips (stored as "adjustments"; trips can be open or closed for new transactions); Splitzes (split debts and settlements); Pending review (queue of kiosk submissions and out-of-month admin entries); kiosk; requests (admin to kiosk); stealth mode (hides amounts, optional passcode); budgets; wage; saved.
+- **Terminology used in the product:** transactions; one-offs and trips (stored as "adjustments"; trips can be open or closed for new transactions); Splitzes (split debts and settlements); Incoming / pending review (queue of kiosk submissions and out-of-month admin entries, shown in Splitzes); kiosk; requests (admin to kiosk); stealth mode (hides amounts, optional passcode); budgets; wage; saved.
 - **Stack:** Angular 22 standalone components, signals, zoneless; TanStack Query; Tailwind 4; Vitest. No Angular Router: tabs are a signal.
 - **Roles:** admin is a hard-coded UID; everyone else is kiosk. Access control is currently client-side (backlog FIX-6).
 - **Data safety:** a local dev server talks to the production Firestore project; do not submit, accept, settle, save or delete while testing manually until backlog PLAT-1 lands.

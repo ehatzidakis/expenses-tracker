@@ -1,4 +1,5 @@
 import { Component, input } from '@angular/core';
+import { ERROR_WELL, SUCCESS_WELL } from '../../utils/pill-styles';
 
 export interface SettingsFeedbackMessage {
   type: 'error' | 'success';
@@ -11,19 +12,17 @@ export interface SettingsFeedbackMessage {
   host: { class: 'block' },
   template: `
     @if (message(); as feedback) {
-      <div
-        class="p-3 rounded-xl text-xs font-medium text-center"
-        [class]="
-          feedback.type === 'error'
-            ? 'bg-cherry-deep/50 border border-cherry-deep/60 text-cherry'
-            : 'bg-avocado-deep/50 border border-avocado-deep/60 text-avocado-ink'
-        "
-      >
-        {{ feedback.text }}
-      </div>
+      @if (feedback.type === 'error') {
+        <p role="alert" [class]="errorWell">{{ feedback.text }}</p>
+      } @else {
+        <p role="status" [class]="successWell">{{ feedback.text }}</p>
+      }
     }
   `,
 })
 export class SettingsFeedbackBannerComponent {
+  protected readonly errorWell = ERROR_WELL;
+  protected readonly successWell = SUCCESS_WELL;
+
   readonly message = input<SettingsFeedbackMessage | null>(null);
 }

@@ -42,16 +42,22 @@ export type { YearlyBreakdownEntry } from './overview-card.models';
 
       <dl class="mt-4 divide-y divide-ink/10 border-t border-ink/10 text-[13px]">
         <div class="flex items-baseline justify-between gap-3 py-2.5">
-          <dt class="text-ink-2">Spent on months</dt>
-          <dd class="tabular-nums text-ink" appSensitive="xs">€{{ monthlyExpenses() | number: '1.2-2' }}</dd>
+          <dt class="text-ink-2">Spent on monthly expenses</dt>
+          <dd class="tabular-nums text-ink" appSensitive="xs">
+            €{{ monthlyExpenses() | number: '1.2-2' }}
+          </dd>
         </div>
         <div class="flex items-baseline justify-between gap-3 py-2.5">
           <dt class="text-ink-2">Spent on one-offs</dt>
-          <dd class="tabular-nums text-ink" appSensitive="xs">€{{ oneOffExpenses() | number: '1.2-2' }}</dd>
+          <dd class="tabular-nums text-ink" appSensitive="xs">
+            €{{ oneOffExpenses() | number: '1.2-2' }}
+          </dd>
         </div>
         <div class="flex items-baseline justify-between gap-3 py-2.5">
           <dt class="text-ink-2">One-off income</dt>
-          <dd class="tabular-nums text-avocado-ink" appSensitive="xs">+€{{ oneOffBonuses() | number: '1.2-2' }}</dd>
+          <dd class="tabular-nums text-avocado-ink" appSensitive="xs">
+            €{{ oneOffBonuses() | number: '1.2-2' }}
+          </dd>
         </div>
         <div class="flex items-baseline justify-between gap-3 py-2.5">
           <dt class="text-ink-2">Saved from monthly budget</dt>
@@ -72,7 +78,7 @@ export type { YearlyBreakdownEntry } from './overview-card.models';
           [attr.aria-expanded]="expanded()"
           (click)="expanded.update((open) => !open)"
         >
-          By year
+          Review by year
           <svg
             class="size-3.5 text-ink-3 transition-transform duration-200"
             [class.rotate-180]="expanded()"
@@ -100,8 +106,12 @@ export type { YearlyBreakdownEntry } from './overview-card.models';
             <tbody class="divide-y divide-ink/10">
               @for (year of years(); track year.year) {
                 <tr>
-                  <th class="type-wide py-2 text-left font-semibold text-ink" scope="row">{{ year.year }}</th>
-                  <td class="py-2 text-right text-ink" appSensitive="xs">€{{ year.spent | number: '1.2-2' }}</td>
+                  <th class="type-wide py-2 text-left font-semibold text-ink" scope="row">
+                    {{ year.year }}
+                  </th>
+                  <td class="py-2 text-right text-ink" appSensitive="xs">
+                    €{{ year.spent | number: '1.2-2' }}
+                  </td>
                   <td
                     class="py-2 text-right"
                     [class]="year.saved >= 0 ? 'text-avocado-ink' : 'text-cherry'"
@@ -135,7 +145,9 @@ export class OverviewCardComponent {
     const info = this.dateRangeInfo();
     if (!info) return '';
     const months = `${info.count} month${info.count === 1 ? '' : 's'}`;
-    return info.first === info.last ? `${months} · ${info.first}` : `${months} · ${info.first} – ${info.last}`;
+    return info.first === info.last
+      ? `${months} · ${info.first}`
+      : `${months} · ${info.first} – ${info.last}`;
   });
 
   readonly years = computed(() =>

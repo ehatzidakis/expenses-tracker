@@ -52,7 +52,7 @@ import { Component, ElementRef, afterNextRender, input, output, viewChild } from
             </svg>
           </button>
         </div>
-        <div class="overflow-y-auto overscroll-contain px-5 pb-[calc(env(safe-area-inset-bottom)+20px)]">
+        <div #body class="overflow-y-auto overscroll-contain px-5 pb-[calc(env(safe-area-inset-bottom)+20px)]">
           <ng-content />
         </div>
       </div>
@@ -64,12 +64,18 @@ export class SheetComponent {
   readonly closed = output<void>();
 
   private readonly dialog = viewChild.required<ElementRef<HTMLDialogElement>>('dialog');
+  private readonly body = viewChild.required<ElementRef<HTMLElement>>('body');
 
   constructor() {
     afterNextRender(() => {
       const dialog = this.dialog().nativeElement;
       if (!dialog.open && typeof dialog.showModal === 'function') dialog.showModal();
     });
+  }
+
+  /** Back to the top, for content that swaps views inside one sheet (Settings › Budgets). */
+  scrollToTop(): void {
+    this.body().nativeElement.scrollTop = 0;
   }
 
   /** A click that lands on the dialog itself (not the panel) is a tap on the backdrop. */

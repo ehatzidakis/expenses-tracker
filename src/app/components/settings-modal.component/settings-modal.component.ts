@@ -1,4 +1,13 @@
-import { Component, inject, output, signal } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  afterNextRender,
+  inject,
+  Injector,
+  output,
+  signal,
+  viewChild,
+} from '@angular/core';
 import { APP_VERSION } from '../../../environments/version';
 import { AuthService } from '../../services/auth.service';
 import { PrivacyService } from '../../services/privacy.service';
@@ -8,7 +17,6 @@ import {
   type SettingsFeedbackMessage,
 } from './settings-feedback-banner.component';
 import { SettingsModalFooterComponent } from './settings-modal-footer.component';
-import { SettingsModalHeaderComponent } from './settings-modal-header.component';
 import { SignOutActionComponent } from './sign-out-action.component';
 import { StealthModeSettingComponent } from './stealth-mode-setting.component';
 import { StealthPasscodeSettingComponent } from './stealth-passcode-setting.component';
@@ -28,7 +36,6 @@ type PinAction = 'none' | 'set' | 'remove' | 'unlock-to-disable';
     PinEntryFormComponent,
     SettingsFeedbackBannerComponent,
     SettingsModalFooterComponent,
-    SettingsModalHeaderComponent,
     SignOutActionComponent,
     StealthModeSettingComponent,
     StealthPasscodeSettingComponent,
@@ -36,99 +43,110 @@ type PinAction = 'none' | 'set' | 'remove' | 'unlock-to-disable';
     NotificationSettingComponent,
   ],
   template: `
-    <div
-      class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fadeIn"
-      (click)="close.emit()"
-    >
-      <div
-        class="bg-panel border border-raised rounded-3xl p-6 w-full max-w-sm shadow-2xl space-y-6 text-ink"
-        (click)="$event.stopPropagation()"
-      >
-        <app-settings-modal-header (close)="close.emit()" />
+    <app-sheet [label]="view() === 'budgets' ? 'Budgets and wage' : 'Settings'" (closed)="close.emit()">
+      @if (view() === 'budgets') {
+        <div class="flex min-h-11 items-center gap-2 pt-1.5">
+          <button
+            #backButton
+            type="button"
+            class="-ml-2 flex min-h-11 items-center gap-1 rounded-xl px-2 text-[14px] text-ink-2 transition-colors hover:text-ink cursor-pointer"
+            (click)="showMain()"
+          >
+            <svg class="size-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+              <path fill-rule="evenodd" clip-rule="evenodd" d="M12.79 5.23a.75.75 0 01-.02 1.06L8.832 10l3.938 3.71a.75.75 0 11-1.04 1.08l-4.5-4.25a.75.75 0 010-1.08l4.5-4.25a.75.75 0 011.06.02z" />
+            </svg>
+            Back
+          </button>
+          <h2 class="type-wide ml-1 text-[18px] font-semibold text-ink">Budgets and wage</h2>
+        </div>
+        <div class="mt-4">
+          <app-category-budgets-grid />
+        </div>
+      } @else {
+        <h2 class="type-wide text-[18px] font-semibold text-ink">Settings</h2>
 
-        <app-settings-feedback-banner [message]="feedbackMessage()" />
+        <div class="mt-3 flex flex-col gap-4">
+          <app-settings-feedback-banner [message]="feedbackMessage()" />
 
-        <app-stealth-mode-setting
-          [enabled]="privacyService.isPrivacyMode()"
-          (toggle)="handleToggleStealth()"
-        />
+          <div class="divide-y divide-ink/10 border-y border-ink/10">
+            <app-stealth-mode-setting
+              [enabled]="privacyService.isPrivacyMode()"
+              (toggle)="handleToggleStealth()"
+            />
 
-        <!-- Inline Form: Unlock to Disable Stealth Mode -->
-        @if (activeAction() === 'unlock-to-disable') {
-          <app-pin-entry-form
-            title="Enter Passcode to Exit Stealth"
-            placeholder="••••"
-            submitLabel="Confirm"
-            [centerTitle]="true"
-            [autofocus]="true"
-            (valueChange)="pinInput.set($event)"
-            (cancel)="resetForm()"
-            (submitted)="handleUnlockDisable()"
-          />
-        }
+            @if (activeAction() === 'unlock-to-disable') {
+              <app-pin-entry-form
+                title="Passcode to turn stealth off"
+                placeholder="PIN"
+                submitLabel="Turn off"
+                [autofocus]="true"
+                (valueChange)="pinInput.set($event)"
+                (cancel)="resetForm()"
+                (submitted)="handleUnlockDisable()"
+              />
+            }
 
-        @if (activeAction() === 'none') {
-          <app-stealth-passcode-setting
-            [hasPassword]="privacyService.hasPassword()"
-            (set)="activeAction.set('set'); clearFeedback()"
-            (remove)="activeAction.set('remove'); clearFeedback()"
-          />
-        }
+            @if (activeAction() === 'none') {
+              <app-stealth-passcode-setting
+                [hasPassword]="privacyService.hasPassword()"
+                (set)="activeAction.set('set'); clearFeedback()"
+                (remove)="activeAction.set('remove'); clearFeedback()"
+              />
+            }
 
-        @if (activeAction() === 'set') {
-          <app-pin-entry-form
-            title="Create New Passcode"
-            placeholder="Enter PIN (e.g. 1234)"
-            submitLabel="Save PIN"
-            (valueChange)="pinInput.set($event)"
-            (cancel)="resetForm()"
-            (submitted)="handleSetPin()"
-          />
-        }
+            @if (activeAction() === 'set') {
+              <app-pin-entry-form
+                title="New passcode"
+                placeholder="For example 1234"
+                submitLabel="Save PIN"
+                (valueChange)="pinInput.set($event)"
+                (cancel)="resetForm()"
+                (submitted)="handleSetPin()"
+              />
+            }
 
-        @if (activeAction() === 'remove') {
-          <app-pin-entry-form
-            title="Confirm Current Passcode"
-            placeholder="Current PIN"
-            submitLabel="Remove PIN"
-            variant="red"
-            (valueChange)="currentPinInput.set($event)"
-            (cancel)="resetForm()"
-            (submitted)="handleRemovePin()"
-          />
-        }
+            @if (activeAction() === 'remove') {
+              <app-pin-entry-form
+                title="Current passcode"
+                placeholder="Current PIN"
+                submitLabel="Remove PIN"
+                tone="danger"
+                (valueChange)="currentPinInput.set($event)"
+                (cancel)="resetForm()"
+                (submitted)="handleRemovePin()"
+              />
+            }
 
-        @if (authService.isAdmin()) {
-          <div class="flex items-center justify-between gap-3 rounded-2xl border border-raised/80 bg-raised/40 p-3.5">
-            <span class="space-y-0.5">
-              <span class="block text-sm font-medium text-ink">Budgets and wage</span>
-              <span class="block text-[12px] text-ink-2">Your wage and each category's monthly budget</span>
-            </span>
-            <button
-              type="button"
-              class="min-h-11 shrink-0 rounded-xl border border-edge px-4 text-[13px] font-medium text-ink-2 transition-colors hover:border-ink-4 hover:text-ink cursor-pointer"
-              (click)="budgetsOpen.set(true)"
-            >
-              Edit
-            </button>
+            @if (authService.isAdmin()) {
+              <button
+                #budgetsRow
+                type="button"
+                class="flex min-h-14 w-full items-center justify-between gap-4 py-2.5 text-left cursor-pointer"
+                (click)="showBudgets()"
+              >
+                <span class="min-w-0">
+                  <span class="block text-[15px] font-medium text-ink">Budgets and wage</span>
+                  <span class="mt-0.5 block text-[12px] text-ink-2">
+                    Your wage and each category's monthly budget
+                  </span>
+                </span>
+                <svg class="size-4 shrink-0 text-ink-3" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                  <path fill-rule="evenodd" clip-rule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z" />
+                </svg>
+              </button>
+
+              <app-notification-setting />
+            }
           </div>
 
-          <app-notification-setting />
-        }
+          <app-data-export-setting />
 
-        <app-data-export-setting />
+          <app-sign-out-action (signOut)="handleSignOut()" />
 
-        <app-sign-out-action (signOut)="handleSignOut()" />
-
-        <app-settings-modal-footer [version]="appVersion" />
-      </div>
-    </div>
-
-    @if (budgetsOpen()) {
-      <app-sheet label="Budgets and wage" (closed)="budgetsOpen.set(false)">
-        <app-category-budgets-grid />
-      </app-sheet>
-    }
+          <app-settings-modal-footer [version]="appVersion" />
+        </div>
+      }
+    </app-sheet>
   `,
 })
 export class SettingsModalComponent {
@@ -138,7 +156,33 @@ export class SettingsModalComponent {
   readonly appVersion = APP_VERSION;
 
   readonly activeAction = signal<PinAction>('none');
-  readonly budgetsOpen = signal(false);
+  /** Budgets opens inside this sheet, not as a second one on top. */
+  readonly view = signal<'main' | 'budgets'>('main');
+  private readonly injector = inject(Injector);
+  private readonly sheet = viewChild(SheetComponent);
+  private readonly backButton = viewChild<ElementRef<HTMLButtonElement>>('backButton');
+  private readonly budgetsRow = viewChild<ElementRef<HTMLButtonElement>>('budgetsRow');
+
+  showBudgets(): void {
+    this.view.set('budgets');
+    this.afterSwap(() => this.backButton()?.nativeElement.focus());
+  }
+
+  showMain(): void {
+    this.view.set('main');
+    this.afterSwap(() => this.budgetsRow()?.nativeElement.focus());
+  }
+
+  /** New view starts at the top, and focus lands where the person just was. */
+  private afterSwap(focus: () => void): void {
+    afterNextRender(
+      () => {
+        this.sheet()?.scrollToTop();
+        focus();
+      },
+      { injector: this.injector },
+    );
+  }
   readonly pinInput = signal<string>('');
   readonly currentPinInput = signal<string>('');
   readonly feedbackMessage = signal<SettingsFeedbackMessage | null>(null);

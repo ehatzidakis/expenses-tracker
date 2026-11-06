@@ -14,6 +14,7 @@ import { EditAdjustmentComponent } from '../edit-adjustment.component/edit-adjus
 import { SheetComponent } from '../sheet/sheet';
 import type { SinglesType } from '../singles-view/singles-view.util';
 import { monthTiming } from '../../utils/period-pace';
+import { SEGMENT_BASE, SEGMENT_FRAME, SEGMENT_OFF, SEGMENT_ON } from '../../utils/pill-styles';
 
 /**
  * The Budget tab: one page for every period with money in it. A month, a trip and the one-offs
@@ -36,12 +37,11 @@ import { monthTiming } from '../../utils/period-pace';
   ],
   host: { class: 'flex flex-col gap-5' },
   template: `
-    <div role="group" aria-label="Period" class="grid grid-cols-3 rounded-xl border border-edge p-0.5">
+    <div role="group" aria-label="Period" [class]="segmentFrame + ' grid-cols-3'">
       @for (option of modes; track option.id) {
         <button
           type="button"
-          class="min-h-11 rounded-[10px] text-[14px] font-medium transition-colors duration-150 cursor-pointer"
-          [class]="mode() === option.id ? 'bg-ember/20 text-ink ring-1 ring-inset ring-ember/60' : 'text-ink-3 hover:text-ink'"
+          [class]="segment(mode() === option.id)"
           [attr.aria-pressed]="mode() === option.id"
           (click)="state.budgetMode.set(option.id)"
         >
@@ -171,6 +171,12 @@ import { monthTiming } from '../../utils/period-pace';
   `,
 })
 export class BudgetPageComponent {
+  protected readonly segmentFrame = SEGMENT_FRAME;
+
+  segment(active: boolean): string {
+    return `${SEGMENT_BASE} ${active ? SEGMENT_ON : SEGMENT_OFF}`;
+  }
+
   readonly state = inject(ExpenseStateService);
   private readonly adjustmentService = inject(AdjustmentService);
 

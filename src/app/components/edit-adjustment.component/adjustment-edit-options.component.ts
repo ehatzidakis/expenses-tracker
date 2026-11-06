@@ -1,66 +1,57 @@
 import { Component, input, output } from '@angular/core';
+import {
+  FIELD_LABEL,
+  SEGMENT_BASE,
+  SEGMENT_FRAME,
+  SEGMENT_OFF,
+  SEGMENT_ON,
+} from '../../utils/pill-styles';
 
+/** Type, trip and open/closed for an existing one-off, as the shared segment switches. */
 @Component({
   selector: 'app-adjustment-edit-options',
   standalone: true,
   host: { class: 'block' },
   template: `
-    <div class="space-y-4">
-      <div class="space-y-1.5">
-        <label class="text-xs font-medium text-ink-2">Type</label>
-        <div class="grid grid-cols-2 gap-2 p-1 bg-ground/80 rounded-xl border border-raised">
+    <div class="flex flex-col gap-4">
+      <div class="flex flex-col gap-1.5">
+        <span id="adj-edit-type" [class]="fieldLabel">Type</span>
+        <div role="group" aria-labelledby="adj-edit-type" [class]="frame + ' grid-cols-2'">
           <button
             type="button"
+            [class]="segment(isAddition())"
+            [attr.aria-pressed]="isAddition()"
             (click)="typeChange.emit(true)"
-            class="min-h-11 rounded-lg text-[13px] font-semibold transition-all duration-150 flex items-center justify-center gap-1 cursor-pointer"
-            [class.bg-avocado/20]="isAddition()"
-            [class.text-avocado-ink]="isAddition()"
-            [class.border]="isAddition()"
-            [class.border-avocado/30]="isAddition()"
-            [class.text-ink-2]="!isAddition()"
           >
-            <span aria-hidden="true">↑</span> Income
+            Income
           </button>
-
           <button
             type="button"
+            [class]="segment(!isAddition())"
+            [attr.aria-pressed]="!isAddition()"
             (click)="typeChange.emit(false)"
-            class="min-h-11 rounded-lg text-[13px] font-semibold transition-all duration-150 flex items-center justify-center gap-1 cursor-pointer"
-            [class.bg-cherry-fill/20]="!isAddition()"
-            [class.text-cherry]="!isAddition()"
-            [class.border]="!isAddition()"
-            [class.border-cherry-fill/30]="!isAddition()"
-            [class.text-ink-2]="isAddition()"
           >
-            <span aria-hidden="true">↓</span> Expense
+            Expense
           </button>
         </div>
       </div>
 
-      <div class="space-y-1.5">
-        <label class="text-xs font-medium text-ink-2">Trip</label>
-        <div class="grid grid-cols-2 gap-2 p-1 bg-ground/80 rounded-xl border border-raised">
+      <div class="flex flex-col gap-1.5">
+        <span id="adj-edit-trip" [class]="fieldLabel">Trip</span>
+        <div role="group" aria-labelledby="adj-edit-trip" [class]="frame + ' grid-cols-2'">
           <button
             type="button"
+            [class]="segment(isTrip())"
+            [attr.aria-pressed]="isTrip()"
             (click)="tripChange.emit(true)"
-            class="min-h-11 rounded-lg text-[13px] font-semibold transition-all duration-150 flex items-center justify-center gap-1 cursor-pointer"
-            [class.bg-ember/20]="isTrip()"
-            [class.text-ember-ink]="isTrip()"
-            [class.border]="isTrip()"
-            [class.border-ember/30]="isTrip()"
-            [class.text-ink-2]="!isTrip()"
           >
-            🛫 Yes
+            Yes
           </button>
           <button
             type="button"
+            [class]="segment(!isTrip())"
+            [attr.aria-pressed]="!isTrip()"
             (click)="tripChange.emit(false)"
-            class="min-h-11 rounded-lg text-[13px] font-semibold transition-all duration-150 flex items-center justify-center gap-1 cursor-pointer"
-            [class.bg-edge/60]="!isTrip()"
-            [class.text-ink]="!isTrip()"
-            [class.border]="!isTrip()"
-            [class.border-ink-4/40]="!isTrip()"
-            [class.text-ink-2]="isTrip()"
           >
             No
           </button>
@@ -68,32 +59,24 @@ import { Component, input, output } from '@angular/core';
       </div>
 
       @if (isTrip()) {
-        <div class="space-y-1.5">
-          <label class="text-xs font-medium text-ink-2">Accept New Transactions</label>
-          <div class="grid grid-cols-2 gap-2 p-1 bg-ground/80 rounded-xl border border-raised">
+        <div class="flex flex-col gap-1.5">
+          <span id="adj-edit-open" [class]="fieldLabel">New transactions</span>
+          <div role="group" aria-labelledby="adj-edit-open" [class]="frame + ' grid-cols-2'">
             <button
               type="button"
+              [class]="segment(isSelectable())"
+              [attr.aria-pressed]="isSelectable()"
               (click)="selectableChange.emit(true)"
-              class="min-h-11 rounded-lg text-[13px] font-semibold transition-all duration-150 flex items-center justify-center gap-1 cursor-pointer"
-              [class.bg-avocado/20]="isSelectable()"
-              [class.text-avocado-ink]="isSelectable()"
-              [class.border]="isSelectable()"
-              [class.border-avocado/30]="isSelectable()"
-              [class.text-ink-2]="!isSelectable()"
             >
-              🔓 Open
+              Open
             </button>
             <button
               type="button"
+              [class]="segment(!isSelectable())"
+              [attr.aria-pressed]="!isSelectable()"
               (click)="selectableChange.emit(false)"
-              class="min-h-11 rounded-lg text-[13px] font-semibold transition-all duration-150 flex items-center justify-center gap-1 cursor-pointer"
-              [class.bg-edge/60]="!isSelectable()"
-              [class.text-ink]="!isSelectable()"
-              [class.border]="!isSelectable()"
-              [class.border-ink-4/40]="!isSelectable()"
-              [class.text-ink-2]="isSelectable()"
             >
-              🔒 Closed
+              Closed
             </button>
           </div>
         </div>
@@ -102,6 +85,9 @@ import { Component, input, output } from '@angular/core';
   `,
 })
 export class AdjustmentEditOptionsComponent {
+  protected readonly frame = SEGMENT_FRAME;
+  protected readonly fieldLabel = FIELD_LABEL;
+
   readonly isAddition = input.required<boolean>();
   readonly isTrip = input.required<boolean>();
   readonly isSelectable = input.required<boolean>();
@@ -109,4 +95,8 @@ export class AdjustmentEditOptionsComponent {
   readonly typeChange = output<boolean>();
   readonly tripChange = output<boolean>();
   readonly selectableChange = output<boolean>();
+
+  segment(active: boolean): string {
+    return `${SEGMENT_BASE} ${active ? SEGMENT_ON : SEGMENT_OFF}`;
+  }
 }
