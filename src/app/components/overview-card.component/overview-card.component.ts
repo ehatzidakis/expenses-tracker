@@ -19,24 +19,21 @@ export type { YearlyBreakdownEntry } from './overview-card.models';
       class="rounded-2xl border border-ink/10 bg-panel px-5 pt-4 pb-2 shadow-[inset_0_1px_0_rgb(241_230_210/0.06)]"
       aria-label="All time summary"
     >
-      <!-- Stacked, not side by side: all-time totals grow past what fits beside each other. -->
+      <!-- Saved leads on this page; stacked because all-time totals don't fit side by side. -->
       <p
-        class="type-wide text-[clamp(30px,9vw,40px)] font-bold leading-none tracking-[-0.02em] text-ink"
+        class="type-wide text-[clamp(30px,9vw,40px)] font-bold leading-none tracking-[-0.02em]"
+        [class]="totalSaved() >= 0 ? 'text-avocado' : 'text-cherry'"
         appSensitive
       >
-        €{{ totalSpend() | number: '1.2-2' }}
+        {{ sign(totalSaved()) }}€{{ abs(totalSaved()) | number: '1.2-2' }}
       </p>
-      <p class="mt-2 text-[14px] text-ink-2">spent in total</p>
+      <p class="mt-2 text-[14px] text-ink-2">saved overall</p>
 
       <p class="mt-3 flex items-baseline gap-2">
-        <span
-          class="type-wide text-[18px] font-semibold leading-none"
-          [class]="totalSaved() >= 0 ? 'text-avocado' : 'text-cherry'"
-          appSensitive="sm"
-        >
-          {{ sign(totalSaved()) }}€{{ abs(totalSaved()) | number: '1.2-2' }}
+        <span class="type-wide text-[18px] font-semibold leading-none text-ink" appSensitive="sm">
+          €{{ totalSpend() | number: '1.2-2' }}
         </span>
-        <span class="text-[13px] text-ink-3">saved overall</span>
+        <span class="text-[13px] text-ink-3">spent in total</span>
       </p>
 
       @if (rangeLine(); as range) {
