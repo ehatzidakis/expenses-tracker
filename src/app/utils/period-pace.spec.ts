@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { budgetStatus, categoryLabel, daysInRange, monthTiming } from './period-pace';
+import { budgetStatus, categoryLabel, daysInRange, monthTiming, friendlyDate, monthNameOf, ordinal } from './period-pace';
 
 describe('monthTiming', () => {
   const now = new Date(2026, 9, 19); // 19 Oct 2026
@@ -56,5 +56,26 @@ describe('daysInRange', () => {
   it('counts both ends', () => {
     expect(daysInRange(new Date(2026, 9, 12), new Date(2026, 9, 17))).toBe(6);
     expect(daysInRange(new Date(2026, 9, 12), new Date(2026, 9, 12))).toBe(1);
+  });
+});
+
+describe('date labels', () => {
+  it('adds the right ordinal suffix', () => {
+    expect([1, 2, 3, 4, 11, 12, 13, 21, 22, 23, 31].map(ordinal)).toEqual([
+      '1st', '2nd', '3rd', '4th', '11th', '12th', '13th', '21st', '22nd', '23rd', '31st',
+    ]);
+  });
+
+  it('turns a date into the month record key', () => {
+    expect(monthNameOf('2026-11-06')).toBe('November 2026');
+    expect(monthNameOf('2027-01-31')).toBe('January 2027');
+    expect(monthNameOf('not a date')).toBe('');
+  });
+
+  it('names today and yesterday, and dates the rest', () => {
+    const now = new Date(2026, 10, 13, 9, 0);
+    expect(friendlyDate('2026-11-13', now)).toBe('Today · Fri. 13th');
+    expect(friendlyDate('2026-11-12', now)).toBe('Yesterday · Thu. 12th');
+    expect(friendlyDate('2026-11-02', now)).toBe('Mon. 2nd Nov');
   });
 });

@@ -31,3 +31,16 @@ export const PICKER_PANEL =
 /** 20x20 calendar glyph (evenodd) for the picker toggle. */
 export const CALENDAR_ICON_PATH =
   'M5.75 2a.75.75 0 01.75.75V4h7V2.75a.75.75 0 011.5 0V4h.25A2.75 2.75 0 0118 6.75v8.5A2.75 2.75 0 0115.25 18H4.75A2.75 2.75 0 012 15.25v-8.5A2.75 2.75 0 014.75 4H5V2.75A.75.75 0 015.75 2zm-1 5.5c-.69 0-1.25.56-1.25 1.25v6.5c0 .69.56 1.25 1.25 1.25h10.5c.69 0 1.25-.56 1.25-1.25v-6.5c0-.69-.56-1.25-1.25-1.25H4.75z';
+
+/** Segmented switch: a teak-edge frame holding equal segments (Month / Trips / One-offs, Yes / No). */
+export const SEGMENT_FRAME = 'grid rounded-xl border border-edge p-0.5';
+export const SEGMENT_BASE =
+  'min-h-11 rounded-[10px] text-[13px] font-medium transition-colors duration-150 cursor-pointer';
+export const SEGMENT_ON = 'bg-ember/20 text-ink ring-1 ring-inset ring-ember/60';
+export const SEGMENT_OFF = 'text-ink-3 hover:text-ink';
+
+/** Text field on the ground: smoked glass, teak edge, ember border on focus. Type size comes from styles.css. */
+export const FIELD =
+  'w-full min-h-12 rounded-xl border border-edge bg-panel px-3.5 text-ink placeholder:text-ink-4 transition-colors focus:border-ember focus-visible:outline-none';
+export const FIELD_LABEL = 'text-[13px] font-medium text-ink-2';
+export const FIELD_ERROR = 'text-[12px] text-cherry';

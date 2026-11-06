@@ -1,5 +1,4 @@
-import { CommonModule } from '@angular/common';
-import { Component, inject, signal } from '@angular/core';
+import { Component, effect, inject, input, signal, untracked } from '@angular/core';
 import { form, maxLength, required } from '@angular/forms/signals';
 import { QueryClient } from '@tanstack/angular-query-experimental';
 import { AdjustmentService } from '../../services/adjustment-service';
@@ -14,10 +13,10 @@ import { buildAdjustmentPayload } from './transaction-payload';
 @Component({
   selector: 'app-create-adjustment-form',
   standalone: true,
-  imports: [CommonModule, AdjustmentFieldsComponent, SplitFieldsComponent],
+  imports: [AdjustmentFieldsComponent, SplitFieldsComponent],
   host: { class: 'block' },
   template: `
-    <form (submit)="onSubmit($event)" class="space-y-4">
+    <form (submit)="onSubmit($event)" class="flex flex-col gap-5">
       <app-adjustment-fields
         [model]="adjustmentModel()"
         [addition]="isAddition()"
@@ -25,7 +24,6 @@ import { buildAdjustmentPayload } from './transaction-payload';
         [amountField]="adjustmentForm.amount"
         [startDateField]="adjustmentForm.startDate"
         [endDateField]="adjustmentForm.endDate"
-        (tripChange)="setIsTrip($event)"
         (selectableChange)="setIsSelectable($event)"
         (additionChange)="isAddition.set($event)"
         (amountChange)="adjustmentModel.update((model) => ({ ...model, amount: $event }))"
@@ -42,24 +40,27 @@ import { buildAdjustmentPayload } from './transaction-payload';
       <button
         type="submit"
         [disabled]="adjustmentForm().invalid() || submitting() || privacyService.isPrivacyMode()"
-        class="w-full py-3 rounded-xl text-sm font-semibold text-ground bg-ember shadow-lg disabled:opacity-40 disabled:cursor-not-allowed active:scale-[0.99] transition-all cursor-pointer"
+        class="min-h-12 w-full rounded-xl bg-ember text-[15px] font-semibold text-ground transition-[background-color,transform] duration-150 hover:bg-ember-ink active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-40 cursor-pointer"
       >
-        {{ submitting() ? 'Adding…' : 'Add One-Off' }}
+        {{ submitting() ? 'Adding…' : adjustmentModel().isTrip ? 'Add trip' : 'Add one-off' }}
       </button>
     </form>
 
-    @if (successMessage()) {
-      <div
-        class="p-3 bg-avocado-deep/40 border border-avocado-deep/60 text-avocado-ink rounded-xl text-xs"
-      >
-        <span>{{ successMessage() }}</span>
-      </div>
-    }
-    @if (errorMessage()) {
-      <div class="p-3 bg-cherry-deep/40 border border-cherry-deep/60 text-cherry rounded-xl text-xs">
-        {{ errorMessage() }}
-      </div>
-    }
+    <div class="mt-4 flex flex-col gap-3" aria-live="polite">
+      @if (successMessage()) {
+        <p class="border-t border-ink/10 pt-3 text-[13px] font-semibold text-avocado-ink">
+          {{ successMessage() }}
+        </p>
+      }
+      @if (errorMessage()) {
+        <p
+          role="alert"
+          class="rounded-xl border border-cherry/30 bg-cherry-deep/60 px-3.5 py-3 text-[13px] text-cherry"
+        >
+          {{ errorMessage() }}
+        </p>
+      }
+    </div>
   `,
 })
 export class CreateAdjustmentFormComponent {
@@ -84,6 +85,14 @@ export class CreateAdjustmentFormComponent {
     });
     required(schemaPath.startDate, { message: 'Start date is required' });
     required(schemaPath.endDate, { message: 'End date is required' });
+  });
+
+  /** Set by the Add tab's top switch (One-off or Trip). */
+  readonly isTrip = input(false);
+
+  private readonly syncTrip = effect(() => {
+    const trip = this.isTrip();
+    untracked(() => this.setIsTrip(trip));
   });
 
   setIsTrip(value: boolean): void {
@@ -129,6 +138,9 @@ export class CreateAdjustmentFormComponent {
       }
 
       await this.adjustmentService.createAdjustment(result.payload);
+      const added = result.payload.isTrip
+        ? `Trip added: ${result.payload.description}`
+        : `One-off added: ${result.payload.description}`;
 
       await this.queryClient.invalidateQueries({ queryKey: ['expenses'] });
       await this.queryClient.invalidateQueries({ queryKey: ['adjustments'] });
@@ -137,9 +149,9 @@ export class CreateAdjustmentFormComponent {
       this.adjustmentModel.set(defaultAdjustmentModel());
       this.adjustmentForm().reset();
       this.resetSplitFields();
-      this.successMessage.set('One-Off adjustment added successfully');
+      this.successMessage.set(added);
     } catch (err) {
-      this.errorMessage.set('Unable to add adjustment. Please try again.');
+      this.errorMessage.set("Couldn't add it. Check your connection and try again.");
     } finally {
       this.submitting.set(false);
     }

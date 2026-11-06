@@ -1,10 +1,11 @@
-import { CommonModule } from '@angular/common';
+import { DecimalPipe } from '@angular/common';
 import { Component, computed, effect, ElementRef, inject, signal, viewChild } from '@angular/core';
 import { form, maxLength, required } from '@angular/forms/signals';
 import { QueryClient } from '@tanstack/angular-query-experimental';
 import { TransactionService } from '../../services/transaction-service';
 import {
   CATEGORY_NAMES,
+  ExpenseStateService,
   TRIP_CATEGORY_NAMES,
   categoryRequiresSubcategory,
   getSubcategoryOptions,
@@ -14,6 +15,12 @@ import { PrivacyService } from '../../services/privacy.service';
 import { AuthService } from '../../services/auth.service';
 import { PushNotificationService } from '../../services/push-notification.service';
 import { PEOPLE, Person } from '../../models/splitz.model';
+import { BudgetSettingsService } from '../../services/budget-settings.service';
+import { categoryLabel, monthNameOf, monthTiming } from '../../utils/period-pace';
+import { FIELD, FIELD_LABEL, SEGMENT_BASE, SEGMENT_FRAME, SEGMENT_OFF, SEGMENT_ON } from '../../utils/pill-styles';
+import { SensitiveDirective } from '../../utils/sensitive.directive';
+import { StripeComponent } from '../stripe/stripe';
+import { CategoryRoom } from '../category-picker/category-picker';
 import { TransactionBasicFieldsComponent } from './transaction-basic-fields.component';
 import { SplitFieldsComponent } from './split-fields.component';
 import { TransactionCommentFieldsComponent } from './transaction-comment-fields.component';
@@ -35,7 +42,9 @@ import {
   selector: 'app-create-transaction-form',
   standalone: true,
   imports: [
-    CommonModule,
+    DecimalPipe,
+    SensitiveDirective,
+    StripeComponent,
     TransactionBasicFieldsComponent,
     SplitFieldsComponent,
     TransactionCommentFieldsComponent,
@@ -43,48 +52,25 @@ import {
   ],
   host: { class: 'block' },
   template: `
-    <form (submit)="onSubmit($event)" class="space-y-4 scroll-mb-32">
+    <form (submit)="onSubmit($event)" class="flex scroll-mb-32 flex-col gap-5">
       <app-transaction-basic-fields
         [model]="transactionModel()"
         [categories]="activeCategories()"
-        [linked]="linkWithAdjustment()"
-        [showTripLink]="!sendToKiosk()"
-        [trips]="selectableTrips()"
-        [selectedTripId]="selectedAdjustmentId()"
+        [room]="room()"
         [dateField]="transactionForm.date"
         [descriptionField]="transactionForm.description"
         [categoryField]="transactionForm.category"
         [subCategoryField]="transactionForm.subCategoryId"
         [amountField]="transactionForm.amount"
         [amountHint]="amountHint()"
-        (linkChange)="toggleLinkWithAdjustment($event)"
-        (tripChange)="selectedAdjustmentId.set($event)"
         (categoryChange)="setCategory($event); clearTemplate()"
         (subcategoryChange)="setSubcategory($event)"
-        (amountChange)="transactionModel.update((model) => ({ ...model, amount: $event }))"
+        (amountChange)="onAmountChange($event)"
         (amountHintUse)="transactionModel.update((model) => ({ ...model, amount: $event }))"
       >
         @if (showRecurring()) {
-          <button
-            descriptionAction
-            type="button"
-            (click)="recurringOpen.set(!recurringOpen())"
-            [attr.aria-expanded]="recurringOpen()"
-            aria-label="Recurring transactions"
-            title="Recurring transactions"
-            class="flex items-center gap-1 px-2 py-0.5 rounded-lg text-[11px] font-semibold border transition-colors cursor-pointer"
-            [class.bg-ember/20]="recurringOpen()"
-            [class.border-ember-ink/50]="recurringOpen()"
-            [class.text-ember-soft]="recurringOpen()"
-            [class.border-edge/60]="!recurringOpen()"
-            [class.text-ink-2]="!recurringOpen()"
-          >
-            🔁 Recurring
-          </button>
-        }
-        @if (showRecurring() && recurringOpen()) {
           <app-recurring-templates
-            descriptionExtras
+            recurringRow
             [targetDate]="transactionModel().date"
             [activeId]="activeTemplateId()"
             [disabled]="privacyService.isPrivacyMode()"
@@ -93,6 +79,7 @@ import {
           />
         }
       </app-transaction-basic-fields>
+
       @if (!isKioskMode() && !sendToKiosk()) {
         <app-split-fields
           [amount]="transactionModel().amount"
@@ -104,33 +91,111 @@ import {
           (reset)="resetSplitFields()"
         />
       }
-      <app-transaction-comment-fields
-        [enabled]="hasComment()"
-        [commentField]="transactionForm.comment"
-        (commentToggle)="setHasComment($event)"
-      />
+
       @if (!isKioskMode()) {
-        <label
-          class="flex items-center justify-between gap-3 rounded-xl border px-3 py-2.5 cursor-pointer transition-colors"
-          [class.border-ember/40]="sendToKiosk()"
-          [class.bg-ember/10]="sendToKiosk()"
-          [class.border-raised]="!sendToKiosk()"
-          [class.bg-ground/60]="!sendToKiosk()"
-        >
-          <span class="space-y-0.5">
-            <span class="block text-xs font-semibold text-ink">Send to kiosk</span>
-            <!-- <span class="block text-[11px] text-ink-3">
-              They fill in the amount and send it back. Amount is optional.
-            </span> -->
-          </span>
-          <input
-            type="checkbox"
-            class="h-4 w-4 shrink-0 accent-ember cursor-pointer"
-            [checked]="sendToKiosk()"
-            (change)="setSendToKiosk($any($event.target).checked)"
-          />
-        </label>
+        <div class="border-y border-ink/10">
+          <button
+            type="button"
+            class="flex min-h-12 w-full items-center justify-between gap-3 text-left cursor-pointer"
+            [attr.aria-expanded]="moreOpen()"
+            aria-controls="tx-more"
+            (click)="moreOpen.set(!moreOpen())"
+          >
+            <span class="text-[14px] font-medium text-ink-2">More options</span>
+            <span class="flex min-w-0 items-center gap-1.5 text-[12px] text-ink-3">
+              <span class="truncate">{{ moreSummary() }}</span>
+              <svg
+                class="size-3.5 shrink-0 transition-transform duration-200"
+                [class.rotate-180]="moreOpen()"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+                aria-hidden="true"
+              >
+                <path
+                  fill-rule="evenodd"
+                  clip-rule="evenodd"
+                  d="M5.23 7.21a.75.75 0 011.06.02L10 11.17l3.71-3.94a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z"
+                />
+              </svg>
+            </span>
+          </button>
+
+          @if (moreOpen()) {
+            <div id="tx-more" class="flex flex-col gap-4 pb-4">
+              @if (!sendToKiosk()) {
+                <div class="flex flex-col gap-1.5">
+                  <span id="tx-trip-label" [class]="fieldLabel">Trip</span>
+                  <div role="group" aria-labelledby="tx-trip-label" [class]="segmentFrame + ' grid-cols-2'">
+                    <button
+                      type="button"
+                      [class]="segment(!linkWithAdjustment())"
+                      [attr.aria-pressed]="!linkWithAdjustment()"
+                      (click)="toggleLinkWithAdjustment(false)"
+                    >
+                      No trip
+                    </button>
+                    <button
+                      type="button"
+                      [class]="segment(linkWithAdjustment())"
+                      [attr.aria-pressed]="linkWithAdjustment()"
+                      (click)="toggleLinkWithAdjustment(true)"
+                    >
+                      Add to a trip
+                    </button>
+                  </div>
+                  @if (linkWithAdjustment()) {
+                    @if (selectableTrips().length === 0) {
+                      <p class="text-[13px] text-ink-3">No open trips. Open one from the One-off tab.</p>
+                    } @else {
+                      <label for="tx-trip" class="sr-only">Which trip</label>
+                      <select
+                        id="tx-trip"
+                        [value]="selectedAdjustmentId()"
+                        (change)="selectedAdjustmentId.set($any($event.target).value)"
+                        [class]="field"
+                      >
+                        <option value="">Pick a trip</option>
+                        @for (trip of selectableTrips(); track trip.id) {
+                          <option [value]="trip.id">{{ trip.title }}</option>
+                        }
+                      </select>
+                    }
+                  }
+                </div>
+              }
+
+              <app-transaction-comment-fields
+                [enabled]="hasComment()"
+                [commentField]="transactionForm.comment"
+                (commentToggle)="setHasComment($event)"
+              />
+
+              <div class="flex flex-col gap-1.5">
+                <span id="tx-kiosk-label" [class]="fieldLabel">Send to kiosk</span>
+                <div role="group" aria-labelledby="tx-kiosk-label" [class]="segmentFrame + ' grid-cols-2'">
+                  <button
+                    type="button"
+                    [class]="segment(!sendToKiosk())"
+                    [attr.aria-pressed]="!sendToKiosk()"
+                    (click)="setSendToKiosk(false)"
+                  >
+                    No
+                  </button>
+                  <button
+                    type="button"
+                    [class]="segment(sendToKiosk())"
+                    [attr.aria-pressed]="sendToKiosk()"
+                    (click)="setSendToKiosk(true)"
+                  >
+                    Yes
+                  </button>
+                </div>
+              </div>
+            </div>
+          }
+        </div>
       }
+
       <button
         type="submit"
         [disabled]="
@@ -142,26 +207,55 @@ import {
             splitStore.customSplitMode() &&
             !customSplitOk())
         "
-        class="w-full py-3 rounded-xl text-sm font-semibold text-ground bg-ember shadow-lg disabled:opacity-40 disabled:cursor-not-allowed active:scale-[0.99] transition-all cursor-pointer"
+        class="min-h-12 w-full rounded-xl bg-ember text-[15px] font-semibold text-ground transition-[background-color,transform] duration-150 hover:bg-ember-ink active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-40 cursor-pointer"
       >
         {{ submitLabel() }}
       </button>
     </form>
 
-    @if (successMessage()) {
-      <div
-        class="mt-2 p-3 bg-avocado-deep/40 border border-avocado-deep/60 text-avocado-ink rounded-xl text-xs text-center"
-      >
-        <span>{{ successMessage() }}</span>
-      </div>
-    }
-    @if (errorMessage()) {
-      <div
-        class="mt-2 p-3 bg-cherry-deep/40 border border-cherry-deep/60 text-cherry rounded-xl text-xs text-center"
-      >
-        {{ errorMessage() }}
-      </div>
-    }
+    <div class="mt-4 flex flex-col gap-3" aria-live="polite">
+      @if (impact(); as saved) {
+        <div class="flex flex-col gap-1.5 border-t border-ink/10 pt-3">
+          <!-- Two lines on purpose: what was saved, then where its category stands. -->
+          <p class="text-[13px] text-ink-2">
+            <span class="font-semibold text-avocado-ink">Saved</span> · {{ saved.label }}
+          </p>
+          <p class="text-[13px] text-ink-2" appSensitive="xs">
+            €{{ saved.spent | number: '1.2-2' }}
+            @if (saved.budget !== null) {
+              of €{{ saved.budget | number: '1.2-2' }}
+            }
+            {{ saved.when }}
+            @if (saved.budget !== null) {
+              @if (saved.spent > saved.budget + 0.005) {
+                <span class="whitespace-nowrap font-semibold text-cherry"
+                  >· €{{ saved.spent - saved.budget | number: '1.2-2' }} over</span
+                >
+              } @else {
+                <span class="whitespace-nowrap text-avocado"
+                  >· €{{ saved.budget - saved.spent | number: '1.2-2' }} left</span
+                >
+              }
+            }
+          </p>
+          @if (saved.budget) {
+            <app-stripe [ratio]="saved.spent / saved.budget" [pace]="saved.pace" [animate]="true" />
+          }
+        </div>
+      } @else if (successMessage()) {
+        <p class="border-t border-ink/10 pt-3 text-[13px] font-semibold text-avocado-ink">
+          {{ successMessage() }}
+        </p>
+      }
+      @if (errorMessage()) {
+        <p
+          role="alert"
+          class="rounded-xl border border-cherry/30 bg-cherry-deep/60 px-3.5 py-3 text-[13px] text-cherry"
+        >
+          {{ errorMessage() }}
+        </p>
+      }
+    </div>
   `,
 })
 export class CreateTransactionFormComponent {
@@ -174,6 +268,13 @@ export class CreateTransactionFormComponent {
   readonly privacyService = inject(PrivacyService);
   readonly splitStore = inject(SplitStateStore);
   readonly isKioskMode = this.authService.isKiosk;
+  private readonly budgetSettings = inject(BudgetSettingsService);
+  /** Admin only: the kiosk never loads the owner's month records or budgets. */
+  private readonly expenseState = this.authService.isKiosk() ? null : inject(ExpenseStateService);
+
+  protected readonly field = FIELD;
+  protected readonly fieldLabel = FIELD_LABEL;
+  protected readonly segmentFrame = SEGMENT_FRAME;
 
   readonly regularCategories = CATEGORY_NAMES;
   readonly tripCategories = TRIP_CATEGORY_NAMES;
@@ -183,7 +284,9 @@ export class CreateTransactionFormComponent {
   readonly selectedAdjustmentId = signal<string>('');
   readonly hasComment = signal<boolean>(false);
   readonly activeTemplateId = signal<string | null>(null);
-  readonly recurringOpen = signal(false);
+  readonly moreOpen = signal(false);
+  /** The last posted transaction, shown with what it did to its category this month. */
+  readonly lastSaved = signal<{ category: string; monthName: string } | null>(null);
   // Admin only: save as a request for the kiosk to fill in, instead of a transaction.
   readonly sendToKiosk = signal(false);
   // Hidden in privacy mode: templates fill in real amounts and last month's bills.
@@ -196,7 +299,8 @@ export class CreateTransactionFormComponent {
   );
   readonly submitLabel = computed(() => {
     if (this.sendToKiosk()) return this.submitting() ? 'Sending…' : 'Send to kiosk';
-    return this.submitting() ? 'Adding…' : 'Add Transaction';
+    if (this.isKioskMode()) return this.submitting() ? 'Sending…' : 'Send for review';
+    return this.submitting() ? 'Adding…' : 'Add transaction';
   });
   readonly amountHint = signal<number | null>(null);
 
@@ -236,6 +340,68 @@ export class CreateTransactionFormComponent {
     const category = this.transactionModel().category;
     return category ? getSubcategoryOptions(category) : [];
   });
+
+  /** Spent and budget per category in a month, from the month record (admin only). */
+  private roomIn(monthName: string): Record<string, CategoryRoom> | null {
+    if (!this.expenseState || !monthName) return null;
+    const record = (this.expenseState.expensesQuery.data() ?? []).find((e) => e.MonthName === monthName);
+    const room: Record<string, CategoryRoom> = {};
+    for (const name of CATEGORY_NAMES) {
+      room[name] = {
+        spent: Number(record?.[name as keyof typeof record] ?? 0) || 0,
+        budget: this.budgetSettings.getCategoryBudget(name),
+      };
+    }
+    return room;
+  }
+
+  /** What is left per category in the month of the entered date. Trips have no budgets. */
+  readonly room = computed(() =>
+    this.linkWithAdjustment() ? null : this.roomIn(monthNameOf(this.transactionModel().date)),
+  );
+
+  readonly impact = computed(() => {
+    const saved = this.lastSaved();
+    if (!saved) return null;
+    const room = this.roomIn(saved.monthName)?.[saved.category];
+    if (!room) return null;
+    const now = new Date();
+    const thisMonth = monthNameOf(`${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-01`);
+    const current = saved.monthName === thisMonth;
+    const timing = monthTiming(saved.monthName);
+    return {
+      pace: timing.kind === 'current' ? timing.pace : null,
+      label: categoryLabel(saved.category),
+      spent: room.spent,
+      budget: room.budget,
+      when: current ? 'this month' : `in ${saved.monthName.split(' ')[0]}`,
+    };
+  });
+
+  readonly moreSummary = computed(() => {
+    const parts: string[] = [];
+    if (this.linkWithAdjustment()) {
+      const trip = this.selectableTrips().find((t) => t.id === this.selectedAdjustmentId());
+      parts.push(trip?.title ?? 'Trip');
+    }
+    if (this.hasComment()) parts.push('Comment');
+    if (this.sendToKiosk()) parts.push('To kiosk');
+    return parts.join(' · ');
+  });
+
+  segment(active: boolean): string {
+    return `${SEGMENT_BASE} ${active ? SEGMENT_ON : SEGMENT_OFF}`;
+  }
+
+  /** A cleared form that keeps the date, so a run of entries for one day stays quick. */
+  private freshModel(): TransactionFormModel {
+    return { ...defaultTransactionModel(), date: this.transactionModel().date };
+  }
+
+  onAmountChange(amount: number): void {
+    this.transactionModel.update((model) => ({ ...model, amount }));
+    if (amount !== 0) this.lastSaved.set(null);
+  }
 
   readonly customSplitOk = computed(() =>
     isCustomSplitValid(this.transactionModel().amount, this.splitStore.state()),
@@ -337,7 +503,6 @@ export class CreateTransactionFormComponent {
 
     // The kiosk can't fill in trips or splits, so drop them.
     if (this.linkWithAdjustment()) this.toggleLinkWithAdjustment(false);
-    this.recurringOpen.set(false);
     this.splitStore.reset();
   }
 
@@ -380,7 +545,7 @@ export class CreateTransactionFormComponent {
     this.successMessageTimer = setTimeout(() => {
       this.successMessage.set(null);
       this.successMessageTimer = undefined;
-    }, 1500);
+    }, 4000);
   }
 
   async onSubmit(event: Event): Promise<void> {
@@ -403,6 +568,7 @@ export class CreateTransactionFormComponent {
 
     this.submitting.set(true);
     this.successMessage.set(null);
+    this.lastSaved.set(null);
     this.errorMessage.set(null);
 
     try {
@@ -425,25 +591,33 @@ export class CreateTransactionFormComponent {
         await this.transactionService.createPendingTransaction(result.payload, 'admin');
         await this.queryClient.invalidateQueries({ queryKey: ['pendingTransactions'] });
 
-        this.transactionModel.set(defaultTransactionModel());
+        this.transactionModel.set(this.freshModel());
         this.transactionForm().reset();
         this.resetSplitFields();
-        this.showSuccessMessage('Transaction saved for approval');
+        this.showSuccessMessage('Saved to Pending review, since it is in another month');
         return;
       }
 
       await this.transactionService.createTransaction(result.payload);
+      const posted = this.linkWithAdjustment()
+        ? null
+        : { category: result.payload.category, monthName: monthNameOf(result.payload.date) };
+      const tripTitle = this.selectableTrips().find((t) => t.id === this.selectedAdjustmentId())?.title;
 
       await this.queryClient.invalidateQueries({ queryKey: ['expenses'] });
       await this.queryClient.invalidateQueries({ queryKey: ['adjustments'] });
       await this.queryClient.invalidateQueries({ queryKey: ['splitTransactions'] });
 
-      this.transactionModel.set(defaultTransactionModel());
+      this.transactionModel.set(this.freshModel());
       this.transactionForm().reset();
       this.resetSplitFields();
-      this.showSuccessMessage('🎉Transaction added🎉');
+      if (posted) {
+        this.lastSaved.set(posted);
+      } else {
+        this.showSuccessMessage(tripTitle ? `Added to ${tripTitle}` : 'Transaction added');
+      }
     } catch (err) {
-      this.errorMessage.set('😢Unable to add transaction😢 Please try again.');
+      this.errorMessage.set("Couldn't add the transaction. Check your connection and try again.");
     } finally {
       this.submitting.set(false);
     }
@@ -452,6 +626,7 @@ export class CreateTransactionFormComponent {
   private async submitKioskRequest(): Promise<void> {
     this.submitting.set(true);
     this.successMessage.set(null);
+    this.lastSaved.set(null);
     this.errorMessage.set(null);
 
     try {
@@ -469,14 +644,14 @@ export class CreateTransactionFormComponent {
       void this.pushNotifications.notifyKioskRequest(result.payload);
       await this.queryClient.invalidateQueries({ queryKey: ['pendingTransactions'] });
 
-      this.transactionModel.set(defaultTransactionModel());
+      this.transactionModel.set(this.freshModel());
       this.transactionForm().reset();
       this.resetSplitFields();
       this.sendToKiosk.set(false);
       this.showSuccessMessage('Request sent to kiosk');
     } catch (err) {
       console.error('Sending the request to the kiosk failed:', err);
-      this.errorMessage.set('Unable to send the request. Please try again.');
+      this.errorMessage.set("Couldn't send the request. Check your connection and try again.");
     } finally {
       this.submitting.set(false);
     }
@@ -485,6 +660,7 @@ export class CreateTransactionFormComponent {
   private async submitKioskTransaction(): Promise<void> {
     this.submitting.set(true);
     this.successMessage.set(null);
+    this.lastSaved.set(null);
     this.errorMessage.set(null);
 
     try {
@@ -504,12 +680,12 @@ export class CreateTransactionFormComponent {
 
       await this.queryClient.invalidateQueries({ queryKey: ['pendingTransactions'] });
 
-      this.transactionModel.set(defaultTransactionModel());
+      this.transactionModel.set(this.freshModel());
       this.transactionForm().reset();
       this.resetSplitFields();
-      this.showSuccessMessage('Transaction sent for approval');
+      this.showSuccessMessage('Sent for review');
     } catch (err) {
-      console.error('😢Kiosk approval submission failed😢:', err);
+      console.error('Kiosk approval submission failed:', err);
       const message =
         err instanceof Error ? err.message : 'Unable to submit kiosk transaction for approval.';
       this.errorMessage.set(message);

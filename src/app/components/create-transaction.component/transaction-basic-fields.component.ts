@@ -1,9 +1,18 @@
-import { CommonModule } from '@angular/common';
 import { Component, computed, ElementRef, input, output, viewChild } from '@angular/core';
 import { FieldTree, FormField } from '@angular/forms/signals';
-import { getCategoryMeta, getSubcategoryOptions } from '../../services/expense-state.service';
+import { getSubcategoryOptions } from '../../services/expense-state.service';
 import { normalizeDecimalInput, parseDecimalInput } from '../../utils/decimal-input';
+import { friendlyDate } from '../../utils/period-pace';
+import {
+  ACTIVE_PILL,
+  FIELD,
+  FIELD_ERROR,
+  FIELD_LABEL,
+  IDLE_PILL,
+  PILL_BASE,
+} from '../../utils/pill-styles';
 import { DateStepperComponent } from '../date-stepper/date-stepper.component';
+import { CategoryPickerComponent, CategoryRoom } from '../category-picker/category-picker';
 
 interface TransactionFieldsModel {
   date: string;
@@ -13,157 +22,22 @@ interface TransactionFieldsModel {
   amount: number;
 }
 
+/**
+ * The till part of the Add tab: the amount as the headline, the category keyboard under it,
+ * then description and date. Recurring picks are projected in between ([recurringRow]).
+ */
 @Component({
   selector: 'app-transaction-basic-fields',
   standalone: true,
-  imports: [CommonModule, FormField, DateStepperComponent],
-  host: { class: 'block' },
+  imports: [FormField, DateStepperComponent, CategoryPickerComponent],
+  host: { class: 'flex flex-col gap-5' },
   template: `
-    <div class="space-y-4">
-      @if (showTripLink()) {
-        <div class="space-y-1.5">
-          <label class="text-xs font-medium text-ink-2">Link with Trip</label>
-          <div class="grid grid-cols-2 gap-2 p-1 bg-ground/80 rounded-xl border border-raised">
-            <button
-              type="button"
-              (click)="linkChange.emit(true)"
-              class="py-2 rounded-lg text-xs font-semibold transition-all duration-150 flex items-center justify-center gap-1 cursor-pointer"
-              [class.bg-ember/20]="linked()"
-              [class.text-ember-ink]="linked()"
-              [class.border]="linked()"
-              [class.border-ember/30]="linked()"
-              [class.text-ink-2]="!linked()"
-            >
-              🛫 Yes
-            </button>
-            <button
-              type="button"
-              (click)="linkChange.emit(false)"
-              class="py-2 rounded-lg text-xs font-semibold transition-all duration-150 flex items-center justify-center gap-1 cursor-pointer"
-              [class.bg-edge/60]="!linked()"
-              [class.text-ink]="!linked()"
-              [class.border]="!linked()"
-              [class.border-ink-4/40]="!linked()"
-              [class.text-ink-2]="linked()"
-            >
-              No
-            </button>
-          </div>
-        </div>
-      }
-
-      @if (linked()) {
-        <div class="space-y-1.5">
-          <label for="tx-trip" class="text-xs font-medium text-ink-2">Select Trip</label>
-          @if (trips().length === 0) {
-            <p class="text-xs text-ink-3 py-1">No open trips available.</p>
-          } @else {
-            <select
-              id="tx-trip"
-              [value]="selectedTripId()"
-              (change)="tripChange.emit($any($event.target).value)"
-              class="w-full bg-raised/60 border border-raised rounded-xl px-3 py-2.5 text-sm text-ink focus:outline-none focus:ring-2 focus:ring-ember/60"
-            >
-              <option value="">Select a trip</option>
-              @for (trip of trips(); track trip.id) {
-                <option [value]="trip.id">{{ trip.title }}</option>
-              }
-            </select>
-          }
-        </div>
-      }
-
-      <div class="space-y-1.5">
-        <label for="tx-date" class="text-xs font-medium text-ink-2">Date</label>
-        <app-date-stepper>
-          <input
-            #dateInput
-            id="tx-date"
-            type="date"
-            [formField]="dateField()"
-            class="flex-1 min-w-0 appearance-none scheme-dark bg-raised/60 border border-raised rounded-xl px-3 py-2.5 text-sm text-ink focus:outline-none focus:ring-2 focus:ring-ember/60"
-          />
-        </app-date-stepper>
-        @if (dateField()().touched() && dateField()().invalid()) {
-          <span class="text-[11px] text-cherry">{{ dateField()().errors()[0]?.message }}</span>
-        }
-      </div>
-
-      <div class="space-y-1.5">
-        <div class="flex items-center justify-between gap-2">
-          <label for="tx-description" class="text-xs font-medium text-ink-2">Description</label>
-          <ng-content select="[descriptionAction]" />
-        </div>
-        <ng-content select="[descriptionExtras]" />
-        <input
-          #descriptionInput
-          id="tx-description"
-          type="text"
-          placeholder="Add transaction description"
-          [formField]="descriptionField()"
-          class="w-full bg-raised/60 border border-raised rounded-xl px-3 py-2.5 text-sm text-ink placeholder:text-ink-4 focus:outline-none focus:ring-2 focus:ring-ember/60"
-        />
-        @if (descriptionField()().touched() && descriptionField()().invalid()) {
-          <span class="text-[11px] text-cherry">{{
-            descriptionField()().errors()[0]?.message
-          }}</span>
-        }
-      </div>
-
-      <div class="space-y-1.5">
-        <label for="tx-category" class="text-xs font-medium text-ink-2">Category</label>
-        <select
-          id="tx-category"
-          [value]="model().category"
-          (change)="categoryChange.emit($any($event.target).value)"
-          class="w-full bg-raised/60 border border-raised rounded-xl px-3 py-2.5 text-sm text-ink focus:outline-none focus:ring-2 focus:ring-ember/60"
-        >
-          <option value="">Select a category</option>
-          @for (category of categories(); track category) {
-            <option [value]="category">{{ categoryLabel(category) }}</option>
-          }
-        </select>
-        @if (categoryField()().touched() && categoryField()().invalid()) {
-          <span class="text-[11px] text-cherry">{{ categoryField()().errors()[0]?.message }}</span>
-        }
-      </div>
-
-      @if (subcategories().length > 0) {
-        <div class="space-y-1.5">
-          <label for="tx-subcategory" class="text-xs font-medium text-ink-2">Subcategory</label>
-          <select
-            id="tx-subcategory"
-            [value]="model().subCategoryId ?? ''"
-            (change)="
-              subcategoryChange.emit(
-                $any($event.target).value === '' ? null : +$any($event.target).value
-              )
-            "
-            class="w-full bg-raised/60 border border-raised rounded-xl px-3 py-2.5 text-sm text-ink focus:outline-none focus:ring-2 focus:ring-ember/60"
-          >
-            <option value="" [selected]="model().subCategoryId == null">
-              Select a subcategory
-            </option>
-            <!-- [selected] per option: the select's own [value] runs before new options exist -->
-            @for (subcategory of subcategories(); track subcategory.id) {
-              <option
-                [value]="subcategory.id"
-                [selected]="model().subCategoryId === subcategory.id"
-              >
-                {{ subcategory.label }}
-              </option>
-            }
-          </select>
-          @if (subCategoryField()().touched() && subCategoryField()().invalid()) {
-            <span class="text-[11px] text-cherry">{{
-              subCategoryField()().errors()[0]?.message
-            }}</span>
-          }
-        </div>
-      }
-
-      <div class="space-y-1.5">
-        <label for="tx-amount" class="text-xs font-medium text-ink-2">Amount</label>
+    <div>
+      <label for="tx-amount" class="sr-only">Amount</label>
+      <div
+        class="flex items-baseline gap-1.5 border-b border-edge pb-2 transition-colors focus-within:border-ember"
+      >
+        <span class="type-wide text-[26px] font-bold text-ink-3" aria-hidden="true">€</span>
         <input
           #amountInput
           id="tx-amount"
@@ -173,33 +47,112 @@ interface TransactionFieldsModel {
           [value]="model().amount === 0 ? '' : model().amount.toString()"
           placeholder="0.00"
           (input)="onAmountInput($event)"
-          class="w-full bg-raised/60 border border-raised rounded-xl px-3 py-2.5 text-sm text-ink placeholder:text-ink-4 focus:outline-none focus:ring-2 focus:ring-ember/60 tabular-nums"
+          class="amount-display type-wide min-w-0 flex-1 bg-transparent text-[40px] font-bold leading-[1.1] tracking-[-0.02em] text-ink placeholder:text-ink-4 focus-visible:outline-none"
         />
-        <!-- Not blurred: the hint only appears after picking a recurring template, which is hidden in privacy mode -->
-        @if (amountHint() != null && model().amount === 0) {
-          <button
-            type="button"
-            (click)="amountHintUse.emit(amountHint()!)"
-            class="text-[11px] text-ember-ink hover:text-ember-soft cursor-pointer tabular-nums"
-          >
-            Last month: €{{ amountHint()!.toFixed(2) }} · tap to use
-          </button>
-        }
-        @if (amountField()().touched() && amountField()().invalid()) {
-          <span class="text-[11px] text-cherry">{{ amountField()().errors()[0]?.message }}</span>
-        }
       </div>
+      <!-- Not blurred: the hint only appears after picking a recurring template, which is hidden in privacy mode -->
+      @if (amountHint() != null && model().amount === 0) {
+        <button
+          type="button"
+          (click)="amountHintUse.emit(amountHint()!)"
+          class="inline-flex min-h-11 items-center text-[13px] text-ember-ink tabular-nums hover:text-ember-soft cursor-pointer"
+        >
+          Last month €{{ amountHint()!.toFixed(2) }} · tap to use
+        </button>
+      }
+      @if (amountField()().touched() && amountField()().invalid()) {
+        <p [class]="fieldError + ' mt-1.5'">{{ amountField()().errors()[0]?.message }}</p>
+      }
+    </div>
+
+    <div class="flex flex-col gap-2">
+      <app-category-picker
+        [categories]="categories()"
+        [selected]="model().category"
+        [room]="room()"
+        (pick)="categoryChange.emit($event)"
+      />
+      @if (categoryField()().touched() && categoryField()().invalid()) {
+        <p [class]="fieldError">{{ categoryField()().errors()[0]?.message }}</p>
+      }
+
+      @if (subcategories().length > 0) {
+        <div role="group" aria-label="Subcategory" class="flex flex-wrap gap-2 pt-1">
+          @for (subcategory of subcategories(); track subcategory.id) {
+            <button
+              type="button"
+              [class]="pillBase + ' flex items-center gap-1.5 ' + (model().subCategoryId === subcategory.id ? activePill : idlePill)"
+              [attr.aria-pressed]="model().subCategoryId === subcategory.id"
+              (click)="subcategoryChange.emit(subcategory.id)"
+            >
+              @if (splitLabel(subcategory.label); as part) {
+                @if (part.glyph) {
+                  <span class="text-[12px] opacity-60 grayscale-[40%]" aria-hidden="true">{{ part.glyph }}</span>
+                }
+                {{ part.text }}
+              }
+            </button>
+          }
+        </div>
+        @if (subCategoryField()().touched() && subCategoryField()().invalid()) {
+          <p [class]="fieldError">{{ subCategoryField()().errors()[0]?.message }}</p>
+        }
+      }
+    </div>
+
+    <ng-content select="[recurringRow]" />
+
+    <div class="flex flex-col gap-1.5">
+      <label for="tx-description" [class]="fieldLabel">Description</label>
+      <input
+        #descriptionInput
+        id="tx-description"
+        type="text"
+        placeholder="What was it?"
+        [formField]="descriptionField()"
+        [class]="field"
+      />
+      @if (descriptionField()().touched() && descriptionField()().invalid()) {
+        <p [class]="fieldError">{{ descriptionField()().errors()[0]?.message }}</p>
+      }
+    </div>
+
+    <div class="flex flex-col gap-1.5">
+      <label for="tx-date" [class]="fieldLabel">Date</label>
+      <app-date-stepper>
+        <div class="relative min-w-0 flex-1">
+          <input
+            #dateInput
+            id="tx-date"
+            type="date"
+            [formField]="dateField()"
+            [class]="field + ' scheme-dark text-transparent [-webkit-text-fill-color:transparent]'"
+          />
+          <span
+            class="pointer-events-none absolute inset-0 flex items-center px-3.5 text-[15px] text-ink"
+            aria-hidden="true"
+            >{{ dateLabel() }}</span
+          >
+        </div>
+      </app-date-stepper>
+      @if (dateField()().touched() && dateField()().invalid()) {
+        <p [class]="fieldError">{{ dateField()().errors()[0]?.message }}</p>
+      }
     </div>
   `,
 })
 export class TransactionBasicFieldsComponent {
+  protected readonly field = FIELD;
+  protected readonly fieldLabel = FIELD_LABEL;
+  protected readonly fieldError = FIELD_ERROR;
+  protected readonly pillBase = PILL_BASE;
+  protected readonly activePill = ACTIVE_PILL;
+  protected readonly idlePill = IDLE_PILL;
+
   readonly model = input.required<TransactionFieldsModel>();
   readonly categories = input.required<ReadonlyArray<string>>();
-  readonly linked = input.required<boolean>();
-  // Off for requests sent to the kiosk, which can't link trips.
-  readonly showTripLink = input(true);
-  readonly trips = input.required<ReadonlyArray<{ id: string; title: string }>>();
-  readonly selectedTripId = input.required<string>();
+  /** What is left per category in the month of the entered date; null hides it (kiosk, trips). */
+  readonly room = input<Record<string, CategoryRoom> | null>(null);
   readonly dateField = input.required<FieldTree<string>>();
   readonly descriptionField = input.required<FieldTree<string>>();
   readonly categoryField = input.required<FieldTree<string>>();
@@ -212,22 +165,26 @@ export class TransactionBasicFieldsComponent {
     viewChild.required<ElementRef<HTMLInputElement>>('descriptionInput');
   private readonly amountInput = viewChild.required<ElementRef<HTMLInputElement>>('amountInput');
 
-  readonly linkChange = output<boolean>();
-  readonly tripChange = output<string>();
   readonly categoryChange = output<string>();
   readonly subcategoryChange = output<number | null>();
   readonly amountChange = output<number>();
   readonly amountHintUse = output<number>();
 
   readonly subcategories = computed(() => getSubcategoryOptions(this.model().category));
+  readonly dateLabel = computed(() => friendlyDate(this.model().date) || 'Pick a date');
+
+  /** "🔥 Electricity" → a muted glyph and the words, like the category tiles. */
+  splitLabel(label: string): { glyph: string; text: string } {
+    const match =
+      /^(\p{Extended_Pictographic}[\p{Extended_Pictographic}\p{Emoji_Modifier}️‍]*)\s*(.*)$/u.exec(
+        label,
+      );
+    return match ? { glyph: match[1], text: match[2] } : { glyph: '', text: label };
+  }
 
   focusField(field: 'description' | 'amount'): void {
     const target = field === 'description' ? this.descriptionInput() : this.amountInput();
     target.nativeElement.focus({ preventScroll: true });
-  }
-
-  categoryLabel(category: string): string {
-    return `${getCategoryMeta(category).emoji} ${category}`;
   }
 
   onAmountInput(event: Event): void {

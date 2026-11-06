@@ -1,39 +1,39 @@
 import { Component, input, output } from '@angular/core';
-import type { EntryType } from './create-transaction.models';
+import type { EntryKind } from './create-transaction.models';
+import { SEGMENT_BASE, SEGMENT_FRAME, SEGMENT_OFF, SEGMENT_ON } from '../../utils/pill-styles';
 
 @Component({
   selector: 'app-create-entry-tabs',
   standalone: true,
   host: { class: 'block' },
   template: `
-    <div class="relative flex bg-ground/80 p-1 rounded-xl border border-raised/80">
-      <button
-        type="button"
-        (click)="tabChange.emit('transaction')"
-        class="relative z-10 flex-1 py-1.5 text-xs font-semibold transition-colors duration-200 text-center rounded-lg cursor-pointer"
-        [class.text-ink]="activeTab() === 'transaction'"
-        [class.text-ink-2]="activeTab() !== 'transaction'"
-      >
-        Add Transaction
-      </button>
-      <button
-        type="button"
-        (click)="tabChange.emit('adjustment')"
-        class="relative z-10 flex-1 py-1.5 text-xs font-semibold transition-colors duration-200 text-center rounded-lg cursor-pointer"
-        [class.text-ink]="activeTab() === 'adjustment'"
-        [class.text-ink-2]="activeTab() !== 'adjustment'"
-      >
-        Add One-Off
-      </button>
-      <div
-        class="absolute top-1 bottom-1 w-[calc(50%-4px)] bg-ember/90 rounded-lg transition-transform duration-200 ease-out"
-        [class.translate-x-0]="activeTab() === 'transaction'"
-        [class.translate-x-full]="activeTab() === 'adjustment'"
-      ></div>
+    <div role="group" aria-label="What to add" [class]="frame + ' grid-cols-3'">
+      @for (option of options; track option.id) {
+        <button
+          type="button"
+          [class]="segment(activeTab() === option.id)"
+          [attr.aria-pressed]="activeTab() === option.id"
+          (click)="tabChange.emit(option.id)"
+        >
+          {{ option.label }}
+        </button>
+      }
     </div>
   `,
 })
 export class CreateEntryTabsComponent {
-  readonly activeTab = input.required<EntryType>();
-  readonly tabChange = output<EntryType>();
+  protected readonly frame = SEGMENT_FRAME;
+
+  segment(active: boolean): string {
+    return `${SEGMENT_BASE} ${active ? SEGMENT_ON : SEGMENT_OFF}`;
+  }
+
+  readonly options: ReadonlyArray<{ id: EntryKind; label: string }> = [
+    { id: 'transaction', label: 'Transaction' },
+    { id: 'trip', label: 'Trip' },
+    { id: 'oneoff', label: 'One-off' },
+  ];
+
+  readonly activeTab = input.required<EntryKind>();
+  readonly tabChange = output<EntryKind>();
 }

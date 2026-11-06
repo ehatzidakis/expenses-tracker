@@ -165,7 +165,7 @@ describe('PendingReviewComponent', () => {
     });
 
     it('shows the editable split controls', () => {
-      expect(fixture.nativeElement.textContent).toContain('Go Splitzes');
+      expect(fixture.nativeElement.textContent).toContain('Just me');
     });
   });
 
@@ -173,7 +173,7 @@ describe('PendingReviewComponent', () => {
     beforeEach(() => setup(pendingTransaction({ sourceRole: 'kiosk', amount: 20 })));
 
     it('pre-fills the default kiosk split in editable controls', () => {
-      expect(fixture.nativeElement.textContent).toContain('Go Splitzes');
+      expect(fixture.nativeElement.textContent).toContain('Just me');
       expect(component.split()).toMatchObject({
         goesSplitzes: true,
         splitWith: [1],

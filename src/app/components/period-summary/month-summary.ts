@@ -3,7 +3,7 @@ import { Component, computed, input } from '@angular/core';
 import { CategorySpend } from '../../services/expense-state.service';
 import { StripeComponent } from '../stripe/stripe';
 import { SensitiveDirective } from '../../utils/sensitive.directive';
-import { MonthTiming } from '../../utils/period-pace';
+import { MonthTiming, ordinal } from '../../utils/period-pace';
 
 /**
  * The month at a glance: what's left of the budget, how far through the month we are, and the
@@ -27,7 +27,7 @@ import { MonthTiming } from '../../utils/period-pace';
               €{{ headlineAmount() | number: '1.2-2' }}
             </span>
           </p>
-          <p class="mt-2 text-[14px] text-ink-2">{{ headlineLabel() }}</p>
+          <p class=" text-[14px] text-ink-2">{{ headlineLabel() }}</p>
         </div>
 
         <div class="shrink-0 pt-1 text-right">
@@ -37,7 +37,6 @@ import { MonthTiming } from '../../utils/period-pace';
       </div>
 
       <app-stripe
-        /* class="mt-3" */
         size="lg"
         [notchLabel]="todayLabel()"
         [animate]="true"
@@ -123,11 +122,4 @@ export class MonthSummaryComponent {
   abs(value: number): number {
     return Math.abs(value);
   }
-}
-
-/** 1 → "1st", 2 → "2nd", 3 → "3rd", 11–13 → "11th"–"13th", 22 → "22nd". */
-export function ordinal(day: number): string {
-  const teen = day % 100 >= 11 && day % 100 <= 13;
-  const suffix = teen ? 'th' : (['th', 'st', 'nd', 'rd'][day % 10] ?? 'th');
-  return `${day}${suffix}`;
 }

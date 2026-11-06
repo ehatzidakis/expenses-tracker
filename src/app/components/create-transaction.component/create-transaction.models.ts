@@ -1,4 +1,6 @@
 export type EntryType = 'transaction' | 'adjustment';
+/** What the Add tab's top switch picks: a one-off and a trip are both adjustments underneath. */
+export type EntryKind = 'transaction' | 'oneoff' | 'trip';
 
 export interface TransactionFormModel {
   date: string;

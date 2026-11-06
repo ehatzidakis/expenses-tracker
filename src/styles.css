@@ -88,26 +88,6 @@
     -webkit-tap-highlight-color: transparent;
   }
 
-  /* Lamplight: one faint warm wash at the top of the room, fixed behind everything. */
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0 0 auto 0;
-    height: 420px;
-    pointer-events: none;
-    z-index: 0;
-    background: radial-gradient(
-      ellipse 70% 100% at 50% 0%,
-      rgb(229 112 58 / 0.07),
-      rgb(229 112 58 / 0) 70%
-    );
-  }
-
-  body > * {
-    position: relative;
-    z-index: 1;
-  }
-
   ::selection {
     background-color: var(--color-ember);
     color: var(--color-ground);
@@ -131,6 +111,16 @@
   a {
     text-underline-offset: 3px;
   }
+}
+
+/*
+ * iOS zooms the whole page into any field set under 16px, so every field is 16px.
+ * Unlayered on purpose: it wins over the text-size utilities on the fields.
+ */
+input:not([type='checkbox']):not([type='radio']):not([type='range']):not(.amount-display),
+select,
+textarea {
+  font-size: 16px;
 }
 
 input[type='date'],

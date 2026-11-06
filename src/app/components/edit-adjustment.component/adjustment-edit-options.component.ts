@@ -12,27 +12,27 @@ import { Component, input, output } from '@angular/core';
           <button
             type="button"
             (click)="typeChange.emit(true)"
-            class="py-2 rounded-lg text-xs font-semibold transition-all duration-150 flex items-center justify-center gap-1 cursor-pointer"
+            class="min-h-11 rounded-lg text-[13px] font-semibold transition-all duration-150 flex items-center justify-center gap-1 cursor-pointer"
             [class.bg-avocado/20]="isAddition()"
             [class.text-avocado-ink]="isAddition()"
             [class.border]="isAddition()"
             [class.border-avocado/30]="isAddition()"
             [class.text-ink-2]="!isAddition()"
           >
-            <span>↑</span> Bonus / Addition
+            <span aria-hidden="true">↑</span> Income
           </button>
 
           <button
             type="button"
             (click)="typeChange.emit(false)"
-            class="py-2 rounded-lg text-xs font-semibold transition-all duration-150 flex items-center justify-center gap-1 cursor-pointer"
+            class="min-h-11 rounded-lg text-[13px] font-semibold transition-all duration-150 flex items-center justify-center gap-1 cursor-pointer"
             [class.bg-cherry-fill/20]="!isAddition()"
             [class.text-cherry]="!isAddition()"
             [class.border]="!isAddition()"
             [class.border-cherry-fill/30]="!isAddition()"
             [class.text-ink-2]="isAddition()"
           >
-            <span>↓</span> One-Off Expense
+            <span aria-hidden="true">↓</span> Expense
           </button>
         </div>
       </div>
@@ -43,7 +43,7 @@ import { Component, input, output } from '@angular/core';
           <button
             type="button"
             (click)="tripChange.emit(true)"
-            class="py-2 rounded-lg text-xs font-semibold transition-all duration-150 flex items-center justify-center gap-1 cursor-pointer"
+            class="min-h-11 rounded-lg text-[13px] font-semibold transition-all duration-150 flex items-center justify-center gap-1 cursor-pointer"
             [class.bg-ember/20]="isTrip()"
             [class.text-ember-ink]="isTrip()"
             [class.border]="isTrip()"
@@ -55,7 +55,7 @@ import { Component, input, output } from '@angular/core';
           <button
             type="button"
             (click)="tripChange.emit(false)"
-            class="py-2 rounded-lg text-xs font-semibold transition-all duration-150 flex items-center justify-center gap-1 cursor-pointer"
+            class="min-h-11 rounded-lg text-[13px] font-semibold transition-all duration-150 flex items-center justify-center gap-1 cursor-pointer"
             [class.bg-edge/60]="!isTrip()"
             [class.text-ink]="!isTrip()"
             [class.border]="!isTrip()"
@@ -74,7 +74,7 @@ import { Component, input, output } from '@angular/core';
             <button
               type="button"
               (click)="selectableChange.emit(true)"
-              class="py-2 rounded-lg text-xs font-semibold transition-all duration-150 flex items-center justify-center gap-1 cursor-pointer"
+              class="min-h-11 rounded-lg text-[13px] font-semibold transition-all duration-150 flex items-center justify-center gap-1 cursor-pointer"
               [class.bg-avocado/20]="isSelectable()"
               [class.text-avocado-ink]="isSelectable()"
               [class.border]="isSelectable()"
@@ -86,7 +86,7 @@ import { Component, input, output } from '@angular/core';
             <button
               type="button"
               (click)="selectableChange.emit(false)"
-              class="py-2 rounded-lg text-xs font-semibold transition-all duration-150 flex items-center justify-center gap-1 cursor-pointer"
+              class="min-h-11 rounded-lg text-[13px] font-semibold transition-all duration-150 flex items-center justify-center gap-1 cursor-pointer"
               [class.bg-edge/60]="!isSelectable()"
               [class.text-ink]="!isSelectable()"
               [class.border]="!isSelectable()"

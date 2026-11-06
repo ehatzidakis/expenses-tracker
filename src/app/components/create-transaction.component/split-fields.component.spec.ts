@@ -78,8 +78,14 @@ describe('SplitFieldsComponent', () => {
     }
   });
 
+  /** The split starts as "Just me"; tapping a person turns it on. */
+  const personButton = (name: string) =>
+    Array.from(fixture.nativeElement.querySelectorAll('button') as NodeListOf<HTMLButtonElement>).find(
+      (button) => button.textContent?.trim() === name,
+    )!;
+
   it('scrolls the enclosing form to its bottom when split is enabled', () => {
-    fixture.nativeElement.querySelector('button')?.click();
+    personButton(PEOPLE[0].name).click();
     fixture.detectChanges();
     pendingFrame?.(0);
 
@@ -95,7 +101,7 @@ describe('SplitFieldsComponent', () => {
       media: query,
     }));
 
-    fixture.nativeElement.querySelector('button')?.click();
+    personButton(PEOPLE[0].name).click();
     fixture.detectChanges();
     pendingFrame?.(0);
 
@@ -114,11 +120,6 @@ describe('SplitFieldsComponent', () => {
       expect(button).toBeTruthy();
       button?.click();
     };
-
-    clickButton('✂️ Yes');
-    fixture.detectChanges();
-    pendingFrame?.(0);
-    vi.mocked(hostForm.scrollIntoView).mockClear();
 
     clickButton(PEOPLE[0].name);
     fixture.detectChanges();
@@ -142,7 +143,7 @@ describe('SplitFieldsComponent', () => {
     fixture.componentRef.setInput('scrollOnSplitInteraction', false);
     fixture.detectChanges();
 
-    fixture.nativeElement.querySelector('button')?.click();
+    personButton(PEOPLE[0].name).click();
     fixture.detectChanges();
     pendingFrame?.(0);
 
@@ -159,9 +160,9 @@ describe('SplitFieldsComponent', () => {
     fixture.detectChanges();
 
     const text = (fixture.nativeElement.textContent as string).replace(/\s+/g, ' ');
-    expect(text).toContain('Your share: €3.34');
-    expect(text).toContain('Stavi owes you: €3.33');
-    expect(text).toContain('Alex owes you: €3.33');
+    expect(text).toMatch(/Your share · 1 of 3s*€3.34/);
+    expect(text).toMatch(/Stavi owes yous*€3.33/);
+    expect(text).toMatch(/Alex owes yous*€3.33/);
   });
 
   it('does not auto-scroll on desktop widths', () => {
@@ -170,7 +171,7 @@ describe('SplitFieldsComponent', () => {
       media: query,
     }));
 
-    fixture.nativeElement.querySelector('button')?.click();
+    personButton(PEOPLE[0].name).click();
     fixture.detectChanges();
     pendingFrame?.(0);
 

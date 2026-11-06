@@ -9,53 +9,17 @@ import { PEOPLE } from '../../models/splitz.model';
   imports: [CommonModule],
   host: { class: 'block' },
   template: `
-    <div
-      class="rounded-xl border bg-ember-deep/20 p-3"
-      [class.border-avocado/30]="netBalance() > 0"
-      [class.bg-avocado/10]="netBalance() > 0"
-      [class.border-ember/30]="netBalance() < 0"
-      [class.bg-ember/10]="netBalance() < 0"
-      [class.border-ink/30]="netBalance() === 0"
-      [class.bg-ink/5]="netBalance() === 0"
-    >
-      <div class="flex items-center justify-between gap-3">
-        <div>
-          <p class="text-[11px] uppercase font-bold tracking-[0.12em] text-ember-ink">
-            Stavi balance
-          </p>
-          <!-- Not blurred: only the kiosk login sees this, and it is their own balance -->
-          <p class="mt-1 text-sm font-semibold text-ink">
-            @if (netBalance() > 0) {
-              You are owed €{{ netBalance().toFixed(2) }}
-            } @else if (netBalance() < 0) {
-              You owe €{{ (-netBalance()).toFixed(2) }}
-            } @else {
-              All settled — €0.00
-            }
-          </p>
-        </div>
-        <span
-          class="rounded-full border px-2.5 py-1 text-[11px] font-semibold"
-          [class.border-avocado/30]="netBalance() > 0"
-          [class.bg-avocado/10]="netBalance() > 0"
-          [class.text-avocado-ink]="netBalance() > 0"
-          [class.border-ember/30]="netBalance() < 0"
-          [class.bg-ember/10]="netBalance() < 0"
-          [class.text-ember-soft]="netBalance() < 0"
-          [class.border-ink/30]="netBalance() === 0"
-          [class.bg-ink/5]="netBalance() === 0"
-          [class.text-ink]="netBalance() === 0"
-        >
-          @if (netBalance() > 0) {
-            Owed
-          } @else if (netBalance() < 0) {
-            Due
-          } @else {
-            Settled
-          }
-        </span>
-      </div>
-    </div>
+    <!-- Not blurred: only the kiosk login sees this, and it is their own balance -->
+    <p class="flex min-h-11 items-center justify-between gap-3 border-b border-ink/10 pb-3 text-[14px]">
+      <span class="text-ink-2">Your balance</span>
+      @if (netBalance() > 0) {
+        <span class="type-wide font-semibold text-avocado-ink">You are owed €{{ netBalance().toFixed(2) }}</span>
+      } @else if (netBalance() < 0) {
+        <span class="type-wide font-semibold text-ink">You owe €{{ (-netBalance()).toFixed(2) }}</span>
+      } @else {
+        <span class="text-ink-3">All settled</span>
+      }
+    </p>
   `,
 })
 export class KioskBalanceComponent {

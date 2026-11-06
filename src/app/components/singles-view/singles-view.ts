@@ -77,7 +77,7 @@ import { SinglesType, filterSingles, singleYears, singlesTotals } from './single
             <button
               type="button"
               [attr.data-testid]="option.testId"
-              class="min-h-10 rounded-[10px] px-3.5 text-[13px] font-medium transition-colors cursor-pointer"
+              class="min-h-11 rounded-[10px] px-3.5 text-[13px] font-medium transition-colors cursor-pointer"
               [class]="type() === option.value ? 'bg-ember/20 text-ink ring-1 ring-inset ring-ember/60' : 'text-ink-3 hover:text-ink'"
               [attr.aria-pressed]="type() === option.value"
               (click)="type.set(option.value)"

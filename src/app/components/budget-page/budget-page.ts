@@ -40,7 +40,7 @@ import { monthTiming } from '../../utils/period-pace';
       @for (option of modes; track option.id) {
         <button
           type="button"
-          class="min-h-10 rounded-[10px] text-[14px] font-medium transition-colors duration-150 cursor-pointer"
+          class="min-h-11 rounded-[10px] text-[14px] font-medium transition-colors duration-150 cursor-pointer"
           [class]="mode() === option.id ? 'bg-ember/20 text-ink ring-1 ring-inset ring-ember/60' : 'text-ink-3 hover:text-ink'"
           [attr.aria-pressed]="mode() === option.id"
           (click)="state.budgetMode.set(option.id)"

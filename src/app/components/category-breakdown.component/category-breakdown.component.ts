@@ -32,7 +32,7 @@ import { STATUS_RANK, budgetStatus, categoryLabel } from '../../utils/period-pac
             @for (mode of modes; track mode.id) {
               <button
                 type="button"
-                class="min-h-10 rounded-[10px] px-3.5 text-[13px] font-medium transition-colors cursor-pointer"
+                class="min-h-11 rounded-[10px] px-3.5 text-[13px] font-medium transition-colors cursor-pointer"
                 [class]="viewMode() === mode.id ? 'bg-ember/20 text-ink ring-1 ring-inset ring-ember/60' : 'text-ink-3 hover:text-ink'"
                 [attr.aria-pressed]="viewMode() === mode.id"
                 (click)="viewMode.set(mode.id)"

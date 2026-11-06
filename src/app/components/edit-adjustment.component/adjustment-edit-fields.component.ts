@@ -35,7 +35,7 @@ import { DateStepperComponent } from '../date-stepper/date-stepper.component';
         (amountChange)="amountChange.emit($event)"
       />
 
-      <div class="grid grid-cols-2 gap-3">
+      <div class="grid grid-cols-1 gap-3">
         <div class="space-y-1.5">
           <label for="adj-edit-start-date" class="text-xs font-medium text-ink-2"
             >Start Date</label

@@ -1,9 +1,21 @@
-import { CommonModule } from '@angular/common';
 import { Component, computed, ElementRef, inject, input, output } from '@angular/core';
 import { normalizeDecimalInput, parseDecimalInput } from '../../utils/decimal-input';
 import { Person } from '../../models/splitz.model';
 import { Transaction } from '../../models/transaction.model';
 import { computeSplit, computeSplitDebtEntries } from '../../services/splitz.service';
+import {
+  ACTIVE_PILL,
+  FIELD,
+  FIELD_LABEL,
+  IDLE_PILL,
+  PILL_BASE,
+  SEGMENT_BASE,
+  SEGMENT_FRAME,
+  SEGMENT_OFF,
+  SEGMENT_ON,
+} from '../../utils/pill-styles';
+
+let nextSplitId = 0;
 
 export interface CreateSplitState {
   goesSplitzes: boolean;
@@ -30,167 +42,113 @@ export function toSplitState(
 @Component({
   selector: 'app-split-fields',
   standalone: true,
-  imports: [CommonModule],
-  host: { class: 'block' },
+    host: { class: 'block' },
   template: `
-    <div class="space-y-4">
-      <div class="space-y-1.5">
-        <label class="text-xs font-medium text-ink-2">Go Splitzes</label>
-        <div class="grid grid-cols-2 gap-2 p-1 bg-ground/80 rounded-xl border border-raised">
+    <div class="flex flex-col gap-3">
+      <div class="flex flex-col gap-1.5">
+        <span [id]="uid + '-split'" [class]="fieldLabel">Split</span>
+        <div role="group" [attr.aria-labelledby]="uid + '-split'" class="flex flex-wrap gap-2">
           <button
             type="button"
-            (click)="setEnabled(true)"
-            class="py-2 rounded-lg text-xs font-semibold transition-all duration-150 flex items-center justify-center gap-1 cursor-pointer"
-            [class.bg-ember/20]="state().goesSplitzes"
-            [class.text-ember-ink]="state().goesSplitzes"
-            [class.border]="state().goesSplitzes"
-            [class.border-ember/30]="state().goesSplitzes"
-            [class.text-ink-2]="!state().goesSplitzes"
-          >
-            ✂️ Yes
-          </button>
-          <button
-            type="button"
+            [class]="pill(justMe())"
+            [attr.aria-pressed]="justMe()"
             (click)="reset.emit()"
-            class="py-2 rounded-lg text-xs font-semibold transition-all duration-150 flex items-center justify-center gap-1 cursor-pointer"
-            [class.bg-edge/60]="!state().goesSplitzes"
-            [class.text-ink]="!state().goesSplitzes"
-            [class.border]="!state().goesSplitzes"
-            [class.border-ink-4/40]="!state().goesSplitzes"
-            [class.text-ink-2]="state().goesSplitzes"
           >
-            No
+            Just me
           </button>
+          @for (person of people(); track person.id) {
+            <button
+              type="button"
+              [class]="pill(isIn(person.id))"
+              [attr.aria-pressed]="isIn(person.id)"
+              (click)="pickPerson(person.id)"
+            >
+              {{ person.name }}
+            </button>
+          }
         </div>
       </div>
 
-      @if (state().goesSplitzes) {
-        <div class="space-y-2">
-          <label class="text-xs font-medium text-ink-2">Split With</label>
-          <div class="flex flex-wrap gap-2">
-            @for (person of people(); track person.id) {
+      @if (!justMe()) {
+        <div class="flex flex-col gap-1.5">
+          <span [id]="uid + '-paid'" [class]="fieldLabel">Paid by</span>
+          <div role="group" [attr.aria-labelledby]="uid + '-paid'" class="flex flex-wrap gap-2">
+            @for (opt of paidByOptions(); track opt.id) {
               <button
                 type="button"
-                (click)="togglePerson(person.id)"
-                class="flex items-center gap-1.5 px-3 py-2 rounded-full text-xs font-semibold border transition-all duration-150 cursor-pointer"
-                [class.bg-ember/20]="state().splitWith.includes(person.id)"
-                [class.border-ember/40]="state().splitWith.includes(person.id)"
-                [class.text-ember-ink]="state().splitWith.includes(person.id)"
-                [class.bg-raised/60]="!state().splitWith.includes(person.id)"
-                [class.border-edge/50]="!state().splitWith.includes(person.id)"
-                [class.text-ink-2]="!state().splitWith.includes(person.id)"
+                [class]="pill(state().paidById === opt.id)"
+                [attr.aria-pressed]="state().paidById === opt.id"
+                (click)="setPaidBy(opt.id)"
               >
-                {{ person.name }}
+                {{ opt.label }}
               </button>
             }
           </div>
         </div>
 
-        @if (state().splitWith.length > 0) {
-          <div class="space-y-1.5">
-            <label class="text-xs font-medium text-ink-2">Paid By</label>
-            <div class="flex flex-wrap gap-2">
-              @for (opt of paidByOptions(); track opt.id) {
-                <button
-                  type="button"
-                  (click)="setPaidBy(opt.id)"
-                  [attr.aria-pressed]="state().paidById === opt.id"
-                  class="flex items-center gap-1.5 px-3 py-2 rounded-full text-xs font-semibold border transition-all duration-150 cursor-pointer"
-                  [class.bg-ember/20]="state().paidById === opt.id"
-                  [class.border-ember/40]="state().paidById === opt.id"
-                  [class.text-ember-ink]="state().paidById === opt.id"
-                  [class.bg-raised/60]="state().paidById !== opt.id"
-                  [class.border-edge/50]="state().paidById !== opt.id"
-                  [class.text-ink-2]="state().paidById !== opt.id"
-                >
-                  {{ opt.label }}
-                </button>
-              }
-            </div>
-          </div>
-
-          <!-- Not blurred: these numbers come from the amount just typed in the form -->
-          @if (!state().customSplitMode) {
-            <div class="p-3 bg-ember-deep/30 border border-ember-deep/40 rounded-xl space-y-1">
-              <p class="text-xs font-medium text-ember-ink">Split preview</p>
-              <p class="text-xs text-ink-2">
-                Your share:
-                <span class="text-ink font-semibold">€{{ myShare().toFixed(2) }}</span
-                ><span class="text-ink-3">
-                  (1 of {{ state().splitWith.length + 1 }} people)</span
-                >
-              </p>
-              @for (line of debtLines(); track $index) {
-                <p class="text-xs text-ink-2">
-                  {{ line.label }}
-                  <span class="text-ink font-semibold">€{{ line.amount.toFixed(2) }}</span>
-                </p>
-              }
-            </div>
-          }
-        }
-
         @if (allowCustom()) {
-          <div class="space-y-1.5">
-            <label class="text-xs font-medium text-ink-2">Split Mode</label>
-            <div
-              class="grid grid-cols-2 gap-2 p-1 bg-ground/80 rounded-xl border border-raised"
+          <div role="group" aria-label="How to split" [class]="segmentFrame + ' grid-cols-2'">
+            <button
+              type="button"
+              [class]="segment(!state().customSplitMode)"
+              [attr.aria-pressed]="!state().customSplitMode"
+              (click)="setCustom(false)"
             >
-              <button
-                type="button"
-                (click)="setCustom(false)"
-                class="py-2 rounded-lg text-xs font-semibold transition-all duration-150 flex items-center justify-center gap-1 cursor-pointer"
-                [class.bg-ember/20]="!state().customSplitMode"
-                [class.text-ember-ink]="!state().customSplitMode"
-                [class.border]="!state().customSplitMode"
-                [class.border-ember/30]="!state().customSplitMode"
-                [class.text-ink-2]="state().customSplitMode"
-              >
-                👥 Halfsies
-              </button>
-              <button
-                type="button"
-                (click)="setCustom(true)"
-                class="py-2 rounded-lg text-xs font-semibold transition-all duration-150 flex items-center justify-center gap-1 cursor-pointer"
-                [class.bg-ember/20]="state().customSplitMode"
-                [class.text-ember-ink]="state().customSplitMode"
-                [class.border]="state().customSplitMode"
-                [class.border-ember/30]="state().customSplitMode"
-                [class.text-ink-2]="!state().customSplitMode"
-              >
-                ⚙️ Custom
-              </button>
-            </div>
+              Evenly
+            </button>
+            <button
+              type="button"
+              [class]="segment(state().customSplitMode)"
+              [attr.aria-pressed]="state().customSplitMode"
+              (click)="setCustom(true)"
+            >
+              Custom amounts
+            </button>
           </div>
         }
 
-        @if (state().customSplitMode && allowCustom()) {
-          <div class="space-y-3 rounded-xl border border-ember/30 bg-ember-deep/20 p-3">
-            <div class="flex items-center justify-between gap-3">
-              <p class="text-xs font-medium text-ember-ink">Custom split</p>
-              <span class="text-[11px] text-ink-2">{{ remainingLabel() }}</span>
+        <!-- Not blurred: these numbers come from the amount just typed in the form -->
+        @if (!state().customSplitMode || !allowCustom()) {
+          <dl class="divide-y divide-ink/10 border-y border-ink/10 text-[13px]">
+            <div class="flex items-baseline justify-between gap-3 py-2.5">
+              <dt class="text-ink-2">
+                Your share <span class="text-ink-3">· 1 of {{ state().splitWith.length + 1 }}</span>
+              </dt>
+              <dd class="tabular-nums text-ink">€{{ myShare().toFixed(2) }}</dd>
             </div>
-            <div class="space-y-2">
-              @for (person of participants(); track person) {
-                <div class="space-y-1">
-                  <label class="text-[11px] uppercase tracking-[0.12em] text-ink-2">{{
-                    personName(person)
-                  }}</label>
-                  <input
-                    type="text"
-                    inputmode="decimal"
-                    autocomplete="off"
-                    [value]="valueFor(person)"
-                    (input)="onCustomInput($event, person)"
-                    class="w-full bg-raised/60 border border-raised rounded-xl px-3 py-2 text-sm text-ink placeholder:text-ink-4 focus:outline-none focus:ring-2 focus:ring-ember/60 tabular-nums"
-                    placeholder="0.00"
-                  />
-                </div>
-              }
-            </div>
-            @if (!customValid()) {
-              <p class="text-[11px] text-ember-soft">{{ remainingLabel() }}</p>
+            @for (line of debtLines(); track $index) {
+              <div class="flex items-baseline justify-between gap-3 py-2.5">
+                <dt class="text-ink-2">{{ line.label }}</dt>
+                <dd class="tabular-nums text-ink">€{{ line.amount.toFixed(2) }}</dd>
+              </div>
             }
+          </dl>
+        } @else {
+          <div class="flex flex-col gap-2">
+            @for (person of participants(); track person) {
+              <div class="flex items-center gap-3">
+                <label [for]="uid + '-amount-' + person" class="w-16 shrink-0 text-[13px] text-ink-2">{{
+                  personName(person)
+                }}</label>
+                <input
+                  [id]="uid + '-amount-' + person"
+                  type="text"
+                  inputmode="decimal"
+                  autocomplete="off"
+                  placeholder="0.00"
+                  [value]="valueFor(person)"
+                  (input)="onCustomInput($event, person)"
+                  [class]="field + ' tabular-nums'"
+                />
+              </div>
+            }
+            <p
+              class="text-[12px]"
+              [class]="customValid() ? 'text-avocado' : 'font-semibold text-ember-ink'"
+              aria-live="polite"
+            >
+              {{ remainingLabel() }}
+            </p>
           </div>
         }
       }
@@ -199,6 +157,11 @@ export function toSplitState(
 })
 export class SplitFieldsComponent {
   private readonly host = inject(ElementRef<HTMLElement>);
+  /** Unique per instance: the Add tab and an edit sheet can both hold split fields. */
+  protected readonly uid = `split-${nextSplitId++}`;
+  protected readonly field = FIELD;
+  protected readonly fieldLabel = FIELD_LABEL;
+  protected readonly segmentFrame = SEGMENT_FRAME;
 
   readonly amount = input.required<number>();
   readonly people = input.required<ReadonlyArray<Person>>();
@@ -256,13 +219,43 @@ export class SplitFieldsComponent {
     return computeSplitDebtEntries(draft).map((debt) => ({
       label:
         debt.debtorId === 'me'
-          ? `You owe ${this.personName(debt.creditorId)}:`
+          ? `You owe ${this.personName(debt.creditorId)}`
           : debt.creditorId === 'me'
-            ? `${this.personName(debt.debtorId)} owes you:`
-            : `${this.personName(debt.debtorId)} owes ${this.personName(debt.creditorId)}:`,
+            ? `${this.personName(debt.debtorId)} owes you`
+            : `${this.personName(debt.debtorId)} owes ${this.personName(debt.creditorId)}`,
       amount: debt.amount,
     }));
   });
+
+  /** Nobody else is in the split. */
+  readonly justMe = computed(() => !this.state().goesSplitzes || this.state().splitWith.length === 0);
+
+  isIn(personId: number): boolean {
+    return !this.justMe() && this.state().splitWith.includes(personId);
+  }
+
+  pill(active: boolean): string {
+    return `${PILL_BASE} ${active ? ACTIVE_PILL : IDLE_PILL}`;
+  }
+
+  segment(active: boolean): string {
+    return `${SEGMENT_BASE} ${active ? SEGMENT_ON : SEGMENT_OFF}`;
+  }
+
+  /** "Just me" clears the split; a person is added or removed, and removing the last one clears it. */
+  pickPerson(personId: number): void {
+    const state = this.state();
+    if (this.justMe()) {
+      this.emit({ ...state, goesSplitzes: true, splitWith: [personId], paidById: 'me' });
+      this.scrollFormToBottom();
+      return;
+    }
+    if (state.splitWith.length === 1 && state.splitWith[0] === personId) {
+      this.reset.emit();
+      return;
+    }
+    this.togglePerson(personId);
+  }
 
   personName(id: 'me' | number): string {
     return id === 'me'
@@ -277,9 +270,9 @@ export class SplitFieldsComponent {
 
   remainingLabel(): string {
     const value = this.remaining();
-    if (Math.abs(value) < 0.005) return 'All split — €0.00';
+    if (Math.abs(value) < 0.005) return 'All split';
     return value > 0
-      ? `€${value.toFixed(2)} remaining to be split`
+      ? `€${value.toFixed(2)} still to split`
       : `€${Math.abs(value).toFixed(2)} over the total`;
   }
 

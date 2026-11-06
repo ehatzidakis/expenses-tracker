@@ -19,7 +19,9 @@ import { shiftDateInputValue } from '../../utils/date-step';
       (click)="step(-1)"
       [class]="buttonClass()"
     >
-      −
+      <svg class="size-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+        <path fill-rule="evenodd" clip-rule="evenodd" d="M12.79 5.23a.75.75 0 01-.02 1.06L8.832 10l3.938 3.71a.75.75 0 11-1.04 1.08l-4.5-4.25a.75.75 0 010-1.08l4.5-4.25a.75.75 0 011.06.02z" />
+      </svg>
     </button>
     <ng-content />
     <button
@@ -29,7 +31,9 @@ import { shiftDateInputValue } from '../../utils/date-step';
       (click)="step(1)"
       [class]="buttonClass()"
     >
-      +
+      <svg class="size-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+        <path fill-rule="evenodd" clip-rule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z" />
+      </svg>
     </button>
   `,
 })
@@ -41,13 +45,11 @@ export class DateStepperComponent {
     { read: ElementRef },
   );
 
-  readonly buttonClass = computed(() => {
-    const base =
-      'shrink-0 flex items-center justify-center bg-raised/60 border border-raised text-ink-2 hover:text-ink hover:bg-edge/60 active:bg-edge transition-colors cursor-pointer select-none focus:outline-none focus:ring-2 focus:ring-ember/60';
-    return this.size() === 'sm'
-      ? `${base} w-7 rounded-lg text-sm`
-      : `${base} w-10 rounded-xl text-lg`;
-  });
+  /** 44px either way; `size` is kept so existing callers still compile. */
+  readonly buttonClass = computed(
+    () =>
+      'flex size-11 shrink-0 items-center justify-center rounded-xl border border-edge text-ink-2 transition-colors hover:border-ink-4 hover:text-ink active:bg-raised cursor-pointer select-none',
+  );
 
   step(days: number): void {
     const el = this.dateInput().nativeElement;
