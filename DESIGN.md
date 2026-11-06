@@ -88,6 +88,7 @@ typography:
     fontWeight: 500
     lineHeight: 1
 rounded:
+  column-top: "4px"
   segment: "10px"
   control: "12px"
   panel: "16px"
@@ -185,6 +186,25 @@ components:
     textColor: "{colors.ink}"
     rounded: "{rounded.sheet}"
     padding: "0 20px 20px"
+  chart-column:
+    backgroundColor: "{colors.ember}"
+    rounded: "{rounded.column-top}"
+    width: "24px"
+  chart-column-over:
+    backgroundColor: "{colors.cherry-fill}"
+    rounded: "{rounded.column-top}"
+    width: "24px"
+  chart-column-over-selected:
+    backgroundColor: "{colors.cherry}"
+  typical-row:
+    textColor: "{colors.ink}"
+    typography: "{typography.body-lg}"
+    padding: "10px 0"
+  cost-row:
+    textColor: "{colors.ink}"
+    typography: "{typography.body-lg}"
+    padding: "10px 0"
+    height: "56px"
 ---
 
 # Design System: Expenses Tracker
@@ -193,7 +213,7 @@ components:
 
 **Creative North Star: "Teak & Smoked Glass"**
 
-The app is a walnut room at night. The page is near-black wood, the few raised surfaces are smoked glass, and all the writing is in cream. Most of the screen is quiet: lists sit straight on the ground and are split by hairlines. Colour only shows up when it means something. The one recurring signature is the budget bar: a single rounded ember bar on a faint cream track, which turns cherry when a budget is blown and carries a cream notch at today on the month's headline bar.
+The app is a walnut room at night. The page is near-black wood, the few raised surfaces are smoked glass, and all the writing is in cream. Most of the screen is quiet: lists sit straight on the ground and are split by hairlines. Colour only shows up when it means something. The one recurring signature is the budget bar: a single rounded ember bar on a faint cream track, which turns cherry when a budget is blown and carries a cream notch at today on the month's headline bar. Looking back, the same materials become a ledger: ember columns on hairline € gridlines, with the budget as one cream line.
 
 It is an installed iPhone PWA used one-handed, so it is dark-only and dense. A phone screen shows the month's headline, the bar and most category rows without scrolling, and every control is still at least thumb-sized. Wide, flat-topped figures in Archivo carry the numbers and headings. The system UI face does the reading.
 
@@ -203,7 +223,7 @@ The world was chosen in place of the previous cool indigo-glass dashboard of equ
 - Dark-only. Walnut ground, two smoked-glass steps, cream ink in four tiers. No ambient light or wash.
 - Colour carries meaning: ember for selection and action, avocado for on pace or money kept, cherry for over budget.
 - Archivo at 125% width for figures and headings; system UI for body text; tabular figures everywhere.
-- One budget bar on one fixed 0–100% scale: ember, cherry when over, cream 4 when muted.
+- Budget bars sit on one fixed 0–100% scale: ember, cherry when over, cream 4 when muted. Comparisons across months or categories share one € scale instead.
 - Rows sit on the ground between hairlines. Panels are kept for period summaries and for chrome.
 - Every target is at least 44px; every field is 48px at 16px type. Every text tier is at least 4.5:1 on every surface.
 
@@ -212,29 +232,29 @@ The world was chosen in place of the previous cool indigo-glass dashboard of equ
 A warm, low-light palette: walnut and cream neutrals, one burnt-orange family, and two status hues used sparingly.
 
 ### Primary
-- **Ember** (ember): the selection and action colour. Used for the selected pill, the primary button, the active tab rule, focus outlines and focused field borders, text selection, the caret, and the fill of every budget bar. At 20% it is the well behind an active segment or a picked category tile.
+- **Ember** (ember): the selection and action colour. Used for the selected pill, the primary button, the active tab rule, focus outlines and focused field borders, text selection, the caret, the fill of every budget bar, the month chart's columns (at 50% unless selected) and the typical-month bars. At 20% it is the well behind an active segment or a picked category tile.
 - **Ember Ink** (ember-ink): ember lifted for text and hover. Used for the active tab label, primary button hover, tappable text hints, and the semibold "ahead of pace" caution in rows.
 - **Ember Soft** (ember-soft): a pale apricot for small accent text on panels and the hover of ember-ink text links.
 - **Ember Deep** (ember-deep): a dark ember well behind the settings avatar while stealth mode is on.
 
 ### Secondary
-- **Avocado** (avocado): on pace, budget left, money saved. **Avocado Ink** (avocado-ink) is the lighter text form for income figures in lists and the "Saved" confirmation on the Add tab. **Avocado Deep** (avocado-deep) is the dark well behind it.
-- **Cherry** (cherry): over budget (including the over-budget bar), errors and destructive actions. **Cherry Fill** (cherry-fill) is the solid cherry for count badges and chart bars that pass the wage, and at 10–30% it tints destructive wells and borders. **Cherry Deep** (cherry-deep) is the dark well behind error messages (at 60%).
+- **Avocado** (avocado): on pace, budget left, money saved, "Left to save", and each month's 2px wage mark on the month chart. **Avocado Ink** (avocado-ink) is the lighter text form for income figures in lists and the "Saved" confirmation on the Add tab, and the month chart's "Wage €X" label. **Avocado Deep** (avocado-deep) is the dark well behind it.
+- **Cherry** (cherry): over budget (including the over-budget bar, the over-budget typical-month bar and the selected over-budget month column), errors and destructive actions. **Cherry Fill** (cherry-fill) is the solid cherry for count badges, unselected over-budget month columns and the chart's status-key swatch, and at 10–30% it tints destructive wells and borders. **Cherry Deep** (cherry-deep) is the dark well behind error messages (at 60%).
 
 ### Neutral
-- **Walnut Ground** (ground): the page, the theme colour, the status bar and the icon tile. Also the text colour on ember fills, and the knockout ring around the bar's notch.
+- **Walnut Ground** (ground): the page, the theme colour, the status bar and the icon tile. Also the text colour on ember fills, the knockout ring around the bar's notch and the typical-month budget tick, the 3px stroke behind labels drawn inside a chart, and the fade over the month chart's left edge once older months scroll off.
 - **Smoked Glass** (panel): period summaries, the docked tab bar (at 90% with blur), sheets, dialogs and every text field.
 - **Raised Glass** (raised) and **Raised Glass High** (raised-hi): dropdown panels, the toast, the settings avatar and pressed or hover wells.
 - **Teak Edge** (edge): control, field and tile borders, the amount field's underline, the sheet grabber and the scrollbar.
-- **Cream** (ink): primary text and figures, and the bar's notch. At 10% opacity it is the hairline between rows and the border of panels; at 7% it is the empty bar track.
+- **Cream** (ink): primary text and figures, the bar's notch and the typical-month budget tick. At 10% opacity it is the hairline between rows, the border of panels and the month chart's € gridlines; at 7% it is the empty bar track.
 - **Cream 2** (ink-2): secondary text, idle pills, field labels, captions on panels.
-- **Cream 3** (ink-3): meta text, idle segments and tabs, budget denominators, the euro sign on the amount field.
+- **Cream 3** (ink-3): meta text, idle segments and tabs, budget denominators, the euro sign on the amount field and money fields, and in the month chart the budget line, its "Budget €X" label, the € ticks and the month labels.
 - **Cream 4** (ink-4): placeholders, "No budget" on a tile, the names in the collapsed "quiet" line, and the muted bar fill for share-of-total and unbudgeted rows. It still passes 4.5:1 on ground, panel and raised.
 
 ### Named Rules
 **The Meaning Rule.** A hue appears only when it says something: ember means selected, acting or running ahead of pace; avocado means on pace or money kept; cherry means over or wrong. Everything else is walnut and cream.
 
-**The No Yellow Rule.** No yellow, gold or amber anywhere, including the chart palette, and no neon or saturated glow. Warnings are ember-ink in semibold, not yellow.
+**The No Yellow Rule.** No yellow, gold or amber anywhere, including charts, and no neon or saturated glow. Warnings are ember-ink in semibold, not yellow.
 
 **The Cream-Text Floor Rule.** Text uses only the four cream tiers or a status hue, and every pairing clears 4.5:1 on ground, panel and raised. Never create a dimmer text tone with opacity.
 
@@ -246,18 +266,18 @@ A warm, low-light palette: walnut and cream neutrals, one burnt-orange family, a
 **Character:** Archivo stretched to 125% gives wide, flat, low figures with a period-sporty feel; it is only used through the wide-type utility, which also locks tabular numbers. The system face keeps body text native and fast to read on iOS.
 
 ### Hierarchy
-- **Display** (Archivo wide, 700, 40px, line-height 1, -0.02em): the period headline figure, such as money spent this month or a trip's total, and the amount being typed on the Add tab (line-height 1.1 there). One per screen. The All-time total clamps it between 30px and 40px.
+- **Display** (Archivo wide, 700, 40px, line-height 1, -0.02em): the period headline figure, such as money spent this month or a trip's total, and the amount being typed on the Add tab (line-height 1.1 there). One per screen. The All-time total and the Charts tab's average month clamp it between 30px and 40px.
 - **Headline** (Archivo wide, 600–700, 26px): the sign-in title, and the cream-3 euro sign beside the Add tab's amount.
-- **Title** (Archivo wide, 600, 18–20px): the trip name, the days-to-go count, and secondary panel figures. One-off In and Spent figures sit at 32px bold.
-- **Figure** (Archivo wide, 600, 13–16px): inline totals inside panels, such as the saved figure under the month bar and In / Out / Net.
+- **Title** (Archivo wide, 600, 18–20px): the trip name, the days-to-go count, secondary panel figures, and the 18px saved figure beside the average month. One-off In and Spent figures sit at 32px bold.
+- **Figure** (Archivo wide, 600, 13–16px): inline totals inside panels, such as the saved figure under the month bar, In / Out / Net, and the Wage · Budgeted · Left to save summary.
 - **Brand** (Archivo wide, 700, 17px, uppercase, 0.02em): the "Expenses" wordmark in the header.
-- **Section Heading** (Archivo wide, 600, 13px, uppercase, cream 2): list headings such as Categories and Recent.
+- **Section Heading** (Archivo wide, 600, 13px, uppercase, cream 2): list headings such as Categories, Recent, Month by month, Typical month and Typical costs.
 - **Field** (system, 16px): the text inside every input, select and textarea, so iOS never zooms. The amount field is the one exception.
-- **Body Large** (system, 500, 15px): row labels, primary button labels and the friendly date label in date fields.
+- **Body Large** (system, 500, 15px): row labels, primary button labels, the friendly date label in date fields, the selected month's name on Charts, and sub-section titles such as Bills and Per purchase.
 - **Body** (system, 400, 14px): transaction descriptions, panel captions and disclosure labels such as "More options".
 - **Body Small** (system, 400–500, 13px): row amounts, pills, segment labels, category tile names, field labels, secondary buttons, meta lines.
 - **Caption** (system, 12px): row status lines, a tile's "€X left", field errors and the labels under panel figures.
-- **Micro** (system, 500, 11px): tab labels and the date caption over the bar's notch ("Fri. 6th").
+- **Micro** (system, 500, 11px): tab labels, the date caption over the bar's notch ("Fri. 6th"), and every label inside the month chart: € ticks, month names and years, the selected column's cap value, and the Budget and Wage labels.
 
 ### Named Rules
 **The Wide For Figures Rule.** Money headlines, panel figures and headings are set in wide Archivo. Running text, labels and list rows stay in the system face, and amounts in rows stay in the system face with tabular numbers.
@@ -274,6 +294,8 @@ The Budget page always runs in the same order: the Month / Trips / One-offs swit
 
 The Add tab runs as a till, top to bottom on the ground with no wrapping card: the Transaction / Trip / One-off switch, the amount, the 3-column category grid, a horizontally scrolling row of recurring pills, description, date, split, the "More options" disclosure, the Add button, then the after-save impact line. Fields stack with 20px gaps; a label sits 6px above its field.
 
+The Charts tab stacks its sections 32px apart: the 6M / 12M / All switch with the average month under it, then "Month by month" (the selected month's readout above the chart), then "Typical month", then "Typical costs" (Bills, then Per purchase, 24px apart). A section heading may carry a 12px cream-3 note on its right ("Monthly average vs budget", "All time"). The range scopes the first two sections only; typical costs are all-time.
+
 Rows are at least 56px tall with 10px of vertical padding. Transaction rows are at least 48px. Panels use 20px of horizontal padding.
 
 There is no ambient light: the ground is flat walnut from top to bottom.
@@ -287,14 +309,16 @@ The page is mostly flat and gets its depth from tone: ground, then panel, then r
 - **Dropdown** (`box-shadow: 0 18px 40px -12px rgb(0 0 0 / 0.7)`): the "More" picker panel.
 - **Sheet** (`box-shadow: 0 -24px 60px -20px rgb(0 0 0 / 0.8)`): the bottom sheet, cast upward.
 - **Toast** (`box-shadow: 0 10px 30px -10px rgb(0 0 0 / 0.8)`): the update notice.
-- **Notch ring** (`box-shadow: 0 0 0 2px var(--color-ground)`): cuts the cream notch out of the bar. This is a ground-coloured knockout, not a glow.
+- **Notch ring** (`box-shadow: 0 0 0 2px var(--color-ground)`): cuts the cream notch out of the bar and the cream budget tick out of a typical-month row. This is a ground-coloured knockout, not a glow.
+- **Label knockout** (SVG `stroke: var(--color-ground); stroke-width: 3; paint-order: stroke`): lifts the month chart's Budget and Wage labels off the lines they sit on. Also a knockout, not a glow.
+- **Scroll fade** (a 28px ground-to-transparent overlay): covers the month chart's left plot edge only while older months are scrolled out of view. It marks hidden content; it is not ambient light.
 
 ### Named Rules
 **The Float Earns The Shadow Rule.** Only sheets, dialogs, dropdowns and the toast cast a shadow, and it is always black. Nothing in the page flow casts one, and no shadow, halo or wash is ever coloured.
 
 ## Shapes
 
-Corners are softly rounded and consistent: 12px on every control (pills, buttons, fields, category tiles, date chevrons, the segmented frame), 10px on segments inside that frame, 16px on panels and dropdowns, and 28px on the top corners of the bottom sheet. Fully round shapes are reserved for the budget bar and its track, the notch, the sheet grabber, avatar and close buttons. Borders are 1px: teak edge on controls, fields and tiles, and 10% cream on panels and hairlines. The amount field has no box, only a 1px bottom rule. The "More" picker is the only dashed border.
+Corners are softly rounded and consistent: 12px on every control (pills, buttons, fields, category tiles, date chevrons, the segmented frame), 10px on segments inside that frame, 16px on panels and dropdowns, and 28px on the top corners of the bottom sheet. Chart columns have 4px rounded tops and square feet on the baseline; the chart's status-key swatch is a 10px square with 2px corners. Fully round shapes are reserved for the budget bar and its track, the typical-month bar and its budget tick, the notch, the sheet grabber, avatar and close buttons. Borders are 1px: teak edge on controls, fields and tiles, and 10% cream on panels and hairlines. The amount field has no box, only a 1px bottom rule. The "More" picker is the only dashed border.
 
 ## Components
 
@@ -312,7 +336,7 @@ Flat and solid, with no gradient or lift.
 - **Other uses:** subcategory choices, recurring quick-picks, and the split row ("Just me" followed by one pill per person; "Paid by" uses the same pills once someone is added).
 
 ### Segmented switch
-- A 12px teak-edge frame with 2px of inner padding holds equal segments, each at least 44px tall with 10px corners and 13px medium labels. The active segment is a 20% ember well with an inset 1px ember ring at 60% and cream text. Idle segments are cream 3, cream on hover. Built from the shared segment styles. Used for Month / Trips / One-offs, Transaction / Trip / One-off, Categories / Months, the one-offs filter, and two-way choices in forms (No trip / Add to a trip, Evenly / Custom amounts, No / Yes).
+- A 12px teak-edge frame with 2px of inner padding holds equal segments, each at least 44px tall with 10px corners and 13px medium labels. The active segment is a 20% ember well with an inset 1px ember ring at 60% and cream text. Idle segments are cream 3, cream on hover. Built from the shared segment styles. Used for Month / Trips / One-offs, Transaction / Trip / One-off, Categories / Months, 6M / 12M / All, Per bill / Per month, Food / Tickets / Games, the one-offs filter, and two-way choices in forms (No trip / Add to a trip, Evenly / Custom amounts, No / Yes).
 
 ### Cards / Containers (summary panel)
 - **Corner Style:** 16px.
@@ -350,24 +374,49 @@ The panel leads with money spent: the display figure in cream (cherry once the m
 The same row is used for months, trips and all time. It sits on the ground with hairlines between rows. The top line has a small emoji (grayscale 40%, opacity 60%), a 15px cream label, and the amount with a cream-3 "/ budget" after it. The small bar sits under that line, without a notch. The bottom line holds a 12px status in its colour (cherry semibold for over, ember-ink semibold for ahead of pace, avocado for left, cream 2 for full) and a cream-3 count with a chevron. When one row is expanded, its siblings dim (label to cream 2, emoji to 25%, bar to 35% opacity).
 
 ### The budget bar (signature)
-One rounded bar fills to spent ÷ budget on a fixed 0–100% scale over a 7% cream track. The large bar is 8px tall with 6px of space above and below; the small bar is 4px with 4px. The fill is ember, turns cherry once spending passes the budget, and is cream 4 for share-of-total and unbudgeted rows. On bars that show pace (the month summary and the Add tab's after-save bar, current month only) a 2px cream notch, cut out by a ground-coloured ring, marks today. Only the month summary captions it, with today's date in micro type ("Fri. 6th"), kept inside the bar near either end. Category rows show no notch.
+One rounded bar fills to spent ÷ budget on a fixed 0–100% scale over a 7% cream track. The fixed scale is for budget bars only; typical-month rows share one € scale instead. The large bar is 8px tall with 6px of space above and below; the small bar is 4px with 4px. The fill is ember, turns cherry once spending passes the budget, and is cream 4 for share-of-total and unbudgeted rows. On bars that show pace (the month summary and the Add tab's after-save bar, current month only) a 2px cream notch, cut out by a ground-coloured ring, marks today. Only the month summary captions it, with today's date in micro type ("Fri. 6th"), kept inside the bar near either end. Category rows show no notch.
+
+### Month chart (signature)
+Spending per month as columns on one € axis, drawn as plain SVG with d3-scale (pinned 4.0.2), the only chart dependency. The 206px plot sits on the walnut ground with no card.
+- **Columns:** ember, at most 24px wide (62% of each month's slot, never under 6px), with 4px rounded tops and square feet. Unselected columns sit at 50% opacity and the selected one is solid. An over-budget month stays solid cherry-fill so it never reads as ember, and turns cherry when selected. Opacity changes take 150ms.
+- **Axis:** three hairline € gridlines at 10% cream. Their 11px cream-3 € ticks sit in a fixed 44px column on the left that does not scroll with the months.
+- **Budget and wage:** the total budget is one 1px cream-3 line across the plot. Each month's wage is a short 2px round-capped avocado mark across its slot. Both are labelled in place at the right end in 11px ("Budget €X" in cream 3, "Wage €X" in avocado ink for the newest month) over the ground label knockout.
+- **Labels:** the selected month's value sits on its column cap in 11px medium cream 2. Month names run along the foot in 11px cream 3 (cream semibold when selected), with a two-digit year ('25) under January, the first month, and any month name that repeats in range.
+- **Picking:** one transparent pointer surface covers the plot. A tap picks the nearest month; in 6M and 12M a deliberate sideways slide scrubs, and a page scroll that starts on the plot picks nothing. It is a single keyboard stop with role="slider": arrows step, Home and End jump to the ends, and focus shows a 2px ember stroke.
+- **All:** once the months no longer fit at 24px per slot, the chart scrolls sideways. It opens at the newest month on the right, and the scroll fade covers the left edge once older months are hidden.
+- **Key and access:** the only status key is a cherry-fill swatch with "Red months went over budget" in 12px cream 3, shown only when a month went over. A screen-reader table lists every month's spent, budget and wage.
+- **Readout:** above the chart sit the selected month's 15px name ("so far" in cream 3 for the current month) and "€X of €Y" on the right. Under them a 13px line gives left to spend or under budget in cream 3, or "over budget" in semibold cherry, then "€X saved" in avocado or cherry.
+
+### Average month
+The Charts tab's headline, under the range switch: the display figure in cream (clamped 30–40px), captioned "spent in an average month" in 14px cream 2. On the right is the saved figure in wide 18px semibold, avocado (cherry with a minus sign when negative), captioned "saved" in 12px cream 3. A 12px cream-3 line under them says how many finished months it averages. The month in progress never counts.
+
+### Typical-month row
+A ranked list of categories by monthly average, largest first, on the ground between hairlines. The top line is the Budget row's: muted emoji, 15px medium cream label, and the 13px amount with a cream-3 "/ €budget". Under it, inset to the label, is a 4px rounded bar over a 7% cream track. Every row shares one € scale (the largest average or budget in range), so lengths compare across categories. The bar is ember, or cherry when the average passes the budget. A 2px by 12px cream budget tick, cut out by the ground knockout ring, marks the budget. Over-budget rows add a 12px semibold cherry line ("€X over budget on average"). Bars and ticks ease to a new range over 500ms on expo-out. Categories with nothing spent fold into one cream-3 "Nothing spent · …" line.
+
+### Typical-cost row
+The Budget page's row language for what things usually cost, over all time. Each group has a 15px medium cream title on the left and its segmented switch on the right. Rows are at least 56px tall, between hairlines. Each has a 20px cream-3 line icon (1.5 stroke) for a bill or the muted emoji for a purchase, a 15px medium label over a 12px cream-3 count, and the 13px tabular amount over a 12px cream-3 qualifier ("a month", "each, on average", "Varies"). A 14px cream-3 chevron turns over in 200ms when the row opens its transactions.
+
+### Budgets and wage sheet
+Opened from the Settings row "Budgets and wage" (with a short cream-2 description) by its secondary "Edit" button. The sheet leads with a three-column Wage · Budgeted · Left to save summary: 12px cream-3 labels over wide 16px semibold figures, with Left to save in avocado or cherry. Categories follow as hairline rows sorted by budget, largest first: muted emoji, 15px cream label and the 13px tabular budget. The secondary "Edit budgets and wage" button is hidden in stealth mode, and turning stealth on closes editing. In edit mode the monthly wage field comes first. Every field is a 48px smoked-glass field with a cream-3 € prefix and right-aligned tabular figures, and each budget has a 12px cream-3 "Suggested €X" caption under it. Cancel (outline) and Save (primary), both 48px, share a sticky bar at the sheet's foot, on panel above a 10% cream hairline.
 
 ### Bottom sheet
 Edits open in a sheet over the page, so the list keeps its scroll position. It is smoked glass with 28px top corners, a teak-edge border, a 40px grabber, a 44px close button, and safe-area padding underneath. The backdrop is walnut-black at 72% with a 3px blur. It rises 24px in 380ms on the expo-out curve.
 
 ### Motion
-Motion uses one curve, expo-out (`cubic-bezier(0.16, 1, 0.3, 1)`). The only authored entrance on page content is a budget bar growing in from the left over 700ms. It is opt-in, and only the month summary's bar and the Add tab's after-save bar use it. Row bars stay still, and a bar's fill eases to new data over 500ms. Overlays settle in: the sheet rises in 380ms, and dialogs lift and fade in 240ms. State changes are colour transitions of 150ms, chevrons turn in 200ms, and row dimming takes 300ms. Under reduced motion every animation and transition collapses to an instant.
+Motion uses one curve, expo-out (`cubic-bezier(0.16, 1, 0.3, 1)`). The only authored entrance on page content is a budget bar growing in from the left over 700ms. It is opt-in, and only the month summary's bar and the Add tab's after-save bar use it. Row bars stay still, and a bar's fill eases to new data over 500ms; typical-month bars and budget ticks do the same on expo-out when the range changes. Overlays settle in: the sheet rises in 380ms, and dialogs lift and fade in 240ms. State changes are colour and opacity transitions of 150ms (including the month chart's columns), chevrons turn in 200ms, and row dimming takes 300ms. Under reduced motion every animation and transition collapses to an instant.
 
 ## Do's and Don'ts
 
 ### Do:
 - **Do** draw every budget bar with the shared bar on the fixed 0–100% scale: ember, cherry when over, cream 4 when muted.
+- **Do** put rows or columns that compare across categories or months on one shared € scale, with the budget as a cream tick or line.
 - **Do** put list rows straight on the walnut ground, split by 10% cream hairlines.
 - **Do** keep every tappable thing at least 44px in its smallest dimension, and every field 48px.
 - **Do** set money headlines and panel figures in wide Archivo, and every amount in tabular figures as € with two decimals.
 - **Do** mark every amount that stealth mode should hide with the sensitive directive.
 - **Do** use the shared pill, segment and field styles for selectors and fields instead of restyling them.
-- **Do** sort category rows by amount spent, largest first, and fold categories with nothing spent into the quiet line.
+- **Do** sort category rows by what they measure, largest first (spent on Budget, average on Typical month, budget in the budgets sheet), and fold categories with nothing spent into one quiet line.
+- **Do** give every chart a single keyboard stop and a screen-reader table, and label its lines in place rather than in a legend.
 - **Do** give a new surface a black shadow only if it floats over the page.
 
 ### Don't:
@@ -375,6 +424,7 @@ Motion uses one curve, expo-out (`cubic-bezier(0.16, 1, 0.3, 1)`). The only auth
 - **Don't** use ember, avocado or cherry for decoration, category identity or headings.
 - **Don't** wrap rows or forms in cards, or put a card inside a panel. Panels are for period summaries, chrome and overlays.
 - **Don't** add a light theme or light surfaces.
+- **Don't** draw pie, donut or gradient-area charts, or add a chart package; charts are plain SVG with d3-scale.
 - **Don't** use a gradient fill on a button, tab, pill or bar.
 - **Don't** add an entrance animation to in-flow content other than an opted-in headline bar, and never animate row bars.
 - **Don't** set a form field below 16px, except the display-size amount.

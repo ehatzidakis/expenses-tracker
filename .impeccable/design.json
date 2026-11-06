@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-11-06T18:00:00Z",
+  "generatedAt": "2026-11-06T21:00:00Z",
   "title": "Design System: Expenses Tracker",
   "extensions": {
     "colorMeta": {
@@ -312,7 +312,7 @@
     "typographyMeta": {
       "display": {
         "displayName": "Display",
-        "purpose": "The period headline figure (money spent this month, trip total) and the Add tab amount. One per screen; All time clamps 30-40px."
+        "purpose": "The period headline figure (money spent this month, trip total, the average month on Charts) and the Add tab amount. One per screen; All time and the average month clamp 30-40px."
       },
       "headline": {
         "displayName": "Headline",
@@ -320,11 +320,11 @@
       },
       "title": {
         "displayName": "Title",
-        "purpose": "Trip name, days-to-go count, secondary panel figures (18–20px; one-off In and Spent at 32px)."
+        "purpose": "Trip name, days-to-go count, secondary panel figures, the 18px saved figure beside the average month (18–20px; one-off In and Spent at 32px)."
       },
       "figure": {
         "displayName": "Figure",
-        "purpose": "Inline panel totals such as the saved figure under the month bar and In / Out / Net (13-16px)."
+        "purpose": "Inline panel totals: the saved figure under the month bar, In / Out / Net, and the Wage · Budgeted · Left to save summary (13-16px)."
       },
       "brand": {
         "displayName": "Brand",
@@ -332,11 +332,11 @@
       },
       "section-heading": {
         "displayName": "Section Heading",
-        "purpose": "Uppercase wide list headings: Categories, Recent."
+        "purpose": "Uppercase wide list headings: Categories, Recent, Month by month, Typical month, Typical costs."
       },
       "body-lg": {
         "displayName": "Body Large",
-        "purpose": "Row labels, primary button labels, the friendly date label."
+        "purpose": "Row labels, primary button labels, the friendly date label, the selected month's name on Charts, sub-section titles (Bills, Per purchase)."
       },
       "field": {
         "displayName": "Field",
@@ -356,7 +356,7 @@
       },
       "micro": {
         "displayName": "Micro",
-        "purpose": "Tab labels and the date caption over the bar's notch (Fri. 6th)."
+        "purpose": "Tab labels, the date caption over the bar's notch (Fri. 6th), and every label inside the month chart: EUR ticks, months and years, the selected cap value, Budget and Wage labels."
       }
     },
     "shadows": [
@@ -383,12 +383,22 @@
       {
         "name": "notch-ring",
         "value": "0 0 0 2px var(--color-ground)",
-        "purpose": "Ground-coloured knockout around the budget bar's notch; not a glow."
+        "purpose": "Ground-coloured knockout around the budget bar's notch and the typical-month budget tick; not a glow."
       },
       {
         "name": "sheet-backdrop",
         "value": "background: rgb(8 5 4 / 0.72); backdrop-filter: blur(3px)",
         "purpose": "Scrim behind the bottom sheet."
+      },
+      {
+        "name": "label-knockout",
+        "value": "stroke: var(--color-ground); stroke-width: 3; paint-order: stroke",
+        "purpose": "Lifts the month chart's in-place Budget and Wage labels off their lines; a knockout, not a glow."
+      },
+      {
+        "name": "chart-scroll-fade",
+        "value": "28px linear-gradient(to right, var(--color-ground), transparent) overlay",
+        "purpose": "Over the month chart's left plot edge only while older months are scrolled out of view."
       }
     ],
     "motion": [
@@ -415,7 +425,7 @@
       {
         "name": "state-colour",
         "value": "150ms",
-        "purpose": "Colour and border changes on pills, segments, tiles, fields, tabs and buttons."
+        "purpose": "Colour, border and opacity changes on pills, segments, tiles, fields, tabs, buttons and month chart columns."
       },
       {
         "name": "chevron-turn",
@@ -431,6 +441,11 @@
         "name": "bar-width",
         "value": "500ms ease-out",
         "purpose": "Bar fill easing to new data."
+      },
+      {
+        "name": "typical-bar",
+        "value": "width and left 500ms ease-out-expo",
+        "purpose": "Typical-month bars and budget ticks easing to a new range."
       },
       {
         "name": "reduced-motion",
@@ -534,16 +549,32 @@
       "description": "A category on the ground between hairlines: label, amount over budget, the small single bar (no notch), and a status line. Sorted by amount spent.",
       "html": "<div class=\"ds-rows\"><button class=\"ds-row\"><span class=\"ds-row-top\"><span class=\"ds-row-name\">Eating out</span><span class=\"ds-row-amt\">€140.00 <em>/ €120.00</em></span></span><span class=\"ds-bar-sm ds-over\"><span class=\"ds-track-sm\"><i style=\"width:100%\"></i></span></span><span class=\"ds-row-foot\"><span class=\"ds-st-over\">€20.00 over</span><span class=\"ds-row-meta\">4 transactions <svg width=\"14\" height=\"14\" viewBox=\"0 0 20 20\" fill=\"currentColor\" aria-hidden=\"true\"><path fill-rule=\"evenodd\" d=\"M5.23 7.21a.75.75 0 011.06.02L10 11.17l3.71-3.94a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z\" clip-rule=\"evenodd\"/></svg></span></span></button><button class=\"ds-row\"><span class=\"ds-row-top\"><span class=\"ds-row-name\">Groceries</span><span class=\"ds-row-amt\">€120.00 <em>/ €300.00</em></span></span><span class=\"ds-bar-sm\"><span class=\"ds-track-sm\"><i style=\"width:40%\"></i></span></span><span class=\"ds-row-foot\"><span class=\"ds-st-ok\">€180.00 left</span><span class=\"ds-row-meta\">6 transactions <svg width=\"14\" height=\"14\" viewBox=\"0 0 20 20\" fill=\"currentColor\" aria-hidden=\"true\"><path fill-rule=\"evenodd\" d=\"M5.23 7.21a.75.75 0 011.06.02L10 11.17l3.71-3.94a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z\" clip-rule=\"evenodd\"/></svg></span></span></button><button class=\"ds-row\"><span class=\"ds-row-top\"><span class=\"ds-row-name\">Takeaway</span><span class=\"ds-row-amt\">€45.00 <em>/ €100.00</em></span></span><span class=\"ds-bar-sm\"><span class=\"ds-track-sm\"><i style=\"width:45%\"></i></span></span><span class=\"ds-row-foot\"><span class=\"ds-st-ahead\">€25.00 ahead of pace</span><span class=\"ds-row-meta\">2 transactions <svg width=\"14\" height=\"14\" viewBox=\"0 0 20 20\" fill=\"currentColor\" aria-hidden=\"true\"><path fill-rule=\"evenodd\" d=\"M5.23 7.21a.75.75 0 011.06.02L10 11.17l3.71-3.94a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z\" clip-rule=\"evenodd\"/></svg></span></span></button></div>",
       "css": ".ds-rows { max-width: 360px; border-top: 1px solid rgb(241 230 210 / 0.1); } .ds-row { display: block; width: 100%; min-height: 56px; padding: 10px 0; border: none; border-bottom: 1px solid rgb(241 230 210 / 0.1); background: transparent; text-align: left; color: var(--color-ink, #f1e6d2); font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif; cursor: pointer; } .ds-row:focus-visible { outline: 2px solid var(--color-ember, #e5703a); outline-offset: 2px; } .ds-row-top, .ds-row-foot { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; } .ds-row-name { font-size: 15px; font-weight: 500; } .ds-row-amt { font-size: 13px; font-variant-numeric: tabular-nums; } .ds-row-amt em { font-style: normal; color: var(--color-ink-3, #b0a08c); } .ds-bar-sm { display: block; margin-top: 4px; padding: 4px 0; } .ds-track-sm { display: block; height: 4px; border-radius: 9999px; background: rgb(241 230 210 / 0.07); overflow: hidden; } .ds-track-sm i { display: block; height: 100%; border-radius: 9999px; background: var(--color-ember, #e5703a); transition: width 500ms ease-out; } .ds-bar-sm.ds-over .ds-track-sm i { background: var(--color-cherry, #f0566b); } .ds-row-foot { font-size: 12px; color: var(--color-ink-3, #b0a08c); } .ds-row-meta { display: inline-flex; align-items: center; gap: 4px; } .ds-st-over { color: var(--color-cherry, #f0566b); font-weight: 600; } .ds-st-ahead { color: var(--color-ember-ink, #ee7d48); font-weight: 600; } .ds-st-ok { color: var(--color-avocado, #8fa35a); }"
+    },
+    {
+      "name": "Month Chart",
+      "kind": "custom",
+      "refersTo": "chart-column",
+      "description": "Ember columns on hairline EUR gridlines with a fixed tick column, the budget as one cream-3 line and each month's wage as a short avocado mark, labelled in place. Unselected at 50%; over-budget months solid cherry-fill.",
+      "html": "<div class=\"ds-mc\"><div class=\"ds-mc-axis\" aria-hidden=\"true\"><span style=\"top:22px\">€1,500</span><span style=\"top:96px\">€750</span><span style=\"top:170px\">€0</span></div><svg width=\"300\" height=\"206\" viewBox=\"0 0 300 206\" role=\"group\" aria-label=\"Spending per month\"><line class=\"ds-mc-grid\" x1=\"0\" x2=\"296\" y1=\"22.5\" y2=\"22.5\"/><line class=\"ds-mc-grid\" x1=\"0\" x2=\"296\" y1=\"96.5\" y2=\"96.5\"/><line class=\"ds-mc-grid\" x1=\"0\" x2=\"296\" y1=\"170.5\" y2=\"170.5\"/><line class=\"ds-mc-budget\" x1=\"0\" x2=\"296\" y1=\"60.5\" y2=\"60.5\"/><text class=\"ds-mc-lbl ds-mc-lbl-b\" x=\"296\" y=\"55\" text-anchor=\"end\">Budget €1,200</text><text class=\"ds-mc-lbl ds-mc-lbl-w\" x=\"296\" y=\"30\" text-anchor=\"end\">Wage €1,400</text><line class=\"ds-mc-wage\" x1=\"9\" x2=\"55\" y1=\"36\" y2=\"36\"/><line class=\"ds-mc-wage\" x1=\"59\" x2=\"105\" y1=\"36\" y2=\"36\"/><line class=\"ds-mc-wage\" x1=\"109\" x2=\"155\" y1=\"36\" y2=\"36\"/><line class=\"ds-mc-wage\" x1=\"159\" x2=\"205\" y1=\"36\" y2=\"36\"/><line class=\"ds-mc-wage\" x1=\"209\" x2=\"255\" y1=\"36\" y2=\"36\"/><path class=\"ds-mc-col\" d=\"M20,170 V94 Q20,90 24,90 H40 Q44,90 44,94 V170 Z\"/><path class=\"ds-mc-col\" d=\"M70,170 V84 Q70,80 74,80 H90 Q94,80 94,84 V170 Z\"/><path class=\"ds-mc-col ds-mc-over\" d=\"M120,170 V44 Q120,40 124,40 H140 Q144,40 144,44 V170 Z\"/><path class=\"ds-mc-col\" d=\"M170,170 V104 Q170,100 174,100 H190 Q194,100 194,104 V170 Z\"/><path class=\"ds-mc-col ds-mc-sel\" d=\"M220,170 V124 Q220,120 224,120 H240 Q244,120 244,124 V170 Z\"/><text class=\"ds-mc-cap\" x=\"232\" y=\"114\" text-anchor=\"middle\">€420</text><text class=\"ds-mc-m\" x=\"32\" y=\"185\" text-anchor=\"middle\">Jul</text><text class=\"ds-mc-m\" x=\"32\" y=\"199\" text-anchor=\"middle\">'26</text><text class=\"ds-mc-m\" x=\"82\" y=\"185\" text-anchor=\"middle\">Aug</text><text class=\"ds-mc-m\" x=\"132\" y=\"185\" text-anchor=\"middle\">Sep</text><text class=\"ds-mc-m\" x=\"182\" y=\"185\" text-anchor=\"middle\">Oct</text><text class=\"ds-mc-m ds-mc-m-on\" x=\"232\" y=\"185\" text-anchor=\"middle\">Nov</text><rect class=\"ds-mc-hit\" x=\"0\" y=\"0\" width=\"300\" height=\"206\" fill=\"transparent\" tabindex=\"0\" role=\"slider\" aria-label=\"Month\" aria-valuemin=\"0\" aria-valuemax=\"4\" aria-valuenow=\"4\" aria-valuetext=\"November 2026\"/></svg><p class=\"ds-mc-key\"><i aria-hidden=\"true\"></i>Red months went over budget</p></div>",
+      "css": ".ds-mc { position: relative; display: flex; flex-wrap: wrap; max-width: 360px; font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif; } .ds-mc-axis { position: relative; width: 44px; height: 206px; flex-shrink: 0; } .ds-mc-axis span { position: absolute; right: 8px; transform: translateY(-50%); font-size: 11px; line-height: 1; color: var(--color-ink-3, #b0a08c); font-variant-numeric: tabular-nums; } .ds-mc svg { display: block; overflow: visible; } .ds-mc-grid { stroke: rgb(241 230 210 / 0.1); stroke-width: 1; shape-rendering: crispEdges; } .ds-mc-budget { stroke: var(--color-ink-3, #b0a08c); stroke-width: 1; shape-rendering: crispEdges; } .ds-mc-wage { stroke: var(--color-avocado, #8fa35a); stroke-width: 2; stroke-linecap: round; } .ds-mc-lbl { font-size: 11px; stroke: var(--color-ground, #120d0a); stroke-width: 3; paint-order: stroke; } .ds-mc-lbl-b { fill: var(--color-ink-3, #b0a08c); } .ds-mc-lbl-w { fill: var(--color-avocado-ink, #a9bc74); } .ds-mc-col { fill: var(--color-ember, #e5703a); opacity: 0.5; transition: opacity 150ms; } .ds-mc-sel { opacity: 1; } .ds-mc-over { fill: var(--color-cherry-fill, #a8283b); opacity: 1; } .ds-mc-over.ds-mc-sel { fill: var(--color-cherry, #f0566b); } .ds-mc-cap { font-size: 11px; font-weight: 500; fill: var(--color-ink-2, #d3c6b1); font-variant-numeric: tabular-nums; } .ds-mc-m { font-size: 11px; fill: var(--color-ink-3, #b0a08c); } .ds-mc-m-on { fill: var(--color-ink, #f1e6d2); font-weight: 600; } .ds-mc-hit { cursor: pointer; outline: none; stroke-width: 2; } .ds-mc-hit:focus-visible { stroke: var(--color-ember, #e5703a); } .ds-mc-key { flex-basis: 100%; display: flex; align-items: center; gap: 6px; margin: 8px 0 0; font-size: 12px; color: var(--color-ink-3, #b0a08c); } .ds-mc-key i { width: 10px; height: 10px; border-radius: 2px; background: var(--color-cherry-fill, #a8283b); }"
+    },
+    {
+      "name": "Typical Month Row",
+      "kind": "custom",
+      "refersTo": "typical-row",
+      "description": "Ranked categories by monthly average on one shared EUR scale: an ember bar (cherry when over) and a cream budget tick cut out by a ground ring. Eases 500ms on expo-out when the range changes.",
+      "html": "<ul class=\"ds-tm\"><li><div class=\"ds-tm-top\"><span class=\"ds-tm-name\"><i aria-hidden=\"true\">🛒</i>Groceries</span><span class=\"ds-tm-amt\">€240.00 <em>/ €280</em></span></div><div class=\"ds-tm-bar\" aria-hidden=\"true\"><span class=\"ds-tm-track\"></span><span class=\"ds-tm-fill\" style=\"width:86%\"></span><span class=\"ds-tm-tick\" style=\"left:100%\"></span></div></li><li><div class=\"ds-tm-top\"><span class=\"ds-tm-name\"><i aria-hidden=\"true\">🚆</i>Travel</span><span class=\"ds-tm-amt\">€60.00 <em>/ €30</em></span></div><div class=\"ds-tm-bar\" aria-hidden=\"true\"><span class=\"ds-tm-track\"></span><span class=\"ds-tm-fill ds-tm-over\" style=\"width:21%\"></span><span class=\"ds-tm-tick\" style=\"left:11%\"></span></div><p class=\"ds-tm-warn\">€30.00 over budget on average</p></li><li><div class=\"ds-tm-top\"><span class=\"ds-tm-name\"><i aria-hidden=\"true\">🐈</i>Pets</span><span class=\"ds-tm-amt\">€40.00 <em>/ €50</em></span></div><div class=\"ds-tm-bar\" aria-hidden=\"true\"><span class=\"ds-tm-track\"></span><span class=\"ds-tm-fill\" style=\"width:14%\"></span><span class=\"ds-tm-tick\" style=\"left:18%\"></span></div></li></ul>",
+      "css": ".ds-tm { max-width: 360px; margin: 0; padding: 0; list-style: none; border-top: 1px solid rgb(241 230 210 / 0.1); font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif; } .ds-tm li { padding: 10px 0; border-bottom: 1px solid rgb(241 230 210 / 0.1); } .ds-tm-top { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; } .ds-tm-name { display: flex; align-items: baseline; gap: 8px; font-size: 15px; font-weight: 500; color: var(--color-ink, #f1e6d2); } .ds-tm-name i { width: 20px; font-style: normal; font-size: 13px; opacity: 0.6; filter: grayscale(40%); } .ds-tm-amt { font-size: 13px; font-variant-numeric: tabular-nums; color: var(--color-ink, #f1e6d2); } .ds-tm-amt em { font-style: normal; color: var(--color-ink-3, #b0a08c); } .ds-tm-bar { position: relative; height: 12px; margin: 6px 0 0 28px; } .ds-tm-track, .ds-tm-fill { position: absolute; left: 0; top: 4px; height: 4px; border-radius: 9999px; } .ds-tm-track { right: 0; background: rgb(241 230 210 / 0.07); } .ds-tm-fill { background: var(--color-ember, #e5703a); transition: width 500ms cubic-bezier(0.16, 1, 0.3, 1); } .ds-tm-over { background: var(--color-cherry, #f0566b); } .ds-tm-tick { position: absolute; top: 0; width: 2px; height: 12px; transform: translateX(-50%); border-radius: 9999px; background: var(--color-ink, #f1e6d2); box-shadow: 0 0 0 2px var(--color-ground, #120d0a); transition: left 500ms cubic-bezier(0.16, 1, 0.3, 1); } .ds-tm-warn { margin: 4px 0 0 28px; font-size: 12px; font-weight: 600; color: var(--color-cherry, #f0566b); }"
     }
   ],
   "narrative": {
     "northStar": "Teak & Smoked Glass",
-    "overview": "The app is a walnut room at night. The page is near-black wood, the few raised surfaces are smoked glass, and all the writing is in cream. Most of the screen is quiet: lists sit straight on the ground and are split by hairlines. Colour only shows up when it means something. The one recurring signature is the budget bar: a single rounded ember bar on a faint cream track, which turns cherry when a budget is blown and carries a cream notch at today on the month's headline bar.\n\nIt is an installed iPhone PWA used one-handed, so it is dark-only and dense. A phone screen shows the month's headline, the bar and most category rows without scrolling, and every control is still at least thumb-sized. Wide, flat-topped figures in Archivo carry the numbers and headings. The system UI face does the reading.\n\nThe world was chosen in place of the previous cool indigo-glass dashboard of equal cards, and it leaves that dashboard's habits behind: no gradients on controls, no floating pill tab bar and no coloured status tints on every row.",
+    "overview": "The app is a walnut room at night. The page is near-black wood, the few raised surfaces are smoked glass, and all the writing is in cream. Most of the screen is quiet: lists sit straight on the ground and are split by hairlines. Colour only shows up when it means something. The one recurring signature is the budget bar: a single rounded ember bar on a faint cream track, which turns cherry when a budget is blown and carries a cream notch at today on the month's headline bar. Looking back, the same materials become a ledger: ember columns on hairline € gridlines, with the budget as one cream line.\n\nIt is an installed iPhone PWA used one-handed, so it is dark-only and dense. A phone screen shows the month's headline, the bar and most category rows without scrolling, and every control is still at least thumb-sized. Wide, flat-topped figures in Archivo carry the numbers and headings. The system UI face does the reading.\n\nThe world was chosen in place of the previous cool indigo-glass dashboard of equal cards, and it leaves that dashboard's habits behind: no gradients on controls, no floating pill tab bar and no coloured status tints on every row.",
     "keyCharacteristics": [
       "Dark-only. Walnut ground, two smoked-glass steps, cream ink in four tiers. No ambient light or wash.",
       "Colour carries meaning: ember for selection and action, avocado for on pace or money kept, cherry for over budget.",
       "Archivo at 125% width for figures and headings; system UI for body text; tabular figures everywhere.",
-      "One budget bar on one fixed 0–100% scale: ember, cherry when over, cream 4 when muted.",
+      "Budget bars sit on one fixed 0–100% scale: ember, cherry when over, cream 4 when muted. Comparisons across months or categories share one € scale instead.",
       "Rows sit on the ground between hairlines. Panels are kept for period summaries and for chrome.",
       "Every target is at least 44px; every field is 48px at 16px type. Every text tier is at least 4.5:1 on every surface."
     ],
@@ -555,7 +586,7 @@
       },
       {
         "name": "The No Yellow Rule",
-        "body": "No yellow, gold or amber anywhere, including the chart palette, and no neon or saturated glow. Warnings are ember-ink in semibold, not yellow.",
+        "body": "No yellow, gold or amber anywhere, including charts, and no neon or saturated glow. Warnings are ember-ink in semibold, not yellow.",
         "section": "colors"
       },
       {
@@ -586,12 +617,14 @@
     ],
     "dos": [
       "Do draw every budget bar with the shared bar on the fixed 0–100% scale: ember, cherry when over, cream 4 when muted.",
+      "Do put rows or columns that compare across categories or months on one shared € scale, with the budget as a cream tick or line.",
       "Do put list rows straight on the walnut ground, split by 10% cream hairlines.",
       "Do keep every tappable thing at least 44px in its smallest dimension, and every field 48px.",
       "Do set money headlines and panel figures in wide Archivo, and every amount in tabular figures as € with two decimals.",
       "Do mark every amount that stealth mode should hide with the sensitive directive.",
       "Do use the shared pill, segment and field styles for selectors and fields instead of restyling them.",
-      "Do sort category rows by amount spent, largest first, and fold categories with nothing spent into the quiet line.",
+      "Do sort category rows by what they measure, largest first (spent on Budget, average on Typical month, budget in the budgets sheet), and fold categories with nothing spent into one quiet line.",
+      "Do give every chart a single keyboard stop and a screen-reader table, and label its lines in place rather than in a legend.",
       "Do give a new surface a black shadow only if it floats over the page."
     ],
     "donts": [
@@ -599,6 +632,7 @@
       "Don't use ember, avocado or cherry for decoration, category identity or headings.",
       "Don't wrap rows or forms in cards, or put a card inside a panel. Panels are for period summaries, chrome and overlays.",
       "Don't add a light theme or light surfaces.",
+      "Don't draw pie, donut or gradient-area charts, or add a chart package; charts are plain SVG with d3-scale.",
       "Don't use a gradient fill on a button, tab, pill or bar.",
       "Don't add an entrance animation to in-flow content other than an opted-in headline bar, and never animate row bars.",
       "Don't set a form field below 16px, except the display-size amount.",

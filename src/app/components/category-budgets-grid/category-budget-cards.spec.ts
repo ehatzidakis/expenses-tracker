@@ -21,7 +21,7 @@ describe('CategoryBudgetCardsComponent', () => {
     ]);
     fixture.detectChanges();
 
-    expect(fixture.nativeElement.textContent).toContain('suggested: €200');
+    expect(fixture.nativeElement.textContent).toContain('Suggested €200');
   });
 
   it('does not render suggestions when the value is null or editing is off', () => {
@@ -29,7 +29,7 @@ describe('CategoryBudgetCardsComponent', () => {
       { category: 'Supermarket', budget: 280, suggestion: null },
     ]);
     fixture.detectChanges();
-    expect(fixture.nativeElement.textContent).not.toContain('suggested:');
+    expect(fixture.nativeElement.textContent).not.toContain('Suggested');
 
     fixture.componentRef.setInput('isEditing', true);
     fixture.componentRef.setInput('budgets', [
@@ -37,10 +37,10 @@ describe('CategoryBudgetCardsComponent', () => {
     ]);
     fixture.componentRef.setInput('draftBudgets', { Supermarket: 280 });
     fixture.detectChanges();
-    expect(fixture.nativeElement.textContent).toContain('suggested: €200');
+    expect(fixture.nativeElement.textContent).toContain('Suggested €200');
 
     fixture.componentRef.setInput('isEditing', false);
     fixture.detectChanges();
-    expect(fixture.nativeElement.textContent).not.toContain('suggested:');
+    expect(fixture.nativeElement.textContent).not.toContain('Suggested');
   });
 });

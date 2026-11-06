@@ -2,6 +2,8 @@ import { CommonModule } from '@angular/common';
 import { Component, input, output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { SensitiveDirective } from '../../utils/sensitive.directive';
+import { getCategoryMeta } from '../../services/expense-state.service';
+import { categoryLabel } from '../../utils/period-pace';
 
 export interface BudgetCardItem {
   category: string;
@@ -15,49 +17,44 @@ export interface BudgetCardItem {
   host: { class: 'block' },
   imports: [CommonModule, FormsModule, SensitiveDirective],
   template: `
-    <div class="grid grid-cols-4 gap-1">
+    <ul class="divide-y divide-ink/10 border-y border-ink/10">
       @for (item of budgets(); track item.category) {
-        <div
-          class="bg-raised/40 border border-raised/60 rounded-2xl p-3.5 flex flex-col justify-between"
-        >
-          <span
-            class="font-medium text-ink-2 block whitespace-nowrap"
-            [class]="getCategoryTextSize(item.category)"
-          >
-            {{ item.category }}
-          </span>
-
+        <li class="flex min-h-12 items-center justify-between gap-3 py-2">
+          <label [for]="'budget-' + item.category" class="flex min-w-0 items-center gap-2">
+            <span class="w-5 shrink-0 text-[13px] opacity-60 grayscale-[40%]" aria-hidden="true">{{
+              emoji(item.category)
+            }}</span>
+            <span class="truncate text-[15px] text-ink">{{ label(item.category) }}</span>
+          </label>
           @if (isEditing()) {
-            <label class="mt-2 block text-[11px] text-ink-2">
-              <span class="mb-1 block">Budget</span>
-              <div
-                class="flex items-center gap-1 rounded-md border border-edge bg-ground/70 px-2 py-1.5"
+            <span class="flex shrink-0 flex-col items-end gap-0.5">
+              <span
+                class="flex min-h-12 w-28 items-center gap-1 rounded-xl border border-edge bg-panel px-3 transition-colors focus-within:border-ember"
               >
-                <span class="text-ink-2">€</span>
+                <span class="text-ink-3" aria-hidden="true">€</span>
                 <input
+                  [id]="'budget-' + item.category"
                   type="text"
                   inputmode="numeric"
                   autocomplete="off"
                   pattern="[0-9]*"
-                  class="w-full bg-transparent text-sm text-ink outline-none"
+                  class="w-full bg-transparent text-right text-ink tabular-nums focus-visible:outline-none"
                   [ngModel]="draftBudgets()[item.category] ?? 0"
                   (ngModelChange)="budgetChange.emit({ category: item.category, value: $event })"
                 />
-              </div>
+              </span>
               @if (item.suggestion !== null) {
-                <span class="mt-1 block text-[11px] text-ember-ink">
-                  suggested: €{{ item.suggestion | number: '1.0-0' }}
-                </span>
+                <span class="text-[12px] text-ink-3">Suggested €{{ item.suggestion | number: '1.0-0' }}</span>
               }
-            </label>
+            </span>
           } @else {
-            <span class="text-base font-semibold text-ink mt-1" appSensitive>
-              €{{ item.budget | number: '1.0-0' }}
+            <span class="shrink-0 text-[13px] text-ink tabular-nums" appSensitive="xs">
+              €{{ item.budget | number: '1.2-2' }}
             </span>
           }
-        </div>
+        </li>
       }
-    </div>
+    </ul>
   `,
 })
 export class CategoryBudgetCardsComponent {
@@ -67,8 +64,11 @@ export class CategoryBudgetCardsComponent {
 
   readonly budgetChange = output<{ category: string; value: string }>();
 
-  getCategoryTextSize(category: string): string {
-    if (category.length > 9) return 'text-[11px]';
-    return 'text-[11px]';
+  emoji(category: string): string {
+    return getCategoryMeta(category).emoji;
+  }
+
+  label(category: string): string {
+    return categoryLabel(category);
   }
 }

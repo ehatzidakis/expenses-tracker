@@ -9,57 +9,70 @@ import { BudgetCardItem, CategoryBudgetCardsComponent } from './category-budget-
 import { CategoryBudgetEditControlsComponent } from './category-budget-edit-controls';
 import { CategoryBudgetSummaryComponent } from './category-budget-summary';
 import { PrivacyService } from '../../services/privacy.service';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-category-budgets-grid',
   standalone: true,
   imports: [
+    FormsModule,
     CategoryBudgetCardsComponent,
     CategoryBudgetEditControlsComponent,
     CategoryBudgetSummaryComponent,
   ],
   template: `
-    <div class="space-y-6">
-      <div
-        class="bg-panel/60 border border-raised/80 rounded-2xl p-5 space-y-4 overflow-hidden select-none"
-      >
+    <div class="flex flex-col gap-4 select-none">
+      <app-category-budget-summary [wage]="wage" [totalBudget]="totalBudget" [projectedSave]="projectedSave" />
+
+      @if (!isEditing && !privacyService.isPrivacyMode()) {
+        <button
+          type="button"
+          class="min-h-11 self-start rounded-xl border border-edge px-4 text-[13px] font-medium text-ink-2 transition-colors hover:border-ink-4 hover:text-ink cursor-pointer"
+          (click)="startEditing()"
+        >
+          Edit budgets and wage
+        </button>
+      }
+
+      @if (isEditing) {
         <div class="flex items-center justify-between gap-3">
-          <div>
-            <h3 class="text-sm font-semibold text-ink">
-              Monthly Allocated Budget Per Category
-            </h3>
-          </div>
-
-          @if (!isEditing && !privacyService.isPrivacyMode()) {
-            <button
-              type="button"
-              class="rounded-lg border border-ember/40 bg-ember/10 px-2.5 py-1 text-[11px] font-medium uppercase tracking-wide text-ember-soft transition hover:bg-ember/20"
-              (click)="startEditing()"
-            >
-              Edit
-            </button>
-          }
+          <label for="budget-wage" class="text-[15px] font-medium text-ink">Monthly wage</label>
+          <span
+            class="flex min-h-12 w-32 items-center gap-1 rounded-xl border border-edge bg-panel px-3 transition-colors focus-within:border-ember"
+          >
+            <span class="text-ink-3" aria-hidden="true">€</span>
+            <input
+              id="budget-wage"
+              type="text"
+              inputmode="numeric"
+              autocomplete="off"
+              pattern="[0-9]*"
+              class="w-full bg-transparent text-right text-ink tabular-nums focus-visible:outline-none"
+              [ngModel]="draftWage"
+              (ngModelChange)="setDraftWage($event)"
+            />
+          </span>
         </div>
+      }
 
-        <app-category-budget-cards
-          [budgets]="budgets"
+      <app-category-budget-cards
+        [budgets]="budgets"
+        [isEditing]="isEditing"
+        [draftBudgets]="draftBudgets"
+        (budgetChange)="updateDraftBudget($event.category, $event.value)"
+      />
+
+      @if (isEditing) {
+        <!-- Pinned to the foot of the sheet while the budgets scroll past -->
+        <app-category-budget-edit-controls
+          class="sticky bottom-[calc(-20px-env(safe-area-inset-bottom))] -mx-5 block border-t border-ink/10 bg-panel px-5 pt-3 pb-[calc(20px+env(safe-area-inset-bottom))]"
           [isEditing]="isEditing"
-          [draftBudgets]="draftBudgets"
-          (budgetChange)="updateDraftBudget($event.category, $event.value)"
+          [draftWage]="draftWage"
+          (wageChange)="setDraftWage($event)"
+          (cancel)="cancelEditing()"
+          (save)="saveBudgetSettings()"
         />
-
-        @if (isEditing) {
-          <app-category-budget-edit-controls
-            [isEditing]="isEditing"
-            [draftWage]="draftWage"
-            (wageChange)="setDraftWage($event)"
-            (cancel)="cancelEditing()"
-            (save)="saveBudgetSettings()"
-          />
-        }
-
-        <app-category-budget-summary [totalBudget]="totalBudget" [projectedSave]="projectedSave" />
-      </div>
+      }
     </div>
   `,
 })
@@ -111,7 +124,8 @@ export class CategoryBudgetsGrid implements OnInit {
       suggestion: averageByCategory.get(category) ?? null,
     }));
 
-    this.budgets = nextBudgets;
+    // Biggest budget first, like every other list in the app.
+    this.budgets = [...nextBudgets].sort((a, b) => b.budget - a.budget);
     this.totalBudget = Object.values(categoryBudgets).reduce(
       (acc, val) => acc + (Number(val) || 0),
       0,

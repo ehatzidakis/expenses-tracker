@@ -14,6 +14,8 @@ import { StealthModeSettingComponent } from './stealth-mode-setting.component';
 import { StealthPasscodeSettingComponent } from './stealth-passcode-setting.component';
 import { DataExportSettingComponent } from './data-export-setting.component';
 import { NotificationSettingComponent } from './notification-setting.component';
+import { SheetComponent } from '../sheet/sheet';
+import { CategoryBudgetsGrid } from '../category-budgets-grid/category-budgets-grid';
 
 type PinAction = 'none' | 'set' | 'remove' | 'unlock-to-disable';
 
@@ -21,6 +23,8 @@ type PinAction = 'none' | 'set' | 'remove' | 'unlock-to-disable';
   selector: 'app-settings-modal',
   standalone: true,
   imports: [
+    SheetComponent,
+    CategoryBudgetsGrid,
     PinEntryFormComponent,
     SettingsFeedbackBannerComponent,
     SettingsModalFooterComponent,
@@ -95,6 +99,20 @@ type PinAction = 'none' | 'set' | 'remove' | 'unlock-to-disable';
         }
 
         @if (authService.isAdmin()) {
+          <div class="flex items-center justify-between gap-3 rounded-2xl border border-raised/80 bg-raised/40 p-3.5">
+            <span class="space-y-0.5">
+              <span class="block text-sm font-medium text-ink">Budgets and wage</span>
+              <span class="block text-[12px] text-ink-2">Your wage and each category's monthly budget</span>
+            </span>
+            <button
+              type="button"
+              class="min-h-11 shrink-0 rounded-xl border border-edge px-4 text-[13px] font-medium text-ink-2 transition-colors hover:border-ink-4 hover:text-ink cursor-pointer"
+              (click)="budgetsOpen.set(true)"
+            >
+              Edit
+            </button>
+          </div>
+
           <app-notification-setting />
         }
 
@@ -105,6 +123,12 @@ type PinAction = 'none' | 'set' | 'remove' | 'unlock-to-disable';
         <app-settings-modal-footer [version]="appVersion" />
       </div>
     </div>
+
+    @if (budgetsOpen()) {
+      <app-sheet label="Budgets and wage" (closed)="budgetsOpen.set(false)">
+        <app-category-budgets-grid />
+      </app-sheet>
+    }
   `,
 })
 export class SettingsModalComponent {
@@ -114,6 +138,7 @@ export class SettingsModalComponent {
   readonly appVersion = APP_VERSION;
 
   readonly activeAction = signal<PinAction>('none');
+  readonly budgetsOpen = signal(false);
   readonly pinInput = signal<string>('');
   readonly currentPinInput = signal<string>('');
   readonly feedbackMessage = signal<SettingsFeedbackMessage | null>(null);

@@ -9,10 +9,7 @@ import { HeaderComponent } from './components/header.component/header.component'
 import { CategoryBreakdownComponent } from './components/category-breakdown.component/category-breakdown.component';
 import { TabBarComponent } from './components/tab-bar.component/tab-bar.component';
 import { CreateTransactionComponent } from './components/create-transaction.component/create-transaction.component';
-import { CategoryBudgetsGrid } from './components/category-budgets-grid/category-budgets-grid';
-import { CategoryBudgetsChartComponent } from './components/category-budgets-chart/category-budgets-chart';
-import { UtilitySumComponent } from './components/utility-sum-component/utility-sum-component';
-import { CategoryAverageComponent } from './components/category-average/category-average';
+import { ChartsPageComponent } from './components/charts-page/charts-page';
 import { AuthService } from './services/auth.service';
 import { PendingBadgeService } from './services/pending-badge.service';
 import { KioskShellComponent } from './components/kiosk-shell/kiosk-shell.component';
@@ -36,10 +33,7 @@ export interface YearlyBreakdownEntry {
     CategoryBreakdownComponent,
     TabBarComponent,
     CreateTransactionComponent,
-    CategoryBudgetsGrid,
-    CategoryBudgetsChartComponent,
-    UtilitySumComponent,
-    CategoryAverageComponent,
+    ChartsPageComponent,
     BudgetPageComponent,
     KioskShellComponent,
   ],

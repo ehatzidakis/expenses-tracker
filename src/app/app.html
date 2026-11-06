@@ -134,10 +134,7 @@
 
       @case ('charts') {
         @defer (on immediate) {
-          <app-category-budgets-grid></app-category-budgets-grid>
-          <app-category-budgets-chart></app-category-budgets-chart>
-          <app-utility-sum></app-utility-sum>
-          <app-category-average></app-category-average>
+          <app-charts-page />
         } @loading {
           <div class="h-96 rounded-2xl bg-panel/60 animate-pulse"></div>
         }

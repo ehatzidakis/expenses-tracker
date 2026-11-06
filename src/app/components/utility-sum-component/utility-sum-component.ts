@@ -4,6 +4,7 @@ import { injectQuery } from '@tanstack/angular-query-experimental';
 import { TransactionService, categoryStatKey } from '../../services/transaction-service';
 import { PagedEntriesListComponent } from '../paged-entries-list/paged-entries-list';
 import { SensitiveDirective } from '../../utils/sensitive.directive';
+import { SEGMENT_BASE, SEGMENT_FRAME, SEGMENT_OFF, SEGMENT_ON } from '../../utils/pill-styles';
 
 interface UtilityAverage {
   id: string;
@@ -22,109 +23,116 @@ interface UtilityAverage {
   standalone: true,
   imports: [CommonModule, PagedEntriesListComponent, SensitiveDirective],
   template: `
-    <div
-      class="bg-panel/60 border border-raised/80 rounded-2xl p-5 select-none"
-    >
-      <!-- Header -->
-      <div class="mb-5 flex items-center justify-between gap-3">
-        <div>
-          <h3 class="text-sm font-semibold text-ink">Utility Averages</h3>
-          <p class="text-xs text-ink-2 mt-0.5">
-            {{ viewMode() === 'bill' ? 'Average per bill' : 'Average per month' }}
-          </p>
-        </div>
-
-        <div class="inline-flex rounded-full border border-edge bg-ground/80 p-1">
+    <section aria-labelledby="costs-bills" class="flex flex-col gap-2">
+      <div class="flex items-center justify-between gap-3">
+        <h3 id="costs-bills" class="text-[15px] font-medium text-ink">Bills</h3>
+        <div role="group" aria-label="Average" [class]="frame + ' grid-cols-2'">
           <button
             type="button"
-            class="rounded-full px-3 py-1.5 text-[11px] font-semibold transition-colors"
-            [class.bg-ember]="viewMode() === 'bill'"
-            [class.text-ground]="viewMode() === 'bill'"
-            [class.text-ink-2]="viewMode() !== 'bill'"
+            [class]="segment(viewMode() === 'bill') + ' px-3.5'"
+            [attr.aria-pressed]="viewMode() === 'bill'"
             (click)="viewMode.set('bill')"
           >
-            Per Bill
+            Per bill
           </button>
           <button
             type="button"
-            class="rounded-full px-3 py-1.5 text-[11px] font-semibold transition-colors"
-            [class.bg-ember]="viewMode() === 'monthly'"
-            [class.text-ground]="viewMode() === 'monthly'"
-            [class.text-ink-2]="viewMode() !== 'monthly'"
+            [class]="segment(viewMode() === 'monthly') + ' px-3.5'"
+            [attr.aria-pressed]="viewMode() === 'monthly'"
             (click)="viewMode.set('monthly')"
           >
-            Monthly
+            Per month
           </button>
         </div>
       </div>
 
-      <!-- List Container -->
-      <div class="space-y-3">
+      <ul class="divide-y divide-ink/10 border-t border-ink/10">
         @for (item of utilityAverages(); track item.id) {
-          <div class="space-y-2">
-            <div
-              class="flex items-center justify-between p-3 rounded-xl bg-raised/40 border border-raised/60 transition-colors hover:bg-raised/60 cursor-pointer"
+          <li>
+            <button
+              type="button"
+              class="flex min-h-14 w-full items-center justify-between gap-3 py-2.5 text-left cursor-pointer"
+              [attr.aria-expanded]="expandedUtility() === item.label"
               (click)="toggleUtility(item.label)"
             >
-              <div class="flex items-center gap-3.5">
-                <!-- Icon Wrapper -->
-                <div
-                  class="flex items-center justify-center w-10 h-10 rounded-full border"
-                  [ngClass]="item.bgColorClass"
+              <span class="flex min-w-0 items-center gap-3">
+                <svg
+                  class="size-5 shrink-0 text-ink-3"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke-width="1.5"
+                  stroke="currentColor"
+                  aria-hidden="true"
                 >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke-width="1.5"
-                    stroke="currentColor"
-                    class="w-5 h-5"
-                    [ngClass]="item.iconColorClass"
-                  >
-                    <path stroke-linecap="round" stroke-linejoin="round" [attr.d]="item.svgPath" />
-                  </svg>
-                </div>
-
-                <!-- Labels -->
-                <div>
-                  <span class="block text-sm font-medium text-ink">{{ item.label }}</span>
-                  <span class="block text-[11px] text-ink-3 mt-0.5">
-                    Based on {{ item.count }} {{ item.count === 1 ? 'record' : 'records' }}
+                  <path stroke-linecap="round" stroke-linejoin="round" [attr.d]="item.svgPath" />
+                </svg>
+                <span class="min-w-0">
+                  <span class="block truncate text-[15px] font-medium text-ink">{{ item.label }}</span>
+                  <span class="block text-[12px] text-ink-3">
+                    {{ item.count }} {{ item.count === 1 ? 'bill' : 'bills' }}
                   </span>
-                </div>
-              </div>
-
-              <!-- Average Amount -->
-              <div class="text-right">
+                </span>
+              </span>
+              <span class="ml-auto shrink-0 text-right">
                 <!-- Other (17) and Taxes (18) never show an average -->
                 @if (item.count > 0 && item.id !== '18' && item.id !== '17') {
-                  <span class="block text-sm font-bold text-ink" appSensitive>
+                  <span class="block text-[13px] text-ink tabular-nums" appSensitive="xs">
                     €{{ item.average | number: '1.2-2' }}
                   </span>
-                  <span class="block text-[11px] text-ink-2 font-medium">{{ item.freq }}</span>
+                  <span class="block text-[12px] text-ink-3">{{ freqLabel(item.freq) }}</span>
                 } @else if (item.id === '18' || item.id === '17') {
-                  <span class="block text-xs font-medium text-ink-3 italic">-</span>
+                  <span class="block text-[12px] text-ink-3">Varies</span>
                 } @else {
-                  <span class="block text-xs font-medium text-ink-3 italic">No data</span>
+                  <span class="block text-[12px] text-ink-3">No bills yet</span>
                 }
-              </div>
-            </div>
-
+              </span>
+                            <svg
+                class="size-3.5 shrink-0 text-ink-3 transition-transform duration-200"
+                [class.rotate-180]="expandedUtility() === item.label"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+                aria-hidden="true"
+              >
+                <path
+                  fill-rule="evenodd"
+                  clip-rule="evenodd"
+                  d="M5.23 7.21a.75.75 0 011.06.02L10 11.17l3.71-3.94a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z"
+                />
+              </svg>
+            </button>
             @if (expandedUtility() === item.label) {
-              <app-paged-entries-list
-                [title]="item.label"
-                mode="category"
-                [filterValue]="'Utilities'"
-                [subCategoryId]="+item.id"
-              />
+              <div class="pb-3">
+                <app-paged-entries-list
+                  [title]="item.label"
+                  mode="category"
+                  [filterValue]="'Utilities'"
+                  [subCategoryId]="+item.id"
+                />
+              </div>
             }
-          </div>
+          </li>
         }
-      </div>
-    </div>
+      </ul>
+    </section>
   `,
 })
 export class UtilitySumComponent {
+  protected readonly frame = SEGMENT_FRAME;
+
+  segment(active: boolean): string {
+    return `${SEGMENT_BASE} ${active ? SEGMENT_ON : SEGMENT_OFF}`;
+  }
+
+  /** "/bi-monthly" → "every 2 months". */
+  freqLabel(freq: string): string {
+    const labels: Record<string, string> = {
+      '/monthly': 'a month',
+      '/bi-monthly': 'every 2 months',
+      '/tri-monthly': 'every 3 months',
+    };
+    return labels[freq] ?? freq.replace('/', '');
+  }
+
   private readonly transactionService = inject(TransactionService);
 
   // Totals per utility are calculated by Firestore and cached; saves refresh them.
