@@ -15,7 +15,7 @@ import { SensitiveDirective } from '../../utils/sensitive.directive';
   template: `
     <div class="space-y-5">
       @if (pieChartSlices().length === 0) {
-        <div class="text-center py-12 text-xs text-gray-500">
+        <div class="text-center py-12 text-xs text-ink-3">
           No data available for this period.
         </div>
       } @else {
@@ -23,14 +23,14 @@ import { SensitiveDirective } from '../../utils/sensitive.directive';
           <div class="flex items-center justify-center">
             <div class="relative flex items-center justify-center">
               <div
-                class="h-44 w-44 rounded-full border border-gray-700/80 shadow-inner"
+                class="h-44 w-44 rounded-full border border-edge/80 shadow-inner"
                 [style.background]="chartStyle()"
               ></div>
               <div
-                class="absolute inset-8 rounded-full bg-gray-950/95 border border-gray-700/80 flex flex-col items-center justify-center text-center"
+                class="absolute inset-8 rounded-full bg-ground/95 border border-edge/80 flex flex-col items-center justify-center text-center"
               >
-                <span class="text-[10px] uppercase tracking-[0.22em] text-gray-500">Total</span>
-                <span class="mt-1 text-lg font-bold text-white" appSensitive>
+                <span class="text-[11px] uppercase tracking-[0.22em] text-ink-3">Total</span>
+                <span class="mt-1 text-lg font-bold text-ink" appSensitive>
                   €{{
                     pieChartSlices().reduce((sum, slice) => sum + slice.amount, 0) | number: '1.0-0'
                   }}
@@ -44,10 +44,10 @@ import { SensitiveDirective } from '../../utils/sensitive.directive';
               <button
                 type="button"
                 class="flex w-full items-center justify-between gap-3 rounded-xl border px-3 py-2 text-left transition-all"
-                [class.border-indigo-400/50]="selectedSlice() === slice.name"
-                [class.bg-indigo-500/8]="selectedSlice() === slice.name"
-                [class.border-gray-800/70]="selectedSlice() !== slice.name"
-                [class.bg-gray-950/60]="selectedSlice() !== slice.name"
+                [class.border-ember-ink/50]="selectedSlice() === slice.name"
+                [class.bg-ember/8]="selectedSlice() === slice.name"
+                [class.border-raised/70]="selectedSlice() !== slice.name"
+                [class.bg-ground/60]="selectedSlice() !== slice.name"
                 (click)="toggleSlice(slice.name)"
               >
                 <div class="flex items-center gap-2 min-w-0">
@@ -57,13 +57,13 @@ import { SensitiveDirective } from '../../utils/sensitive.directive';
                       dimColorForSelection(slice.color, selectedSlice() === slice.name)
                     "
                   ></span>
-                  <span class="text-xs font-medium text-gray-200 truncate">{{ slice.name }}</span>
+                  <span class="text-xs font-medium text-ink truncate">{{ slice.name }}</span>
                 </div>
                 <div class="text-right shrink-0">
-                  <div class="text-[11px] font-semibold text-white">
+                  <div class="text-[11px] font-semibold text-ink">
                     {{ slice.percentage | number: '1.0-1' }}%
                   </div>
-                  <div class="text-[10px] text-gray-400" appSensitive>
+                  <div class="text-[11px] text-ink-2" appSensitive>
                     €{{ slice.amount | number: '1.0-0' }}
                   </div>
                 </div>
@@ -93,7 +93,7 @@ export class CategoryBudgetsPieChartComponent {
     const selected = this.selectedSlice();
 
     if (!slices.length) {
-      return 'conic-gradient(#1f2937 0 100%)';
+      return 'conic-gradient(#261d17 0 100%)';
     }
 
     let accumulator = 0;

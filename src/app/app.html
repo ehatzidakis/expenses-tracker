@@ -1,69 +1,70 @@
 @if (isUpdating()) {
-  <div class="fixed inset-x-0 top-3 z-50 flex justify-center pointer-events-none">
+  <div
+    class="fixed inset-x-0 top-[max(env(safe-area-inset-top),12px)] z-50 flex justify-center pointer-events-none"
+  >
     <div
-      class="rounded-full border border-cyan-500/40 bg-slate-950/90 px-3 py-1.5 text-[10px] font-medium uppercase tracking-[0.18em] text-cyan-300 shadow-lg backdrop-blur-sm"
+      role="status"
+      class="rounded-full border border-ink/10 bg-raised px-3.5 py-1.5 text-[12px] font-medium text-ink shadow-[0_10px_30px_-10px_rgb(0_0_0/0.8)]"
     >
-      Updating...
+      Updating to the latest version…
     </div>
   </div>
 }
 
 @if (!authReady()) {
-  <main class="min-h-screen bg-gray-950 text-gray-100 p-4 flex items-center justify-center">
-    <div
-      class="flex items-center gap-3 rounded-xl border border-gray-800 bg-gray-900/80 px-4 py-3 text-sm text-gray-300"
-    >
-      <div
-        class="h-4 w-4 animate-spin rounded-full border-2 border-cyan-400 border-t-transparent"
-      ></div>
-      Loading your session...
+  <main class="flex min-h-dvh items-center justify-center p-4">
+    <div class="flex items-center gap-3 text-[14px] text-ink-2" role="status">
+      <div class="size-4 animate-spin rounded-full border-2 border-ember border-t-transparent"></div>
+      Loading your session…
     </div>
   </main>
 } @else if (!isAuthenticated()) {
-  <main class="min-h-screen bg-gray-950 text-gray-100 p-4 flex items-center justify-center">
-    <div class="w-full max-w-md rounded-2xl border border-gray-800 bg-gray-900/80 p-6 shadow-2xl">
-      <div class="mb-6">
-        <p class="text-xs uppercase tracking-[0.2em] text-cyan-400">Expenses Tracker</p>
-        <h1 class="mt-3 text-2xl font-semibold text-white">Sign in to continue</h1>
+  <main
+    class="flex min-h-dvh items-center justify-center px-4 pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)]"
+  >
+    <div class="w-full max-w-sm">
+      <div class="mb-8 flex items-center gap-2.5">
+        <img src="assets/favicon.svg" alt="" class="size-8" />
+        <span class="type-wide text-[17px] font-bold uppercase text-ink">Expenses</span>
       </div>
+      <h1 class="type-wide text-[26px] font-semibold leading-tight text-ink">Sign in to continue</h1>
 
-      <form class="flex flex-col gap-4" (ngSubmit)="signIn()">
-        <label class="flex flex-col gap-2 text-sm text-gray-300">
+      <form class="mt-6 flex flex-col gap-4" (ngSubmit)="signIn()">
+        <label class="flex flex-col gap-1.5 text-[13px] font-medium text-ink-2">
           Email
           <input
             type="email"
+            autocomplete="email"
             [(ngModel)]="email"
             name="email"
-            class="rounded-xl border border-gray-700 bg-gray-950 px-3 py-2 text-white outline-none ring-0 placeholder:text-gray-500"
+            class="min-h-12 rounded-xl border border-edge bg-panel px-3.5 text-[16px] text-ink outline-none focus:border-ember"
             placeholder="you@example.com"
           />
         </label>
 
-        <label class="flex flex-col gap-2 text-sm text-gray-300">
+        <label class="flex flex-col gap-1.5 text-[13px] font-medium text-ink-2">
           Password
           <input
             type="password"
+            autocomplete="current-password"
             [(ngModel)]="password"
             name="password"
-            class="rounded-xl border border-gray-700 bg-gray-950 px-3 py-2 text-white outline-none ring-0 placeholder:text-gray-500"
-            placeholder="••••••••"
+            class="min-h-12 rounded-xl border border-edge bg-panel px-3.5 text-[16px] text-ink outline-none focus:border-ember"
           />
         </label>
 
         @if (authError(); as error) {
-          <p
-            class="rounded-xl border border-red-800/70 bg-red-950/30 px-3 py-2 text-sm text-red-300"
-          >
+          <p role="alert" class="rounded-xl border border-cherry/30 bg-cherry-deep/60 px-3.5 py-2.5 text-[13px] text-cherry">
             {{ error }}
           </p>
         }
 
         <button
           type="submit"
-          class="rounded-xl bg-cyan-500 px-4 py-2.5 font-medium text-slate-950 transition hover:bg-cyan-400 disabled:cursor-not-allowed disabled:opacity-60"
+          class="mt-2 min-h-12 rounded-xl bg-ember px-4 text-[15px] font-semibold text-ground transition-colors hover:bg-ember-ink disabled:cursor-not-allowed disabled:opacity-60 cursor-pointer"
           [disabled]="isSigningIn()"
         >
-          {{ isSigningIn() ? 'Signing in...' : 'Sign In' }}
+          {{ isSigningIn() ? 'Signing in…' : 'Sign in' }}
         </button>
       </form>
     </div>
@@ -72,147 +73,74 @@
   <app-kiosk-shell />
 } @else {
   <main
-    class="min-h-screen bg-gray-950 text-gray-100 p-4 pb-28 max-w-md mx-auto md:max-w-3xl md:p-8 md:pb-28 flex flex-col gap-4"
+    class="mx-auto flex min-h-dvh max-w-lg flex-col gap-5 px-4 pt-[max(env(safe-area-inset-top),8px)] pb-[calc(env(safe-area-inset-bottom)+92px)]"
   >
     <app-header></app-header>
 
-    @if (state.activeTab() === 'monthly' || state.activeTab() === 'sumup') {
-      <!-- Loading State -->
-      @if (state.expensesQuery.isPending()) {
-        <div class="flex flex-col gap-4 animate-pulse">
-          <div class="h-12 bg-gray-900 rounded-xl"></div>
-          <div class="h-32 bg-gray-900 rounded-2xl"></div>
-          <div class="h-64 bg-gray-900 rounded-2xl"></div>
-        </div>
+    @switch (state.activeTab()) {
+      @case ('monthly') {
+        <app-budget-page />
       }
 
-      <!-- Error State -->
-      @if (state.expensesQuery.isError()) {
-        <div class="p-4 bg-red-950/40 border border-red-800/60 text-red-300 rounded-xl text-sm">
-          Unable to load expenses data.
-        </div>
-      }
-
-      <!-- Success State -->
-      @if (state.expensesQuery.isSuccess() && state.selectedExpense()) {
-        @switch (state.activeTab()) {
-          @case ('monthly') {
-            <app-month-selector
-              [months]="state.processedExpenses()"
-              [selectedId]="state.selectedExpense()?.id ?? null"
-              (monthSelected)="state.selectMonth($event)"
+      @case ('sumup') {
+        @if (state.expensesQuery.isPending()) {
+          <div class="flex flex-col gap-5 animate-pulse" aria-label="Loading">
+            <div class="h-48 rounded-2xl bg-panel"></div>
+            <div class="h-64 rounded-xl bg-panel/60"></div>
+          </div>
+        } @else if (state.expensesQuery.isError()) {
+          <div role="alert" class="flex flex-col items-start gap-3 border-y border-ink/10 py-6">
+            <p class="text-[15px] text-ink">Couldn't load your months.</p>
+            <p class="text-[13px] text-ink-3">Check your connection and try again.</p>
+            <button
+              type="button"
+              class="min-h-11 rounded-xl border border-edge px-4 text-[14px] font-medium text-ink hover:border-ink-4 cursor-pointer"
+              (click)="state.expensesQuery.refetch()"
             >
-            </app-month-selector>
-
+              Try again
+            </button>
+          </div>
+        } @else if (state.selectedExpense()) {
+          @defer (on immediate) {
             <app-overview-card
-              [totalSpend]="state.totalMonthlySpend()"
-              [totalWage]="state.selectedTotalWage()"
-              [monthName]="state.selectedExpense()?.MonthName ?? ''"
-              [dateRangeInfo]="null"
-              [topCategory]="state.topCategory()"
+              [totalSpend]="totalOutgoing()"
+              [totalSaved]="totalSaved()"
+              [monthlyExpenses]="state.totalMonthlySpend()"
+              [oneOffExpenses]="oneOffExpenses()"
+              [monthlySaved]="monthlySaved()"
+              [oneOffBonuses]="oneOffBonuses()"
+              [yearlyBreakdown]="yearlyBreakdown()"
+              [dateRangeInfo]="state.dateRangeInfo()"
             >
             </app-overview-card>
 
             <app-category-breakdown
-              [categories]="state.categoryBreakdown()"
-              [monthName]="state.selectedExpense()?.MonthName ?? ''"
+              [categories]="state.allTimeCategoryBreakdown()"
+              [months]="state.expensesQuery.data() ?? []"
+              [adjustments]="adjustmentsQuery.data() ?? []"
             >
             </app-category-breakdown>
-
-            <app-recent-transactions
-              [monthName]="state.selectedExpense()?.MonthName ?? null"
-            ></app-recent-transactions>
-          }
-          @case ('sumup') {
-            @defer (on immediate) {
-              <app-overview-card
-                [totalSpend]="totalOutgoing()"
-                [totalWage]="state.selectedTotalWage()"
-                [totalSaved]="totalSaved()"
-                [monthlyExpenses]="state.totalMonthlySpend()"
-                [oneOffExpenses]="oneOffExpenses()"
-                [monthlySaved]="monthlySaved()"
-                [oneOffBonuses]="oneOffBonuses()"
-                [yearlyBreakdown]="yearlyBreakdown()"
-                [monthName]="state.selectedExpense()?.MonthName ?? ''"
-                [dateRangeInfo]="state.dateRangeInfo()"
-                [topCategory]="state.topCategory()"
-              >
-              </app-overview-card>
-
-              <app-category-breakdown
-                [categories]="state.allTimeCategoryBreakdown()"
-                [months]="state.expensesQuery.data() ?? []"
-                [adjustments]="adjustmentsQuery.data() ?? []"
-              >
-              </app-category-breakdown>
-            }
           }
         }
       }
-    }
 
-    @if (state.activeTab() === 'oneoffs') {
-      @defer (on immediate) {
-        @if (editingAdjustment(); as selectedAdj) {
-          <!-- EDIT VIEW -->
-          <app-edit-adjustment
-            [adjustment]="selectedAdj"
-            (back)="editingAdjustment.set(null)"
-            (updated)="editingAdjustment.set(null)"
-            (deleted)="editingAdjustment.set(null)"
-          />
-        } @else if (adjustmentsQuery.isPending()) {
-          <div class="flex flex-col gap-3 animate-pulse">
-            <div class="h-16 bg-gray-900 rounded-2xl"></div>
-            <div class="h-16 bg-gray-900 rounded-2xl"></div>
-            <div class="h-16 bg-gray-900 rounded-2xl"></div>
-          </div>
-        } @else if (adjustmentsQuery.isError()) {
-          <div class="p-4 bg-red-950/40 border border-red-800/60 text-red-300 rounded-xl text-sm">
-            Unable to load one-offs data.
-          </div>
-        } @else {
-          <!-- Adjustment Selector (Singles + Trip pills) -->
-          <app-adjustment-selector
-            [adjustments]="sortedAdjustments()"
-            [selectedId]="selectedTripId()"
-            (selectionChanged)="selectedTripId.set($event)"
-          />
-
-          @if (selectedTripId() === null) {
-            <!-- SINGLES VIEW -->
-            <app-singles-view
-              [adjustments]="singleAdjustments()"
-              [(type)]="singlesType"
-              [(year)]="singlesYear"
-              (edit)="editingAdjustment.set($event)"
-            />
-          } @else if (selectedTrip()) {
-            <!-- TRIP BREAKDOWN VIEW -->
-            <app-trip-breakdown [trip]="selectedTrip()!" />
-            <app-recent-transactions [adjustmentId]="selectedTrip()!.id"></app-recent-transactions>
-          }
+      @case ('create') {
+        @defer (on immediate) {
+          <app-create-transaction></app-create-transaction>
+        } @loading {
+          <div class="h-96 rounded-2xl bg-panel/60 animate-pulse"></div>
         }
       }
-    }
 
-    @if (state.activeTab() === 'create') {
-      @defer (on immediate) {
-        <app-create-transaction></app-create-transaction>
-      } @loading {
-        <div class="h-96 bg-gray-900/60 rounded-2xl animate-pulse"></div>
-      }
-    }
-
-    @if (state.activeTab() === 'charts') {
-      @defer (on immediate) {
-        <app-category-budgets-grid></app-category-budgets-grid>
-        <app-category-budgets-chart></app-category-budgets-chart>
-        <app-utility-sum></app-utility-sum>
-        <app-category-average></app-category-average>
-      } @loading {
-        <div class="h-96 bg-gray-900/60 rounded-2xl animate-pulse"></div>
+      @case ('charts') {
+        @defer (on immediate) {
+          <app-category-budgets-grid></app-category-budgets-grid>
+          <app-category-budgets-chart></app-category-budgets-chart>
+          <app-utility-sum></app-utility-sum>
+          <app-category-average></app-category-average>
+        } @loading {
+          <div class="h-96 rounded-2xl bg-panel/60 animate-pulse"></div>
+        }
       }
     }
   </main>

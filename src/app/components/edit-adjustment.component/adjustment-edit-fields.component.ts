@@ -11,7 +11,7 @@ import { DateStepperComponent } from '../date-stepper/date-stepper.component';
   template: `
     <div class="space-y-4">
       <div class="space-y-1.5">
-        <label for="adj-edit-description" class="text-xs font-medium text-gray-400"
+        <label for="adj-edit-description" class="text-xs font-medium text-ink-2"
           >Description</label
         >
         <input
@@ -19,10 +19,10 @@ import { DateStepperComponent } from '../date-stepper/date-stepper.component';
           type="text"
           placeholder="e.g. Annual Bonus"
           [formField]="descriptionField()"
-          class="w-full bg-gray-800/60 border border-gray-800 rounded-xl px-3 py-2.5 text-sm text-gray-100 placeholder:text-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/60"
+          class="w-full bg-raised/60 border border-raised rounded-xl px-3 py-2.5 text-sm text-ink placeholder:text-ink-4 focus:outline-none focus:ring-2 focus:ring-ember/60"
         />
         @if (descriptionField()().touched() && descriptionField()().invalid()) {
-          <span class="text-[11px] text-red-400">
+          <span class="text-[11px] text-cherry">
             {{ descriptionField()().errors()[0]?.message }}
           </span>
         }
@@ -37,7 +37,7 @@ import { DateStepperComponent } from '../date-stepper/date-stepper.component';
 
       <div class="grid grid-cols-2 gap-3">
         <div class="space-y-1.5">
-          <label for="adj-edit-start-date" class="text-xs font-medium text-gray-400"
+          <label for="adj-edit-start-date" class="text-xs font-medium text-ink-2"
             >Start Date</label
           >
           <app-date-stepper size="sm">
@@ -46,29 +46,29 @@ import { DateStepperComponent } from '../date-stepper/date-stepper.component';
               id="adj-edit-start-date"
               type="date"
               [formField]="startDateField()"
-              class="flex-1 min-w-0 appearance-none scheme-dark bg-gray-800/60 border border-gray-800 rounded-xl px-2 py-2.5 text-xs text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/60"
+              class="flex-1 min-w-0 appearance-none scheme-dark bg-raised/60 border border-raised rounded-xl px-2 py-2.5 text-xs text-ink focus:outline-none focus:ring-2 focus:ring-ember/60"
             />
           </app-date-stepper>
           @if (startDateField()().touched() && startDateField()().invalid()) {
-            <span class="text-[11px] text-red-400">
+            <span class="text-[11px] text-cherry">
               {{ startDateField()().errors()[0]?.message }}
             </span>
           }
         </div>
 
         <div class="space-y-1.5">
-          <label for="adj-edit-end-date" class="text-xs font-medium text-gray-400">End Date</label>
+          <label for="adj-edit-end-date" class="text-xs font-medium text-ink-2">End Date</label>
           <app-date-stepper size="sm">
             <input
               #dateInput
               id="adj-edit-end-date"
               type="date"
               [formField]="endDateField()"
-              class="flex-1 min-w-0 appearance-none scheme-dark bg-gray-800/60 border border-gray-800 rounded-xl px-2 py-2.5 text-xs text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/60"
+              class="flex-1 min-w-0 appearance-none scheme-dark bg-raised/60 border border-raised rounded-xl px-2 py-2.5 text-xs text-ink focus:outline-none focus:ring-2 focus:ring-ember/60"
             />
           </app-date-stepper>
           @if (endDateField()().touched() && endDateField()().invalid()) {
-            <span class="text-[11px] text-red-400">
+            <span class="text-[11px] text-cherry">
               {{ endDateField()().errors()[0]?.message }}
             </span>
           }

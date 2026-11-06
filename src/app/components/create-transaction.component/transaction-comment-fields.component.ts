@@ -10,17 +10,17 @@ import { FieldTree, FormField } from '@angular/forms/signals';
   template: `
     <div class="space-y-4">
       <div class="space-y-2 pt-1">
-        <label class="text-xs font-medium text-gray-400">Add Comment</label>
-        <div class="grid grid-cols-2 gap-2 p-1 bg-gray-950/80 rounded-xl border border-gray-800">
+        <label class="text-xs font-medium text-ink-2">Add Comment</label>
+        <div class="grid grid-cols-2 gap-2 p-1 bg-ground/80 rounded-xl border border-raised">
           <button
             type="button"
             (click)="commentToggle.emit(true)"
             class="py-2 rounded-lg text-xs font-semibold transition-all duration-150 flex items-center justify-center gap-1 cursor-pointer"
-            [class.bg-indigo-500/20]="enabled()"
-            [class.text-indigo-400]="enabled()"
+            [class.bg-ember/20]="enabled()"
+            [class.text-ember-ink]="enabled()"
             [class.border]="enabled()"
-            [class.border-indigo-500/30]="enabled()"
-            [class.text-gray-400]="!enabled()"
+            [class.border-ember/30]="enabled()"
+            [class.text-ink-2]="!enabled()"
           >
             Yes
           </button>
@@ -28,11 +28,11 @@ import { FieldTree, FormField } from '@angular/forms/signals';
             type="button"
             (click)="commentToggle.emit(false)"
             class="py-2 rounded-lg text-xs font-semibold transition-all duration-150 flex items-center justify-center gap-1 cursor-pointer"
-            [class.bg-gray-700/60]="!enabled()"
-            [class.text-gray-200]="!enabled()"
+            [class.bg-edge/60]="!enabled()"
+            [class.text-ink]="!enabled()"
             [class.border]="!enabled()"
-            [class.border-gray-600/40]="!enabled()"
-            [class.text-gray-400]="enabled()"
+            [class.border-ink-4/40]="!enabled()"
+            [class.text-ink-2]="enabled()"
           >
             No
           </button>
@@ -41,16 +41,16 @@ import { FieldTree, FormField } from '@angular/forms/signals';
 
       @if (enabled()) {
         <div class="space-y-1.5">
-          <label for="tx-comment" class="text-xs font-medium text-gray-400">Comment</label>
+          <label for="tx-comment" class="text-xs font-medium text-ink-2">Comment</label>
           <textarea
             id="tx-comment"
             rows="2"
             [formField]="commentField()"
             placeholder="Add a note about this transaction"
-            class="w-full bg-gray-800/60 border border-gray-800 rounded-xl px-3 py-2.5 text-sm text-gray-100 placeholder:text-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/60 resize-none"
+            class="w-full bg-raised/60 border border-raised rounded-xl px-3 py-2.5 text-sm text-ink placeholder:text-ink-4 focus:outline-none focus:ring-2 focus:ring-ember/60 resize-none"
           ></textarea>
           @if (commentField()().touched() && commentField()().invalid()) {
-            <span class="text-[11px] text-red-400">{{
+            <span class="text-[11px] text-cherry">{{
               commentField()().errors()[0]?.message
             }}</span>
           }

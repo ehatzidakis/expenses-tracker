@@ -9,10 +9,10 @@ import { Transaction } from '../../models/transaction.model';
   selector: 'app-data-export-setting',
   standalone: true,
   template: `
-    <section class="space-y-3 border-t border-gray-800 pt-4">
+    <section class="space-y-3 border-t border-raised pt-4">
       <div>
-        <h3 class="text-sm font-semibold text-gray-200">Data export</h3>
-        <p class="mt-1 text-xs text-gray-500">Downloads existing data without changing it.</p>
+        <h3 class="text-sm font-semibold text-ink">Data export</h3>
+        <p class="mt-1 text-xs text-ink-3">Downloads existing data without changing it.</p>
       </div>
 
       <div class="grid grid-cols-2 gap-2">
@@ -20,7 +20,7 @@ import { Transaction } from '../../models/transaction.model';
           type="button"
           (click)="downloadTransactions('csv')"
           [disabled]="loading()"
-          class="rounded-xl border border-gray-700 bg-gray-800/70 px-3 py-2 text-xs text-gray-200 transition hover:bg-gray-700 disabled:opacity-50"
+          class="rounded-xl border border-edge bg-raised/70 px-3 py-2 text-xs text-ink transition hover:bg-edge disabled:opacity-50"
         >
           Transactions CSV
         </button>
@@ -28,7 +28,7 @@ import { Transaction } from '../../models/transaction.model';
           type="button"
           (click)="downloadTransactions('json')"
           [disabled]="loading()"
-          class="rounded-xl border border-gray-700 bg-gray-800/70 px-3 py-2 text-xs text-gray-200 transition hover:bg-gray-700 disabled:opacity-50"
+          class="rounded-xl border border-edge bg-raised/70 px-3 py-2 text-xs text-ink transition hover:bg-edge disabled:opacity-50"
         >
           Transactions JSON
         </button>
@@ -36,7 +36,7 @@ import { Transaction } from '../../models/transaction.model';
           type="button"
           (click)="downloadAdjustments('csv')"
           [disabled]="loading()"
-          class="rounded-xl border border-gray-700 bg-gray-800/70 px-3 py-2 text-xs text-gray-200 transition hover:bg-gray-700 disabled:opacity-50"
+          class="rounded-xl border border-edge bg-raised/70 px-3 py-2 text-xs text-ink transition hover:bg-edge disabled:opacity-50"
         >
           One-offs CSV
         </button>
@@ -44,17 +44,17 @@ import { Transaction } from '../../models/transaction.model';
           type="button"
           (click)="downloadAdjustments('json')"
           [disabled]="loading()"
-          class="rounded-xl border border-gray-700 bg-gray-800/70 px-3 py-2 text-xs text-gray-200 transition hover:bg-gray-700 disabled:opacity-50"
+          class="rounded-xl border border-edge bg-raised/70 px-3 py-2 text-xs text-ink transition hover:bg-edge disabled:opacity-50"
         >
           One-offs JSON
         </button>
       </div>
 
       @if (loading()) {
-        <p class="text-xs text-gray-500">Preparing download...</p>
+        <p class="text-xs text-ink-3">Preparing download...</p>
       }
       @if (message(); as message) {
-        <p class="text-xs" [class.text-emerald-300]="!error()" [class.text-red-300]="error()">
+        <p class="text-xs" [class.text-avocado-ink]="!error()" [class.text-cherry]="error()">
           {{ message }}
         </p>
       }

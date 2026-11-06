@@ -23,7 +23,7 @@ import { SplitzesTab, SplitzesTabsComponent } from './splitzes-tabs.component';
       (click)="close.emit()"
     >
       <div
-        class="w-full max-w-md max-h-[85vh] overflow-y-auto bg-gray-900 border border-gray-800/80 rounded-t-3xl sm:rounded-3xl p-6 space-y-5 shadow-2xl text-gray-100"
+        class="w-full max-w-md max-h-[85vh] overflow-y-auto bg-panel border border-raised/80 rounded-t-3xl sm:rounded-3xl p-6 space-y-5 shadow-2xl text-ink"
         (click)="$event.stopPropagation()"
       >
         <app-splitzes-modal-header (close)="close.emit()" />

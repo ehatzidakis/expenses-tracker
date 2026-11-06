@@ -5,7 +5,7 @@ import { Component, input } from '@angular/core';
   standalone: true,
   host: { class: 'block' },
   template: `
-    <div class="pt-1 text-[10px] uppercase tracking-[0.18em] text-gray-500 text-left">
+    <div class="pt-1 text-[11px] uppercase tracking-[0.18em] text-ink-3 text-left">
       v{{ version() }}
     </div>
   `,

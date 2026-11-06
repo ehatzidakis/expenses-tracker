@@ -2,28 +2,21 @@ import { Component, computed, effect, inject, Injector, signal } from '@angular/
 import { SwUpdate } from '@angular/service-worker';
 import { FormsModule } from '@angular/forms';
 import { filter } from 'rxjs';
-import { AdjustmentSelectorComponent } from './components/adjustment-selector/adjustment-selector';
-import { TripBreakdownComponent } from './components/trip-breakdown/trip-breakdown';
 import { ExpenseStateService } from './services/expense-state.service';
 import { AdjustmentService } from './services/adjustment-service';
 import { OverviewCardComponent } from './components/overview-card.component/overview-card.component';
 import { HeaderComponent } from './components/header.component/header.component';
-import { MonthSelectorComponent } from './components/month-selector.component/month-selector.component';
 import { CategoryBreakdownComponent } from './components/category-breakdown.component/category-breakdown.component';
 import { TabBarComponent } from './components/tab-bar.component/tab-bar.component';
 import { CreateTransactionComponent } from './components/create-transaction.component/create-transaction.component';
-import { Adjustment } from './models/adjustments.model';
-import { EditAdjustmentComponent } from './components/edit-adjustment.component/edit-adjustment.component';
 import { CategoryBudgetsGrid } from './components/category-budgets-grid/category-budgets-grid';
 import { CategoryBudgetsChartComponent } from './components/category-budgets-chart/category-budgets-chart';
 import { UtilitySumComponent } from './components/utility-sum-component/utility-sum-component';
 import { CategoryAverageComponent } from './components/category-average/category-average';
-import { RecentTransactionsComponent } from './components/recent-transactions/recent-transactions';
 import { AuthService } from './services/auth.service';
 import { PendingBadgeService } from './services/pending-badge.service';
 import { KioskShellComponent } from './components/kiosk-shell/kiosk-shell.component';
-import { SinglesViewComponent } from './components/singles-view/singles-view';
-import type { SinglesType } from './components/singles-view/singles-view.util';
+import { BudgetPageComponent } from './components/budget-page/budget-page';
 
 export interface YearlyBreakdownEntry {
   year: number;
@@ -40,19 +33,14 @@ export interface YearlyBreakdownEntry {
     FormsModule,
     HeaderComponent,
     OverviewCardComponent,
-    MonthSelectorComponent,
     CategoryBreakdownComponent,
     TabBarComponent,
-    EditAdjustmentComponent,
     CreateTransactionComponent,
     CategoryBudgetsGrid,
     CategoryBudgetsChartComponent,
-    AdjustmentSelectorComponent,
-    TripBreakdownComponent,
     UtilitySumComponent,
     CategoryAverageComponent,
-    RecentTransactionsComponent,
-    SinglesViewComponent,
+    BudgetPageComponent,
     KioskShellComponent,
   ],
   templateUrl: './app.html',
@@ -64,11 +52,6 @@ export class AppComponent {
   private swUpdate = inject(SwUpdate);
   private injector = inject(Injector);
 
-  readonly editingAdjustment = signal<Adjustment | null>(null);
-  readonly selectedTripId = signal<string | null>(null);
-  // Lives here so the filters survive opening and closing the edit view.
-  readonly singlesType = signal<SinglesType | null>(null);
-  readonly singlesYear = signal<number | null>(null);
   readonly email = signal('');
   readonly password = signal('');
   readonly authError = signal<string | null>(null);
@@ -107,12 +90,6 @@ export class AppComponent {
     [...(this.adjustmentsQuery.data() ?? [])].sort(
       (a, b) => b.startDate.getTime() - a.startDate.getTime(),
     ),
-  );
-
-  readonly singleAdjustments = computed(() => this.sortedAdjustments().filter((a) => !a.isTrip));
-
-  readonly selectedTrip = computed(
-    () => this.sortedAdjustments().find((a) => a.id === this.selectedTripId()) ?? null,
   );
 
   readonly oneOffExpenses = computed(() =>

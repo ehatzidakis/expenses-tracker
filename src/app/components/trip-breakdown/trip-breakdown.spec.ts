@@ -79,9 +79,9 @@ describe('TripBreakdownComponent', () => {
     component.expandedCategory.set('Food');
     await settle(fixture);
 
-    const text = fixture.nativeElement.textContent as string;
-    expect(text).toContain('✂️');
-    expect(text).toContain('of €60.00');
+    const el = fixture.nativeElement as HTMLElement;
+    expect(el.querySelector('[aria-label="Split transaction"]')).not.toBeNull();
+    expect(el.textContent).toContain('of €60.00');
   });
 
   it('keeps the open category after a save refreshes the trip', async () => {

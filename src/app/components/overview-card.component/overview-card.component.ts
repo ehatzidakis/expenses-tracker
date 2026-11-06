@@ -1,156 +1,162 @@
+import { DecimalPipe } from '@angular/common';
 import { Component, computed, input, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { CategorySpend } from '../../services/expense-state.service';
-import { OverviewCardSavedColumnComponent } from './overview-card-saved-column.component';
-import { OverviewCardSpendColumnComponent } from './overview-card-spend-column.component';
 import { YearlyBreakdownEntry } from './overview-card.models';
+import { SensitiveDirective } from '../../utils/sensitive.directive';
 
 export type { YearlyBreakdownEntry } from './overview-card.models';
 
+/**
+ * All time at a glance, in the same shape as the month summary: one wide figure, a side figure,
+ * then the plain lines that add up to it. Each year can be opened below.
+ */
 @Component({
   selector: 'app-overview-card',
   standalone: true,
-  imports: [CommonModule, OverviewCardSavedColumnComponent, OverviewCardSpendColumnComponent],
+  imports: [DecimalPipe, SensitiveDirective],
   host: { class: 'block' },
   template: `
     <section
-      class="bg-linear-to-br from-gray-900 via-gray-900 to-indigo-950/50 border border-gray-800 rounded-2xl p-5 shadow-xl transition-all duration-200"
-      [class.cursor-pointer]="hasBreakdown()"
-      (click)="toggleExpanded()"
+      class="rounded-2xl border border-ink/10 bg-panel px-5 pt-4 pb-2 shadow-[inset_0_1px_0_rgb(241_230_210/0.06)]"
+      aria-label="All time summary"
     >
-      @if (dateRangeInfo(); as info) {
-        <span class="text-xs font-medium text-gray-400 uppercase tracking-wider block mb-4">
-          @if (info.first === info.last) {
-            Sum for <span class="text-gray-100 font-semibold">{{ info.count }}</span> month:
-            <span class="text-gray-100 font-semibold">{{ info.first }}</span>
-          } @else {
-            Sum for <span class="text-gray-100 font-semibold">{{ info.count }}</span> months:
-            <span class="text-gray-100 font-semibold">{{ info.first }}</span> to
-            <span class="text-gray-100 font-semibold">{{ info.last }}</span>
-          }
-        </span>
-      }
+      <div class="flex items-start justify-between gap-4">
+        <div class="min-w-0">
+          <p
+            class="type-wide text-[clamp(30px,9vw,40px)] font-bold leading-none tracking-[-0.02em] text-ink"
+            appSensitive
+          >
+            €{{ totalSpend() | number: '1.2-2' }}
+          </p>
+          <p class="mt-2 text-[14px] text-ink-2">spent in total</p>
+        </div>
 
-      <div class="grid items-start justify-between grid-cols-2 gap-6">
-        <app-overview-card-spend-column
-          [totalSpend]="totalSpend()"
-          [hasBreakdown]="hasBreakdown()"
-          [expanded]="expanded()"
-          [monthlyExpenses]="monthlyExpenses()"
-          [oneOffExpenses]="oneOffExpenses()"
-          [yearlyBreakdown]="yearlyBreakdown()"
-        />
-        <app-overview-card-saved-column
-          [totalSaved]="computedTotalSaved()"
-          [hasBreakdown]="hasBreakdown()"
-          [expanded]="expanded()"
-          [monthlySaved]="monthlySaved()"
-          [oneOffBonuses]="oneOffBonuses()"
-          [yearlyBreakdown]="yearlyBreakdown()"
-        />
+        <div class="shrink-0 pt-1 text-right">
+          <p
+            class="type-wide text-[20px] font-semibold leading-none"
+            [class]="totalSaved() >= 0 ? 'text-avocado' : 'text-cherry'"
+            appSensitive="sm"
+          >
+            {{ sign(totalSaved()) }}€{{ abs(totalSaved()) | number: '1.2-2' }}
+          </p>
+          <p class="mt-1.5 text-[12px] text-ink-3">saved overall</p>
+        </div>
       </div>
 
-      @if (!hasBreakdown() && monthCountdownLabel()) {
-        <div class="mt-3 text-center">
-          <span class="text-[10px] font-medium uppercase tracking-[0.14em] text-gray-400">
-            {{ monthCountdownLabel() }}
-          </span>
-        </div>
+      @if (rangeLine(); as range) {
+        <p class="mt-3 text-[13px] text-ink-3">{{ range }}</p>
       }
 
-      @if (hasBreakdown()) {
-        <div class="flex justify-center mt-3 pt-2 border-t border-gray-800/60">
-          <svg
-            class="w-4 h-4 text-gray-500 transition-transform duration-400"
-            [class.rotate-180]="expanded()"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <polyline points="6 9 12 15 18 9" />
-          </svg>
+      <dl class="mt-4 divide-y divide-ink/10 border-t border-ink/10 text-[13px]">
+        <div class="flex items-baseline justify-between gap-3 py-2.5">
+          <dt class="text-ink-2">Spent on months</dt>
+          <dd class="tabular-nums text-ink" appSensitive="xs">€{{ monthlyExpenses() | number: '1.2-2' }}</dd>
         </div>
+        <div class="flex items-baseline justify-between gap-3 py-2.5">
+          <dt class="text-ink-2">Spent on one-offs</dt>
+          <dd class="tabular-nums text-ink" appSensitive="xs">€{{ oneOffExpenses() | number: '1.2-2' }}</dd>
+        </div>
+        <div class="flex items-baseline justify-between gap-3 py-2.5">
+          <dt class="text-ink-2">One-off income</dt>
+          <dd class="tabular-nums text-avocado-ink" appSensitive="xs">+€{{ oneOffBonuses() | number: '1.2-2' }}</dd>
+        </div>
+        <div class="flex items-baseline justify-between gap-3 py-2.5">
+          <dt class="text-ink-2">Saved from monthly budget</dt>
+          <dd
+            class="tabular-nums"
+            [class]="monthlySaved() >= 0 ? 'text-avocado-ink' : 'text-cherry'"
+            appSensitive="xs"
+          >
+            {{ sign(monthlySaved()) }}€{{ abs(monthlySaved()) | number: '1.2-2' }}
+          </dd>
+        </div>
+      </dl>
+
+      @if (yearlyBreakdown().length) {
+        <button
+          type="button"
+          class="flex min-h-11 w-full items-center justify-between border-t border-ink/10 text-[13px] text-ink-2 cursor-pointer hover:text-ink"
+          [attr.aria-expanded]="expanded()"
+          (click)="expanded.update((open) => !open)"
+        >
+          By year
+          <svg
+            class="size-3.5 text-ink-3 transition-transform duration-200"
+            [class.rotate-180]="expanded()"
+            viewBox="0 0 20 20"
+            fill="currentColor"
+            aria-hidden="true"
+          >
+            <path
+              fill-rule="evenodd"
+              d="M5.23 7.21a.75.75 0 011.06.02L10 11.17l3.71-3.94a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z"
+              clip-rule="evenodd"
+            />
+          </svg>
+        </button>
+
+        @if (expanded()) {
+          <table class="mb-3 w-full text-[13px] tabular-nums">
+            <thead>
+              <tr class="text-left text-[12px] text-ink-3">
+                <th class="py-1.5 font-normal">Year</th>
+                <th class="py-1.5 text-right font-normal">Spent</th>
+                <th class="py-1.5 text-right font-normal">Saved</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-ink/10">
+              @for (year of years(); track year.year) {
+                <tr>
+                  <th class="type-wide py-2 text-left font-semibold text-ink" scope="row">{{ year.year }}</th>
+                  <td class="py-2 text-right text-ink" appSensitive="xs">€{{ year.spent | number: '1.2-2' }}</td>
+                  <td
+                    class="py-2 text-right"
+                    [class]="year.saved >= 0 ? 'text-avocado-ink' : 'text-cherry'"
+                    appSensitive="xs"
+                  >
+                    {{ sign(year.saved) }}€{{ abs(year.saved) | number: '1.2-2' }}
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        }
       }
     </section>
   `,
 })
 export class OverviewCardComponent {
-  totalSpend = input.required<number>();
-  totalWage = input<number>(0);
-  totalSaved = input<number | null>(null);
-  monthName = input<string>('');
-  dateRangeInfo = input<{ count: number; first: string; last: string } | null>(null);
-  topCategory = input<CategorySpend | null>(null);
+  readonly totalSpend = input.required<number>();
+  readonly totalSaved = input(0);
+  readonly monthlyExpenses = input(0);
+  readonly oneOffExpenses = input(0);
+  /** Wage minus category spend, summed over the months. */
+  readonly monthlySaved = input(0);
+  readonly oneOffBonuses = input(0);
+  readonly yearlyBreakdown = input<YearlyBreakdownEntry[]>([]);
+  readonly dateRangeInfo = input<{ count: number; first: string; last: string } | null>(null);
 
-  monthlyExpenses = input<number | null>(null);
-  oneOffExpenses = input<number | null>(null);
-  monthlySaved = input<number | null>(null);
-  oneOffBonuses = input<number | null>(null);
-  yearlyBreakdown = input<YearlyBreakdownEntry[]>([]);
+  readonly expanded = signal(false);
 
-  computedTotalSaved = computed(() => this.totalSaved() ?? this.totalWage() - this.totalSpend());
+  readonly rangeLine = computed(() => {
+    const info = this.dateRangeInfo();
+    if (!info) return '';
+    const months = `${info.count} month${info.count === 1 ? '' : 's'}`;
+    return info.first === info.last ? `${months} · ${info.first}` : `${months} · ${info.first} – ${info.last}`;
+  });
 
-  // Breakdown rows only apply when the parent supplies the monthly/one-off split (SumUp view).
-  hasBreakdown = computed(
-    () => this.monthlyExpenses() !== null || this.yearlyBreakdown().length > 0,
+  readonly years = computed(() =>
+    this.yearlyBreakdown().map((y) => ({
+      year: y.year,
+      spent: y.monthlyExpenses + y.oneOffExpenses,
+      saved: y.monthlySaved + y.oneOffBonuses - y.oneOffExpenses,
+    })),
   );
 
-  isCurrentMonthView = computed(() => {
-    const monthName = this.monthName().trim();
-    if (!monthName) return false;
+  sign(value: number): string {
+    return value < 0 ? '−' : '';
+  }
 
-    const [monthLabel, yearLabel] = monthName.split(/\s+/);
-    if (!monthLabel || !yearLabel) return false;
-
-    const monthIndex = [
-      'January',
-      'February',
-      'March',
-      'April',
-      'May',
-      'June',
-      'July',
-      'August',
-      'September',
-      'October',
-      'November',
-      'December',
-    ].findIndex((month) => month.toLowerCase() === monthLabel.toLowerCase());
-
-    if (monthIndex === -1) return false;
-
-    const selectedMonth = new Date(Number(yearLabel), monthIndex, 1);
-    const today = new Date();
-    const currentMonth = new Date(today.getFullYear(), today.getMonth(), 1);
-
-    return (
-      selectedMonth.getFullYear() === currentMonth.getFullYear() &&
-      selectedMonth.getMonth() === currentMonth.getMonth()
-    );
-  });
-
-  daysLeftInMonth = computed(() => {
-    if (!this.isCurrentMonthView()) return 0;
-
-    const today = new Date();
-    const lastDayOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0).getDate();
-    return Math.max(1, lastDayOfMonth - today.getDate() + 1);
-  });
-
-  monthCountdownLabel = computed(() => {
-    const remainingDays = this.daysLeftInMonth();
-    if (!this.isCurrentMonthView()) return '';
-    return `${remainingDays} day${remainingDays === 1 ? '' : 's'} left in this month`;
-  });
-
-  expanded = signal(false);
-
-  toggleExpanded(): void {
-    if (this.hasBreakdown()) {
-      this.expanded.update((v) => !v);
-    }
+  abs(value: number): number {
+    return Math.abs(value);
   }
 }

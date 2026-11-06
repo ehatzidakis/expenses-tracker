@@ -15,8 +15,8 @@ export interface SettingsFeedbackMessage {
         class="p-3 rounded-xl text-xs font-medium text-center"
         [class]="
           feedback.type === 'error'
-            ? 'bg-red-950/50 border border-red-800/60 text-red-300'
-            : 'bg-emerald-950/50 border border-emerald-800/60 text-emerald-300'
+            ? 'bg-cherry-deep/50 border border-cherry-deep/60 text-cherry'
+            : 'bg-avocado-deep/50 border border-avocado-deep/60 text-avocado-ink'
         "
       >
         {{ feedback.text }}

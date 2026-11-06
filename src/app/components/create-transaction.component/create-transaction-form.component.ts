@@ -73,11 +73,11 @@ import {
             aria-label="Recurring transactions"
             title="Recurring transactions"
             class="flex items-center gap-1 px-2 py-0.5 rounded-lg text-[11px] font-semibold border transition-colors cursor-pointer"
-            [class.bg-indigo-500/20]="recurringOpen()"
-            [class.border-indigo-400/50]="recurringOpen()"
-            [class.text-indigo-200]="recurringOpen()"
-            [class.border-gray-700/60]="!recurringOpen()"
-            [class.text-gray-400]="!recurringOpen()"
+            [class.bg-ember/20]="recurringOpen()"
+            [class.border-ember-ink/50]="recurringOpen()"
+            [class.text-ember-soft]="recurringOpen()"
+            [class.border-edge/60]="!recurringOpen()"
+            [class.text-ink-2]="!recurringOpen()"
           >
             🔁 Recurring
           </button>
@@ -112,20 +112,20 @@ import {
       @if (!isKioskMode()) {
         <label
           class="flex items-center justify-between gap-3 rounded-xl border px-3 py-2.5 cursor-pointer transition-colors"
-          [class.border-indigo-500/40]="sendToKiosk()"
-          [class.bg-indigo-500/10]="sendToKiosk()"
-          [class.border-gray-800]="!sendToKiosk()"
-          [class.bg-gray-950/60]="!sendToKiosk()"
+          [class.border-ember/40]="sendToKiosk()"
+          [class.bg-ember/10]="sendToKiosk()"
+          [class.border-raised]="!sendToKiosk()"
+          [class.bg-ground/60]="!sendToKiosk()"
         >
           <span class="space-y-0.5">
-            <span class="block text-xs font-semibold text-gray-200">Send to kiosk</span>
-            <!-- <span class="block text-[11px] text-gray-500">
+            <span class="block text-xs font-semibold text-ink">Send to kiosk</span>
+            <!-- <span class="block text-[11px] text-ink-3">
               They fill in the amount and send it back. Amount is optional.
             </span> -->
           </span>
           <input
             type="checkbox"
-            class="h-4 w-4 shrink-0 accent-indigo-500 cursor-pointer"
+            class="h-4 w-4 shrink-0 accent-ember cursor-pointer"
             [checked]="sendToKiosk()"
             (change)="setSendToKiosk($any($event.target).checked)"
           />
@@ -142,7 +142,7 @@ import {
             splitStore.customSplitMode() &&
             !customSplitOk())
         "
-        class="w-full py-3 rounded-xl text-sm font-semibold text-white bg-linear-to-br from-indigo-500 to-violet-600 shadow-lg disabled:opacity-40 disabled:cursor-not-allowed active:scale-[0.99] transition-all cursor-pointer"
+        class="w-full py-3 rounded-xl text-sm font-semibold text-ground bg-ember shadow-lg disabled:opacity-40 disabled:cursor-not-allowed active:scale-[0.99] transition-all cursor-pointer"
       >
         {{ submitLabel() }}
       </button>
@@ -150,14 +150,14 @@ import {
 
     @if (successMessage()) {
       <div
-        class="mt-2 p-3 bg-emerald-950/40 border border-emerald-800/60 text-emerald-300 rounded-xl text-xs text-center"
+        class="mt-2 p-3 bg-avocado-deep/40 border border-avocado-deep/60 text-avocado-ink rounded-xl text-xs text-center"
       >
         <span>{{ successMessage() }}</span>
       </div>
     }
     @if (errorMessage()) {
       <div
-        class="mt-2 p-3 bg-red-950/40 border border-red-800/60 text-red-300 rounded-xl text-xs text-center"
+        class="mt-2 p-3 bg-cherry-deep/40 border border-cherry-deep/60 text-cherry rounded-xl text-xs text-center"
       >
         {{ errorMessage() }}
       </div>

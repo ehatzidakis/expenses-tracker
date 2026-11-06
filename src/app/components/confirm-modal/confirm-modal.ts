@@ -12,12 +12,12 @@ import { Component, ElementRef, effect, input, output, viewChild } from '@angula
     >
       <!-- Modal Card -->
       <div
-        class="bg-gray-900 border border-gray-800/90 rounded-2xl p-5 space-y-4 shadow-2xl animate-fade-in"
+        class="bg-panel border border-raised/90 rounded-2xl p-5 space-y-4 shadow-2xl animate-fade-in"
       >
         <!-- Header & Icon -->
         <div class="flex items-start gap-3">
           <div
-            class="p-2.5 rounded-xl bg-red-500/10 text-red-400 border border-red-500/20 shrink-0"
+            class="p-2.5 rounded-xl bg-cherry-fill/10 text-cherry border border-cherry-fill/20 shrink-0"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -35,8 +35,8 @@ import { Component, ElementRef, effect, input, output, viewChild } from '@angula
             </svg>
           </div>
           <div>
-            <h3 class="text-sm font-semibold text-gray-100">{{ title() }}</h3>
-            <p class="text-xs text-gray-400 mt-1 leading-relaxed">{{ message() }}</p>
+            <h3 class="text-sm font-semibold text-ink">{{ title() }}</h3>
+            <p class="text-xs text-ink-2 mt-1 leading-relaxed">{{ message() }}</p>
           </div>
         </div>
 
@@ -45,14 +45,14 @@ import { Component, ElementRef, effect, input, output, viewChild } from '@angula
           <button
             type="button"
             (click)="cancelled.emit()"
-            class="flex-1 py-2.5 rounded-xl text-xs font-semibold text-gray-300 bg-gray-800 border border-gray-700/80 hover:bg-gray-750 active:scale-[0.98] transition-all cursor-pointer"
+            class="flex-1 py-2.5 rounded-xl text-xs font-semibold text-ink-2 bg-raised border border-edge/80 hover:bg-raised-hi active:scale-[0.98] transition-all cursor-pointer"
           >
             Cancel
           </button>
           <button
             type="button"
             (click)="confirmed.emit()"
-            class="flex-1 py-2.5 rounded-xl text-xs font-semibold text-white bg-linear-to-br from-red-500 to-rose-600 shadow-lg active:scale-[0.98] transition-all cursor-pointer"
+            class="flex-1 py-2.5 rounded-xl text-xs font-semibold text-ink bg-cherry-fill shadow-lg active:scale-[0.98] transition-all cursor-pointer"
           >
             {{ confirmText() }}
           </button>

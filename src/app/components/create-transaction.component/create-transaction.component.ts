@@ -20,7 +20,7 @@ import { EntryType } from './create-transaction.models';
   host: { class: 'block' },
   template: `
     <div
-      class="bg-gray-900/60 border border-gray-800/80 rounded-2xl p-5 space-y-4 backdrop-blur-sm"
+      class="bg-panel/60 border border-raised/80 rounded-2xl p-5 space-y-4"
     >
       @if (isKioskMode()) {
         <app-kiosk-balance />

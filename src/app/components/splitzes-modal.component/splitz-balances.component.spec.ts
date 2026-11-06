@@ -113,9 +113,9 @@ describe('SplitzBalancesComponent', () => {
     expect(cards[0].textContent).toContain('I paid');
     expect(cards[0].textContent).toContain('Owed: €7.00');
     expect(cards[0].textContent).toContain('Full amount: €21.00');
-    expect(cards[0].classList.contains('border-teal-500/40')).toBe(true);
+    expect(cards[0].classList.contains('border-avocado/40')).toBe(true);
     expect(cards[1].textContent).toContain('Alex paid');
     expect(cards[1].textContent).toContain('Owed: €5.00');
-    expect(cards[1].classList.contains('border-amber-500/40')).toBe(true);
+    expect(cards[1].classList.contains('border-ember/40')).toBe(true);
   });
 });

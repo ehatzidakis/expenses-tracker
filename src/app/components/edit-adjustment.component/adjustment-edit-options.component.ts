@@ -7,17 +7,17 @@ import { Component, input, output } from '@angular/core';
   template: `
     <div class="space-y-4">
       <div class="space-y-1.5">
-        <label class="text-xs font-medium text-gray-400">Adjustment Type</label>
-        <div class="grid grid-cols-2 gap-2 p-1 bg-gray-950/80 rounded-xl border border-gray-800">
+        <label class="text-xs font-medium text-ink-2">Type</label>
+        <div class="grid grid-cols-2 gap-2 p-1 bg-ground/80 rounded-xl border border-raised">
           <button
             type="button"
             (click)="typeChange.emit(true)"
             class="py-2 rounded-lg text-xs font-semibold transition-all duration-150 flex items-center justify-center gap-1 cursor-pointer"
-            [class.bg-emerald-500/20]="isAddition()"
-            [class.text-emerald-400]="isAddition()"
+            [class.bg-avocado/20]="isAddition()"
+            [class.text-avocado-ink]="isAddition()"
             [class.border]="isAddition()"
-            [class.border-emerald-500/30]="isAddition()"
-            [class.text-gray-400]="!isAddition()"
+            [class.border-avocado/30]="isAddition()"
+            [class.text-ink-2]="!isAddition()"
           >
             <span>↑</span> Bonus / Addition
           </button>
@@ -26,11 +26,11 @@ import { Component, input, output } from '@angular/core';
             type="button"
             (click)="typeChange.emit(false)"
             class="py-2 rounded-lg text-xs font-semibold transition-all duration-150 flex items-center justify-center gap-1 cursor-pointer"
-            [class.bg-red-500/20]="!isAddition()"
-            [class.text-red-400]="!isAddition()"
+            [class.bg-cherry-fill/20]="!isAddition()"
+            [class.text-cherry]="!isAddition()"
             [class.border]="!isAddition()"
-            [class.border-red-500/30]="!isAddition()"
-            [class.text-gray-400]="isAddition()"
+            [class.border-cherry-fill/30]="!isAddition()"
+            [class.text-ink-2]="isAddition()"
           >
             <span>↓</span> One-Off Expense
           </button>
@@ -38,17 +38,17 @@ import { Component, input, output } from '@angular/core';
       </div>
 
       <div class="space-y-1.5">
-        <label class="text-xs font-medium text-gray-400">Trip</label>
-        <div class="grid grid-cols-2 gap-2 p-1 bg-gray-950/80 rounded-xl border border-gray-800">
+        <label class="text-xs font-medium text-ink-2">Trip</label>
+        <div class="grid grid-cols-2 gap-2 p-1 bg-ground/80 rounded-xl border border-raised">
           <button
             type="button"
             (click)="tripChange.emit(true)"
             class="py-2 rounded-lg text-xs font-semibold transition-all duration-150 flex items-center justify-center gap-1 cursor-pointer"
-            [class.bg-sky-500/20]="isTrip()"
-            [class.text-sky-400]="isTrip()"
+            [class.bg-ember/20]="isTrip()"
+            [class.text-ember-ink]="isTrip()"
             [class.border]="isTrip()"
-            [class.border-sky-500/30]="isTrip()"
-            [class.text-gray-400]="!isTrip()"
+            [class.border-ember/30]="isTrip()"
+            [class.text-ink-2]="!isTrip()"
           >
             🛫 Yes
           </button>
@@ -56,11 +56,11 @@ import { Component, input, output } from '@angular/core';
             type="button"
             (click)="tripChange.emit(false)"
             class="py-2 rounded-lg text-xs font-semibold transition-all duration-150 flex items-center justify-center gap-1 cursor-pointer"
-            [class.bg-gray-700/60]="!isTrip()"
-            [class.text-gray-200]="!isTrip()"
+            [class.bg-edge/60]="!isTrip()"
+            [class.text-ink]="!isTrip()"
             [class.border]="!isTrip()"
-            [class.border-gray-600/40]="!isTrip()"
-            [class.text-gray-400]="isTrip()"
+            [class.border-ink-4/40]="!isTrip()"
+            [class.text-ink-2]="isTrip()"
           >
             No
           </button>
@@ -69,17 +69,17 @@ import { Component, input, output } from '@angular/core';
 
       @if (isTrip()) {
         <div class="space-y-1.5">
-          <label class="text-xs font-medium text-gray-400">Accept New Transactions</label>
-          <div class="grid grid-cols-2 gap-2 p-1 bg-gray-950/80 rounded-xl border border-gray-800">
+          <label class="text-xs font-medium text-ink-2">Accept New Transactions</label>
+          <div class="grid grid-cols-2 gap-2 p-1 bg-ground/80 rounded-xl border border-raised">
             <button
               type="button"
               (click)="selectableChange.emit(true)"
               class="py-2 rounded-lg text-xs font-semibold transition-all duration-150 flex items-center justify-center gap-1 cursor-pointer"
-              [class.bg-emerald-500/20]="isSelectable()"
-              [class.text-emerald-400]="isSelectable()"
+              [class.bg-avocado/20]="isSelectable()"
+              [class.text-avocado-ink]="isSelectable()"
               [class.border]="isSelectable()"
-              [class.border-emerald-500/30]="isSelectable()"
-              [class.text-gray-400]="!isSelectable()"
+              [class.border-avocado/30]="isSelectable()"
+              [class.text-ink-2]="!isSelectable()"
             >
               🔓 Open
             </button>
@@ -87,11 +87,11 @@ import { Component, input, output } from '@angular/core';
               type="button"
               (click)="selectableChange.emit(false)"
               class="py-2 rounded-lg text-xs font-semibold transition-all duration-150 flex items-center justify-center gap-1 cursor-pointer"
-              [class.bg-gray-700/60]="!isSelectable()"
-              [class.text-gray-200]="!isSelectable()"
+              [class.bg-edge/60]="!isSelectable()"
+              [class.text-ink]="!isSelectable()"
               [class.border]="!isSelectable()"
-              [class.border-gray-600/40]="!isSelectable()"
-              [class.text-gray-400]="isSelectable()"
+              [class.border-ink-4/40]="!isSelectable()"
+              [class.text-ink-2]="isSelectable()"
             >
               🔒 Closed
             </button>

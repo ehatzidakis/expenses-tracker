@@ -43,7 +43,7 @@ export class DateStepperComponent {
 
   readonly buttonClass = computed(() => {
     const base =
-      'shrink-0 flex items-center justify-center bg-gray-800/60 border border-gray-800 text-gray-300 hover:text-white hover:bg-gray-700/60 active:bg-gray-700 transition-colors cursor-pointer select-none focus:outline-none focus:ring-2 focus:ring-indigo-500/60';
+      'shrink-0 flex items-center justify-center bg-raised/60 border border-raised text-ink-2 hover:text-ink hover:bg-edge/60 active:bg-edge transition-colors cursor-pointer select-none focus:outline-none focus:ring-2 focus:ring-ember/60';
     return this.size() === 'sm'
       ? `${base} w-7 rounded-lg text-sm`
       : `${base} w-10 rounded-xl text-lg`;

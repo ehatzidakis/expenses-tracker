@@ -4,13 +4,13 @@ import { PEOPLE } from '../../models/splitz.model';
 import { Transaction } from '../../models/transaction.model';
 import { compareNewestFirst } from '../../services/transaction-service';
 import { SensitiveDirective } from '../../utils/sensitive.directive';
+import { categoryLabel } from '../../utils/period-pace';
 
 const PAGE_SIZE = 10;
 
 /**
- * Scrollable list of transaction cards, shared by the month and trip breakdowns.
- * It only displays the list it is given; "Load more" reveals already-loaded items, so it
- * never costs a Firestore read.
+ * Transaction rows, shared by every breakdown and by Recent. Each row opens the edit sheet.
+ * "Load more" reveals already-loaded items, so it never costs a Firestore read.
  */
 @Component({
   selector: 'app-transaction-list',
@@ -18,50 +18,52 @@ const PAGE_SIZE = 10;
   imports: [CommonModule, SensitiveDirective],
   host: { class: 'block' },
   template: `
-    <div class="mt-3 pt-3 border-t border-gray-800/60">
-      @if (loading()) {
-        <div class="space-y-2 animate-pulse">
-          @for (i of [1, 2, 3]; track i) {
-            <div class="h-12 bg-gray-800/60 rounded-xl"></div>
-          }
-        </div>
-      } @else if (error()) {
-        <div class="p-3 bg-red-950/40 border border-red-800/60 text-red-300 rounded-xl text-xs">
-          Unable to load transactions.
-        </div>
-      } @else if (!sorted().length) {
-        <div class="text-center text-xs text-gray-500 py-4">No transactions found.</div>
-      } @else {
-        <div class="max-h-88 overflow-y-auto overscroll-contain space-y-2 pr-1">
-          @for (tx of visible(); track tx.id) {
+    @if (loading()) {
+      <div class="space-y-2 py-2 animate-pulse" aria-label="Loading transactions">
+        @for (i of [1, 2, 3]; track i) {
+          <div class="h-11 rounded-lg bg-raised/70"></div>
+        }
+      </div>
+    } @else if (error()) {
+      <p role="alert" class="py-3 text-[13px] text-cherry">
+        Couldn't load these transactions. Check your connection, then close and reopen this list.
+      </p>
+    } @else if (!sorted().length) {
+      <p class="py-3 text-[13px] text-ink-3">No transactions found.</p>
+    } @else {
+      <ul class="divide-y divide-ink/[0.07]">
+        @for (tx of visible(); track tx.id) {
+          <li>
             <button
               type="button"
               (click)="selectTransaction.emit(tx)"
-              class="w-full text-left bg-gray-800/40 border border-gray-800/80 rounded-xl px-3 py-2 hover:border-gray-700 transition-colors cursor-pointer"
+              class="flex w-full min-h-12 items-center justify-between gap-3 py-2.5 text-left hover:bg-ink/[0.03] cursor-pointer"
             >
-              <div class="flex items-center justify-between gap-2">
-                <span class="min-w-0 flex items-center gap-1.5 text-xs font-medium text-gray-200">
+              <span class="min-w-0">
+                <span class="flex items-center gap-1.5 text-[14px] text-ink">
                   <span class="truncate">{{ tx.description }}</span>
                   @if (tx.isSplit) {
-                    <span
+                    <svg
+                      class="size-3.5 shrink-0 text-ink-3"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="1.8"
+                      stroke-linecap="round"
+                      role="img"
                       aria-label="Split transaction"
-                      title="Split transaction"
-                      class="text-[11px] leading-none"
-                      >✂️</span
                     >
+                      <circle cx="6" cy="6" r="3" />
+                      <circle cx="6" cy="18" r="3" />
+                      <path d="M20 4 8.1 15.9M14.5 14.5 20 20M8.1 8.1 12 12" />
+                    </svg>
                   }
                 </span>
-                <span
-                  class="shrink-0 text-xs font-semibold text-white tabular-nums"
-                  appSensitive="xs"
-                >
-                  €{{ tx.amount | number: '1.2-2' }}
-                </span>
-              </div>
-
-              <div class="mt-0.5 flex items-center justify-between gap-2 text-[10px]">
-                <span class="min-w-0 truncate text-gray-500">
-                  {{ tx.date | date: 'dd/MM' }}
+                <span class="mt-0.5 block truncate text-[12px] text-ink-3">
+                  {{ tx.date | date: 'd MMM' }}
+                  @if (showCategory()) {
+                    · {{ label(tx.category) }}
+                  }
                   @if (tx.subCategory) {
                     · {{ tx.subCategory }}
                   }
@@ -69,44 +71,43 @@ const PAGE_SIZE = 10;
                     · {{ note }}
                   }
                   @if (tx.comment) {
-                    · <span class="italic text-gray-400">“{{ tx.comment }}”</span>
+                    · <span class="italic text-ink-2">“{{ tx.comment }}”</span>
                   }
                 </span>
+              </span>
+              <span class="shrink-0 text-right">
+                <span class="block text-[14px] font-medium text-ink tabular-nums" appSensitive="xs">
+                  €{{ tx.amount | number: '1.2-2' }}
+                </span>
                 @if (tx.isSplit) {
-                  <span class="shrink-0 text-gray-500 tabular-nums" appSensitive="xs">
+                  <span class="block text-[12px] text-ink-3 tabular-nums" appSensitive="xs">
                     of €{{ tx.totalAmount ?? tx.amount | number: '1.2-2' }}
                   </span>
                 }
-              </div>
+              </span>
             </button>
-          }
+          </li>
+        }
+      </ul>
 
-          @if (hasMore()) {
-            <button
-              type="button"
-              (click)="loadMore()"
-              class="w-full py-2 rounded-xl text-xs font-medium border border-indigo-500/30 bg-indigo-500/10 text-indigo-200 hover:bg-indigo-500/15 hover:border-indigo-500/50 transition-colors cursor-pointer"
-            >
-              Load more
-            </button>
-          }
-
-          <!-- Fade hinting at more cards below; only when the list overflows the box. -->
-          @if (visible().length > 6) {
-            <div
-              class="sticky bottom-0 -mt-2 h-8 rounded-b-xl bg-linear-to-t from-gray-950/40 via-gray-950/15 to-transparent pointer-events-none"
-              aria-hidden="true"
-            ></div>
-          }
-        </div>
+      @if (hasMore()) {
+        <button
+          type="button"
+          (click)="loadMore()"
+          class="mt-1 w-full min-h-11 rounded-xl border border-edge text-[13px] font-medium text-ink-2 hover:border-ink-4 hover:text-ink cursor-pointer"
+        >
+          Load more
+        </button>
       }
-    </div>
+    }
   `,
 })
 export class TransactionListComponent {
   readonly transactions = input<Transaction[]>([]);
   readonly loading = input(false);
   readonly error = input(false);
+  /** Show the category on each row (for mixed lists like Recent). */
+  readonly showCategory = input(false);
 
   readonly selectTransaction = output<Transaction>();
 
@@ -118,6 +119,10 @@ export class TransactionListComponent {
 
   loadMore(): void {
     this.visibleCount.update((count) => count + PAGE_SIZE);
+  }
+
+  label(category: string): string {
+    return categoryLabel(category);
   }
 
   /** Who paid, or how many have settled when I paid. */

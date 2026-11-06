@@ -19,51 +19,51 @@ interface MonthSummary {
   template: `
     <div class="space-y-2">
       @for (month of monthSummaries(); track month.name) {
-        <article class="space-y-3 rounded-xl border border-gray-800/60 bg-amber-50/5 px-3 py-3">
+        <article class="space-y-3 rounded-xl border border-raised/60 bg-ember-soft/5 px-3 py-3">
           <div class="flex items-center justify-between gap-3">
-            <h3 class="font-medium text-sm text-gray-200">{{ month.name }}</h3>
-            <span class="text-xs text-gray-500 tabular-nums" appSensitive>
+            <h3 class="font-medium text-sm text-ink">{{ month.name }}</h3>
+            <span class="text-xs text-ink-3 tabular-nums" appSensitive>
               Wage €{{ month.wage | number: '1.2-2' }}
             </span>
           </div>
           <div class="grid grid-cols-2 gap-3">
             <div>
-              <span class="block text-[10px] uppercase tracking-wider text-gray-500">Saved</span>
+              <span class="block text-[11px] uppercase tracking-wider text-ink-3">Saved</span>
               <span
                 class="saved-amount text-xl font-semibold tabular-nums"
-                [class.text-emerald-300]="month.saved >= 0"
-                [class.text-red-300]="month.saved < 0"
+                [class.text-avocado-ink]="month.saved >= 0"
+                [class.text-cherry]="month.saved < 0"
                 appSensitive
               >
                 €{{ month.saved | number: '1.2-2' }}
               </span>
             </div>
             <div class="text-right">
-              <span class="block text-[10px] uppercase tracking-wider text-gray-500">Spend</span>
-              <span class="text-lg font-medium text-gray-200 tabular-nums" appSensitive>
+              <span class="block text-[11px] uppercase tracking-wider text-ink-3">Spend</span>
+              <span class="text-lg font-medium text-ink tabular-nums" appSensitive>
                 €{{ month.spend | number: '1.2-2' }}
               </span>
             </div>
           </div>
           @if (month.adjustments.length) {
-            <div class="space-y-1 border-t border-gray-800/60 pt-2">
-              <span class="text-[10px] uppercase tracking-wider text-gray-500">
+            <div class="space-y-1 border-t border-raised/60 pt-2">
+              <span class="text-[11px] uppercase tracking-wider text-ink-3">
                 One-off adjustments
               </span>
               @for (adjustment of month.adjustments; track adjustment.id) {
                 <div class="flex items-center justify-between gap-2 text-xs">
-                  <span class="min-w-0 truncate text-gray-300">{{ adjustment.title }}</span>
+                  <span class="min-w-0 truncate text-ink-2">{{ adjustment.title }}</span>
                   <span
                     class="shrink-0 tabular-nums"
-                    [class.text-emerald-300]="adjustment.adjType"
-                    [class.text-red-300]="!adjustment.adjType"
+                    [class.text-avocado-ink]="adjustment.adjType"
+                    [class.text-cherry]="!adjustment.adjType"
                   >
                     <span appSensitive
                       >{{ adjustment.adjType ? '+' : '-' }}€{{
                         adjustment.amount | number: '1.2-2'
                       }}</span
                     >
-                    <span class="text-gray-500">{{ adjustment.endDate | date: 'dd/MM/yyyy' }}</span>
+                    <span class="text-ink-3">{{ adjustment.endDate | date: 'dd/MM/yyyy' }}</span>
                   </span>
                 </div>
               }
@@ -71,7 +71,7 @@ interface MonthSummary {
           }
         </article>
       } @empty {
-        <p class="py-4 text-center text-xs text-gray-500">No completed months yet.</p>
+        <p class="py-4 text-center text-xs text-ink-3">No completed months yet.</p>
       }
     </div>
   `,

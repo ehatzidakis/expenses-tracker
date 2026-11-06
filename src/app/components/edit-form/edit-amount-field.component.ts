@@ -11,7 +11,7 @@ import { SensitiveDirective } from '../../utils/sensitive.directive';
   host: { class: 'block' },
   template: `
     <div class="space-y-1.5">
-      <label [for]="inputId()" class="text-xs font-medium text-gray-400">{{ label() }}</label>
+      <label [for]="inputId()" class="text-xs font-medium text-ink-2">{{ label() }}</label>
       <input
         [id]="inputId()"
         type="text"
@@ -22,13 +22,13 @@ import { SensitiveDirective } from '../../utils/sensitive.directive';
         [value]="amount() === 0 ? '' : amount().toString()"
         placeholder="0.00"
         (input)="onInput($event)"
-        class="w-full bg-gray-800/60 border border-gray-800 rounded-xl px-3 py-2.5 text-sm text-gray-100 placeholder:text-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/60"
-        [class.text-gray-400]="readonly()"
+        class="w-full bg-raised/60 border border-raised rounded-xl px-3 py-2.5 text-sm text-ink placeholder:text-ink-4 focus:outline-none focus:ring-2 focus:ring-ember/60"
+        [class.text-ink-2]="readonly()"
         [class.cursor-not-allowed]="readonly()"
         appSensitive
       />
       @if (amountField()().touched() && amountField()().invalid()) {
-        <span class="text-[11px] text-red-400">
+        <span class="text-[11px] text-cherry">
           {{ amountField()().errors()[0]?.message }}
         </span>
       }

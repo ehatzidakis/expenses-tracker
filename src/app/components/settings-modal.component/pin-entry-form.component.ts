@@ -9,8 +9,8 @@ type PinFormVariant = 'indigo' | 'red';
   imports: [FormsModule],
   host: { class: 'block' },
   template: `
-    <div class="bg-gray-800/60 border border-gray-700 p-4 rounded-2xl space-y-3">
-      <span class="text-xs font-medium text-gray-300 block" [class.text-center]="centerTitle()">
+    <div class="bg-raised/60 border border-edge p-4 rounded-2xl space-y-3">
+      <span class="text-xs font-medium text-ink-2 block" [class.text-center]="centerTitle()">
         {{ title() }}
       </span>
       <input
@@ -19,21 +19,21 @@ type PinFormVariant = 'indigo' | 'red';
         (ngModelChange)="setValue($event)"
         [placeholder]="placeholder()"
         [autofocus]="autofocus()"
-        class="w-full bg-gray-900 border border-gray-700 rounded-xl px-3.5 py-2 text-sm text-gray-100 placeholder:text-gray-600 tracking-widest focus:outline-none focus:border-indigo-500"
+        class="w-full bg-panel border border-edge rounded-xl px-3.5 py-2 text-sm text-ink placeholder:text-ink-4 tracking-widest focus:outline-none focus:border-ember"
         [class.text-center]="centerTitle()"
       />
       <div class="flex gap-2">
         <button
           type="button"
           (click)="cancel.emit()"
-          class="flex-1 py-2 text-xs text-gray-400 bg-gray-800 rounded-xl hover:text-white cursor-pointer"
+          class="flex-1 py-2 text-xs text-ink-2 bg-raised rounded-xl hover:text-ink cursor-pointer"
         >
           Cancel
         </button>
         <button
           type="button"
           (click)="submitted.emit(value())"
-          class="flex-1 py-2 text-xs font-semibold text-white rounded-xl cursor-pointer"
+          class="flex-1 py-2 text-xs font-semibold rounded-xl cursor-pointer"
           [class]="submitButtonClass()"
         >
           {{ submitLabel() }}
@@ -62,7 +62,7 @@ export class PinEntryFormComponent {
 
   submitButtonClass(): string {
     return this.variant() === 'red'
-      ? 'bg-red-600 hover:bg-red-500'
-      : 'bg-indigo-600 hover:bg-indigo-500';
+      ? 'bg-cherry-fill text-ink hover:brightness-110'
+      : 'bg-ember text-ground hover:bg-ember-ink';
   }
 }

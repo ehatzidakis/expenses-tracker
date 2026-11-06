@@ -21,17 +21,17 @@ interface AdjustmentFieldsModel {
   template: `
     <div class="space-y-4">
       <div class="space-y-1.5">
-        <label class="text-xs font-medium text-gray-400">Trip</label>
-        <div class="grid grid-cols-2 gap-2 p-1 bg-gray-950/80 rounded-xl border border-gray-800">
+        <label class="text-xs font-medium text-ink-2">Trip</label>
+        <div class="grid grid-cols-2 gap-2 p-1 bg-ground/80 rounded-xl border border-raised">
           <button
             type="button"
             (click)="tripChange.emit(true)"
             class="py-2 rounded-lg text-xs font-semibold transition-all duration-150 flex items-center justify-center gap-1 cursor-pointer"
-            [class.bg-sky-500/20]="model().isTrip"
-            [class.text-sky-400]="model().isTrip"
+            [class.bg-ember/20]="model().isTrip"
+            [class.text-ember-ink]="model().isTrip"
             [class.border]="model().isTrip"
-            [class.border-sky-500/30]="model().isTrip"
-            [class.text-gray-400]="!model().isTrip"
+            [class.border-ember/30]="model().isTrip"
+            [class.text-ink-2]="!model().isTrip"
           >
             🛫 Yes
           </button>
@@ -39,11 +39,11 @@ interface AdjustmentFieldsModel {
             type="button"
             (click)="tripChange.emit(false)"
             class="py-2 rounded-lg text-xs font-semibold transition-all duration-150 flex items-center justify-center gap-1 cursor-pointer"
-            [class.bg-gray-700/60]="!model().isTrip"
-            [class.text-gray-200]="!model().isTrip"
+            [class.bg-edge/60]="!model().isTrip"
+            [class.text-ink]="!model().isTrip"
             [class.border]="!model().isTrip"
-            [class.border-gray-600/40]="!model().isTrip"
-            [class.text-gray-400]="model().isTrip"
+            [class.border-ink-4/40]="!model().isTrip"
+            [class.text-ink-2]="model().isTrip"
           >
             No
           </button>
@@ -52,17 +52,17 @@ interface AdjustmentFieldsModel {
 
       @if (model().isTrip) {
         <div class="space-y-1.5">
-          <label class="text-xs font-medium text-gray-400">Accept New Transactions</label>
-          <div class="grid grid-cols-2 gap-2 p-1 bg-gray-950/80 rounded-xl border border-gray-800">
+          <label class="text-xs font-medium text-ink-2">Accept New Transactions</label>
+          <div class="grid grid-cols-2 gap-2 p-1 bg-ground/80 rounded-xl border border-raised">
             <button
               type="button"
               (click)="selectableChange.emit(true)"
               class="py-2 rounded-lg text-xs font-semibold transition-all duration-150 flex items-center justify-center gap-1 cursor-pointer"
-              [class.bg-emerald-500/20]="model().isSelectable"
-              [class.text-emerald-400]="model().isSelectable"
+              [class.bg-avocado/20]="model().isSelectable"
+              [class.text-avocado-ink]="model().isSelectable"
               [class.border]="model().isSelectable"
-              [class.border-emerald-500/30]="model().isSelectable"
-              [class.text-gray-400]="!model().isSelectable"
+              [class.border-avocado/30]="model().isSelectable"
+              [class.text-ink-2]="!model().isSelectable"
             >
               🔓 Open
             </button>
@@ -70,11 +70,11 @@ interface AdjustmentFieldsModel {
               type="button"
               (click)="selectableChange.emit(false)"
               class="py-2 rounded-lg text-xs font-semibold transition-all duration-150 flex items-center justify-center gap-1 cursor-pointer"
-              [class.bg-gray-700/60]="!model().isSelectable"
-              [class.text-gray-200]="!model().isSelectable"
+              [class.bg-edge/60]="!model().isSelectable"
+              [class.text-ink]="!model().isSelectable"
               [class.border]="!model().isSelectable"
-              [class.border-gray-600/40]="!model().isSelectable"
-              [class.text-gray-400]="model().isSelectable"
+              [class.border-ink-4/40]="!model().isSelectable"
+              [class.text-ink-2]="model().isSelectable"
             >
               🔒 Closed
             </button>
@@ -83,16 +83,16 @@ interface AdjustmentFieldsModel {
       }
 
       <div class="space-y-1.5">
-        <label for="adj-description" class="text-xs font-medium text-gray-400">Description</label>
+        <label for="adj-description" class="text-xs font-medium text-ink-2">Description</label>
         <input
           id="adj-description"
           type="text"
           placeholder="Add description"
           [formField]="descriptionField()"
-          class="w-full bg-gray-800/60 border border-gray-800 rounded-xl px-3 py-2.5 text-sm text-gray-100 placeholder:text-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/60"
+          class="w-full bg-raised/60 border border-raised rounded-xl px-3 py-2.5 text-sm text-ink placeholder:text-ink-4 focus:outline-none focus:ring-2 focus:ring-ember/60"
         />
         @if (descriptionField()().touched() && descriptionField()().invalid()) {
-          <span class="text-[11px] text-red-400">{{
+          <span class="text-[11px] text-cherry">{{
             descriptionField()().errors()[0]?.message
           }}</span>
         }
@@ -100,7 +100,7 @@ interface AdjustmentFieldsModel {
 
       @if (!model().isTrip) {
         <div class="space-y-1.5">
-          <label for="adj-amount" class="text-xs font-medium text-gray-400">Amount</label>
+          <label for="adj-amount" class="text-xs font-medium text-ink-2">Amount</label>
           <input
             id="adj-amount"
             type="text"
@@ -109,45 +109,45 @@ interface AdjustmentFieldsModel {
             [value]="model().amount === 0 ? '' : model().amount.toString()"
             placeholder="0.00"
             (input)="onAmountInput($event)"
-            class="w-full bg-gray-800/60 border border-gray-800 rounded-xl px-3 py-2.5 text-sm text-gray-100 placeholder:text-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/60 tabular-nums"
+            class="w-full bg-raised/60 border border-raised rounded-xl px-3 py-2.5 text-sm text-ink placeholder:text-ink-4 focus:outline-none focus:ring-2 focus:ring-ember/60 tabular-nums"
           />
           @if (amountField()().touched() && amountField()().invalid()) {
-            <span class="text-[11px] text-red-400">{{ amountField()().errors()[0]?.message }}</span>
+            <span class="text-[11px] text-cherry">{{ amountField()().errors()[0]?.message }}</span>
           }
         </div>
       }
 
       <div class="grid grid-cols-2 gap-3">
         <div class="space-y-1.5">
-          <label for="adj-start-date" class="text-xs font-medium text-gray-400">Start Date</label>
+          <label for="adj-start-date" class="text-xs font-medium text-ink-2">Start Date</label>
           <app-date-stepper size="sm">
             <input
               #dateInput
               id="adj-start-date"
               type="date"
               [formField]="startDateField()"
-              class="flex-1 min-w-0 appearance-none scheme-dark bg-gray-800/60 border border-gray-800 rounded-xl px-2 py-2 text-xs text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/60"
+              class="flex-1 min-w-0 appearance-none scheme-dark bg-raised/60 border border-raised rounded-xl px-2 py-2 text-xs text-ink focus:outline-none focus:ring-2 focus:ring-ember/60"
             />
           </app-date-stepper>
           @if (startDateField()().touched() && startDateField()().invalid()) {
-            <span class="text-[11px] text-red-400">{{
+            <span class="text-[11px] text-cherry">{{
               startDateField()().errors()[0]?.message
             }}</span>
           }
         </div>
         <div class="space-y-1.5">
-          <label for="adj-end-date" class="text-xs font-medium text-gray-400">End Date</label>
+          <label for="adj-end-date" class="text-xs font-medium text-ink-2">End Date</label>
           <app-date-stepper size="sm">
             <input
               #dateInput
               id="adj-end-date"
               type="date"
               [formField]="endDateField()"
-              class="flex-1 min-w-0 appearance-none scheme-dark bg-gray-800/60 border border-gray-800 rounded-xl px-2 py-2 text-xs text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/60"
+              class="flex-1 min-w-0 appearance-none scheme-dark bg-raised/60 border border-raised rounded-xl px-2 py-2 text-xs text-ink focus:outline-none focus:ring-2 focus:ring-ember/60"
             />
           </app-date-stepper>
           @if (endDateField()().touched() && endDateField()().invalid()) {
-            <span class="text-[11px] text-red-400">{{
+            <span class="text-[11px] text-cherry">{{
               endDateField()().errors()[0]?.message
             }}</span>
           }
@@ -155,17 +155,17 @@ interface AdjustmentFieldsModel {
       </div>
 
       <div class="space-y-1.5">
-        <label class="text-xs font-medium text-gray-400">Adjustment Type</label>
-        <div class="grid grid-cols-2 gap-2 p-1 bg-gray-950/80 rounded-xl border border-gray-800">
+        <label class="text-xs font-medium text-ink-2">Adjustment Type</label>
+        <div class="grid grid-cols-2 gap-2 p-1 bg-ground/80 rounded-xl border border-raised">
           <button
             type="button"
             (click)="additionChange.emit(true)"
             class="py-2 rounded-lg text-xs font-semibold transition-all duration-150 flex items-center justify-center gap-1 cursor-pointer"
-            [class.bg-emerald-500/20]="addition()"
-            [class.text-emerald-400]="addition()"
+            [class.bg-avocado/20]="addition()"
+            [class.text-avocado-ink]="addition()"
             [class.border]="addition()"
-            [class.border-emerald-500/30]="addition()"
-            [class.text-gray-400]="!addition()"
+            [class.border-avocado/30]="addition()"
+            [class.text-ink-2]="!addition()"
           >
             <span>+</span> Addition
           </button>
@@ -173,11 +173,11 @@ interface AdjustmentFieldsModel {
             type="button"
             (click)="additionChange.emit(false)"
             class="py-2 rounded-lg text-xs font-semibold transition-all duration-150 flex items-center justify-center gap-1 cursor-pointer"
-            [class.bg-red-500/20]="!addition()"
-            [class.text-red-400]="!addition()"
+            [class.bg-cherry-fill/20]="!addition()"
+            [class.text-cherry]="!addition()"
             [class.border]="!addition()"
-            [class.border-red-500/30]="!addition()"
-            [class.text-gray-400]="addition()"
+            [class.border-cherry-fill/30]="!addition()"
+            [class.text-ink-2]="addition()"
           >
             <span>-</span> Subtraction
           </button>

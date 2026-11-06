@@ -1,22 +1,32 @@
-/** Shared look for the selector pills (Monthly months, OneOffs trips, Singles filters). */
+/** Shared look for the selector pills (months, trips, one-off filters). 44px tall for thumbs. */
 export const PILL_BASE =
-  'px-4 py-2 rounded-xl text-xs whitespace-nowrap border transition-all duration-150 shrink-0';
-export const ACTIVE_PILL = 'bg-indigo-600 text-white font-medium border-indigo-500';
-export const IDLE_PILL = 'bg-gray-900 text-gray-400 border-gray-800 hover:border-gray-700';
+  'min-h-11 px-4 rounded-xl text-[13px] font-medium whitespace-nowrap border transition-colors duration-150 shrink-0 cursor-pointer';
+export const ACTIVE_PILL = 'bg-ember text-ground border-ember';
+export const IDLE_PILL = 'bg-transparent text-ink-2 border-edge hover:border-ink-4 hover:text-ink';
+
+/** The look of a recent-item pill, without its share of the row. */
+export const QUICK_PILL_SHAPE =
+  'min-h-11 truncate text-center px-3 rounded-xl text-[13px] font-medium whitespace-nowrap border transition-colors duration-150 cursor-pointer';
 
 /** A recent-item pill (month or trip) that shares the row equally with its siblings. */
-export const QUICK_PILL =
-  'flex-1 basis-0 min-w-0 truncate text-center px-3 py-2 rounded-xl text-xs whitespace-nowrap border transition-all duration-150';
+export const QUICK_PILL = 'flex-1 basis-0 min-w-0 ' + QUICK_PILL_SHAPE;
+
+/** A selected trip keeps its whole name; the idle pills give up the room. */
+export const QUICK_PILL_GROW = 'flex-none max-w-[60%] ' + QUICK_PILL_SHAPE;
 
 /** Wraps the "More" picker: 1.5x a quick pill's width, and anchors its dropdown. */
-export const PICKER_WRAPPER = 'relative flex-[1.5] basis-0 min-w-0';
+export const PICKER_WRAPPER = 'relative flex-[1.3] basis-0 min-w-0';
 
-/** The "More" picker toggle: a dashed ghost button that looks like a selected pill when an older item is picked. */
+/** The "More" picker toggle: a dashed pill that looks selected once an older item is picked. */
 export const PICKER_BASE =
-  'w-full px-2.5 py-2 rounded-xl text-xs whitespace-nowrap border transition-all duration-150 flex items-center justify-center gap-1';
+  'w-full min-h-11 px-2.5 rounded-xl text-[13px] font-medium whitespace-nowrap border transition-colors duration-150 flex items-center justify-center gap-1 cursor-pointer';
 export const PICKER_IDLE =
-  'border-dashed border-teal-600/50 bg-teal-500/10 text-gray-300 hover:border-teal-500/70 hover:bg-teal-500/15';
+  'border-dashed border-edge bg-transparent text-ink-2 hover:border-ink-4 hover:text-ink';
 export const PICKER_ACTIVE = ACTIVE_PILL;
+
+/** Dropdown panel opened by a "More" picker. */
+export const PICKER_PANEL =
+  'absolute right-0 top-full mt-2 z-30 w-64 bg-raised border border-edge rounded-2xl p-3 shadow-[0_18px_40px_-12px_rgb(0_0_0/0.7)]';
 
 /** 20x20 calendar glyph (evenodd) for the picker toggle. */
 export const CALENDAR_ICON_PATH =

@@ -1,459 +1,476 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-11-06T09:36:55.588Z",
+  "generatedAt": "2026-11-06T11:22:14Z",
   "title": "Design System: Expenses Tracker",
   "extensions": {
     "colorMeta": {
-      "signal-indigo": {
-        "role": "primary",
-        "displayName": "Signal Indigo",
-        "canonical": "oklch(58.5% 0.233 277.117)",
+      "ground": {
+        "role": "neutral",
+        "displayName": "Walnut Ground",
+        "canonical": "#120d0a",
+        "oklch": "oklch(16.4% 0.011 52.7)",
         "tonalRamp": [
-          "oklch(25.7% 0.09 281.288)",
-          "oklch(39.8% 0.195 277.366)",
-          "oklch(45.7% 0.24 277.023)",
-          "oklch(51.1% 0.262 276.966)",
-          "oklch(58.5% 0.233 277.117)",
-          "oklch(67.3% 0.182 276.935)",
-          "oklch(87% 0.065 274.039)",
-          "oklch(96.2% 0.018 272.314)"
+          "oklch(15.0% 0.003 52.7)",
+          "oklch(26.4% 0.005 52.7)",
+          "oklch(37.9% 0.007 52.7)",
+          "oklch(49.3% 0.009 52.7)",
+          "oklch(60.7% 0.010 52.7)",
+          "oklch(72.1% 0.008 52.7)",
+          "oklch(83.6% 0.006 52.7)",
+          "oklch(95.0% 0.004 52.7)"
         ]
       },
-      "signal-indigo-deep": {
-        "role": "primary",
-        "displayName": "Signal Indigo Deep",
-        "canonical": "oklch(51.1% 0.262 276.966)",
+      "panel": {
+        "role": "neutral",
+        "displayName": "Smoked Glass",
+        "canonical": "#1c1511",
+        "oklch": "oklch(20.3% 0.014 51.4)",
         "tonalRamp": [
-          "oklch(25.7% 0.09 281.288)",
-          "oklch(39.8% 0.195 277.366)",
-          "oklch(45.7% 0.24 277.023)",
-          "oklch(51.1% 0.262 276.966)",
-          "oklch(58.5% 0.233 277.117)",
-          "oklch(67.3% 0.182 276.935)",
-          "oklch(87% 0.065 274.039)",
-          "oklch(96.2% 0.018 272.314)"
+          "oklch(15.0% 0.003 51.4)",
+          "oklch(26.4% 0.006 51.4)",
+          "oklch(37.9% 0.009 51.4)",
+          "oklch(49.3% 0.011 51.4)",
+          "oklch(60.7% 0.014 51.4)",
+          "oklch(72.1% 0.011 51.4)",
+          "oklch(83.6% 0.008 51.4)",
+          "oklch(95.0% 0.006 51.4)"
         ]
       },
-      "signal-violet": {
-        "role": "primary",
-        "displayName": "Signal Violet",
-        "canonical": "oklch(54.1% 0.281 293.009)",
+      "raised": {
+        "role": "neutral",
+        "displayName": "Raised Glass",
+        "canonical": "#261d17",
+        "oklch": "oklch(23.9% 0.018 55.4)",
         "tonalRamp": [
-          "oklch(28.3% 0.141 291.089)",
-          "oklch(43.2% 0.232 292.759)",
-          "oklch(49.1% 0.27 292.581)",
-          "oklch(54.1% 0.281 293.009)",
-          "oklch(60.6% 0.25 292.717)",
-          "oklch(70.2% 0.183 293.541)",
-          "oklch(89.4% 0.057 293.283)",
-          "oklch(96.9% 0.016 293.756)"
+          "oklch(15.0% 0.004 55.4)",
+          "oklch(26.4% 0.008 55.4)",
+          "oklch(37.9% 0.011 55.4)",
+          "oklch(49.3% 0.015 55.4)",
+          "oklch(60.7% 0.018 55.4)",
+          "oklch(72.1% 0.014 55.4)",
+          "oklch(83.6% 0.011 55.4)",
+          "oklch(95.0% 0.007 55.4)"
         ]
       },
-      "signal-indigo-text": {
-        "role": "primary",
-        "displayName": "Indigo Readout",
-        "canonical": "oklch(78.5% 0.115 274.713)",
+      "raised-hi": {
+        "role": "neutral",
+        "displayName": "Raised Glass High",
+        "canonical": "#30251d",
+        "oklch": "oklch(27.5% 0.022 57.7)",
         "tonalRamp": [
-          "oklch(25.7% 0.09 281.288)",
-          "oklch(39.8% 0.195 277.366)",
-          "oklch(45.7% 0.24 277.023)",
-          "oklch(51.1% 0.262 276.966)",
-          "oklch(58.5% 0.233 277.117)",
-          "oklch(67.3% 0.182 276.935)",
-          "oklch(87% 0.065 274.039)",
-          "oklch(96.2% 0.018 272.314)"
+          "oklch(15.0% 0.005 57.7)",
+          "oklch(26.4% 0.010 57.7)",
+          "oklch(37.9% 0.014 57.7)",
+          "oklch(49.3% 0.018 57.7)",
+          "oklch(60.7% 0.022 57.7)",
+          "oklch(72.1% 0.017 57.7)",
+          "oklch(83.6% 0.013 57.7)",
+          "oklch(95.0% 0.009 57.7)"
         ]
       },
-      "trip-teal": {
+      "edge": {
+        "role": "neutral",
+        "displayName": "Teak Edge",
+        "canonical": "#3d2f25",
+        "oklch": "oklch(31.8% 0.027 57.1)",
+        "tonalRamp": [
+          "oklch(15.0% 0.007 57.1)",
+          "oklch(26.4% 0.012 57.1)",
+          "oklch(37.9% 0.017 57.1)",
+          "oklch(49.3% 0.022 57.1)",
+          "oklch(60.7% 0.026 57.1)",
+          "oklch(72.1% 0.021 57.1)",
+          "oklch(83.6% 0.016 57.1)",
+          "oklch(95.0% 0.011 57.1)"
+        ]
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "Cream",
+        "canonical": "#f1e6d2",
+        "oklch": "oklch(92.8% 0.029 82.6)",
+        "tonalRamp": [
+          "oklch(15.0% 0.007 82.6)",
+          "oklch(26.4% 0.013 82.6)",
+          "oklch(37.9% 0.018 82.6)",
+          "oklch(49.3% 0.024 82.6)",
+          "oklch(60.7% 0.029 82.6)",
+          "oklch(72.1% 0.023 82.6)",
+          "oklch(83.6% 0.018 82.6)",
+          "oklch(95.0% 0.012 82.6)"
+        ]
+      },
+      "ink-2": {
+        "role": "neutral",
+        "displayName": "Cream 2",
+        "canonical": "#d3c6b1",
+        "oklch": "oklch(83.2% 0.032 79.9)",
+        "tonalRamp": [
+          "oklch(15.0% 0.008 79.9)",
+          "oklch(26.4% 0.014 79.9)",
+          "oklch(37.9% 0.020 79.9)",
+          "oklch(49.3% 0.026 79.9)",
+          "oklch(60.7% 0.032 79.9)",
+          "oklch(72.1% 0.026 79.9)",
+          "oklch(83.6% 0.019 79.9)",
+          "oklch(95.0% 0.013 79.9)"
+        ]
+      },
+      "ink-3": {
+        "role": "neutral",
+        "displayName": "Cream 3",
+        "canonical": "#b0a08c",
+        "oklch": "oklch(71.4% 0.034 73.4)",
+        "tonalRamp": [
+          "oklch(15.0% 0.008 73.4)",
+          "oklch(26.4% 0.015 73.4)",
+          "oklch(37.9% 0.021 73.4)",
+          "oklch(49.3% 0.028 73.4)",
+          "oklch(60.7% 0.033 73.4)",
+          "oklch(72.1% 0.027 73.4)",
+          "oklch(83.6% 0.021 73.4)",
+          "oklch(95.0% 0.014 73.4)"
+        ]
+      },
+      "ink-4": {
+        "role": "neutral",
+        "displayName": "Cream 4",
+        "canonical": "#95836f",
+        "oklch": "oklch(62.1% 0.036 70.0)",
+        "tonalRamp": [
+          "oklch(15.0% 0.009 70.0)",
+          "oklch(26.4% 0.016 70.0)",
+          "oklch(37.9% 0.023 70.0)",
+          "oklch(49.3% 0.030 70.0)",
+          "oklch(60.7% 0.036 70.0)",
+          "oklch(72.1% 0.029 70.0)",
+          "oklch(83.6% 0.022 70.0)",
+          "oklch(95.0% 0.015 70.0)"
+        ]
+      },
+      "ember": {
+        "role": "primary",
+        "displayName": "Ember",
+        "canonical": "#e5703a",
+        "oklch": "oklch(67.4% 0.160 43.6)",
+        "tonalRamp": [
+          "oklch(15.0% 0.040 43.6)",
+          "oklch(26.4% 0.071 43.6)",
+          "oklch(37.9% 0.101 43.6)",
+          "oklch(49.3% 0.132 43.6)",
+          "oklch(60.7% 0.158 43.6)",
+          "oklch(72.1% 0.128 43.6)",
+          "oklch(83.6% 0.097 43.6)",
+          "oklch(95.0% 0.067 43.6)"
+        ]
+      },
+      "ember-ink": {
+        "role": "primary",
+        "displayName": "Ember Ink",
+        "canonical": "#ee7d48",
+        "oklch": "oklch(70.8% 0.155 44.4)",
+        "tonalRamp": [
+          "oklch(15.0% 0.039 44.4)",
+          "oklch(26.4% 0.068 44.4)",
+          "oklch(37.9% 0.098 44.4)",
+          "oklch(49.3% 0.127 44.4)",
+          "oklch(60.7% 0.153 44.4)",
+          "oklch(72.1% 0.123 44.4)",
+          "oklch(83.6% 0.094 44.4)",
+          "oklch(95.0% 0.064 44.4)"
+        ]
+      },
+      "ember-soft": {
+        "role": "primary",
+        "displayName": "Ember Soft",
+        "canonical": "#f2ae85",
+        "oklch": "oklch(80.6% 0.097 52.0)",
+        "tonalRamp": [
+          "oklch(15.0% 0.024 52.0)",
+          "oklch(26.4% 0.043 52.0)",
+          "oklch(37.9% 0.061 52.0)",
+          "oklch(49.3% 0.080 52.0)",
+          "oklch(60.7% 0.096 52.0)",
+          "oklch(72.1% 0.077 52.0)",
+          "oklch(83.6% 0.059 52.0)",
+          "oklch(95.0% 0.040 52.0)"
+        ]
+      },
+      "ember-deep": {
+        "role": "primary",
+        "displayName": "Ember Deep",
+        "canonical": "#3a1d10",
+        "oklch": "oklch(26.8% 0.051 44.2)",
+        "tonalRamp": [
+          "oklch(15.0% 0.013 44.2)",
+          "oklch(26.4% 0.022 44.2)",
+          "oklch(37.9% 0.032 44.2)",
+          "oklch(49.3% 0.042 44.2)",
+          "oklch(60.7% 0.050 44.2)",
+          "oklch(72.1% 0.040 44.2)",
+          "oklch(83.6% 0.031 44.2)",
+          "oklch(95.0% 0.021 44.2)"
+        ]
+      },
+      "rust": {
         "role": "secondary",
-        "displayName": "Trip Teal",
-        "canonical": "oklch(77.7% 0.152 181.912)",
+        "displayName": "Rust",
+        "canonical": "#b4482a",
+        "oklch": "oklch(54.1% 0.147 36.2)",
         "tonalRamp": [
-          "oklch(27.7% 0.046 192.524)",
-          "oklch(43.7% 0.078 188.216)",
-          "oklch(51.1% 0.096 186.391)",
-          "oklch(60% 0.118 184.704)",
-          "oklch(70.4% 0.14 182.503)",
-          "oklch(77.7% 0.152 181.912)",
-          "oklch(91% 0.096 180.426)",
-          "oklch(98.4% 0.014 180.72)"
+          "oklch(15.0% 0.037 36.2)",
+          "oklch(26.4% 0.065 36.2)",
+          "oklch(37.9% 0.093 36.2)",
+          "oklch(49.3% 0.121 36.2)",
+          "oklch(60.7% 0.146 36.2)",
+          "oklch(72.1% 0.118 36.2)",
+          "oklch(83.6% 0.090 36.2)",
+          "oklch(95.0% 0.061 36.2)"
         ]
       },
-      "trip-teal-deep": {
+      "umber": {
         "role": "secondary",
-        "displayName": "Trip Teal Deep",
-        "canonical": "oklch(60% 0.118 184.704)",
+        "displayName": "Umber",
+        "canonical": "#7a3b22",
+        "oklch": "oklch(42.9% 0.096 41.5)",
         "tonalRamp": [
-          "oklch(27.7% 0.046 192.524)",
-          "oklch(43.7% 0.078 188.216)",
-          "oklch(51.1% 0.096 186.391)",
-          "oklch(60% 0.118 184.704)",
-          "oklch(70.4% 0.14 182.503)",
-          "oklch(77.7% 0.152 181.912)",
-          "oklch(91% 0.096 180.426)",
-          "oklch(98.4% 0.014 180.72)"
+          "oklch(15.0% 0.024 41.5)",
+          "oklch(26.4% 0.042 41.5)",
+          "oklch(37.9% 0.060 41.5)",
+          "oklch(49.3% 0.078 41.5)",
+          "oklch(60.7% 0.094 41.5)",
+          "oklch(72.1% 0.076 41.5)",
+          "oklch(83.6% 0.058 41.5)",
+          "oklch(95.0% 0.040 41.5)"
         ]
       },
-      "saved-emerald": {
+      "avocado": {
         "role": "tertiary",
-        "displayName": "Saved Emerald",
-        "canonical": "oklch(76.5% 0.177 163.223)",
+        "displayName": "Avocado",
+        "canonical": "#8fa35a",
+        "oklch": "oklch(68.3% 0.101 121.7)",
         "tonalRamp": [
-          "oklch(26.2% 0.051 172.552)",
-          "oklch(43.2% 0.095 166.913)",
-          "oklch(50.8% 0.118 165.612)",
-          "oklch(59.6% 0.145 163.225)",
-          "oklch(69.6% 0.17 162.48)",
-          "oklch(76.5% 0.177 163.223)",
-          "oklch(90.5% 0.093 164.15)",
-          "oklch(97.9% 0.021 166.113)"
+          "oklch(15.0% 0.025 121.7)",
+          "oklch(26.4% 0.044 121.7)",
+          "oklch(37.9% 0.064 121.7)",
+          "oklch(49.3% 0.083 121.7)",
+          "oklch(60.7% 0.100 121.7)",
+          "oklch(72.1% 0.080 121.7)",
+          "oklch(83.6% 0.061 121.7)",
+          "oklch(95.0% 0.042 121.7)"
         ]
       },
-      "saved-emerald-soft": {
+      "avocado-ink": {
         "role": "tertiary",
-        "displayName": "Saved Emerald Soft",
-        "canonical": "oklch(84.5% 0.143 164.978)",
+        "displayName": "Avocado Ink",
+        "canonical": "#a9bc74",
+        "oklch": "oklch(76.4% 0.098 120.8)",
         "tonalRamp": [
-          "oklch(26.2% 0.051 172.552)",
-          "oklch(43.2% 0.095 166.913)",
-          "oklch(50.8% 0.118 165.612)",
-          "oklch(59.6% 0.145 163.225)",
-          "oklch(69.6% 0.17 162.48)",
-          "oklch(76.5% 0.177 163.223)",
-          "oklch(90.5% 0.093 164.15)",
-          "oklch(97.9% 0.021 166.113)"
+          "oklch(15.0% 0.024 120.8)",
+          "oklch(26.4% 0.043 120.8)",
+          "oklch(37.9% 0.062 120.8)",
+          "oklch(49.3% 0.080 120.8)",
+          "oklch(60.7% 0.097 120.8)",
+          "oklch(72.1% 0.078 120.8)",
+          "oklch(83.6% 0.059 120.8)",
+          "oklch(95.0% 0.041 120.8)"
         ]
       },
-      "overspend-red": {
+      "avocado-deep": {
         "role": "tertiary",
-        "displayName": "Overspend Red",
-        "canonical": "oklch(70.4% 0.191 22.216)",
+        "displayName": "Avocado Deep",
+        "canonical": "#263016",
+        "oklch": "oklch(29.2% 0.046 126.3)",
         "tonalRamp": [
-          "oklch(25.8% 0.092 26.042)",
-          "oklch(44.4% 0.177 26.899)",
-          "oklch(50.5% 0.213 27.518)",
-          "oklch(57.7% 0.245 27.325)",
-          "oklch(63.7% 0.237 25.331)",
-          "oklch(70.4% 0.191 22.216)",
-          "oklch(88.5% 0.062 18.334)",
-          "oklch(97.1% 0.013 17.38)"
+          "oklch(15.0% 0.011 126.3)",
+          "oklch(26.4% 0.020 126.3)",
+          "oklch(37.9% 0.029 126.3)",
+          "oklch(49.3% 0.038 126.3)",
+          "oklch(60.7% 0.045 126.3)",
+          "oklch(72.1% 0.036 126.3)",
+          "oklch(83.6% 0.028 126.3)",
+          "oklch(95.0% 0.019 126.3)"
         ]
       },
-      "overspend-red-strong": {
+      "cherry": {
         "role": "tertiary",
-        "displayName": "Overspend Red Strong",
-        "canonical": "oklch(63.7% 0.237 25.331)",
+        "displayName": "Cherry",
+        "canonical": "#f0566b",
+        "oklch": "oklch(66.4% 0.189 15.9)",
         "tonalRamp": [
-          "oklch(25.8% 0.092 26.042)",
-          "oklch(44.4% 0.177 26.899)",
-          "oklch(50.5% 0.213 27.518)",
-          "oklch(57.7% 0.245 27.325)",
-          "oklch(63.7% 0.237 25.331)",
-          "oklch(70.4% 0.191 22.216)",
-          "oklch(88.5% 0.062 18.334)",
-          "oklch(97.1% 0.013 17.38)"
+          "oklch(15.0% 0.047 15.9)",
+          "oklch(26.4% 0.083 15.9)",
+          "oklch(37.9% 0.119 15.9)",
+          "oklch(49.3% 0.155 15.9)",
+          "oklch(60.7% 0.186 15.9)",
+          "oklch(72.1% 0.151 15.9)",
+          "oklch(83.6% 0.115 15.9)",
+          "oklch(95.0% 0.079 15.9)"
         ]
       },
-      "overspend-red-deep": {
+      "cherry-fill": {
         "role": "tertiary",
-        "displayName": "Overspend Red Deep",
-        "canonical": "oklch(57.7% 0.245 27.325)",
+        "displayName": "Cherry Fill",
+        "canonical": "#a8283b",
+        "oklch": "oklch(48.7% 0.163 17.9)",
         "tonalRamp": [
-          "oklch(25.8% 0.092 26.042)",
-          "oklch(44.4% 0.177 26.899)",
-          "oklch(50.5% 0.213 27.518)",
-          "oklch(57.7% 0.245 27.325)",
-          "oklch(63.7% 0.237 25.331)",
-          "oklch(70.4% 0.191 22.216)",
-          "oklch(88.5% 0.062 18.334)",
-          "oklch(97.1% 0.013 17.38)"
+          "oklch(15.0% 0.041 17.9)",
+          "oklch(26.4% 0.072 17.9)",
+          "oklch(37.9% 0.103 17.9)",
+          "oklch(49.3% 0.134 17.9)",
+          "oklch(60.7% 0.161 17.9)",
+          "oklch(72.1% 0.130 17.9)",
+          "oklch(83.6% 0.099 17.9)",
+          "oklch(95.0% 0.068 17.9)"
         ]
       },
-      "overspend-rose-deep": {
+      "cherry-deep": {
         "role": "tertiary",
-        "displayName": "Overspend Rose Deep",
-        "canonical": "oklch(45.5% 0.188 13.697)",
+        "displayName": "Cherry Deep",
+        "canonical": "#3a1418",
+        "oklch": "oklch(25.2% 0.060 16.1)",
         "tonalRamp": [
-          "oklch(27.1% 0.105 12.094)",
-          "oklch(45.5% 0.188 13.697)",
-          "oklch(51.4% 0.222 16.935)",
-          "oklch(58.6% 0.253 17.585)",
-          "oklch(64.5% 0.246 16.439)",
-          "oklch(71.2% 0.194 13.428)",
-          "oklch(89.2% 0.058 10.001)",
-          "oklch(96.9% 0.015 12.422)"
-        ]
-      },
-      "pending-amber": {
-        "role": "tertiary",
-        "displayName": "Pending Amber",
-        "canonical": "oklch(87.9% 0.169 91.605)",
-        "tonalRamp": [
-          "oklch(27.9% 0.077 45.635)",
-          "oklch(47.3% 0.137 46.201)",
-          "oklch(55.5% 0.163 48.998)",
-          "oklch(66.6% 0.179 58.318)",
-          "oklch(76.9% 0.188 70.08)",
-          "oklch(82.8% 0.189 84.429)",
-          "oklch(92.4% 0.12 95.746)",
-          "oklch(98.7% 0.022 95.277)"
-        ]
-      },
-      "night-base": {
-        "role": "neutral",
-        "displayName": "Night Base",
-        "canonical": "oklch(13% 0.028 261.692)",
-        "tonalRamp": [
-          "oklch(13% 0.028 261.692)",
-          "oklch(27.8% 0.033 256.848)",
-          "oklch(37.3% 0.034 259.733)",
-          "oklch(44.6% 0.03 256.802)",
-          "oklch(55.1% 0.027 264.364)",
-          "oklch(70.7% 0.022 261.325)",
-          "oklch(92.8% 0.006 264.531)",
-          "oklch(98.5% 0.002 247.839)"
-        ]
-      },
-      "console-panel": {
-        "role": "neutral",
-        "displayName": "Console Panel",
-        "canonical": "oklch(21% 0.034 264.665)",
-        "tonalRamp": [
-          "oklch(13% 0.028 261.692)",
-          "oklch(27.8% 0.033 256.848)",
-          "oklch(37.3% 0.034 259.733)",
-          "oklch(44.6% 0.03 256.802)",
-          "oklch(55.1% 0.027 264.364)",
-          "oklch(70.7% 0.022 261.325)",
-          "oklch(92.8% 0.006 264.531)",
-          "oklch(98.5% 0.002 247.839)"
-        ]
-      },
-      "raised-slate": {
-        "role": "neutral",
-        "displayName": "Raised Slate",
-        "canonical": "oklch(27.8% 0.033 256.848)",
-        "tonalRamp": [
-          "oklch(13% 0.028 261.692)",
-          "oklch(27.8% 0.033 256.848)",
-          "oklch(37.3% 0.034 259.733)",
-          "oklch(44.6% 0.03 256.802)",
-          "oklch(55.1% 0.027 264.364)",
-          "oklch(70.7% 0.022 261.325)",
-          "oklch(92.8% 0.006 264.531)",
-          "oklch(98.5% 0.002 247.839)"
-        ]
-      },
-      "field-fill": {
-        "role": "neutral",
-        "displayName": "Field Fill",
-        "canonical": "oklch(27.8% 0.033 256.848 / 0.6)",
-        "tonalRamp": [
-          "oklch(13% 0.028 261.692)",
-          "oklch(27.8% 0.033 256.848)",
-          "oklch(37.3% 0.034 259.733)",
-          "oklch(44.6% 0.03 256.802)",
-          "oklch(55.1% 0.027 264.364)",
-          "oklch(70.7% 0.022 261.325)",
-          "oklch(92.8% 0.006 264.531)",
-          "oklch(98.5% 0.002 247.839)"
-        ]
-      },
-      "control-edge": {
-        "role": "neutral",
-        "displayName": "Control Edge",
-        "canonical": "oklch(37.3% 0.034 259.733)",
-        "tonalRamp": [
-          "oklch(13% 0.028 261.692)",
-          "oklch(27.8% 0.033 256.848)",
-          "oklch(37.3% 0.034 259.733)",
-          "oklch(44.6% 0.03 256.802)",
-          "oklch(55.1% 0.027 264.364)",
-          "oklch(70.7% 0.022 261.325)",
-          "oklch(92.8% 0.006 264.531)",
-          "oklch(98.5% 0.002 247.839)"
-        ]
-      },
-      "ink-white": {
-        "role": "neutral",
-        "displayName": "Ink White",
-        "canonical": "#ffffff",
-        "tonalRamp": [
-          "oklch(13% 0.028 261.692)",
-          "oklch(27.8% 0.033 256.848)",
-          "oklch(37.3% 0.034 259.733)",
-          "oklch(44.6% 0.03 256.802)",
-          "oklch(55.1% 0.027 264.364)",
-          "oklch(70.7% 0.022 261.325)",
-          "oklch(92.8% 0.006 264.531)",
-          "oklch(98.5% 0.002 247.839)"
-        ]
-      },
-      "ink-primary": {
-        "role": "neutral",
-        "displayName": "Ink Primary",
-        "canonical": "oklch(96.7% 0.003 264.542)",
-        "tonalRamp": [
-          "oklch(13% 0.028 261.692)",
-          "oklch(27.8% 0.033 256.848)",
-          "oklch(37.3% 0.034 259.733)",
-          "oklch(44.6% 0.03 256.802)",
-          "oklch(55.1% 0.027 264.364)",
-          "oklch(70.7% 0.022 261.325)",
-          "oklch(92.8% 0.006 264.531)",
-          "oklch(98.5% 0.002 247.839)"
-        ]
-      },
-      "ink-body": {
-        "role": "neutral",
-        "displayName": "Ink Body",
-        "canonical": "oklch(87.2% 0.01 258.338)",
-        "tonalRamp": [
-          "oklch(13% 0.028 261.692)",
-          "oklch(27.8% 0.033 256.848)",
-          "oklch(37.3% 0.034 259.733)",
-          "oklch(44.6% 0.03 256.802)",
-          "oklch(55.1% 0.027 264.364)",
-          "oklch(70.7% 0.022 261.325)",
-          "oklch(92.8% 0.006 264.531)",
-          "oklch(98.5% 0.002 247.839)"
-        ]
-      },
-      "ink-secondary": {
-        "role": "neutral",
-        "displayName": "Ink Secondary",
-        "canonical": "oklch(70.7% 0.022 261.325)",
-        "tonalRamp": [
-          "oklch(13% 0.028 261.692)",
-          "oklch(27.8% 0.033 256.848)",
-          "oklch(37.3% 0.034 259.733)",
-          "oklch(44.6% 0.03 256.802)",
-          "oklch(55.1% 0.027 264.364)",
-          "oklch(70.7% 0.022 261.325)",
-          "oklch(92.8% 0.006 264.531)",
-          "oklch(98.5% 0.002 247.839)"
-        ]
-      },
-      "ink-muted": {
-        "role": "neutral",
-        "displayName": "Ink Muted",
-        "canonical": "oklch(55.1% 0.027 264.364)",
-        "tonalRamp": [
-          "oklch(13% 0.028 261.692)",
-          "oklch(27.8% 0.033 256.848)",
-          "oklch(37.3% 0.034 259.733)",
-          "oklch(44.6% 0.03 256.802)",
-          "oklch(55.1% 0.027 264.364)",
-          "oklch(70.7% 0.022 261.325)",
-          "oklch(92.8% 0.006 264.531)",
-          "oklch(98.5% 0.002 247.839)"
-        ]
-      },
-      "ink-faint": {
-        "role": "neutral",
-        "displayName": "Ink Faint",
-        "canonical": "oklch(44.6% 0.03 256.802)",
-        "tonalRamp": [
-          "oklch(13% 0.028 261.692)",
-          "oklch(27.8% 0.033 256.848)",
-          "oklch(37.3% 0.034 259.733)",
-          "oklch(44.6% 0.03 256.802)",
-          "oklch(55.1% 0.027 264.364)",
-          "oklch(70.7% 0.022 261.325)",
-          "oklch(92.8% 0.006 264.531)",
-          "oklch(98.5% 0.002 247.839)"
+          "oklch(15.0% 0.015 16.1)",
+          "oklch(26.4% 0.027 16.1)",
+          "oklch(37.9% 0.038 16.1)",
+          "oklch(49.3% 0.050 16.1)",
+          "oklch(60.7% 0.060 16.1)",
+          "oklch(72.1% 0.048 16.1)",
+          "oklch(83.6% 0.037 16.1)",
+          "oklch(95.0% 0.025 16.1)"
         ]
       }
     },
     "typographyMeta": {
       "display": {
         "displayName": "Display",
-        "purpose": "The month's hero figures in the overview card. The largest type in the app."
+        "purpose": "The period headline figure (money left, trip total). One per screen; All time clamps 30–40px."
       },
       "headline": {
         "displayName": "Headline",
-        "purpose": "App title in the header."
+        "purpose": "Sign-in title only."
       },
       "title": {
         "displayName": "Title",
-        "purpose": "Modal titles, card titles, primary button labels."
+        "purpose": "Trip name, days-to-go count, secondary panel figures (18–20px; one-off In and Spent at 32px)."
+      },
+      "figure": {
+        "displayName": "Figure",
+        "purpose": "Inline panel totals such as Saved and In / Out / Net (15–16px)."
+      },
+      "brand": {
+        "displayName": "Brand",
+        "purpose": "The uppercase Expenses wordmark in the header."
+      },
+      "section-heading": {
+        "displayName": "Section Heading",
+        "purpose": "Uppercase wide list headings: Categories, Recent."
+      },
+      "body-lg": {
+        "displayName": "Body Large",
+        "purpose": "Row labels and primary button labels."
       },
       "body": {
         "displayName": "Body",
-        "purpose": "Input values, category names, list primary text."
+        "purpose": "Transaction descriptions, panel captions, segment labels."
       },
-      "body-compact": {
-        "displayName": "Body Compact",
-        "purpose": "The workhorse 12px size: pills, secondary buttons, field labels, list text."
+      "body-sm": {
+        "displayName": "Body Small",
+        "purpose": "Row amounts, pills, secondary buttons, meta lines."
       },
-      "label": {
-        "displayName": "Label",
-        "purpose": "Uppercase section headings on cards."
+      "caption": {
+        "displayName": "Caption",
+        "purpose": "Row status lines and the labels under panel figures."
       },
       "micro": {
         "displayName": "Micro",
-        "purpose": "Tab labels, meta lines, counts, validation messages (10-11px)."
+        "purpose": "Tab labels and the Today notch caption."
       }
     },
     "shadows": [
       {
-        "name": "floating-chrome",
-        "value": "0 25px 50px -12px rgb(0 0 0 / 0.5)",
-        "purpose": "Tab bar and modals: elements that float over content."
+        "name": "glass-top-edge",
+        "value": "inset 0 1px 0 rgb(241 230 210 / 0.06)",
+        "purpose": "Every summary panel: light catching the glass edge."
       },
       {
-        "name": "hero-card",
-        "value": "0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)",
-        "purpose": "The overview card only."
+        "name": "dropdown",
+        "value": "0 18px 40px -12px rgb(0 0 0 / 0.7)",
+        "purpose": "The More picker panel."
       },
       {
-        "name": "accent-lift",
-        "value": "0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)",
-        "purpose": "Primary and danger buttons, active tab (tinted indigo-950 at 40%)."
+        "name": "sheet",
+        "value": "0 -24px 60px -20px rgb(0 0 0 / 0.8)",
+        "purpose": "Bottom sheet, cast upward."
       },
       {
-        "name": "inset-well",
-        "value": "inset 0 2px 4px rgb(0 0 0 / 0.05)",
-        "purpose": "Category emoji avatars."
+        "name": "toast",
+        "value": "0 10px 30px -10px rgb(0 0 0 / 0.8)",
+        "purpose": "The update notice."
+      },
+      {
+        "name": "notch-ring",
+        "value": "0 0 0 2px var(--color-ground)",
+        "purpose": "Ground-coloured knockout around the stripe's pace notch; not a glow."
+      },
+      {
+        "name": "sheet-backdrop",
+        "value": "background: rgb(8 5 4 / 0.72); backdrop-filter: blur(3px)",
+        "purpose": "Scrim behind the bottom sheet."
+      },
+      {
+        "name": "lamplight",
+        "value": "radial-gradient(ellipse 70% 100% at 50% 0%, rgb(229 112 58 / 0.07), rgb(229 112 58 / 0) 70%)",
+        "purpose": "Fixed 420px warm wash behind the top of every screen; the only ambient light."
       }
     ],
     "motion": [
       {
-        "name": "press",
-        "value": "transform: scale(0.98)",
-        "purpose": "Active state on buttons and rows; 0.95 on small round controls and tabs."
+        "name": "ease-out-expo",
+        "value": "cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "The single curve for entrances and overlays."
       },
       {
-        "name": "duration-quick",
+        "name": "stripe-in",
+        "value": "scaleX(0) to scaleX(1), 700ms ease-out-expo, bands staggered 0 / 70 / 140ms",
+        "purpose": "The one authored entrance on page content: the summary stripe only."
+      },
+      {
+        "name": "sheet-up",
+        "value": "translateY(24px) and opacity 0 to rest, 380ms ease-out-expo",
+        "purpose": "Bottom sheet opening."
+      },
+      {
+        "name": "fade-in",
+        "value": "translateY(8px) scale(0.98) and opacity 0 to rest, 240ms ease-out-expo",
+        "purpose": "Dialog cards settling in."
+      },
+      {
+        "name": "state-colour",
         "value": "150ms",
-        "purpose": "Default for pills, buttons and colour changes."
+        "purpose": "Colour and border changes on pills, segments, tabs and buttons."
       },
       {
-        "name": "duration-standard",
-        "value": "200ms",
-        "purpose": "Tab switches and card state changes."
-      },
-      {
-        "name": "duration-bar",
+        "name": "row-dim",
         "value": "300ms",
-        "purpose": "Budget progress bar width."
+        "purpose": "Sibling rows dimming when one expands."
       },
       {
-        "name": "duration-expand",
-        "value": "400ms",
-        "purpose": "Overview card chevron rotation."
+        "name": "stripe-width",
+        "value": "500ms ease-out",
+        "purpose": "Stripe fill changing with data."
+      },
+      {
+        "name": "reduced-motion",
+        "value": "animation-duration and transition-duration 0.01ms",
+        "purpose": "Global collapse under prefers-reduced-motion: reduce."
       }
     ],
     "breakpoints": [
       {
         "name": "base",
         "value": "0px",
-        "note": "Single column, max-width 448px, 16px gutter."
-      },
-      {
-        "name": "md",
-        "value": "768px",
-        "note": "Column widens to 768px with 32px padding."
+        "note": "A single centred column, max 512px, 16px gutters, safe-area aware. It does not widen on desktop."
       }
     ]
   },
@@ -462,136 +479,136 @@
       "name": "Primary Button",
       "kind": "button",
       "refersTo": "button-primary",
-      "description": "Full-width Save / Submit action at the end of a form. One per screen.",
-      "html": "<button class=\"ds-btn-primary\">Save transaction</button>",
-      "css": ".ds-btn-primary { width: 100%; padding: 12px 16px; border: none; border-radius: 12px; background: linear-gradient(to bottom right, oklch(58.5% 0.233 277.117), oklch(54.1% 0.281 293.009)); color: #fff; font: 600 14px/20px ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji'; box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1); cursor: pointer; transition: transform 150ms, opacity 150ms; } .ds-btn-primary:active { transform: scale(0.98); } .ds-btn-primary:focus-visible { outline: none; box-shadow: 0 0 0 2px oklch(13% 0.028 261.692), 0 0 0 4px oklch(58.5% 0.233 277.117 / 0.6); } .ds-btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }"
+      "description": "The one solid ember action at the foot of a form or empty state.",
+      "html": "<button class=\"ds-btn-primary\">Save expense</button>",
+      "css": ".ds-btn-primary { min-height: 48px; padding: 0 16px; border: none; border-radius: 12px; background: var(--color-ember, #e5703a); color: var(--color-ground, #120d0a); font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif; font-size: 15px; font-weight: 600; cursor: pointer; transition: background-color 150ms, transform 150ms; } .ds-btn-primary:hover { background: var(--color-ember-ink, #ee7d48); } .ds-btn-primary:active { transform: scale(0.99); } .ds-btn-primary:focus-visible { outline: 2px solid var(--color-ember, #e5703a); outline-offset: 2px; } .ds-btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }"
     },
     {
       "name": "Secondary Button",
       "kind": "button",
       "refersTo": "button-secondary",
-      "description": "Cancel and neutral actions, often paired 50/50 with a primary or danger button.",
-      "html": "<button class=\"ds-btn-secondary\">Cancel</button>",
-      "css": ".ds-btn-secondary { padding: 10px 16px; border-radius: 12px; border: 1px solid oklch(37.3% 0.034 259.733 / 0.8); background: oklch(27.8% 0.033 256.848); color: oklch(87.2% 0.01 258.338); font: 600 12px/16px ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji'; cursor: pointer; transition: transform 150ms, background 150ms; } .ds-btn-secondary:hover { background: oklch(37.3% 0.034 259.733); } .ds-btn-secondary:active { transform: scale(0.98); } .ds-btn-secondary:focus-visible { outline: none; box-shadow: 0 0 0 2px oklch(58.5% 0.233 277.117 / 0.6); }"
+      "description": "Outline action: Try again, Edit trip, Splitz.",
+      "html": "<button class=\"ds-btn-secondary\">Try again</button>",
+      "css": ".ds-btn-secondary { min-height: 44px; padding: 0 14px; border: 1px solid var(--color-edge, #3d2f25); border-radius: 12px; background: transparent; color: var(--color-ink-2, #d3c6b1); font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif; font-size: 13px; font-weight: 500; cursor: pointer; transition: color 150ms, border-color 150ms; } .ds-btn-secondary:hover { border-color: var(--color-ink-4, #95836f); color: var(--color-ink, #f1e6d2); } .ds-btn-secondary:focus-visible { outline: 2px solid var(--color-ember, #e5703a); outline-offset: 2px; }"
     },
     {
-      "name": "Danger Button",
+      "name": "Destructive Button",
       "kind": "button",
       "refersTo": "button-danger",
-      "description": "Confirms destructive actions (delete, decline) inside confirm dialogs.",
-      "html": "<button class=\"ds-btn-danger\">Delete</button>",
-      "css": ".ds-btn-danger { padding: 10px 16px; border: none; border-radius: 12px; background: linear-gradient(to bottom right, oklch(63.7% 0.237 25.331), oklch(58.6% 0.253 17.585)); color: #fff; font: 600 12px/16px ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji'; box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1); cursor: pointer; transition: transform 150ms; } .ds-btn-danger:active { transform: scale(0.98); } .ds-btn-danger:focus-visible { outline: none; box-shadow: 0 0 0 2px oklch(63.7% 0.237 25.331 / 0.5); }"
+      "description": "Delete in edit forms: a cherry outline, never a solid red fill.",
+      "html": "<button class=\"ds-btn-danger\">Delete expense</button>",
+      "css": ".ds-btn-danger { min-height: 48px; padding: 0 16px; border: 1px solid rgb(240 86 107 / 0.35); border-radius: 12px; background: transparent; color: var(--color-cherry, #f0566b); font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif; font-size: 15px; font-weight: 600; cursor: pointer; transition: background-color 150ms; } .ds-btn-danger:hover { background: rgb(58 20 24 / 0.5); } .ds-btn-danger:focus-visible { outline: 2px solid var(--color-ember, #e5703a); outline-offset: 2px; }"
     },
     {
-      "name": "Selector Pills",
+      "name": "Period Pills",
       "kind": "chip",
-      "refersTo": "pill",
-      "description": "Month, trip and filter selectors; one selected at a time, with a dashed teal More picker.",
-      "html": "<div class=\"ds-pill-row\"><button class=\"ds-pill\">Sep</button><button class=\"ds-pill ds-pill--active\">Oct</button><button class=\"ds-pill\">Nov</button><button class=\"ds-pill-more\"><svg width=\"14\" height=\"14\" viewBox=\"0 0 20 20\" fill=\"currentColor\"><path fill-rule=\"evenodd\" clip-rule=\"evenodd\" d=\"M5.75 2a.75.75 0 01.75.75V4h7V2.75a.75.75 0 011.5 0V4h.25A2.75 2.75 0 0118 6.75v8.5A2.75 2.75 0 0115.25 18H4.75A2.75 2.75 0 012 15.25v-8.5A2.75 2.75 0 014.75 4H5V2.75A.75.75 0 015.75 2zm-1 5.5c-.69 0-1.25.56-1.25 1.25v6.5c0 .69.56 1.25 1.25 1.25h10.5c.69 0 1.25-.56 1.25-1.25v-6.5c0-.69-.56-1.25-1.25-1.25H4.75z\"/></svg>More</button></div>",
-      "css": ".ds-pill-row { display: flex; gap: 8px; } .ds-pill, .ds-pill-more { padding: 8px 16px; border-radius: 12px; border: 1px solid oklch(27.8% 0.033 256.848); background: oklch(21% 0.034 264.665); color: oklch(70.7% 0.022 261.325); font: 400 12px/16px ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji'; white-space: nowrap; cursor: pointer; transition: all 150ms; } .ds-pill:hover { border-color: oklch(37.3% 0.034 259.733); } .ds-pill--active, .ds-pill--active:hover { background: oklch(51.1% 0.262 276.966); border-color: oklch(58.5% 0.233 277.117); color: #fff; font-weight: 500; } .ds-pill-more { display: inline-flex; align-items: center; gap: 4px; padding: 8px 10px; border-style: dashed; border-color: oklch(60% 0.118 184.704 / 0.5); background: oklch(70.4% 0.14 182.503 / 0.1); color: oklch(87.2% 0.01 258.338); } .ds-pill-more:hover { border-color: oklch(70.4% 0.14 182.503 / 0.7); background: oklch(70.4% 0.14 182.503 / 0.15); } .ds-pill:focus-visible, .ds-pill-more:focus-visible { outline: none; box-shadow: 0 0 0 2px oklch(58.5% 0.233 277.117 / 0.6); }"
+      "refersTo": "pill-active",
+      "description": "Recent months or trips sharing one row, with a dashed More picker.",
+      "html": "<div class=\"ds-pills\"><button class=\"ds-pill ds-pill--on\">Nov 2026</button><button class=\"ds-pill\">Oct 2026</button><button class=\"ds-pill\">Sep 2026</button><button class=\"ds-pill ds-pill--more\">More <svg width=\"12\" height=\"12\" viewBox=\"0 0 20 20\" fill=\"currentColor\" aria-hidden=\"true\"><path fill-rule=\"evenodd\" d=\"M5.23 7.21a.75.75 0 011.06.02L10 11.17l3.71-3.94a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z\" clip-rule=\"evenodd\"/></svg></button></div>",
+      "css": ".ds-pills { display: flex; gap: 8px; max-width: 360px; } .ds-pill { flex: 1 1 0; min-width: 0; min-height: 44px; padding: 0 12px; border: 1px solid var(--color-edge, #3d2f25); border-radius: 12px; background: transparent; color: var(--color-ink-2, #d3c6b1); font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif; font-size: 13px; font-weight: 500; white-space: nowrap; cursor: pointer; transition: color 150ms, border-color 150ms; } .ds-pill:hover { border-color: var(--color-ink-4, #95836f); color: var(--color-ink, #f1e6d2); } .ds-pill--on, .ds-pill--on:hover { background: var(--color-ember, #e5703a); border-color: var(--color-ember, #e5703a); color: var(--color-ground, #120d0a); } .ds-pill--more { flex: 1.3 1 0; display: inline-flex; align-items: center; justify-content: center; gap: 4px; border-style: dashed; } .ds-pill:focus-visible { outline: 2px solid var(--color-ember, #e5703a); outline-offset: 2px; }"
+    },
+    {
+      "name": "Segmented Switch",
+      "kind": "chip",
+      "refersTo": "segment-active",
+      "description": "Month / Trips / One-offs inside Budget; the same frame groups Categories / Months and the one-offs filter.",
+      "html": "<div class=\"ds-seg\" role=\"group\" aria-label=\"Period\"><button class=\"ds-seg-btn ds-seg-btn--on\" aria-pressed=\"true\">Month</button><button class=\"ds-seg-btn\" aria-pressed=\"false\">Trips</button><button class=\"ds-seg-btn\" aria-pressed=\"false\">One-offs</button></div>",
+      "css": ".ds-seg { display: grid; grid-template-columns: repeat(3, 1fr); padding: 2px; border: 1px solid var(--color-edge, #3d2f25); border-radius: 12px; max-width: 360px; } .ds-seg-btn { min-height: 40px; border: none; border-radius: 10px; background: transparent; color: var(--color-ink-3, #b0a08c); font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif; font-size: 14px; font-weight: 500; cursor: pointer; transition: color 150ms, background-color 150ms; } .ds-seg-btn:hover { color: var(--color-ink, #f1e6d2); } .ds-seg-btn--on { background: rgb(229 112 58 / 0.2); color: var(--color-ink, #f1e6d2); box-shadow: inset 0 0 0 1px rgb(229 112 58 / 0.6); } .ds-seg-btn:focus-visible { outline: 2px solid var(--color-ember, #e5703a); outline-offset: 2px; }"
     },
     {
       "name": "Text Field",
       "kind": "input",
       "refersTo": "input",
-      "description": "Labelled form field used throughout Create, Edit and Settings.",
-      "html": "<label class=\"ds-field\"><span class=\"ds-field-label\">Description</span><input class=\"ds-input\" placeholder=\"e.g. Groceries\" /></label>",
-      "css": ".ds-field { display: flex; flex-direction: column; gap: 6px; } .ds-field-label { color: oklch(70.7% 0.022 261.325); font: 500 12px/16px ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji'; } .ds-input { padding: 10px 12px; border-radius: 12px; border: 1px solid oklch(27.8% 0.033 256.848); background: oklch(27.8% 0.033 256.848 / 0.6); color: oklch(96.7% 0.003 264.542); font: 400 14px/20px ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji'; outline: none; transition: box-shadow 150ms; } .ds-input::placeholder { color: oklch(44.6% 0.03 256.802); } .ds-input:focus { box-shadow: 0 0 0 2px oklch(58.5% 0.233 277.117 / 0.6); }"
+      "description": "Labelled field on smoked glass; the border turns ember on focus.",
+      "html": "<label class=\"ds-field\">Email<input class=\"ds-input\" type=\"email\" placeholder=\"you@example.com\"></label>",
+      "css": ".ds-field { display: flex; flex-direction: column; gap: 6px; max-width: 320px; color: var(--color-ink-2, #d3c6b1); font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif; font-size: 13px; font-weight: 500; } .ds-input { min-height: 48px; padding: 0 14px; border: 1px solid var(--color-edge, #3d2f25); border-radius: 12px; background: var(--color-panel, #1c1511); color: var(--color-ink, #f1e6d2); font-family: inherit; font-size: 16px; outline: none; caret-color: var(--color-ember, #e5703a); transition: border-color 150ms; } .ds-input::placeholder { color: var(--color-ink-4, #95836f); opacity: 1; } .ds-input:focus { border-color: var(--color-ember, #e5703a); }"
     },
     {
-      "name": "Floating Tab Bar",
+      "name": "Docked Tab Bar",
       "kind": "nav",
       "refersTo": "tab-bar",
-      "description": "The five-tab admin navigation, floating 16px above the bottom edge.",
-      "html": "<nav class=\"ds-tabbar\"><button class=\"ds-tab ds-tab--active\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.75\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><rect x=\"3.5\" y=\"4.5\" width=\"17\" height=\"16\" rx=\"2.5\"/><line x1=\"3.5\" y1=\"9.5\" x2=\"20.5\" y2=\"9.5\"/><line x1=\"8\" y1=\"2.5\" x2=\"8\" y2=\"6.5\"/><line x1=\"16\" y1=\"2.5\" x2=\"16\" y2=\"6.5\"/></svg>Monthly</button><button class=\"ds-tab\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.75\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M12 2 2 7l10 5 10-5-10-5z\"/><path d=\"M2 17l10 5 10-5\"/><path d=\"M2 12l10 5 10-5\"/></svg>SumUp</button><button class=\"ds-tab\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.75\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><line x1=\"12\" y1=\"5\" x2=\"12\" y2=\"19\"/><line x1=\"5\" y1=\"12\" x2=\"19\" y2=\"12\"/></svg>Create</button><button class=\"ds-tab\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.75\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M13 2 3 14h7l-1 8 10-12h-7l1-8z\"/></svg>OneOffs</button><button class=\"ds-tab\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.75\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><line x1=\"5\" y1=\"20\" x2=\"5\" y2=\"11\"/><line x1=\"12\" y1=\"20\" x2=\"12\" y2=\"5\"/><line x1=\"19\" y1=\"20\" x2=\"19\" y2=\"14\"/></svg>Charts</button></nav>",
-      "css": ".ds-tabbar { display: inline-flex; align-items: center; gap: 4px; padding: 6px; border-radius: 9999px; background: oklch(21% 0.034 264.665 / 0.7); border: 1px solid oklch(27.8% 0.033 256.848 / 0.7); backdrop-filter: blur(24px); box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.5); } .ds-tab { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 8px 14px; border: none; border-radius: 9999px; background: transparent; color: oklch(70.7% 0.022 261.325); font: 500 10px/14px ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji'; cursor: pointer; transition: all 200ms; } .ds-tab svg { width: 18px; height: 18px; } .ds-tab:hover { color: oklch(92.8% 0.006 264.531); } .ds-tab:active { transform: scale(0.95); } .ds-tab--active, .ds-tab--active:hover { background: linear-gradient(to bottom right, oklch(58.5% 0.233 277.117), oklch(54.1% 0.281 293.009)); color: #fff; box-shadow: 0 10px 15px -3px oklch(25.7% 0.09 281.288 / 0.4); } .ds-tab:focus-visible { outline: none; box-shadow: 0 0 0 2px oklch(58.5% 0.233 277.117 / 0.6); }"
+      "description": "Four tabs on smoked glass, docked to the bottom edge; an ember rule tops the current one.",
+      "html": "<nav class=\"ds-tabs\" aria-label=\"Main\"><button class=\"ds-tab ds-tab--on\" aria-current=\"page\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.7\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M3.5 7.5h17M3.5 12h17M3.5 16.5h10\"/></svg>Budget</button><button class=\"ds-tab\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.7\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M12 2 2 7l10 5 10-5-10-5z\"/><path d=\"M2 17l10 5 10-5\"/><path d=\"M2 12l10 5 10-5\"/></svg>All time</button><button class=\"ds-tab\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.7\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"12\" r=\"9\"/><path d=\"M12 8v8M8 12h8\"/></svg>Add</button><button class=\"ds-tab\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.7\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M5 20V11M12 20V5M19 20v-6\"/></svg>Charts</button></nav>",
+      "css": ".ds-tabs { display: flex; max-width: 390px; border-top: 1px solid rgb(241 230 210 / 0.1); background: rgb(28 21 17 / 0.9); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); } .ds-tab { position: relative; flex: 1; min-height: 54px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; border: none; background: transparent; color: var(--color-ink-3, #b0a08c); font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif; font-size: 11px; font-weight: 500; cursor: pointer; transition: color 150ms; } .ds-tab svg { width: 22px; height: 22px; } .ds-tab:hover { color: var(--color-ink, #f1e6d2); } .ds-tab--on, .ds-tab--on:hover { color: var(--color-ember-ink, #ee7d48); } .ds-tab--on::before { content: ''; position: absolute; top: 0; left: 24px; right: 24px; height: 2px; border-radius: 0 0 9999px 9999px; background: var(--color-ember, #e5703a); } .ds-tab:focus-visible { outline: 2px solid var(--color-ember, #e5703a); outline-offset: -2px; }"
     },
     {
-      "name": "Overview Card",
+      "name": "Month Summary Panel",
       "kind": "card",
-      "refersTo": "card",
-      "description": "The month at a glance: spent and saved hero figures with breakdown lines.",
-      "html": "<section class=\"ds-card\"><div class=\"ds-card-cols\"><div><span class=\"ds-card-label\">Total Spent</span><div class=\"ds-hero\">€1,284.50</div><div class=\"ds-line\"><span>Monthly Expenses:</span><span>€1,104.50</span></div></div><div><span class=\"ds-card-label\">Total Saved</span><div class=\"ds-hero ds-hero--saved\">€915.50</div><div class=\"ds-line\"><span>Wage:</span><span>€2,200.00</span></div></div></div></section>",
-      "css": ".ds-card { padding: 20px; border-radius: 16px; border: 1px solid oklch(27.8% 0.033 256.848); background: linear-gradient(to bottom right, oklch(21% 0.034 264.665), oklch(21% 0.034 264.665), oklch(25.7% 0.09 281.288 / 0.5)); box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1); } .ds-card-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; } .ds-card-label { display: block; color: oklch(70.7% 0.022 261.325); font: 500 12px/16px ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji'; text-transform: uppercase; letter-spacing: 0.05em; } .ds-hero { margin-top: 4px; color: #fff; font: 800 30px/36px ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji'; letter-spacing: -0.025em; font-variant-numeric: tabular-nums; } .ds-hero--saved { color: oklch(76.5% 0.177 163.223); } .ds-line { display: flex; justify-content: space-between; gap: 8px; margin-top: 10px; font: 500 11px/16px ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji'; color: oklch(87.2% 0.01 258.338); font-variant-numeric: tabular-nums; } .ds-line span:first-child { color: oklch(55.1% 0.027 264.364); font-size: 10px; }"
+      "refersTo": "summary-panel",
+      "description": "The only panel on the page: money left, days to go, the large stripe notched at today, and saved.",
+      "html": "<section class=\"ds-sum\"><div class=\"ds-sum-top\"><div><p class=\"ds-sum-hero\">€832.01</p><p class=\"ds-sum-cap\">left to spend</p></div><div class=\"ds-sum-side\"><p class=\"ds-sum-days\">25</p><p class=\"ds-sum-meta\">days to go</p></div></div><div class=\"ds-stripe-lg\" style=\"--fill:37%;--notch:17%\"><span class=\"ds-today\">Today</span><i></i><i></i><i></i><b></b></div><p class=\"ds-sum-pace\">Spent €497.99 of €1,330.00 · <strong>€231.99 ahead of pace</strong></p><div class=\"ds-sum-saved\"><span>Saved from monthly budget</span><span class=\"ds-sum-good\">€1,102.01</span></div></section>",
+      "css": ".ds-sum { max-width: 360px; padding: 16px 20px 20px; border: 1px solid rgb(241 230 210 / 0.1); border-radius: 16px; background: var(--color-panel, #1c1511); box-shadow: inset 0 1px 0 rgb(241 230 210 / 0.06); color: var(--color-ink, #f1e6d2); font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif; } .ds-sum p { margin: 0; } .ds-sum-top { display: flex; justify-content: space-between; gap: 16px; } .ds-sum-hero { font-family: 'Archivo', ui-sans-serif, system-ui, sans-serif; font-stretch: 125%; font-variant-numeric: tabular-nums; font-size: 40px; font-weight: 700; line-height: 1; letter-spacing: -0.02em; } .ds-sum .ds-sum-cap { margin-top: 8px; font-size: 14px; color: var(--color-ink-2, #d3c6b1); } .ds-sum-side { padding-top: 4px; text-align: right; } .ds-sum-days { font-family: 'Archivo', ui-sans-serif, system-ui, sans-serif; font-stretch: 125%; font-variant-numeric: tabular-nums; font-size: 20px; font-weight: 600; line-height: 1; } .ds-sum .ds-sum-meta { margin-top: 6px; font-size: 12px; color: var(--color-ink-3, #b0a08c); } .ds-stripe-lg { margin-top: 12px; } .ds-stripe-lg { position: relative; display: flex; flex-direction: column; gap: 3px; padding: 22px 0 6px; } .ds-stripe-lg i { display: block; height: 5px; border-radius: 9999px; background: linear-gradient(to right, var(--band) var(--fill), rgb(241 230 210 / 0.07) var(--fill)); } .ds-stripe-lg i:nth-of-type(1) { --band: #e5703a; } .ds-stripe-lg i:nth-of-type(2) { --band: #b4482a; } .ds-stripe-lg i:nth-of-type(3) { --band: #7a3b22; } .ds-stripe-lg.ds-over i:nth-of-type(1) { --band: #f0566b; } .ds-stripe-lg.ds-over i:nth-of-type(2) { --band: #a8283b; } .ds-stripe-lg.ds-over i:nth-of-type(3) { --band: rgb(168 40 59 / 0.55); } .ds-stripe-lg b { position: absolute; top: 16px; bottom: 0; left: var(--notch); width: 2px; transform: translateX(-50%); border-radius: 9999px; background: var(--color-ink, #f1e6d2); box-shadow: 0 0 0 2px var(--color-ground, #120d0a); } .ds-today { position: absolute; top: 0; left: var(--notch); transform: translateX(-50%); font-size: 11px; line-height: 1; color: var(--color-ink-2, #d3c6b1); } .ds-sum .ds-sum-pace { margin-top: 8px; font-size: 13px; color: var(--color-ink-2, #d3c6b1); font-variant-numeric: tabular-nums; } .ds-sum-pace strong { color: var(--color-ember-ink, #ee7d48); font-weight: 600; } .ds-sum-saved { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin-top: 16px; padding-top: 12px; border-top: 1px solid rgb(241 230 210 / 0.1); font-size: 13px; color: var(--color-ink-2, #d3c6b1); } .ds-sum-good { font-family: 'Archivo', ui-sans-serif, system-ui, sans-serif; font-stretch: 125%; font-variant-numeric: tabular-nums; font-size: 16px; font-weight: 600; color: var(--color-avocado, #8fa35a); }"
     },
     {
-      "name": "Category Row",
+      "name": "Breakdown Row",
       "kind": "custom",
-      "refersTo": "category-row",
-      "description": "Monthly readout row: emoji avatar in its category tint, amount, and budget progress bar.",
-      "html": "<div class=\"ds-cat\"><div class=\"ds-cat-top\"><span class=\"ds-cat-avatar\">🛒</span><span class=\"ds-cat-name\">Supermarket</span><span class=\"ds-cat-amt\">€312.40</span></div><div class=\"ds-track\"><div class=\"ds-fill\" style=\"width:62%\"></div></div><div class=\"ds-cat-meta\">14 transactions</div></div>",
-      "css": ".ds-cat { padding: 6px 12px; border-radius: 12px; border: 1px solid oklch(27.8% 0.033 256.848 / 0.6); background: oklch(98.7% 0.022 95.277 / 0.05); } .ds-cat-top { display: flex; align-items: center; gap: 8px; } .ds-cat-avatar { display: flex; width: 32px; height: 32px; align-items: center; justify-content: center; border-radius: 9999px; font-size: 14px; background: oklch(69.6% 0.17 162.48 / 0.15); border: 1px solid oklch(76.5% 0.177 163.223 / 0.2); box-shadow: inset 0 2px 4px rgb(0 0 0 / 0.05); } .ds-cat-name { flex: 1; color: oklch(87.2% 0.01 258.338); font: 500 14px/20px ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji'; } .ds-cat-amt { color: #fff; font: 400 13px/18px ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji'; font-variant-numeric: tabular-nums; } .ds-track { margin-top: 10px; height: 8px; border-radius: 9999px; background: oklch(27.8% 0.033 256.848); overflow: hidden; } .ds-fill { height: 100%; border-radius: 9999px; background: linear-gradient(to right, oklch(58.5% 0.233 277.117), oklch(60.6% 0.25 292.717)); transition: width 300ms; } .ds-fill--over { background: linear-gradient(to right, oklch(57.7% 0.245 27.325), oklch(45.5% 0.188 13.697)); } .ds-cat-meta { margin-top: 6px; color: oklch(70.7% 0.022 261.325); font: 400 10px/14px ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji'; }"
-    },
-    {
-      "name": "Status Badge",
-      "kind": "chip",
-      "refersTo": "badge-saved",
-      "description": "Inline tinted badge for budget status: emerald for under budget, indigo for remaining.",
-      "html": "<span class=\"ds-badge ds-badge--saved\">€87.60 under</span> <span class=\"ds-badge ds-badge--info\">€40.00 left</span>",
-      "css": ".ds-badge { display: inline-flex; align-items: center; gap: 4px; padding: 2px 10px; border-radius: 6px; font: 600 12px/16px ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji'; font-variant-numeric: tabular-nums; } .ds-badge--saved { background: oklch(69.6% 0.17 162.48 / 0.15); color: oklch(84.5% 0.143 164.978); border: 1px solid oklch(69.6% 0.17 162.48 / 0.3); } .ds-badge--info { background: oklch(58.5% 0.233 277.117 / 0.15); color: oklch(78.5% 0.115 274.713); border: 1px solid oklch(58.5% 0.233 277.117 / 0.3); }"
+      "refersTo": "breakdown-row",
+      "description": "A category on the ground between hairlines: label, amount over budget, the thin triple stripe with its pace notch, and a status line.",
+      "html": "<div class=\"ds-rows\"><button class=\"ds-row\"><span class=\"ds-row-top\"><span class=\"ds-row-name\">Eating out</span><span class=\"ds-row-amt\">€142.10 <em>/ €130.00</em></span></span><span class=\"ds-stripe-sm ds-over\" style=\"--fill:100%;--notch:17%\"><i></i><i></i><i></i><b></b></span><span class=\"ds-row-foot\"><span class=\"ds-st-over\">€12.10 over</span><span>3 transactions <svg width=\"12\" height=\"12\" viewBox=\"0 0 20 20\" fill=\"currentColor\" aria-hidden=\"true\"><path fill-rule=\"evenodd\" d=\"M5.23 7.21a.75.75 0 011.06.02L10 11.17l3.71-3.94a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z\" clip-rule=\"evenodd\"/></svg></span></span></button><button class=\"ds-row\"><span class=\"ds-row-top\"><span class=\"ds-row-name\">Takeaway</span><span class=\"ds-row-amt\">€38.50 <em>/ €100.00</em></span></span><span class=\"ds-stripe-sm\" style=\"--fill:38%;--notch:17%\"><i></i><i></i><i></i><b></b></span><span class=\"ds-row-foot\"><span class=\"ds-st-ahead\">€18.50 ahead of pace</span><span>2 transactions <svg width=\"12\" height=\"12\" viewBox=\"0 0 20 20\" fill=\"currentColor\" aria-hidden=\"true\"><path fill-rule=\"evenodd\" d=\"M5.23 7.21a.75.75 0 011.06.02L10 11.17l3.71-3.94a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z\" clip-rule=\"evenodd\"/></svg></span></span></button><button class=\"ds-row\"><span class=\"ds-row-top\"><span class=\"ds-row-name\">Cats</span><span class=\"ds-row-amt\">€8.99 <em>/ €50.00</em></span></span><span class=\"ds-stripe-sm\" style=\"--fill:18%;--notch:17%\"><i></i><i></i><i></i><b></b></span><span class=\"ds-row-foot\"><span class=\"ds-st-ok\">€41.01 left</span><span>1 transaction <svg width=\"12\" height=\"12\" viewBox=\"0 0 20 20\" fill=\"currentColor\" aria-hidden=\"true\"><path fill-rule=\"evenodd\" d=\"M5.23 7.21a.75.75 0 011.06.02L10 11.17l3.71-3.94a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z\" clip-rule=\"evenodd\"/></svg></span></span></button></div>",
+      "css": ".ds-rows { max-width: 360px; border-top: 1px solid rgb(241 230 210 / 0.1); } .ds-row { display: block; width: 100%; min-height: 56px; padding: 10px 0; border: none; border-bottom: 1px solid rgb(241 230 210 / 0.1); background: transparent; text-align: left; color: var(--color-ink, #f1e6d2); font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif; cursor: pointer; } .ds-row:focus-visible { outline: 2px solid var(--color-ember, #e5703a); outline-offset: 2px; } .ds-row-top, .ds-row-foot { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; } .ds-row-name { font-size: 15px; font-weight: 500; } .ds-row-amt { font-size: 13px; font-variant-numeric: tabular-nums; } .ds-row-amt em { font-style: normal; color: var(--color-ink-3, #b0a08c); } .ds-stripe-sm { margin-top: 4px; } .ds-stripe-sm { position: relative; display: flex; flex-direction: column; gap: 1px; padding: 4px 0 4px; } .ds-stripe-sm i { display: block; height: 2px; border-radius: 9999px; background: linear-gradient(to right, var(--band) var(--fill), rgb(241 230 210 / 0.07) var(--fill)); } .ds-stripe-sm i:nth-of-type(1) { --band: #e5703a; } .ds-stripe-sm i:nth-of-type(2) { --band: #b4482a; } .ds-stripe-sm i:nth-of-type(3) { --band: #7a3b22; } .ds-stripe-sm.ds-over i:nth-of-type(1) { --band: #f0566b; } .ds-stripe-sm.ds-over i:nth-of-type(2) { --band: #a8283b; } .ds-stripe-sm.ds-over i:nth-of-type(3) { --band: rgb(168 40 59 / 0.55); } .ds-stripe-sm b { position: absolute; top: 0; bottom: 0; left: var(--notch); width: 2px; transform: translateX(-50%); border-radius: 9999px; background: var(--color-ink, #f1e6d2); box-shadow: 0 0 0 2px var(--color-ground, #120d0a); } .ds-row-foot { font-size: 12px; color: var(--color-ink-3, #b0a08c); } .ds-st-over { color: var(--color-cherry, #f0566b); font-weight: 600; } .ds-st-ahead { color: var(--color-ember-ink, #ee7d48); font-weight: 600; } .ds-st-ok { color: var(--color-avocado, #8fa35a); }"
     }
   ],
   "narrative": {
-    "northStar": "The Pocket Console",
-    "overview": "A compact control panel held in one hand. The app is a dense, dark readout of one household's month: a stack of low-light gray panels, small precise type, and numbers set in tabular figures so columns of euros line up. Controls float above the content as glassy, rounded objects (the pill tab bar, modals) and respond to a press by shrinking slightly, like physical buttons.\n\nColour is functional. One accent, **Signal Indigo** (blending into violet on gradients), marks what is selected or what will act. Emerald means money kept, red means money over, amber means waiting. Everything else is gray, so the moment a hue appears it carries meaning. The only place colour is used for personality is the category set, where each category gets its own soft tinted circle with an emoji.\n\nThe feel is compact and efficient, polished and modern. Density is deliberate: a phone screen should show the whole month's picture with minimal scrolling. Polish comes from consistent radii, translucent layering, hairline borders and small press animations, not from decoration.",
+    "northStar": "Teak & Smoked Glass",
+    "overview": "The app is a walnut room at night, lit by one low lamp. The page is near-black wood, the few raised surfaces are smoked glass, and all the writing is in cream. Most of the screen is quiet: lists sit straight on the ground and are split by hairlines. Colour only shows up when it means something. The one thing with real personality is a triple racing stripe in burnt orange, rust and umber, which draws every budget bar in the app.\n\nIt is an installed iPhone PWA used one-handed, so it is dark-only and dense. A phone screen shows the month's headline, the stripe and most category rows without scrolling, and every control is still at least thumb-sized. Wide, flat-topped figures in Archivo carry the numbers and headings. The system UI face does the reading.\n\nThe world was chosen in place of the previous cool indigo-glass dashboard of equal cards, and it leaves that dashboard's habits behind: no gradients on controls, no floating pill tab bar and no coloured status tints on every row.",
     "keyCharacteristics": [
-      "Dark-only. Every surface is a step on one cool gray ramp.",
-      "One action colour (Signal Indigo), with semantic colours for saved, over-budget and pending.",
-      "Small type: most text is 10 to 12px; the month's headline figure is the largest thing on screen at 30px.",
-      "Tabular numbers for every amount.",
-      "Rounded, tactile controls (12px corners) that scale down on press.",
-      "Floating, blurred chrome (tab bar, modals) over tonally layered content."
+      "Dark-only. Walnut ground, two smoked-glass steps, cream ink in four tiers.",
+      "Colour carries meaning: ember for selection and action, avocado for on pace or money in, cherry for over budget.",
+      "Archivo at 125% width for figures and headings; system UI for body text; tabular figures everywhere.",
+      "The triple stripe, drawn on one fixed 0–100% scale with a cream notch at today's pace, is every budget bar.",
+      "Rows sit on the ground between hairlines. Panels are kept for period summaries and for chrome.",
+      "Every target is at least 44px. Every text tier is at least 4.5:1 on every surface."
     ],
     "rules": [
       {
-        "name": "The One Signal Rule",
-        "body": "Indigo means \"selected\" or \"this will act\". Do not use it for decoration, headings or data series that are not selectable.",
+        "name": "The Meaning Rule",
+        "body": "A hue appears only when it says something: ember means selected, acting or running ahead of pace; avocado means on pace or money kept; cherry means over or wrong. Everything else is walnut and cream.",
         "section": "colors"
       },
       {
-        "name": "The Money Colour Rule",
-        "body": "Emerald and red are claims about money (kept vs over) or validity (ok vs error). Never use them for anything else, and never show a money figure in emerald or red unless its sign or budget status warrants it.",
+        "name": "The No Yellow Rule",
+        "body": "No yellow, gold or amber anywhere, including the chart palette, and no neon or saturated glow. Warnings are ember-ink in semibold, not yellow.",
         "section": "colors"
       },
       {
-        "name": "The Tint, Don't Fill Rule",
-        "body": "Status and category colour appears as a translucent tint (500 at 10 to 20% fill, 200 or 300 text, 400 or 500 at 20 to 30% border). Solid saturated fills are reserved for the active tab, primary and danger buttons, and the selected pill.",
+        "name": "The Cream-Text Floor Rule",
+        "body": "Text uses only the four cream tiers or a status hue, and every pairing clears 4.5:1 on ground, panel and raised. Never create a dimmer text tone with opacity.",
         "section": "colors"
+      },
+      {
+        "name": "The Wide For Figures Rule",
+        "body": "Money headlines, panel figures and headings are set in wide Archivo. Running text, labels and list rows stay in the system face, and amounts in rows stay in the system face with tabular numbers.",
+        "section": "typography"
       },
       {
         "name": "The Tabular Rule",
-        "body": "Every money figure uses tabular numbers (`tabular-nums`), so amounts align in rows and do not jitter as they change.",
+        "body": "Every amount uses tabular figures, written as € with two decimals, so columns line up and numbers do not jitter.",
         "section": "typography"
       },
       {
-        "name": "The 30px Ceiling Rule",
-        "body": "Nothing is larger than the Display figure. If a new screen needs emphasis, use weight or colour, not a bigger size.",
-        "section": "typography"
-      },
-      {
-        "name": "The Float Earns the Shadow Rule",
-        "body": "Content sitting in the page flow is separated by tone and borders, never by shadow. Only elements that float over content (or the single hero card) get a shadow.",
+        "name": "The Float Earns The Shadow Rule",
+        "body": "Only sheets, dialogs, dropdowns and the toast cast a shadow, and it is always black. Nothing in the page flow casts one, and no shadow or halo is ever coloured.",
         "section": "elevation"
       }
     ],
     "dos": [
-      "Do use tabular numbers for every amount, and show money as `€` with two decimals.",
-      "Do mark every amount that stealth mode should hide with the `appSensitive` directive.",
-      "Do build new surfaces from the gray ramp: night base for the page, console panel for cards, raised slate for borders and fields.",
-      "Do use the indigo-to-violet gradient only for the primary action on a screen and the active tab.",
-      "Do apply status and category colour as tints (500 at 10 to 20%, 200 or 300 text, 400 or 500 border at 20 to 30%).",
-      "Do use 12px corners on controls and 16px on containers.",
-      "Do give every pressable element press feedback (`active:scale-[0.98]` or `0.95` for small round controls) and a 150 to 200ms transition.",
-      "Do keep 112px of bottom clearance on any scrolling page so the floating tab bar never covers content.",
-      "Do use the shared pill styles in `src/app/utils/pill-styles.ts` and category tints from `CATEGORY_META` instead of restyling them per component."
+      "Do draw every budget bar with the triple stripe on the fixed 0–100% scale, with the cream notch at pace when the period is current.",
+      "Do put list rows straight on the walnut ground, split by 10% cream hairlines.",
+      "Do keep every tappable thing at least 44px in its smallest dimension.",
+      "Do set money headlines and panel figures in wide Archivo, and every amount in tabular figures as € with two decimals.",
+      "Do mark every amount that stealth mode should hide with the sensitive directive.",
+      "Do use the shared pill styles for period and filter selectors instead of restyling them.",
+      "Do rank breakdowns by trouble: over, ahead, full, on pace, then quiet.",
+      "Do give a new surface a black shadow only if it floats over the page."
     ],
     "donts": [
-      "Don't add light surfaces or a light theme; the system is dark-only.",
-      "Don't use emerald or red for anything other than saved/over-budget money and valid/invalid states.",
-      "Don't introduce new action colours. The cyan on the sign-in button and the \"Updating...\" toast predates Signal Indigo; don't extend it.",
-      "Don't set any text larger than the 30px Display figure.",
-      "Don't put shadows on in-flow cards and rows; separate them with tone and hairline borders.",
-      "Don't use solid saturated fills for status or category; tint them."
+      "Don't use yellow, gold, amber, neon, or any coloured glow or halo.",
+      "Don't use ember, avocado or cherry for decoration, category identity or headings.",
+      "Don't wrap rows in cards, or put a card inside a panel. Panels are for period summaries, chrome and overlays.",
+      "Don't add a light theme or light surfaces.",
+      "Don't use a gradient fill on a button, tab or pill.",
+      "Don't add a second entrance animation to in-flow content, or animate the row stripes.",
+      "Don't set a text colour below cream 4, or dim text with opacity, except for the dimming of sibling rows behind an expanded one."
     ]
   }
 }

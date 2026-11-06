@@ -21,11 +21,11 @@ import { PrivacyService } from '../../services/privacy.service';
   template: `
     <div class="space-y-6">
       <div
-        class="bg-gray-900/60 border border-gray-800/80 rounded-2xl p-5 space-y-4 backdrop-blur-sm overflow-hidden select-none"
+        class="bg-panel/60 border border-raised/80 rounded-2xl p-5 space-y-4 overflow-hidden select-none"
       >
         <div class="flex items-center justify-between gap-3">
           <div>
-            <h3 class="text-sm font-semibold text-gray-100">
+            <h3 class="text-sm font-semibold text-ink">
               Monthly Allocated Budget Per Category
             </h3>
           </div>
@@ -33,7 +33,7 @@ import { PrivacyService } from '../../services/privacy.service';
           @if (!isEditing && !privacyService.isPrivacyMode()) {
             <button
               type="button"
-              class="rounded-lg border border-indigo-500/40 bg-indigo-500/10 px-2.5 py-1 text-[10px] font-medium uppercase tracking-wide text-indigo-200 transition hover:bg-indigo-500/20"
+              class="rounded-lg border border-ember/40 bg-ember/10 px-2.5 py-1 text-[11px] font-medium uppercase tracking-wide text-ember-soft transition hover:bg-ember/20"
               (click)="startEditing()"
             >
               Edit

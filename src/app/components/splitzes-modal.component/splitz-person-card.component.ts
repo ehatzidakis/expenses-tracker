@@ -3,11 +3,11 @@ import { PersonSummary } from '../../models/splitz.model';
 import { SensitiveDirective } from '../../utils/sensitive.directive';
 
 const AVATAR_CLASSES: Record<number, string> = {
-  1: 'bg-teal-600/20 border-teal-500/30 text-teal-400',
-  2: 'bg-amber-600/20 border-amber-500/30 text-amber-400',
-  3: 'bg-violet-600/20 border-violet-500/30 text-violet-400',
+  1: 'bg-ember/20 border-ember/30 text-ember-ink',
+  2: 'bg-ember/20 border-ember/30 text-ember-soft',
+  3: 'bg-ember/20 border-ember/30 text-ember-ink',
 };
-const DEFAULT_AVATAR = 'bg-gray-700/40 border-gray-600/40 text-gray-300';
+const DEFAULT_AVATAR = 'bg-edge/40 border-ink-4/40 text-ink-2';
 
 @Component({
   selector: 'app-splitz-person-card',
@@ -15,7 +15,7 @@ const DEFAULT_AVATAR = 'bg-gray-700/40 border-gray-600/40 text-gray-300';
   imports: [SensitiveDirective],
   host: { class: 'block' },
   template: `
-    <article class="rounded-xl border border-gray-800/80 bg-gray-950/30 px-3 py-3 space-y-2">
+    <article class="rounded-xl border border-raised/80 bg-ground/30 px-3 py-3 space-y-2">
       <div class="flex items-center justify-between gap-3">
         <div class="flex items-center gap-3 min-w-0">
           <div
@@ -24,17 +24,17 @@ const DEFAULT_AVATAR = 'bg-gray-700/40 border-gray-600/40 text-gray-300';
           >
             {{ initials() }}
           </div>
-          <p class="truncate text-sm font-semibold text-gray-100">{{ summary().person.name }}</p>
+          <p class="truncate text-sm font-semibold text-ink">{{ summary().person.name }}</p>
         </div>
 
         <span
           class="shrink-0 px-3 py-1 rounded-full text-xs font-semibold tabular-nums"
-          [class.bg-emerald-500/15]="net() > 0"
-          [class.text-emerald-400]="net() > 0"
-          [class.bg-amber-500/15]="net() < 0"
-          [class.text-amber-400]="net() < 0"
-          [class.bg-gray-700/60]="net() === 0"
-          [class.text-gray-400]="net() === 0"
+          [class.bg-avocado/15]="net() > 0"
+          [class.text-avocado-ink]="net() > 0"
+          [class.bg-ember/15]="net() < 0"
+          [class.text-ember-soft]="net() < 0"
+          [class.bg-edge/60]="net() === 0"
+          [class.text-ink-2]="net() === 0"
           appSensitive
         >
           {{ balanceLabel() }}
@@ -45,8 +45,8 @@ const DEFAULT_AVATAR = 'bg-gray-700/40 border-gray-600/40 text-gray-300';
         <div class="ml-12 space-y-1">
           @for (peer of summary().peerDebts; track peer.creditor.id) {
             <div class="flex items-center justify-between text-xs">
-              <span class="text-gray-500">Owes {{ peer.creditor.name }}</span>
-              <span class="font-medium text-amber-400 tabular-nums" appSensitive>
+              <span class="text-ink-3">Owes {{ peer.creditor.name }}</span>
+              <span class="font-medium text-ember-soft tabular-nums" appSensitive>
                 €{{ peer.netOwed.toFixed(2) }}
               </span>
             </div>
@@ -60,7 +60,7 @@ const DEFAULT_AVATAR = 'bg-gray-700/40 border-gray-600/40 text-gray-300';
             type="button"
             (click)="settle.emit()"
             [disabled]="disabled()"
-            class="text-xs px-3 py-1.5 rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/25 disabled:opacity-50 disabled:cursor-not-allowed transition-colors cursor-pointer"
+            class="text-xs px-3 py-1.5 rounded-full bg-avocado/15 text-avocado-ink border border-avocado/30 hover:bg-avocado/25 disabled:opacity-50 disabled:cursor-not-allowed transition-colors cursor-pointer"
           >
             {{ busy() ? 'Settling…' : '✓ Settle up' }}
           </button>

@@ -29,6 +29,7 @@ import {
   host: { class: 'block' },
   template: `
     <app-edit-form-shell
+      [showBack]="true"
       title="Fill in request"
       [formInvalid]="requestForm().invalid()"
       [submitting]="submitting()"
@@ -48,11 +49,11 @@ import {
     >
       <div class="flex items-center justify-between gap-2 text-[11px]">
         <span
-          class="px-2.5 py-1 rounded-full bg-sky-500/10 border border-sky-500/30 text-sky-300 font-semibold"
+          class="px-2.5 py-1 rounded-full bg-ember/10 border border-ember/30 text-ember-ink font-semibold"
         >
           Request
         </span>
-        <span class="text-gray-500 truncate">{{ requestedFor() }}</span>
+        <span class="text-ink-3 truncate">{{ requestedFor() }}</span>
       </div>
 
       <app-transaction-edit-fields
@@ -72,8 +73,8 @@ import {
       />
 
       @if (showDecline()) {
-        <div class="space-y-2 rounded-xl border border-red-800/50 bg-red-950/20 p-3">
-          <label for="kiosk-decline-reason" class="text-xs font-medium text-red-200">
+        <div class="space-y-2 rounded-xl border border-cherry-deep/50 bg-cherry-deep/20 p-3">
+          <label for="kiosk-decline-reason" class="text-xs font-medium text-cherry">
             Why can't you fill it in?
           </label>
           <textarea
@@ -83,13 +84,13 @@ import {
             [value]="declineReason()"
             (input)="declineReason.set($any($event.target).value)"
             placeholder="e.g. Not mine, or I don't have the receipt"
-            class="w-full bg-gray-800/60 border border-gray-800 rounded-xl px-3 py-2 text-sm text-gray-100 focus:outline-none focus:ring-2 focus:ring-red-500/50"
+            class="w-full bg-raised/60 border border-raised rounded-xl px-3 py-2 text-sm text-ink focus:outline-none focus:ring-2 focus:ring-cherry-fill/50"
           ></textarea>
           <div class="grid grid-cols-2 gap-2">
             <button
               type="button"
               (click)="showDecline.set(false)"
-              class="py-2 rounded-xl text-xs font-semibold text-gray-300 border border-gray-700 bg-gray-800/70"
+              class="py-2 rounded-xl text-xs font-semibold text-ink-2 border border-edge bg-raised/70"
             >
               Cancel
             </button>
@@ -97,7 +98,7 @@ import {
               type="button"
               (click)="onDecline()"
               [disabled]="!declineReason().trim() || declining()"
-              class="py-2 rounded-xl text-xs font-semibold text-red-200 border border-red-800/60 bg-red-900/40 disabled:opacity-40"
+              class="py-2 rounded-xl text-xs font-semibold text-cherry border border-cherry-deep/60 bg-cherry-deep/40 disabled:opacity-40"
             >
               {{ declining() ? 'Sending…' : 'Send reason' }}
             </button>

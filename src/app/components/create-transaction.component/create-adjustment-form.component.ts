@@ -42,7 +42,7 @@ import { buildAdjustmentPayload } from './transaction-payload';
       <button
         type="submit"
         [disabled]="adjustmentForm().invalid() || submitting() || privacyService.isPrivacyMode()"
-        class="w-full py-3 rounded-xl text-sm font-semibold text-white bg-linear-to-br from-indigo-500 to-violet-600 shadow-lg disabled:opacity-40 disabled:cursor-not-allowed active:scale-[0.99] transition-all cursor-pointer"
+        class="w-full py-3 rounded-xl text-sm font-semibold text-ground bg-ember shadow-lg disabled:opacity-40 disabled:cursor-not-allowed active:scale-[0.99] transition-all cursor-pointer"
       >
         {{ submitting() ? 'Adding…' : 'Add One-Off' }}
       </button>
@@ -50,13 +50,13 @@ import { buildAdjustmentPayload } from './transaction-payload';
 
     @if (successMessage()) {
       <div
-        class="p-3 bg-emerald-950/40 border border-emerald-800/60 text-emerald-300 rounded-xl text-xs"
+        class="p-3 bg-avocado-deep/40 border border-avocado-deep/60 text-avocado-ink rounded-xl text-xs"
       >
         <span>{{ successMessage() }}</span>
       </div>
     }
     @if (errorMessage()) {
-      <div class="p-3 bg-red-950/40 border border-red-800/60 text-red-300 rounded-xl text-xs">
+      <div class="p-3 bg-cherry-deep/40 border border-cherry-deep/60 text-cherry rounded-xl text-xs">
         {{ errorMessage() }}
       </div>
     }

@@ -9,7 +9,7 @@ import { Component, output } from '@angular/core';
       <button
         type="button"
         (click)="signOut.emit()"
-        class="w-full flex items-center justify-center gap-2 rounded-2xl border border-red-700/80 bg-red-950/40 px-3 py-2.5 text-sm font-medium text-red-300 transition hover:bg-red-900/50 cursor-pointer"
+        class="w-full flex items-center justify-center gap-2 rounded-2xl border border-cherry-fill/80 bg-cherry-deep/40 px-3 py-2.5 text-sm font-medium text-cherry transition hover:bg-cherry-deep/50 cursor-pointer"
       >
         <span>↩</span>
         Sign out

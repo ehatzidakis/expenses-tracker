@@ -9,46 +9,57 @@ import { SplitzesModalComponent } from '../splitzes-modal.component/splitzes-mod
   host: { class: 'block' },
   imports: [SettingsModalComponent, SplitzesModalComponent],
   template: `
-    <header class="flex items-center justify-between pt-2 pb-4">
-      <div class="flex items-center gap-3">
-        <img src="assets/favicon.svg" alt="Logo" class="w-10 h-10" />
-        <div>
-          <h1 class="text-xl font-bold tracking-tight text-white">Expenses Tracker</h1>
-          <p class="text-xs text-gray-400">Breakdown & Analysis</p>
-        </div>
+    <header class="flex min-h-14 items-center justify-between gap-3">
+      <div class="flex items-center gap-2.5">
+        <img src="assets/favicon.svg" alt="" class="size-7" />
+        <h1 class="type-wide text-[17px] font-bold uppercase tracking-[0.02em] text-ink">Expenses</h1>
       </div>
 
       <div class="flex items-center gap-2">
-        <!-- Splitzes pill button -->
         <button
           type="button"
           (click)="showSplitzesModal.set(true)"
-          class="flex items-center gap-1.5 px-4 py-2 rounded-full bg-teal-600/20 border border-teal-500/30 text-teal-400 text-xs font-semibold transition-all active:scale-95 hover:bg-teal-600/30 cursor-pointer"
+          class="flex min-h-11 items-center gap-1.5 rounded-xl border border-edge px-3.5 text-[13px] font-medium text-ink-2 transition-colors hover:border-ink-4 hover:text-ink active:scale-[0.97] cursor-pointer"
         >
-          <span>✂️</span> Splitzes
+          <svg
+            class="size-4"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+            stroke-linecap="round"
+            aria-hidden="true"
+          >
+            <circle cx="6" cy="6" r="3" />
+            <circle cx="6" cy="18" r="3" />
+            <path d="M20 4 8.1 15.9M14.5 14.5 20 20M8.1 8.1 12 12" />
+          </svg>
+          Splitz
         </button>
 
-        <!-- Profile / Settings button -->
         <div class="relative">
           <button
             type="button"
             (click)="showSettingsModal.set(true)"
-            [class.ring-2]="privacyService.isPrivacyMode()"
-            [class.ring-indigo-500]="privacyService.isPrivacyMode()"
-            [class.bg-indigo-500/20]="privacyService.isPrivacyMode()"
-            class="relative flex items-center justify-center w-9 h-9 rounded-full bg-gray-800 border border-gray-700/80 text-xs font-bold text-gray-300 transition-all active:scale-95 cursor-pointer"
-            title="Toggle Stealth Mode"
+            class="relative flex size-11 items-center justify-center rounded-full border text-[12px] font-bold transition-colors active:scale-95 cursor-pointer"
+            [class]="
+              privacyService.isPrivacyMode()
+                ? 'border-ember bg-ember-deep text-ember-ink'
+                : 'border-edge bg-raised text-ink-2 hover:text-ink'
+            "
+            [attr.aria-label]="
+              privacyService.isPrivacyMode() ? 'Settings (stealth mode on)' : 'Settings'
+            "
           >
             ME
-
             @if (privacyService.isPrivacyMode()) {
               <span
-                class="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-indigo-500 rounded-full border-2 border-gray-900"
+                class="absolute -top-0.5 -right-0.5 size-2.5 rounded-full border-2 border-ground bg-ember"
+                aria-hidden="true"
               ></span>
             }
           </button>
 
-          <!-- Settings Modal -->
           @if (showSettingsModal()) {
             <app-settings-modal (close)="showSettingsModal.set(false)" />
           }
@@ -56,7 +67,6 @@ import { SplitzesModalComponent } from '../splitzes-modal.component/splitzes-mod
       </div>
     </header>
 
-    <!-- Splitzes Modal -->
     @if (showSplitzesModal()) {
       <app-splitzes-modal (close)="showSplitzesModal.set(false)" />
     }

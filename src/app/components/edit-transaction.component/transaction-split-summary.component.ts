@@ -19,33 +19,33 @@ function personName(id: 'me' | number | undefined): string {
   template: `
     <div class="space-y-1.5">
       <div class="flex items-center justify-between gap-2">
-        <span class="text-xs font-medium text-gray-400">Splitzes</span>
-        <span class="text-[11px] text-amber-300">🔒 Partly settled — amounts locked</span>
+        <span class="text-xs font-medium text-ink-2">Splitzes</span>
+        <span class="text-[11px] text-ember-soft">🔒 Partly settled — amounts locked</span>
       </div>
 
       <div
-        class="bg-gray-800/40 border border-gray-800 rounded-xl px-3 py-2.5 text-sm text-gray-300 space-y-2"
+        class="bg-raised/40 border border-raised rounded-xl px-3 py-2.5 text-sm text-ink-2 space-y-2"
       >
         <div class="flex items-center justify-between gap-3">
-          <span class="text-gray-400">{{ typeLabel() }} · paid by {{ paidByLabel() }}</span>
+          <span class="text-ink-2">{{ typeLabel() }} · paid by {{ paidByLabel() }}</span>
           <span class="tabular-nums" appSensitive>€{{ total().toFixed(2) }}</span>
         </div>
         <div class="flex items-center justify-between gap-3">
-          <span class="text-gray-400">Your share</span>
+          <span class="text-ink-2">Your share</span>
           <span class="tabular-nums" appSensitive>€{{ transaction().amount.toFixed(2) }}</span>
         </div>
 
         @for (debt of debts(); track $index) {
           <div
-            class="flex items-center justify-between gap-3 border-t border-gray-800 pt-2 text-xs"
+            class="flex items-center justify-between gap-3 border-t border-raised pt-2 text-xs"
           >
-            <span [class.text-gray-500]="debt.paid">
+            <span [class.text-ink-3]="debt.paid">
               {{ debt.label }}
               @if (debt.paid) {
-                <span class="text-teal-400">✓ settled</span>
+                <span class="text-ember-ink">✓ settled</span>
               }
             </span>
-            <span class="tabular-nums" [class.text-gray-500]="debt.paid" appSensitive
+            <span class="tabular-nums" [class.text-ink-3]="debt.paid" appSensitive
               >€{{ debt.amount.toFixed(2) }}</span
             >
           </div>

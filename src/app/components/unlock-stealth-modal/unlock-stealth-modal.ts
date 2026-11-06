@@ -11,17 +11,17 @@ import { PrivacyService } from '../../services/privacy.service';
     (click)="cancelled.emit()"
   >
     <div
-      class="bg-gray-900 border border-gray-800 rounded-2xl p-6 w-full max-w-sm shadow-2xl space-y-4"
+      class="bg-panel border border-raised rounded-2xl p-6 w-full max-w-sm shadow-2xl space-y-4"
       (click)="$event.stopPropagation()"
     >
       <div class="space-y-1 text-center">
         <div
-          class="h-10 w-10 rounded-full bg-indigo-500/15 text-indigo-400 mx-auto flex items-center justify-center text-lg font-bold"
+          class="h-10 w-10 rounded-full bg-ember/15 text-ember-ink mx-auto flex items-center justify-center text-lg font-bold"
         >
           🔒
         </div>
-        <h3 class="text-base font-semibold text-gray-100">Unlock Stealth Mode</h3>
-        <p class="text-xs text-gray-400">Enter your passcode to restore financial details.</p>
+        <h3 class="text-base font-semibold text-ink">Unlock Stealth Mode</h3>
+        <p class="text-xs text-ink-2">Enter your passcode to restore financial details.</p>
       </div>
 
       <form (submit)="onUnlock($event)" class="space-y-4">
@@ -31,10 +31,10 @@ import { PrivacyService } from '../../services/privacy.service';
             type="password"
             placeholder="Enter passcode"
             autofocus
-            class="w-full bg-gray-800/80 border border-gray-700 rounded-xl px-3.5 py-2.5 text-sm text-center text-gray-100 placeholder:text-gray-500 tracking-widest focus:outline-none focus:ring-2 focus:ring-indigo-500/60"
+            class="w-full bg-raised/80 border border-edge rounded-xl px-3.5 py-2.5 text-sm text-center text-ink placeholder:text-ink-3 tracking-widest focus:outline-none focus:ring-2 focus:ring-ember/60"
           />
           @if (errorMessage()) {
-            <span class="text-[11px] text-red-400 block text-center mt-1.5">
+            <span class="text-[11px] text-cherry block text-center mt-1.5">
               {{ errorMessage() }}
             </span>
           }
@@ -44,14 +44,14 @@ import { PrivacyService } from '../../services/privacy.service';
           <button
             type="button"
             (click)="cancelled.emit()"
-            class="py-2.5 rounded-xl text-xs font-medium text-gray-400 hover:text-white bg-gray-800/50 hover:bg-gray-800 transition-all cursor-pointer"
+            class="py-2.5 rounded-xl text-xs font-medium text-ink-2 hover:text-ink bg-raised/50 hover:bg-raised transition-all cursor-pointer"
           >
             Cancel
           </button>
           <button
             type="submit"
             [disabled]="isSubmitting()"
-            class="py-2.5 rounded-xl text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 transition-all shadow-md cursor-pointer"
+            class="py-2.5 rounded-xl text-xs font-semibold text-ground bg-ember hover:bg-ember-ink disabled:opacity-50 transition-all shadow-md cursor-pointer"
           >
             {{ isSubmitting() ? 'Checking...' : 'Unlock' }}
           </button>

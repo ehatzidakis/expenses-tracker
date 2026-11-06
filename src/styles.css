@@ -1,6 +1,137 @@
-/* You can add global styles to this file, and also import other style files */
-
 @import 'tailwindcss';
+
+/* Archivo, self-hosted so the PWA keeps its type offline. Width axis 100–125%. */
+@font-face {
+  font-family: 'Archivo';
+  font-style: normal;
+  font-weight: 400 800;
+  font-stretch: 100% 125%;
+  font-display: swap;
+  src: url('/fonts/archivo-latin-var.woff2') format('woff2');
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329,
+    U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+/*
+ * Teak & Smoked Glass: a 70s living room after dark.
+ * Grounds are walnut and smoked glass, ink is cream, colour only carries meaning:
+ * ember = selection, avocado = on pace, cherry = over.
+ */
+@theme {
+  --color-ground: #120d0a;
+  --color-panel: #1c1511;
+  --color-raised: #261d17;
+  --color-raised-hi: #30251d;
+  --color-edge: #3d2f25;
+
+  --color-ink: #f1e6d2;
+  --color-ink-2: #d3c6b1;
+  --color-ink-3: #b0a08c;
+  --color-ink-4: #95836f;
+
+  --color-ember: #e5703a;
+  --color-ember-ink: #ee7d48;
+  --color-ember-soft: #f2ae85;
+  --color-ember-deep: #3a1d10;
+  --color-rust: #b4482a;
+  --color-umber: #7a3b22;
+
+  --color-avocado: #8fa35a;
+  --color-avocado-ink: #a9bc74;
+  --color-avocado-deep: #263016;
+
+  --color-cherry: #f0566b;
+  --color-cherry-fill: #a8283b;
+  --color-cherry-deep: #3a1418;
+
+  --font-sans: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif,
+    'Apple Color Emoji', 'Segoe UI Emoji';
+  --font-wide: 'Archivo', ui-sans-serif, system-ui, sans-serif;
+
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* Dialog cards settle in: a short lift and fade. */
+  --animate-fade-in: fade-in 240ms var(--ease-out-expo) both;
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+      transform: translateY(8px) scale(0.98);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+}
+
+/* The wide 70s grotesk used for figures and headings. */
+@utility type-wide {
+  font-family: var(--font-wide);
+  font-stretch: 125%;
+  font-variant-numeric: tabular-nums;
+}
+
+@layer base {
+  html {
+    background-color: var(--color-ground);
+    color-scheme: dark;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    min-height: 100dvh;
+    background-color: var(--color-ground);
+    color: var(--color-ink);
+    font-variant-numeric: tabular-nums;
+    caret-color: var(--color-ember);
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Lamplight: one faint warm wash at the top of the room, fixed behind everything. */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0 0 auto 0;
+    height: 420px;
+    pointer-events: none;
+    z-index: 0;
+    background: radial-gradient(
+      ellipse 70% 100% at 50% 0%,
+      rgb(229 112 58 / 0.07),
+      rgb(229 112 58 / 0) 70%
+    );
+  }
+
+  body > * {
+    position: relative;
+    z-index: 1;
+  }
+
+  ::selection {
+    background-color: var(--color-ember);
+    color: var(--color-ground);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-ember);
+    outline-offset: 2px;
+  }
+
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-edge) transparent;
+  }
+
+  ::placeholder {
+    color: var(--color-ink-4);
+    opacity: 1;
+  }
+
+  a {
+    text-underline-offset: 3px;
+  }
+}
 
 input[type='date'],
 input[type='datetime-local'],
@@ -19,4 +150,13 @@ input[type='datetime-local']::-webkit-calendar-picker-indicator,
 input[type='time']::-webkit-calendar-picker-indicator {
   opacity: 0.8;
   cursor: pointer;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
 }

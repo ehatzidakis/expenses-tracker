@@ -20,12 +20,12 @@ import { SplitzPersonCardComponent } from './splitz-person-card.component';
         <p
           role="status"
           class="p-3 rounded-xl text-xs border"
-          [class.bg-teal-950/30]="!messageIsError()"
-          [class.border-teal-800/40]="!messageIsError()"
-          [class.text-teal-300]="!messageIsError()"
-          [class.bg-red-950/40]="messageIsError()"
-          [class.border-red-800/60]="messageIsError()"
-          [class.text-red-300]="messageIsError()"
+          [class.bg-ember-deep/30]="!messageIsError()"
+          [class.border-ember-deep/40]="!messageIsError()"
+          [class.text-ember-ink]="!messageIsError()"
+          [class.bg-cherry-deep/40]="messageIsError()"
+          [class.border-cherry-deep/60]="messageIsError()"
+          [class.text-cherry]="messageIsError()"
         >
           {{ text }}
         </p>
@@ -34,11 +34,11 @@ import { SplitzPersonCardComponent } from './splitz-person-card.component';
       @if (splitTxQuery.isPending()) {
         <div class="space-y-2 animate-pulse">
           @for (item of [1, 2, 3]; track item) {
-            <div class="h-16 rounded-xl bg-gray-800/60"></div>
+            <div class="h-16 rounded-xl bg-raised/60"></div>
           }
         </div>
       } @else if (splitTxQuery.isError()) {
-        <p class="p-3 bg-red-950/40 border border-red-800/60 text-red-300 rounded-xl text-xs">
+        <p class="p-3 bg-cherry-deep/40 border border-cherry-deep/60 text-cherry rounded-xl text-xs">
           Unable to load split data.
         </p>
       } @else {

@@ -22,17 +22,17 @@ interface TransactionFieldsModel {
     <div class="space-y-4">
       @if (showTripLink()) {
         <div class="space-y-1.5">
-          <label class="text-xs font-medium text-gray-400">Link with Trip</label>
-          <div class="grid grid-cols-2 gap-2 p-1 bg-gray-950/80 rounded-xl border border-gray-800">
+          <label class="text-xs font-medium text-ink-2">Link with Trip</label>
+          <div class="grid grid-cols-2 gap-2 p-1 bg-ground/80 rounded-xl border border-raised">
             <button
               type="button"
               (click)="linkChange.emit(true)"
               class="py-2 rounded-lg text-xs font-semibold transition-all duration-150 flex items-center justify-center gap-1 cursor-pointer"
-              [class.bg-sky-500/20]="linked()"
-              [class.text-sky-400]="linked()"
+              [class.bg-ember/20]="linked()"
+              [class.text-ember-ink]="linked()"
               [class.border]="linked()"
-              [class.border-sky-500/30]="linked()"
-              [class.text-gray-400]="!linked()"
+              [class.border-ember/30]="linked()"
+              [class.text-ink-2]="!linked()"
             >
               🛫 Yes
             </button>
@@ -40,11 +40,11 @@ interface TransactionFieldsModel {
               type="button"
               (click)="linkChange.emit(false)"
               class="py-2 rounded-lg text-xs font-semibold transition-all duration-150 flex items-center justify-center gap-1 cursor-pointer"
-              [class.bg-gray-700/60]="!linked()"
-              [class.text-gray-200]="!linked()"
+              [class.bg-edge/60]="!linked()"
+              [class.text-ink]="!linked()"
               [class.border]="!linked()"
-              [class.border-gray-600/40]="!linked()"
-              [class.text-gray-400]="linked()"
+              [class.border-ink-4/40]="!linked()"
+              [class.text-ink-2]="linked()"
             >
               No
             </button>
@@ -54,15 +54,15 @@ interface TransactionFieldsModel {
 
       @if (linked()) {
         <div class="space-y-1.5">
-          <label for="tx-trip" class="text-xs font-medium text-gray-400">Select Trip</label>
+          <label for="tx-trip" class="text-xs font-medium text-ink-2">Select Trip</label>
           @if (trips().length === 0) {
-            <p class="text-xs text-gray-500 py-1">No open trips available.</p>
+            <p class="text-xs text-ink-3 py-1">No open trips available.</p>
           } @else {
             <select
               id="tx-trip"
               [value]="selectedTripId()"
               (change)="tripChange.emit($any($event.target).value)"
-              class="w-full bg-gray-800/60 border border-gray-800 rounded-xl px-3 py-2.5 text-sm text-gray-100 focus:outline-none focus:ring-2 focus:ring-sky-500/60"
+              class="w-full bg-raised/60 border border-raised rounded-xl px-3 py-2.5 text-sm text-ink focus:outline-none focus:ring-2 focus:ring-ember/60"
             >
               <option value="">Select a trip</option>
               @for (trip of trips(); track trip.id) {
@@ -74,24 +74,24 @@ interface TransactionFieldsModel {
       }
 
       <div class="space-y-1.5">
-        <label for="tx-date" class="text-xs font-medium text-gray-400">Date</label>
+        <label for="tx-date" class="text-xs font-medium text-ink-2">Date</label>
         <app-date-stepper>
           <input
             #dateInput
             id="tx-date"
             type="date"
             [formField]="dateField()"
-            class="flex-1 min-w-0 appearance-none scheme-dark bg-gray-800/60 border border-gray-800 rounded-xl px-3 py-2.5 text-sm text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/60"
+            class="flex-1 min-w-0 appearance-none scheme-dark bg-raised/60 border border-raised rounded-xl px-3 py-2.5 text-sm text-ink focus:outline-none focus:ring-2 focus:ring-ember/60"
           />
         </app-date-stepper>
         @if (dateField()().touched() && dateField()().invalid()) {
-          <span class="text-[11px] text-red-400">{{ dateField()().errors()[0]?.message }}</span>
+          <span class="text-[11px] text-cherry">{{ dateField()().errors()[0]?.message }}</span>
         }
       </div>
 
       <div class="space-y-1.5">
         <div class="flex items-center justify-between gap-2">
-          <label for="tx-description" class="text-xs font-medium text-gray-400">Description</label>
+          <label for="tx-description" class="text-xs font-medium text-ink-2">Description</label>
           <ng-content select="[descriptionAction]" />
         </div>
         <ng-content select="[descriptionExtras]" />
@@ -101,22 +101,22 @@ interface TransactionFieldsModel {
           type="text"
           placeholder="Add transaction description"
           [formField]="descriptionField()"
-          class="w-full bg-gray-800/60 border border-gray-800 rounded-xl px-3 py-2.5 text-sm text-gray-100 placeholder:text-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/60"
+          class="w-full bg-raised/60 border border-raised rounded-xl px-3 py-2.5 text-sm text-ink placeholder:text-ink-4 focus:outline-none focus:ring-2 focus:ring-ember/60"
         />
         @if (descriptionField()().touched() && descriptionField()().invalid()) {
-          <span class="text-[11px] text-red-400">{{
+          <span class="text-[11px] text-cherry">{{
             descriptionField()().errors()[0]?.message
           }}</span>
         }
       </div>
 
       <div class="space-y-1.5">
-        <label for="tx-category" class="text-xs font-medium text-gray-400">Category</label>
+        <label for="tx-category" class="text-xs font-medium text-ink-2">Category</label>
         <select
           id="tx-category"
           [value]="model().category"
           (change)="categoryChange.emit($any($event.target).value)"
-          class="w-full bg-gray-800/60 border border-gray-800 rounded-xl px-3 py-2.5 text-sm text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/60"
+          class="w-full bg-raised/60 border border-raised rounded-xl px-3 py-2.5 text-sm text-ink focus:outline-none focus:ring-2 focus:ring-ember/60"
         >
           <option value="">Select a category</option>
           @for (category of categories(); track category) {
@@ -124,13 +124,13 @@ interface TransactionFieldsModel {
           }
         </select>
         @if (categoryField()().touched() && categoryField()().invalid()) {
-          <span class="text-[11px] text-red-400">{{ categoryField()().errors()[0]?.message }}</span>
+          <span class="text-[11px] text-cherry">{{ categoryField()().errors()[0]?.message }}</span>
         }
       </div>
 
       @if (subcategories().length > 0) {
         <div class="space-y-1.5">
-          <label for="tx-subcategory" class="text-xs font-medium text-gray-400">Subcategory</label>
+          <label for="tx-subcategory" class="text-xs font-medium text-ink-2">Subcategory</label>
           <select
             id="tx-subcategory"
             [value]="model().subCategoryId ?? ''"
@@ -139,7 +139,7 @@ interface TransactionFieldsModel {
                 $any($event.target).value === '' ? null : +$any($event.target).value
               )
             "
-            class="w-full bg-gray-800/60 border border-gray-800 rounded-xl px-3 py-2.5 text-sm text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/60"
+            class="w-full bg-raised/60 border border-raised rounded-xl px-3 py-2.5 text-sm text-ink focus:outline-none focus:ring-2 focus:ring-ember/60"
           >
             <option value="" [selected]="model().subCategoryId == null">
               Select a subcategory
@@ -155,7 +155,7 @@ interface TransactionFieldsModel {
             }
           </select>
           @if (subCategoryField()().touched() && subCategoryField()().invalid()) {
-            <span class="text-[11px] text-red-400">{{
+            <span class="text-[11px] text-cherry">{{
               subCategoryField()().errors()[0]?.message
             }}</span>
           }
@@ -163,7 +163,7 @@ interface TransactionFieldsModel {
       }
 
       <div class="space-y-1.5">
-        <label for="tx-amount" class="text-xs font-medium text-gray-400">Amount</label>
+        <label for="tx-amount" class="text-xs font-medium text-ink-2">Amount</label>
         <input
           #amountInput
           id="tx-amount"
@@ -173,20 +173,20 @@ interface TransactionFieldsModel {
           [value]="model().amount === 0 ? '' : model().amount.toString()"
           placeholder="0.00"
           (input)="onAmountInput($event)"
-          class="w-full bg-gray-800/60 border border-gray-800 rounded-xl px-3 py-2.5 text-sm text-gray-100 placeholder:text-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/60 tabular-nums"
+          class="w-full bg-raised/60 border border-raised rounded-xl px-3 py-2.5 text-sm text-ink placeholder:text-ink-4 focus:outline-none focus:ring-2 focus:ring-ember/60 tabular-nums"
         />
         <!-- Not blurred: the hint only appears after picking a recurring template, which is hidden in privacy mode -->
         @if (amountHint() != null && model().amount === 0) {
           <button
             type="button"
             (click)="amountHintUse.emit(amountHint()!)"
-            class="text-[11px] text-indigo-300 hover:text-indigo-200 cursor-pointer tabular-nums"
+            class="text-[11px] text-ember-ink hover:text-ember-soft cursor-pointer tabular-nums"
           >
             Last month: €{{ amountHint()!.toFixed(2) }} · tap to use
           </button>
         }
         @if (amountField()().touched() && amountField()().invalid()) {
-          <span class="text-[11px] text-red-400">{{ amountField()().errors()[0]?.message }}</span>
+          <span class="text-[11px] text-cherry">{{ amountField()().errors()[0]?.message }}</span>
         }
       </div>
     </div>

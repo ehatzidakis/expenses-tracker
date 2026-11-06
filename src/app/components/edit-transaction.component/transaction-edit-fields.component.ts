@@ -13,23 +13,23 @@ import { TransactionFormModel } from './edit-transaction.model';
   template: `
     <div class="space-y-4">
       <div class="space-y-1.5">
-        <label for="tx-edit-date" class="text-xs font-medium text-gray-400">Date</label>
+        <label for="tx-edit-date" class="text-xs font-medium text-ink-2">Date</label>
         <app-date-stepper>
           <input
             #dateInput
             id="tx-edit-date"
             type="date"
             [formField]="dateField()"
-            class="flex-1 min-w-0 appearance-none scheme-dark bg-gray-800/60 border border-gray-800 rounded-xl px-3 py-2.5 text-sm text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/60"
+            class="flex-1 min-w-0 appearance-none scheme-dark bg-raised/60 border border-raised rounded-xl px-3 py-2.5 text-sm text-ink focus:outline-none focus:ring-2 focus:ring-ember/60"
           />
         </app-date-stepper>
         @if (dateField()().touched() && dateField()().invalid()) {
-          <span class="text-[11px] text-red-400">{{ dateField()().errors()[0]?.message }}</span>
+          <span class="text-[11px] text-cherry">{{ dateField()().errors()[0]?.message }}</span>
         }
       </div>
 
       <div class="space-y-1.5">
-        <label for="tx-edit-description" class="text-xs font-medium text-gray-400"
+        <label for="tx-edit-description" class="text-xs font-medium text-ink-2"
           >Description</label
         >
         <input
@@ -37,22 +37,22 @@ import { TransactionFormModel } from './edit-transaction.model';
           type="text"
           placeholder="e.g. Σκλαβενίτης"
           [formField]="descriptionField()"
-          class="w-full bg-gray-800/60 border border-gray-800 rounded-xl px-3 py-2.5 text-sm text-gray-100 placeholder:text-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/60"
+          class="w-full bg-raised/60 border border-raised rounded-xl px-3 py-2.5 text-sm text-ink placeholder:text-ink-4 focus:outline-none focus:ring-2 focus:ring-ember/60"
         />
         @if (descriptionField()().touched() && descriptionField()().invalid()) {
-          <span class="text-[11px] text-red-400">{{
+          <span class="text-[11px] text-cherry">{{
             descriptionField()().errors()[0]?.message
           }}</span>
         }
       </div>
 
       <div class="space-y-1.5">
-        <label for="tx-edit-category" class="text-xs font-medium text-gray-400">Category</label>
+        <label for="tx-edit-category" class="text-xs font-medium text-ink-2">Category</label>
         <select
           id="tx-edit-category"
           [value]="model().category"
           (change)="categoryChange.emit($any($event.target).value)"
-          class="w-full bg-gray-800/60 border border-gray-800 rounded-xl px-3 py-2.5 text-sm text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/60"
+          class="w-full bg-raised/60 border border-raised rounded-xl px-3 py-2.5 text-sm text-ink focus:outline-none focus:ring-2 focus:ring-ember/60"
         >
           <option value="">Select a category</option>
           @for (category of categories(); track category) {
@@ -62,20 +62,20 @@ import { TransactionFormModel } from './edit-transaction.model';
           }
         </select>
         @if (categoryField()().touched() && categoryField()().invalid()) {
-          <span class="text-[11px] text-red-400">{{ categoryField()().errors()[0]?.message }}</span>
+          <span class="text-[11px] text-cherry">{{ categoryField()().errors()[0]?.message }}</span>
         }
       </div>
 
       @if (subcategories().length > 0) {
         <div class="space-y-1.5">
-          <label for="tx-edit-subcategory" class="text-xs font-medium text-gray-400"
+          <label for="tx-edit-subcategory" class="text-xs font-medium text-ink-2"
             >Subcategory</label
           >
           <select
             id="tx-edit-subcategory"
             [value]="model().subCategoryId ?? ''"
             (change)="onSubcategoryChange($event)"
-            class="w-full bg-gray-800/60 border border-gray-800 rounded-xl px-3 py-2.5 text-sm text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/60"
+            class="w-full bg-raised/60 border border-raised rounded-xl px-3 py-2.5 text-sm text-ink focus:outline-none focus:ring-2 focus:ring-ember/60"
           >
             <option value="">Select a subcategory</option>
             @for (subcategory of subcategories(); track subcategory.id) {
@@ -88,7 +88,7 @@ import { TransactionFormModel } from './edit-transaction.model';
             }
           </select>
           @if (subCategoryField()().touched() && subCategoryField()().invalid()) {
-            <span class="text-[11px] text-red-400">{{
+            <span class="text-[11px] text-cherry">{{
               subCategoryField()().errors()[0]?.message
             }}</span>
           }
@@ -105,16 +105,16 @@ import { TransactionFormModel } from './edit-transaction.model';
       />
 
       <div class="space-y-1.5">
-        <label for="tx-edit-comment" class="text-xs font-medium text-gray-400">Comment</label>
+        <label for="tx-edit-comment" class="text-xs font-medium text-ink-2">Comment</label>
         <textarea
           id="tx-edit-comment"
           rows="3"
           [formField]="commentField()"
           placeholder="Add a note about this transaction"
-          class="w-full bg-gray-800/60 border border-gray-800 rounded-xl px-3 py-2.5 text-sm text-gray-100 placeholder:text-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/60 resize-none"
+          class="w-full bg-raised/60 border border-raised rounded-xl px-3 py-2.5 text-sm text-ink placeholder:text-ink-4 focus:outline-none focus:ring-2 focus:ring-ember/60 resize-none"
         ></textarea>
         @if (commentField()().touched() && commentField()().invalid()) {
-          <span class="text-[11px] text-red-400">{{ commentField()().errors()[0]?.message }}</span>
+          <span class="text-[11px] text-cherry">{{ commentField()().errors()[0]?.message }}</span>
         }
       </div>
     </div>

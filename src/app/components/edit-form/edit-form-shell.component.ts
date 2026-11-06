@@ -8,20 +8,33 @@ import { ConfirmModal } from '../confirm-modal/confirm-modal';
   host: { class: 'block' },
   template: `
     <div [class]="outerClass()">
-      <div class="flex items-center justify-between">
-        <button type="button" (click)="back.emit()" [class]="backClass()">← Back</button>
-        <h3 class="text-sm font-semibold text-gray-200">{{ title() }}</h3>
-        <div class="w-10"></div>
-      </div>
+      @if (showBack()) {
+        <div class="flex items-center justify-between gap-3">
+          <button type="button" (click)="back.emit()" [class]="backClass()">
+            <svg class="size-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+              <path
+                fill-rule="evenodd"
+                d="M12.79 5.23a.75.75 0 01-.02 1.06L8.83 10l3.94 3.71a.75.75 0 11-1.04 1.08l-4.5-4.25a.75.75 0 010-1.08l4.5-4.25a.75.75 0 011.06.02z"
+                clip-rule="evenodd"
+              />
+            </svg>
+            Back
+          </button>
+          <h3 class="type-wide text-[16px] font-semibold text-ink">{{ title() }}</h3>
+          <span class="w-16" aria-hidden="true"></span>
+        </div>
+      } @else {
+        <h3 class="type-wide text-lg font-semibold text-ink">{{ title() }}</h3>
+      }
 
-      <form
-        (submit)="submitted.emit($event)"
-        class="bg-gray-900/60 border border-gray-800/80 rounded-2xl p-5 space-y-4 backdrop-blur-sm"
-      >
+      <form (submit)="submitted.emit($event)" class="space-y-4">
         <ng-content />
 
         @if (errorMessage()) {
-          <div class="p-3 bg-red-950/40 border border-red-800/60 text-red-300 rounded-xl text-xs">
+          <div
+            role="alert"
+            class="p-3 bg-cherry-deep/60 border border-cherry/30 text-cherry rounded-xl text-[13px]"
+          >
             {{ errorMessage() }}
           </div>
         }
@@ -30,7 +43,7 @@ import { ConfirmModal } from '../confirm-modal/confirm-modal';
           <button
             type="submit"
             [disabled]="formInvalid() || submitting() || deleting() || privacyDisabled()"
-            class="w-full py-3 rounded-xl text-sm font-semibold text-white bg-linear-to-br from-indigo-500 to-violet-600 shadow-lg disabled:opacity-40 disabled:cursor-not-allowed active:scale-[0.99] transition-all"
+            class="w-full min-h-12 rounded-xl text-[15px] font-semibold text-ground bg-ember hover:bg-ember-ink disabled:opacity-40 disabled:cursor-not-allowed active:scale-[0.99] transition-[transform,background-color] cursor-pointer"
           >
             {{ submitting() ? submittingLabel() : submitLabel() }}
           </button>
@@ -39,7 +52,7 @@ import { ConfirmModal } from '../confirm-modal/confirm-modal';
             type="button"
             (click)="deleteRequested.emit()"
             [disabled]="submitting() || deleting() || privacyDisabled()"
-            class="w-full py-3 rounded-xl text-sm font-semibold text-red-400 bg-red-950/30 hover:bg-red-900/40 border border-red-800/50 disabled:opacity-40 disabled:cursor-not-allowed active:scale-[0.99] transition-all"
+            class="w-full min-h-12 rounded-xl text-[15px] font-semibold text-cherry border border-cherry/35 hover:bg-cherry-deep/50 disabled:opacity-40 disabled:cursor-not-allowed active:scale-[0.99] transition-[transform,background-color] cursor-pointer"
           >
             {{ deleting() ? deletingLabel() : deleteLabel() }}
           </button>
@@ -60,8 +73,10 @@ import { ConfirmModal } from '../confirm-modal/confirm-modal';
 export class EditFormShellComponent {
   readonly title = input.required<string>();
   readonly outerClass = input('space-y-4');
+  /** Show a Back button; off inside a sheet, which has its own close button. */
+  readonly showBack = input(false);
   readonly backClass = input(
-    'text-xs font-medium text-gray-400 hover:text-gray-200 flex items-center gap-1 transition-colors',
+    '-ml-2 flex min-h-11 items-center gap-1 px-2 text-[14px] font-medium text-ink-2 hover:text-ink transition-colors cursor-pointer',
   );
   readonly formInvalid = input.required<boolean>();
   readonly submitting = input.required<boolean>();

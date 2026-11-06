@@ -17,35 +17,35 @@ export interface MonthlyTrendItem {
   template: `
     <div class="space-y-4">
       @if (monthlyTrends.length === 0) {
-        <div class="text-center py-12 text-xs text-gray-500">No monthly data available yet.</div>
+        <div class="text-center py-12 text-xs text-ink-3">No monthly data available yet.</div>
       } @else {
         @if (activeMonth; as active) {
           <div
-            class="bg-gray-950/70 border border-gray-800/90 rounded-xl p-3 flex items-center justify-between transition-all"
+            class="bg-ground/70 border border-raised/90 rounded-xl p-3 flex items-center justify-between transition-all"
           >
             <div>
-              <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider block"
+              <span class="text-[11px] font-bold text-ink-2 uppercase tracking-wider block"
                 >Selected Period</span
               >
-              <span class="text-xs font-semibold text-gray-100">{{ active.monthName }}</span>
+              <span class="text-xs font-semibold text-ink">{{ active.monthName }}</span>
             </div>
 
             <div class="flex items-center gap-4 text-right">
               <div>
-                <span class="text-[10px] text-gray-400 block">Spend</span>
+                <span class="text-[11px] text-ink-2 block">Spend</span>
                 <span
                   class="text-xs font-bold"
-                  [class.text-red-400]="active.total > active.wage"
-                  [class.text-indigo-300]="active.total <= active.wage"
+                  [class.text-cherry]="active.total > active.wage"
+                  [class.text-ember-ink]="active.total <= active.wage"
                   appSensitive
                 >
                   €{{ active.total | number: '1.2-2' }}
                 </span>
               </div>
 
-              <div class="border-l border-gray-800 pl-4">
-                <span class="text-[10px] text-gray-400 block">Wage</span>
-                <span class="text-xs font-bold text-emerald-400" appSensitive>
+              <div class="border-l border-raised pl-4">
+                <span class="text-[11px] text-ink-2 block">Wage</span>
+                <span class="text-xs font-bold text-avocado-ink" appSensitive>
                   €{{ active.wage | number: '1.0-0' }}
                 </span>
               </div>
@@ -57,7 +57,7 @@ export interface MonthlyTrendItem {
           class="relative pt-1 pb-2 overflow-x-auto scroll-smooth snap-x snap-mandatory scrollbar-none"
         >
           <div
-            class="inline-flex min-w-full items-end gap-3 h-44 border-b border-gray-800/80 pb-6 relative pl-2"
+            class="inline-flex min-w-full items-end gap-3 h-44 border-b border-raised/80 pb-6 relative pl-2"
           >
             @for (item of monthlyTrends; track item.id) {
               <div
@@ -65,23 +65,20 @@ export interface MonthlyTrendItem {
                 class="flex-none w-8 flex flex-col items-center h-full justify-end relative snap-center cursor-pointer group"
               >
                 <div
-                  class="absolute left-1 right-1 border-b border-emerald-400/30 z-0 pointer-events-none"
+                  class="absolute left-1 right-1 border-b border-avocado-ink/30 z-0 pointer-events-none"
                   [style.bottom.%]="getWageLinePercent(item.wage)"
                 ></div>
 
                 <div
-                  class="w-full max-w-5 rounded-t-lg transition-all duration-200 relative z-10 active:scale-95 min-h-1 bg-linear-to-t"
-                  [class.from-red-600]="item.total > item.wage"
-                  [class.to-rose-400]="item.total > item.wage"
-                  [class.from-indigo-600]="item.total <= item.wage"
-                  [class.to-violet-400]="item.total <= item.wage"
+                  class="w-full max-w-5 rounded-t-lg transition-all duration-200 relative z-10 active:scale-95 min-h-1"
+                  [class.bg-cherry-fill]="item.total > item.wage"
+                  [class.bg-ember]="item.total <= item.wage"
                   [class.ring-2]="activeMonth?.id === item.id"
-                  [class.ring-indigo-400]="activeMonth?.id === item.id"
+                  [class.ring-ember-ink]="activeMonth?.id === item.id"
                   [class.ring-offset-2]="activeMonth?.id === item.id"
-                  [class.ring-offset-gray-950]="activeMonth?.id === item.id"
+                  [class.ring-offset-ground]="activeMonth?.id === item.id"
                   [class.brightness-125]="activeMonth?.id === item.id"
                   [class.shadow-lg]="activeMonth?.id === item.id"
-                  [class.shadow-indigo-500/20]="activeMonth?.id === item.id"
                   [class.opacity-100]="activeMonth?.id === item.id"
                   [class.opacity-60]="activeMonth?.id !== item.id"
                   [style.height.%]="getBarHeightPercent(item.total)"
@@ -89,9 +86,9 @@ export interface MonthlyTrendItem {
 
                 <span
                   class="absolute -bottom-6 text-[11px] font-semibold transition-colors whitespace-nowrap"
-                  [class.text-indigo-400]="activeMonth?.id === item.id"
+                  [class.text-ember-ink]="activeMonth?.id === item.id"
                   [class.font-bold]="activeMonth?.id === item.id"
-                  [class.text-gray-400]="activeMonth?.id !== item.id"
+                  [class.text-ink-2]="activeMonth?.id !== item.id"
                 >
                   {{ item.shortLabel }}
                 </span>

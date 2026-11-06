@@ -37,7 +37,7 @@ type PinAction = 'none' | 'set' | 'remove' | 'unlock-to-disable';
       (click)="close.emit()"
     >
       <div
-        class="bg-gray-900 border border-gray-800 rounded-3xl p-6 w-full max-w-sm shadow-2xl space-y-6 text-gray-100"
+        class="bg-panel border border-raised rounded-3xl p-6 w-full max-w-sm shadow-2xl space-y-6 text-ink"
         (click)="$event.stopPropagation()"
       >
         <app-settings-modal-header (close)="close.emit()" />

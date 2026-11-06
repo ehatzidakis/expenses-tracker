@@ -1,326 +1,343 @@
 ---
 name: Expenses Tracker
-description: A dark, dense pocket console for one household's monthly budget.
+description: A dark, dense household budget for the iPhone home screen, set in walnut, smoked glass and cream.
 colors:
-  signal-indigo: "oklch(58.5% 0.233 277.117)"
-  signal-indigo-deep: "oklch(51.1% 0.262 276.966)"
-  signal-violet: "oklch(54.1% 0.281 293.009)"
-  signal-indigo-text: "oklch(78.5% 0.115 274.713)"
-  trip-teal: "oklch(77.7% 0.152 181.912)"
-  trip-teal-deep: "oklch(60% 0.118 184.704)"
-  saved-emerald: "oklch(76.5% 0.177 163.223)"
-  saved-emerald-soft: "oklch(84.5% 0.143 164.978)"
-  overspend-red: "oklch(70.4% 0.191 22.216)"
-  overspend-red-strong: "oklch(63.7% 0.237 25.331)"
-  overspend-red-deep: "oklch(57.7% 0.245 27.325)"
-  overspend-rose-deep: "oklch(45.5% 0.188 13.697)"
-  pending-amber: "oklch(87.9% 0.169 91.605)"
-  night-base: "oklch(13% 0.028 261.692)"
-  console-panel: "oklch(21% 0.034 264.665)"
-  raised-slate: "oklch(27.8% 0.033 256.848)"
-  field-fill: "oklch(27.8% 0.033 256.848 / 0.6)"
-  control-edge: "oklch(37.3% 0.034 259.733)"
-  ink-white: "#ffffff"
-  ink-primary: "oklch(96.7% 0.003 264.542)"
-  ink-body: "oklch(87.2% 0.01 258.338)"
-  ink-secondary: "oklch(70.7% 0.022 261.325)"
-  ink-muted: "oklch(55.1% 0.027 264.364)"
-  ink-faint: "oklch(44.6% 0.03 256.802)"
+  ground: "#120d0a"
+  panel: "#1c1511"
+  raised: "#261d17"
+  raised-hi: "#30251d"
+  edge: "#3d2f25"
+  ink: "#f1e6d2"
+  ink-2: "#d3c6b1"
+  ink-3: "#b0a08c"
+  ink-4: "#95836f"
+  ember: "#e5703a"
+  ember-ink: "#ee7d48"
+  ember-soft: "#f2ae85"
+  ember-deep: "#3a1d10"
+  rust: "#b4482a"
+  umber: "#7a3b22"
+  avocado: "#8fa35a"
+  avocado-ink: "#a9bc74"
+  avocado-deep: "#263016"
+  cherry: "#f0566b"
+  cherry-fill: "#a8283b"
+  cherry-deep: "#3a1418"
 typography:
   display:
-    fontFamily: "ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji'"
-    fontSize: "1.875rem"
-    fontWeight: 800
-    lineHeight: 1.2
-    letterSpacing: "-0.025em"
-    fontFeature: "'tnum'"
-  headline:
-    fontFamily: "ui-sans-serif, system-ui, sans-serif"
-    fontSize: "1.25rem"
+    fontFamily: "Archivo, ui-sans-serif, system-ui, sans-serif"
+    fontSize: "40px"
     fontWeight: 700
-    lineHeight: 1.4
-    letterSpacing: "-0.025em"
-  title:
-    fontFamily: "ui-sans-serif, system-ui, sans-serif"
-    fontSize: "0.875rem"
+    lineHeight: 1
+    letterSpacing: "-0.02em"
+    fontVariation: "'wdth' 125"
+    fontFeature: "'tnum' 1"
+  headline:
+    fontFamily: "Archivo, ui-sans-serif, system-ui, sans-serif"
+    fontSize: "26px"
     fontWeight: 600
-    lineHeight: 1.43
+    lineHeight: 1.25
+    fontVariation: "'wdth' 125"
+  title:
+    fontFamily: "Archivo, ui-sans-serif, system-ui, sans-serif"
+    fontSize: "18px"
+    fontWeight: 600
+    lineHeight: 1.25
+    fontVariation: "'wdth' 125"
+  figure:
+    fontFamily: "Archivo, ui-sans-serif, system-ui, sans-serif"
+    fontSize: "16px"
+    fontWeight: 600
+    lineHeight: 1
+    fontVariation: "'wdth' 125"
+    fontFeature: "'tnum' 1"
+  brand:
+    fontFamily: "Archivo, ui-sans-serif, system-ui, sans-serif"
+    fontSize: "17px"
+    fontWeight: 700
+    letterSpacing: "0.02em"
+    fontVariation: "'wdth' 125"
+  section-heading:
+    fontFamily: "Archivo, ui-sans-serif, system-ui, sans-serif"
+    fontSize: "13px"
+    fontWeight: 600
+    fontVariation: "'wdth' 125"
+  body-lg:
+    fontFamily: "ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif"
+    fontSize: "15px"
+    fontWeight: 500
   body:
-    fontFamily: "ui-sans-serif, system-ui, sans-serif"
-    fontSize: "0.875rem"
+    fontFamily: "ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif"
+    fontSize: "14px"
     fontWeight: 400
-    lineHeight: 1.43
-  body-compact:
-    fontFamily: "ui-sans-serif, system-ui, sans-serif"
-    fontSize: "0.75rem"
-    fontWeight: 500
-    lineHeight: 1.33
-  label:
-    fontFamily: "ui-sans-serif, system-ui, sans-serif"
-    fontSize: "0.75rem"
-    fontWeight: 500
-    lineHeight: 1.33
-    letterSpacing: "0.05em"
+    fontFeature: "'tnum' 1"
+  body-sm:
+    fontFamily: "ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif"
+    fontSize: "13px"
+    fontWeight: 400
+    fontFeature: "'tnum' 1"
+  caption:
+    fontFamily: "ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif"
+    fontSize: "12px"
+    fontWeight: 400
   micro:
-    fontFamily: "ui-sans-serif, system-ui, sans-serif"
-    fontSize: "0.625rem"
+    fontFamily: "ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif"
+    fontSize: "11px"
     fontWeight: 500
-    lineHeight: 1.4
+    lineHeight: 1
 rounded:
-  md: "6px"
-  lg: "8px"
-  xl: "12px"
-  2xl: "16px"
+  segment: "10px"
+  control: "12px"
+  panel: "16px"
+  sheet: "28px"
   full: "9999px"
 spacing:
-  xs: "4px"
-  sm: "8px"
-  md: "12px"
-  lg: "16px"
-  xl: "20px"
-  2xl: "24px"
-  tab-clearance: "112px"
+  hairline-gap: "1px"
+  stack: "20px"
+  gutter: "16px"
+  panel-x: "20px"
+  row-y: "10px"
+  touch: "44px"
+  column: "512px"
 components:
   button-primary:
-    backgroundColor: "{colors.signal-indigo}"
-    textColor: "{colors.ink-white}"
-    typography: "{typography.title}"
-    rounded: "{rounded.xl}"
-    padding: "12px 16px"
+    backgroundColor: "{colors.ember}"
+    textColor: "{colors.ground}"
+    typography: "{typography.body-lg}"
+    rounded: "{rounded.control}"
+    padding: "0 16px"
+    height: "48px"
+  button-primary-hover:
+    backgroundColor: "{colors.ember-ink}"
   button-secondary:
-    backgroundColor: "{colors.raised-slate}"
-    textColor: "{colors.ink-body}"
-    typography: "{typography.body-compact}"
-    rounded: "{rounded.xl}"
-    padding: "10px 16px"
+    backgroundColor: "transparent"
+    textColor: "{colors.ink-2}"
+    typography: "{typography.body-sm}"
+    rounded: "{rounded.control}"
+    padding: "0 14px"
+    height: "44px"
   button-danger:
-    backgroundColor: "{colors.overspend-red-strong}"
-    textColor: "{colors.ink-white}"
-    typography: "{typography.body-compact}"
-    rounded: "{rounded.xl}"
-    padding: "10px 16px"
-  pill:
-    backgroundColor: "{colors.console-panel}"
-    textColor: "{colors.ink-secondary}"
-    typography: "{typography.body-compact}"
-    rounded: "{rounded.xl}"
-    padding: "8px 16px"
+    backgroundColor: "transparent"
+    textColor: "{colors.cherry}"
+    typography: "{typography.body-lg}"
+    rounded: "{rounded.control}"
+    height: "48px"
   pill-active:
-    backgroundColor: "{colors.signal-indigo-deep}"
-    textColor: "{colors.ink-white}"
-    typography: "{typography.body-compact}"
-    rounded: "{rounded.xl}"
-    padding: "8px 16px"
+    backgroundColor: "{colors.ember}"
+    textColor: "{colors.ground}"
+    typography: "{typography.body-sm}"
+    rounded: "{rounded.control}"
+    padding: "0 16px"
+    height: "44px"
+  pill-idle:
+    backgroundColor: "transparent"
+    textColor: "{colors.ink-2}"
+    typography: "{typography.body-sm}"
+    rounded: "{rounded.control}"
+    padding: "0 16px"
+    height: "44px"
+  segment-active:
+    textColor: "{colors.ink}"
+    rounded: "{rounded.segment}"
+    height: "40px"
+  segment-idle:
+    backgroundColor: "transparent"
+    textColor: "{colors.ink-3}"
+    rounded: "{rounded.segment}"
+    height: "40px"
   input:
-    backgroundColor: "{colors.field-fill}"
-    textColor: "{colors.ink-primary}"
-    typography: "{typography.body}"
-    rounded: "{rounded.xl}"
-    padding: "10px 12px"
-  card:
-    backgroundColor: "{colors.console-panel}"
-    textColor: "{colors.ink-primary}"
-    rounded: "{rounded.2xl}"
-    padding: "20px"
-  category-row:
-    backgroundColor: "{colors.night-base}"
-    textColor: "{colors.ink-body}"
-    rounded: "{rounded.xl}"
-    padding: "6px 12px"
+    backgroundColor: "{colors.panel}"
+    textColor: "{colors.ink}"
+    rounded: "{rounded.control}"
+    padding: "0 14px"
+    height: "48px"
+  summary-panel:
+    backgroundColor: "{colors.panel}"
+    textColor: "{colors.ink}"
+    rounded: "{rounded.panel}"
+    padding: "16px 20px 20px"
   tab-bar:
-    backgroundColor: "{colors.console-panel}"
-    rounded: "{rounded.full}"
-    padding: "6px"
+    backgroundColor: "{colors.panel}"
+    textColor: "{colors.ink-3}"
+    height: "54px"
   tab-active:
-    backgroundColor: "{colors.signal-indigo}"
-    textColor: "{colors.ink-white}"
-    typography: "{typography.micro}"
-    rounded: "{rounded.full}"
-    padding: "8px 14px"
-  badge-saved:
-    textColor: "{colors.saved-emerald-soft}"
-    typography: "{typography.body-compact}"
-    rounded: "{rounded.md}"
-    padding: "2px 10px"
+    textColor: "{colors.ember-ink}"
+  sheet:
+    backgroundColor: "{colors.panel}"
+    textColor: "{colors.ink}"
+    rounded: "{rounded.sheet}"
+    padding: "0 20px 20px"
 ---
 
 # Design System: Expenses Tracker
 
 ## Overview
 
-**Creative North Star: "The Pocket Console"**
+**Creative North Star: "Teak & Smoked Glass"**
 
-A compact control panel held in one hand. The app is a dense, dark readout of one household's month: a stack of low-light gray panels, small precise type, and numbers set in tabular figures so columns of euros line up. Controls float above the content as glassy, rounded objects (the pill tab bar, modals) and respond to a press by shrinking slightly, like physical buttons.
+The app is a walnut room at night, lit by one low lamp. The page is near-black wood, the few raised surfaces are smoked glass, and all the writing is in cream. Most of the screen is quiet: lists sit straight on the ground and are split by hairlines. Colour only shows up when it means something. The one thing with real personality is a triple racing stripe in burnt orange, rust and umber, which draws every budget bar in the app.
 
-Colour is functional. One accent, **Signal Indigo** (blending into violet on gradients), marks what is selected or what will act. Emerald means money kept, red means money over, amber means waiting. Everything else is gray, so the moment a hue appears it carries meaning. The only place colour is used for personality is the category set, where each category gets its own soft tinted circle with an emoji.
+It is an installed iPhone PWA used one-handed, so it is dark-only and dense. A phone screen shows the month's headline, the stripe and most category rows without scrolling, and every control is still at least thumb-sized. Wide, flat-topped figures in Archivo carry the numbers and headings. The system UI face does the reading.
 
-The feel is compact and efficient, polished and modern. Density is deliberate: a phone screen should show the whole month's picture with minimal scrolling. Polish comes from consistent radii, translucent layering, hairline borders and small press animations, not from decoration.
+The world was chosen in place of the previous cool indigo-glass dashboard of equal cards, and it leaves that dashboard's habits behind: no gradients on controls, no floating pill tab bar and no coloured status tints on every row.
 
 **Key Characteristics:**
-- Dark-only. Every surface is a step on one cool gray ramp.
-- One action colour (Signal Indigo), with semantic colours for saved, over-budget and pending.
-- Small type: most text is 10 to 12px; the month's headline figure is the largest thing on screen at 30px.
-- Tabular numbers for every amount.
-- Rounded, tactile controls (12px corners) that scale down on press.
-- Floating, blurred chrome (tab bar, modals) over tonally layered content.
+- Dark-only. Walnut ground, two smoked-glass steps, cream ink in four tiers.
+- Colour carries meaning: ember for selection and action, avocado for on pace or money in, cherry for over budget.
+- Archivo at 125% width for figures and headings; system UI for body text; tabular figures everywhere.
+- The triple stripe, drawn on one fixed 0–100% scale with a cream notch at today's pace, is every budget bar.
+- Rows sit on the ground between hairlines. Panels are kept for period summaries and for chrome.
+- Every target is at least 44px. Every text tier is at least 4.5:1 on every surface.
 
 ## Colors
 
-A cool, near-black gray ramp carries the whole interface; saturated colour is reserved for action and money states.
+A warm, low-light palette: walnut and cream neutrals, one burnt-orange family, and two status hues used sparingly.
 
 ### Primary
-- **Signal Indigo** (`signal-indigo`, Tailwind indigo-500): the action and selection colour. Start of the indigo-to-violet gradient on the active tab, primary Save/Submit buttons and in-budget progress bars. Also the 2px focus ring at 60% opacity on every field, and the small unread dot on the header avatar.
-- **Signal Indigo Deep** (`signal-indigo-deep`, indigo-600): solid fill for the selected pill (month, trip, filter) and for solid secondary actions like the stealth unlock button.
-- **Signal Violet** (`signal-violet`, violet-600): end stop of the action gradient. Never used on its own.
-- **Indigo Readout** (`signal-indigo-text`, indigo-300): text on indigo-tinted chips and badges (e.g. the "remaining" budget badge).
+- **Ember** (ember): the selection and action colour. Used for the selected period pill, the primary button, the active tab rule, focus outlines, text selection, the caret and the lead band of the stripe.
+- **Ember Ink** (ember-ink): ember lifted for text and hover. Used for the active tab label, primary button hover, and the semibold "ahead of pace" caution in rows and the summary.
+- **Ember Soft** (ember-soft): a pale apricot for small accent text on panels.
+- **Ember Deep** (ember-deep): a dark ember well behind the settings avatar while stealth mode is on.
 
 ### Secondary
-- **Trip Teal** (`trip-teal`, teal-400; `trip-teal-deep`, teal-600): trips and shared-cost entry points. The Splitzes button in the header, the dashed "More" picker for older months and trips, and the trip-link toggle. Used as a translucent tint (teal-600 at 20%, teal-500 border at 30%), not a solid fill.
+- **Rust** (rust) and **Umber** (umber): the second and third bands of the stripe. Stripe only; they never appear as text or fills elsewhere.
 
-### Tertiary (semantic)
-- **Saved Emerald** (`saved-emerald`, emerald-400; `saved-emerald-soft`, emerald-300): money kept. The "Total Saved" figure when positive, "under budget" badges, accepted states.
-- **Overspend Red** (`overspend-red`, red-400): money over and errors. A negative "Total Saved", over-budget amounts, field validation text. `overspend-red-strong` (red-500) and the deep red-600 to rose-800 pair form the danger button and over-budget progress bar gradients.
-- **Pending Amber** (`pending-amber`, amber-300): waiting items such as pending review and kiosk requests.
+### Tertiary
+- **Avocado** (avocado): on pace, under pace, budget left, money saved. **Avocado Ink** (avocado-ink) is the lighter text form for income figures in lists. **Avocado Deep** (avocado-deep) is the dark well behind it.
+- **Cherry** (cherry): over budget, errors and destructive actions. **Cherry Fill** (cherry-fill) is the stripe's second and third bands when a budget is blown. **Cherry Deep** (cherry-deep) is the dark well behind error messages (at 60%).
 
 ### Neutral
-- **Night Base** (`night-base`, gray-950): the page background, the app's theme colour and the base of inset wells (segmented controls at 80%).
-- **Console Panel** (`console-panel`, gray-900): cards, modals, idle pills and the tab bar (at 70% with blur).
-- **Raised Slate** (`raised-slate`, gray-800): the hairline border on almost every container, secondary button fill, progress-bar track, and (at 60%) the fill of every input as `field-fill`.
-- **Control Edge** (`control-edge`, gray-700): stronger borders on interactive controls and hover edges.
-- **Ink White** (`#ffffff`): hero figures, headings, text on accent fills.
-- **Ink Primary** (`ink-primary`, gray-100): default body text and input values.
-- **Ink Body** (`ink-body`, gray-300): row names and secondary values.
-- **Ink Secondary** (`ink-secondary`, gray-400): the most common text colour. Labels, captions, idle tabs.
-- **Ink Muted** (`ink-muted`, gray-500): helper text, empty states, minor metadata.
-- **Ink Faint** (`ink-faint`, gray-600): placeholders only.
-
-### Category tints
-The twelve categories each map to one Tailwind hue (emerald, rose, violet, amber, yellow, orange, sky, cyan, pink, indigo, fuchsia, teal, with slate as fallback), always applied the same way: hue-500 at 15% fill, hue-200 text, hue-400 at 20% border. The mapping lives in `CATEGORY_META` (`src/app/services/expense-state.service.ts`); add to it rather than styling categories inline.
+- **Walnut Ground** (ground): the page, the theme colour, the status bar and the icon tile. Also the text colour on ember fills.
+- **Smoked Glass** (panel): period summaries, the docked tab bar (at 90% with blur), sheets, dialogs and input fields.
+- **Raised Glass** (raised) and **Raised Glass High** (raised-hi): dropdown panels, the toast, the settings avatar and hover wells.
+- **Teak Edge** (edge): control borders, the sheet grabber, the scrollbar and the muted stripe band.
+- **Cream** (ink): primary text and figures. At 10% opacity it is the hairline between rows and the border of panels; at 7% it is the empty stripe track.
+- **Cream 2** (ink-2): secondary text, idle pills, captions on panels.
+- **Cream 3** (ink-3): meta text, idle segments and tabs, budget denominators.
+- **Cream 4** (ink-4): placeholders and the names in the collapsed "quiet" line. It still passes 4.5:1 on ground, panel and raised.
 
 ### Named Rules
-**The One Signal Rule.** Indigo means "selected" or "this will act". Do not use it for decoration, headings or data series that are not selectable.
+**The Meaning Rule.** A hue appears only when it says something: ember means selected, acting or running ahead of pace; avocado means on pace or money kept; cherry means over or wrong. Everything else is walnut and cream.
 
-**The Money Colour Rule.** Emerald and red are claims about money (kept vs over) or validity (ok vs error). Never use them for anything else, and never show a money figure in emerald or red unless its sign or budget status warrants it.
+**The No Yellow Rule.** No yellow, gold or amber anywhere, including the chart palette, and no neon or saturated glow. Warnings are ember-ink in semibold, not yellow.
 
-**The Tint, Don't Fill Rule.** Status and category colour appears as a translucent tint (500 at 10 to 20% fill, 200 or 300 text, 400 or 500 at 20 to 30% border). Solid saturated fills are reserved for the active tab, primary and danger buttons, and the selected pill.
+**The Cream-Text Floor Rule.** Text uses only the four cream tiers or a status hue, and every pairing clears 4.5:1 on ground, panel and raised. Never create a dimmer text tone with opacity.
 
 ## Typography
 
-**Body Font:** the system UI stack (Tailwind's default `ui-sans-serif, system-ui, sans-serif` plus emoji fonts), which renders as SF Pro on the iPhone.
-**Label/Mono Font:** none. Numbers use the same family with tabular figures.
+**Display Font:** Archivo, self-hosted variable (weight 400–800, width 100–125%), with ui-sans-serif and system-ui as fallbacks
+**Body Font:** the system UI stack (ui-sans-serif, system-ui, -apple-system, Segoe UI)
 
-**Character:** native and unbranded. The type stays out of the way so numbers read cleanly; hierarchy comes from weight and size steps, not from a display face.
+**Character:** Archivo stretched to 125% gives wide, flat, low figures with a period-sporty feel; it is only used through the wide-type utility, which also locks tabular numbers. The system face keeps body text native and fast to read on iOS.
 
 ### Hierarchy
-- **Display** (800, 1.875rem / 30px, tight tracking, tabular): the month's hero figure in the overview card ("spent", "saved"). One or two per screen at most.
-- **Headline** (700, 1.25rem / 20px, tight tracking): the app title in the header. Rare.
-- **Title** (600, 0.875rem / 14px): modal titles, primary button labels, card titles.
-- **Body** (400, 0.875rem / 14px): input values, category names, list item primary text.
-- **Body Compact** (500, 0.75rem / 12px): the workhorse size. Pills, secondary buttons, field labels, most list text.
-- **Label** (500, 0.75rem / 12px, uppercase, 0.05em tracking): section headings on cards ("Total Spent"). Some smaller badges and toasts use 10px uppercase with wider tracking (0.12 to 0.22em).
-- **Micro** (500, 0.625rem / 10px; also 11px): tab labels, meta lines, transaction counts, validation messages.
+- **Display** (Archivo wide, 700, 40px, line-height 1, -0.02em): the period headline figure, such as money left this month or a trip's total. One per screen. The All-time total clamps it between 30px and 40px.
+- **Headline** (Archivo wide, 600, 26px): the sign-in title only.
+- **Title** (Archivo wide, 600, 18–20px): the trip name, the days-to-go count, and secondary panel figures. One-off In and Spent figures sit at 32px bold.
+- **Figure** (Archivo wide, 600, 15–16px): inline totals inside panels, such as Saved and In / Out / Net.
+- **Brand** (Archivo wide, 700, 17px, uppercase, 0.02em): the "Expenses" wordmark in the header.
+- **Section Heading** (Archivo wide, 600, 13px, uppercase, cream 2): list headings such as Categories and Recent.
+- **Body Large** (system, 500, 15px): row labels and primary button labels.
+- **Body** (system, 400, 14px): transaction descriptions, panel captions and segmented control labels.
+- **Body Small** (system, 400–500, 13px): row amounts, pills, secondary buttons, meta lines.
+- **Caption** (system, 12px): row status lines and the labels under panel figures.
+- **Micro** (system, 500, 11px): tab labels and the "Today" notch caption.
 
 ### Named Rules
-**The Tabular Rule.** Every money figure uses tabular numbers (`tabular-nums`), so amounts align in rows and do not jitter as they change.
+**The Wide For Figures Rule.** Money headlines, panel figures and headings are set in wide Archivo. Running text, labels and list rows stay in the system face, and amounts in rows stay in the system face with tabular numbers.
 
-**The 30px Ceiling Rule.** Nothing is larger than the Display figure. If a new screen needs emphasis, use weight or colour, not a bigger size.
+**The Tabular Rule.** Every amount uses tabular figures, written as € with two decimals, so columns line up and numbers do not jitter.
 
 ## Layout
 
-A single centred column, mobile-first. The admin shell is `max-w-md` (448px) with a 16px gutter (`p-4`); from the `md` breakpoint (768px) it widens to `max-w-3xl` (768px) with 32px padding. Content stacks vertically with 16px gaps between major blocks.
+There is one centred column with a maximum width of 512px. It has 16px side gutters and stacks its sections with 20px gaps. The column pads for the iOS status bar (the safe area, at least 8px) and leaves the safe area plus 92px at the bottom so the docked tab bar never covers content. On desktop the same column stays centred on the walnut ground and does not widen.
 
-Spacing follows Tailwind's 4px base, and the app lives at the small end of it: 8px and 12px are the common gaps and paddings inside components, 16 to 20px inside cards, 24px between overview columns. Rows and controls are compact (8 to 10px vertical padding).
+The Budget page always runs in the same order: the Month / Trips / One-offs switch, the period pills, the summary panel, the ranked breakdown, then the transactions. Category rows are sorted by trouble: over, then ahead of pace, then full, then on pace. Categories with no spending collapse into a single "quiet" line.
 
-The tab bar floats 16px above the bottom edge, so the page reserves 112px of bottom padding (`tab-clearance`, `pb-28`). Long forms also use `scroll-mb-32` so focused fields scroll clear of it.
+Rows are at least 56px tall with 10px of vertical padding. Transaction rows are at least 48px. Panels use 20px of horizontal padding.
 
-Horizontal pill rows (months, trips, filters) do not wrap: pills keep their width and the row scrolls, or quick pills share the row equally with a 1.5x-wide "More" picker at the end (`src/app/utils/pill-styles.ts`).
+A faint ember wash (7% at the top, fading out by 70%) sits fixed behind the top 420px of every screen. It is the only ambient light.
 
 ## Elevation & Depth
 
-Depth is mostly tonal. Surfaces step up the gray ramp (night base, then console panel, then raised slate) and are separated by 1px hairline borders in raised slate, often at 60 to 80% opacity. Translucent fills over the dark base give a layered, glassy feel without shadows.
-
-Shadows appear only on things that float above the page: the tab bar, modals, toasts, the overview card, and primary/active accent elements.
+The page is mostly flat and gets its depth from tone: ground, then panel, then raised. In-flow surfaces take no drop shadow. A panel is lifted only by a 10% cream border and a 1px cream highlight along its top inside edge, as if light were catching the glass. Real shadows belong only to things that float over the page.
 
 ### Shadow Vocabulary
-- **Floating chrome** (`box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.5)`, Tailwind `shadow-2xl shadow-black/50`): the tab bar and modals.
-- **Hero card** (`shadow-xl`): the overview card.
-- **Accent lift** (`shadow-lg`, on the active tab tinted `shadow-indigo-950/40`): primary buttons, the active tab, danger confirm buttons.
-- **Inset well** (`shadow-inner`): category emoji circles.
-
-Blur accompanies floating chrome: `backdrop-blur-xl` on the tab bar, `backdrop-blur-sm` on overlays and toasts, and modal backdrops are black at 75% with a light blur.
+- **Glass top edge** (`box-shadow: inset 0 1px 0 rgb(241 230 210 / 0.06)`): every summary panel.
+- **Dropdown** (`box-shadow: 0 18px 40px -12px rgb(0 0 0 / 0.7)`): the "More" picker panel.
+- **Sheet** (`box-shadow: 0 -24px 60px -20px rgb(0 0 0 / 0.8)`): the bottom sheet, cast upward.
+- **Toast** (`box-shadow: 0 10px 30px -10px rgb(0 0 0 / 0.8)`): the update notice.
+- **Notch ring** (`box-shadow: 0 0 0 2px var(--color-ground)`): cuts the cream notch out of the stripe. This is a ground-coloured knockout, not a glow.
 
 ### Named Rules
-**The Float Earns the Shadow Rule.** Content sitting in the page flow is separated by tone and borders, never by shadow. Only elements that float over content (or the single hero card) get a shadow.
+**The Float Earns The Shadow Rule.** Only sheets, dialogs, dropdowns and the toast cast a shadow, and it is always black. Nothing in the page flow casts one, and no shadow or halo is ever coloured.
 
 ## Shapes
 
-Soft, consistent rounding with three working radii:
-
-- **12px** (`rounded-xl`) is the default for anything you touch: inputs, buttons, pills, list rows, segmented controls.
-- **16px** (`rounded-2xl`) for containers: cards, modals, the sign-in panel.
-- **Full** (`rounded-full`) for the tab bar and its tabs, avatars, the header Splitzes button, status dots and progress bars.
-- **8px** (`rounded-lg`) for buttons nested inside a 12px well (segmented control options), and **6px** (`rounded-md`) for small inline badges.
-
-Borders are 1px hairlines. A dashed border marks the "More" picker as a different kind of control from the plain pills. Icons are inline SVG line glyphs, 24px viewBox with a 1.75px stroke, rounded caps and joins.
+Corners are softly rounded and consistent: 12px on every control (pills, buttons, inputs, the segmented frame), 10px on segments inside that frame, 16px on panels and dropdowns, and 28px on the top corners of the bottom sheet. Fully round shapes are reserved for the stripe bands, the notch, the sheet grabber, avatar and close buttons. Borders are 1px: teak edge on controls, and 10% cream on panels and hairlines. The "More" picker is the only dashed border.
 
 ## Components
 
 ### Buttons
-Tight and tactile: compact, rounded, and they shrink on press.
-- **Shape:** 12px corners (`rounded-xl`).
-- **Primary:** full-width, indigo-500 to violet-600 gradient, white 14px semibold text, 12px vertical padding, `shadow-lg`. Used for Save / Submit on forms.
-- **Secondary:** raised slate fill, ink-body text, control-edge border at 80%, 12px semibold.
-- **Danger:** red-500 to rose-600 gradient, white text, `shadow-lg`. Confirm dialogs pair it 50/50 with a secondary Cancel.
-- **States:** press scales to 0.98 (`active:scale-[0.98]`; small round controls use 0.95). Disabled drops to 40% opacity with a not-allowed cursor. Transitions are 150 to 200ms.
-- **Ghost-tint (header):** pill-shaped teal tint (teal-600 at 20% fill, teal-500 at 30% border, teal-400 text) for the Splitzes entry point.
+Flat and solid, with no gradient or lift.
+- **Shape:** gently rounded (12px).
+- **Primary:** ember fill, walnut text, 15px semibold, at least 48px tall in forms (44px inline). Hover lifts to ember ink. Pressing scales it to 0.99. Disabled is 40% opacity.
+- **Secondary:** transparent with a teak-edge border, cream 2 text at 13px medium, at least 44px tall. Hover brightens the border to cream 4 and the text to cream.
+- **Destructive:** transparent with a cherry border at 35%, cherry text. Hover adds a cherry-deep well at 50%.
+- **Focus:** a 2px ember outline with a 2px offset, applied globally.
 
-### Chips and Pills
-- **Selector pill:** console-panel fill, ink-secondary 12px text, raised-slate border, 8px x 16px padding; hover strengthens the border. Selected: solid indigo-600 with white medium text and an indigo-500 border.
-- **More picker:** dashed teal border at 50%, teal tint at 10%, ink-body text and a calendar glyph; looks like a selected pill once an older item is chosen.
-- **Status badge:** 6px corners, semantic tint (e.g. emerald-500 at 15% fill, emerald-300 text, emerald-500 at 30% border), 12px semibold tabular text.
+### Chips (period pills)
+- **Style:** at least 44px tall, 12px corners, 13px medium, 16px horizontal padding. Idle pills are transparent with a teak-edge border and cream 2 text.
+- **State:** the selected pill is a solid ember fill with walnut text. Recent pills share their row equally; a selected trip pill grows to keep its full name (at most 60%). The "More" picker is dashed until an older item is picked, then it takes the selected style.
 
-### Cards / Containers
+### Segmented switch
+- A 12px teak-edge frame with 2px of inner padding holds equal segments, each at least 40px tall with 10px corners. The active segment is a 20% ember well with an inset 1px ember ring at 60% and cream text. Idle segments are cream 3. Used for Month / Trips / One-offs, Categories / Months and the one-offs filter.
+
+### Cards / Containers (summary panel)
 - **Corner Style:** 16px.
-- **Background:** console panel; the overview card adds a diagonal gradient that drifts into indigo-950 at 50% in the bottom-right corner.
-- **Shadow Strategy:** none in flow; `shadow-xl` on the overview card only (see Elevation).
-- **Border:** 1px raised slate.
-- **Internal Padding:** 20px (cards), 12px (smaller containers and list rows).
+- **Background:** smoked glass (panel), with a 10% cream border.
+- **Shadow Strategy:** the glass top edge only (see Elevation & Depth).
+- **Internal Padding:** 20px horizontal, 16px top, 20px bottom.
+- **Use:** only for a period's summary (month, trip, one-offs, all time). A divider inside the panel is a 10% cream hairline. Never nest a card inside it, and never wrap list rows in one.
 
 ### Inputs / Fields
-- **Style:** field-fill (raised slate at 60%), 1px raised-slate border, 12px corners, 10px x 12px padding, 14px ink-primary text, ink-faint placeholder. Date inputs use `scheme-dark`.
-- **Label:** 12px medium ink-secondary, 6px above the field.
-- **Focus:** native outline removed, 2px Signal Indigo ring at 60% (trip select uses sky at 60%).
-- **Error:** 11px overspend-red message under the field.
-- **Segmented control:** a night-base well at 80% with a 4px inset, holding two 8px-radius options.
+- **Style:** smoked glass or a 60% raised fill, a 1px border and 12px corners. Text is cream and placeholders are cream 4. Sign-in fields are 48px tall at 16px.
+- **Focus:** the border turns ember, or a 2px ember ring at 60%.
+- **Error:** a message in a cherry-deep well at 60% with a cherry border at 30% and cherry text.
 
 ### Navigation
-- **Tab bar:** a floating pill centred 16px above the bottom edge. Console panel at 70% with `backdrop-blur-xl`, raised-slate border at 70%, `shadow-2xl` in black at 50%. Five tabs (Monthly, SumUp, Create, OneOffs, Charts), each an 18px line icon above a 10px medium label.
-- **Active tab:** indigo-500 to violet-600 gradient pill, white text, indigo-tinted `shadow-lg`. Idle tabs are ink-secondary, lightening on hover. All tabs scale to 0.95 on press.
-- **Header:** logo, 20px bold title and a 12px ink-secondary subtitle on the left; the teal Splitzes pill and a 36px round avatar button (with an indigo unread dot) on the right.
+- **Header:** at least 56px tall, with the icon tile, the wide uppercase wordmark, a Splitz outline button and a 44px round "ME" avatar. In stealth mode the avatar shows an ember border on an ember-deep fill with an ember dot.
+- **Tab bar:** docked full-width to the bottom edge, panel at 90% with a strong backdrop blur and a 10% cream top hairline. Four equal tabs, each at least 54px tall, with a 22px line icon (1.7 stroke) over an 11px label. The active tab has ember-ink text and a 2px ember rule along its top edge. Idle tabs are cream 3.
 
-### Category Row (signature)
-The main readout of the Monthly tab. A 12px-radius row with a faint warm wash (amber-50 at 5%) and a raised-slate border at 60%. Left: a 32px round emoji avatar in its category tint with an inner shadow, the category name in 14px medium, and a 10px count. Right: tabular amounts with budget context. Below: an 8px progress track in raised slate, filled with the indigo-to-violet gradient while in budget and the red-600 to rose-800 gradient once over.
+### Breakdown row (signature list item)
+The same row is used for months, trips and all time. It sits on the ground with hairlines between rows. The top line has a small emoji (grayscale 40%, opacity 60%), a 15px cream label, and the amount with a cream-3 "/ budget" after it. The thin stripe sits under that line. The bottom line holds a 12px status in its colour (cherry semibold for over, ember-ink semibold for ahead, avocado for on pace) and a cream-3 count with a chevron. When one row is expanded, its siblings dim (label to cream 2, stripe to 35% opacity).
 
-### Overview Card (signature)
-The month at a glance: two columns (spent and saved) separated by 24px. Each column starts with an uppercase 12px label, then a 30px extra-bold tabular hero figure (white for spent; emerald or red for saved), then 10 to 11px breakdown lines. Expands to show more detail behind a chevron that rotates over 400ms.
+### The triple stripe (signature)
+Three parallel rounded bands, ember, rust and umber, fill to spent ÷ budget on a fixed 0–100% scale over a 7% cream track. The large stripe in summaries has 5px bands with 3px gaps; the small stripe in rows has 2px bands with 1px gaps. A 2px cream notch, cut out of the bands by a ground-coloured ring, marks today's pace; the summary labels it "Today" in micro type. When spending passes the budget the bands become cherry and cherry fill. Unbudgeted or share-of-total rows use a muted set (cream 4, edge, raised high).
+
+### Bottom sheet
+Edits open in a sheet over the page, so the list keeps its scroll position. It is smoked glass with 28px top corners, a teak-edge border, a 40px grabber, a 44px close button, and safe-area padding underneath. The backdrop is walnut-black at 72% with a 3px blur. It rises 24px in 380ms on the expo-out curve.
+
+### Motion
+Motion uses one curve, expo-out (`cubic-bezier(0.16, 1, 0.3, 1)`). The only authored entrance on page content is the summary stripe growing in from the left: 700ms, with the bands staggered by 70ms. Row stripes stay still. Overlays settle in: the sheet rises in 380ms, and dialogs lift and fade in 240ms. State changes are colour transitions of 150ms and row dimming of 300ms. Under reduced motion every animation and transition collapses to an instant.
 
 ## Do's and Don'ts
 
 ### Do:
-- **Do** use tabular numbers for every amount, and show money as `€` with two decimals.
-- **Do** mark every amount that stealth mode should hide with the `appSensitive` directive.
-- **Do** build new surfaces from the gray ramp: night base for the page, console panel for cards, raised slate for borders and fields.
-- **Do** use the indigo-to-violet gradient only for the primary action on a screen and the active tab.
-- **Do** apply status and category colour as tints (500 at 10 to 20%, 200 or 300 text, 400 or 500 border at 20 to 30%).
-- **Do** use 12px corners on controls and 16px on containers.
-- **Do** give every pressable element press feedback (`active:scale-[0.98]` or `0.95` for small round controls) and a 150 to 200ms transition.
-- **Do** keep 112px of bottom clearance on any scrolling page so the floating tab bar never covers content.
-- **Do** use the shared pill styles in `src/app/utils/pill-styles.ts` and category tints from `CATEGORY_META` instead of restyling them per component.
+- **Do** draw every budget bar with the triple stripe on the fixed 0–100% scale, with the cream notch at pace when the period is current.
+- **Do** put list rows straight on the walnut ground, split by 10% cream hairlines.
+- **Do** keep every tappable thing at least 44px in its smallest dimension.
+- **Do** set money headlines and panel figures in wide Archivo, and every amount in tabular figures as € with two decimals.
+- **Do** mark every amount that stealth mode should hide with the sensitive directive.
+- **Do** use the shared pill styles for period and filter selectors instead of restyling them.
+- **Do** rank breakdowns by trouble: over, ahead, full, on pace, then quiet.
+- **Do** give a new surface a black shadow only if it floats over the page.
 
 ### Don't:
-- **Don't** add light surfaces or a light theme; the system is dark-only.
-- **Don't** use emerald or red for anything other than saved/over-budget money and valid/invalid states.
-- **Don't** introduce new action colours. The cyan on the sign-in button and the "Updating..." toast predates Signal Indigo; don't extend it.
-- **Don't** set any text larger than the 30px Display figure.
-- **Don't** put shadows on in-flow cards and rows; separate them with tone and hairline borders.
-- **Don't** use solid saturated fills for status or category; tint them.
+- **Don't** use yellow, gold, amber, neon, or any coloured glow or halo.
+- **Don't** use ember, avocado or cherry for decoration, category identity or headings.
+- **Don't** wrap rows in cards, or put a card inside a panel. Panels are for period summaries, chrome and overlays.
+- **Don't** add a light theme or light surfaces.
+- **Don't** use a gradient fill on a button, tab or pill.
+- **Don't** add a second entrance animation to in-flow content, or animate the row stripes.
+- **Don't** set a text colour below cream 4, or dim text with opacity, except for the dimming of sibling rows behind an expanded one.

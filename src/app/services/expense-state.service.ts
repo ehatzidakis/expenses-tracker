@@ -14,7 +14,10 @@ export interface CategorySpend {
   isOverBudget: boolean;
 }
 
-export type AppTab = 'monthly' | 'sumup' | 'create' | 'oneoffs' | 'charts';
+export type AppTab = 'monthly' | 'sumup' | 'create' | 'charts';
+
+/** Which period the Budget tab shows. */
+export type BudgetMode = 'month' | 'trips' | 'oneoffs';
 
 export interface CategorySubcategoryOption {
   id: number;
@@ -107,87 +110,87 @@ export const CATEGORY_NAMES = Object.keys(CATEGORY_BUDGETS);
 export const CATEGORY_META: Record<string, { emoji: string; classes: string }> = {
   Supermarket: {
     emoji: '🛒',
-    classes: 'bg-emerald-500/15 text-emerald-200 border border-emerald-400/20',
+    classes: 'bg-raised text-ink-2 border border-edge',
   },
   Medical: {
     emoji: '❤️‍🩹',
-    classes: 'bg-rose-500/15 text-rose-200 border border-rose-400/20',
+    classes: 'bg-raised text-ink-2 border border-edge',
   },
   Personal: {
     emoji: '👤',
-    classes: 'bg-violet-500/15 text-violet-200 border border-violet-400/20',
+    classes: 'bg-raised text-ink-2 border border-edge',
   },
   EatingOut: {
     emoji: '🍽️',
-    classes: 'bg-amber-500/15 text-amber-200 border border-amber-400/20',
+    classes: 'bg-raised text-ink-2 border border-edge',
   },
   Utilities: {
     emoji: '💡',
-    classes: 'bg-yellow-500/15 text-yellow-200 border border-yellow-400/20',
+    classes: 'bg-raised text-ink-2 border border-edge',
   },
   Takeaway: {
     emoji: '🥡',
-    classes: 'bg-orange-500/15 text-orange-200 border border-orange-400/20',
+    classes: 'bg-raised text-ink-2 border border-edge',
   },
   Tickets: {
     emoji: '🎟️',
-    classes: 'bg-sky-500/15 text-sky-200 border border-sky-400/20',
+    classes: 'bg-raised text-ink-2 border border-edge',
   },
   Gaming: {
     emoji: '🎮',
-    classes: 'bg-cyan-500/15 text-cyan-200 border border-cyan-400/20',
+    classes: 'bg-raised text-ink-2 border border-edge',
   },
   Cats: {
     emoji: '🐱',
-    classes: 'bg-pink-500/15 text-pink-200 border border-pink-400/20',
+    classes: 'bg-raised text-ink-2 border border-edge',
   },
   Travel: {
     emoji: '🚅',
-    classes: 'bg-indigo-500/15 text-indigo-200 border border-indigo-400/20',
+    classes: 'bg-raised text-ink-2 border border-edge',
   },
   Subscriptions: {
     emoji: '📺',
-    classes: 'bg-fuchsia-500/15 text-fuchsia-200 border border-fuchsia-400/20',
+    classes: 'bg-raised text-ink-2 border border-edge',
   },
   Gym: {
     emoji: '🏋️',
-    classes: 'bg-teal-500/15 text-teal-200 border border-teal-400/20',
+    classes: 'bg-raised text-ink-2 border border-edge',
   },
   'Plane Tickets': {
     emoji: '🎫',
-    classes: 'bg-sky-500/15 text-sky-200 border border-sky-400/20',
+    classes: 'bg-raised text-ink-2 border border-edge',
   },
   Accommodation: {
     emoji: '🏨',
-    classes: 'bg-violet-500/15 text-violet-200 border border-violet-400/20',
+    classes: 'bg-raised text-ink-2 border border-edge',
   },
   Food: {
     emoji: '🍽️',
-    classes: 'bg-amber-500/15 text-amber-200 border border-amber-400/20',
+    classes: 'bg-raised text-ink-2 border border-edge',
   },
   Transportation: {
     emoji: '🚅',
-    classes: 'bg-indigo-500/15 text-indigo-200 border border-indigo-400/20',
+    classes: 'bg-raised text-ink-2 border border-edge',
   },
   Gifts: {
     emoji: '🎁',
-    classes: 'bg-pink-500/15 text-pink-200 border border-pink-400/20',
+    classes: 'bg-raised text-ink-2 border border-edge',
   },
   Activities: {
     emoji: '🎉',
-    classes: 'bg-teal-500/15 text-teal-200 border border-teal-400/20',
+    classes: 'bg-raised text-ink-2 border border-edge',
   },
   Attractions: {
     emoji: '🏛️',
-    classes: 'bg-yellow-500/15 text-yellow-200 border border-yellow-400/20',
+    classes: 'bg-raised text-ink-2 border border-edge',
   },
   Splurge: {
     emoji: '🤑',
-    classes: 'bg-fuchsia-500/15 text-fuchsia-200 border border-fuchsia-400/20',
+    classes: 'bg-raised text-ink-2 border border-edge',
   },
   Miscellaneous: {
     emoji: '✨',
-    classes: 'bg-slate-500/15 text-slate-200 border border-slate-400/20',
+    classes: 'bg-raised text-ink-2 border border-edge',
   },
 };
 
@@ -195,7 +198,7 @@ export function getCategoryMeta(name: string): { emoji: string; classes: string 
   return (
     CATEGORY_META[name] ?? {
       emoji: '•',
-      classes: 'bg-slate-500/15 text-slate-200 border border-slate-400/20',
+      classes: 'bg-raised text-ink-2 border border-edge',
     }
   );
 }
@@ -252,6 +255,7 @@ export class ExpenseStateService {
   // Internal state
   readonly selectedExpenseId = signal<string | null>(null);
   readonly activeTab = signal<AppTab>('monthly');
+  readonly budgetMode = signal<BudgetMode>('month');
   private readonly lastSelectedMonthId = signal<string | null>(null);
 
   readonly processedExpenses = computed<Expense[]>(() => {

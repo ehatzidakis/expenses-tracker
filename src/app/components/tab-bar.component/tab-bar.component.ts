@@ -6,62 +6,62 @@ interface TabDef {
   label: string;
 }
 
+/** Docked bottom navigation: smoked glass, an ember rule over the current tab. */
 @Component({
   selector: 'app-tab-bar',
   standalone: true,
   host: { class: 'block' },
   template: `
     <nav
-      class="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 flex items-center gap-1 px-1.5 py-1.5 rounded-full bg-gray-900/70 border border-gray-800/70 backdrop-blur-xl shadow-2xl shadow-black/50"
+      aria-label="Main"
+      class="fixed inset-x-0 bottom-0 z-40 border-t border-ink/10 bg-panel/90 pb-[env(safe-area-inset-bottom)] backdrop-blur-xl"
     >
-      @for (tab of tabs; track tab.id) {
-        <button
-          (click)="onSelect(tab.id)"
-          class="relative flex flex-col items-center justify-center gap-0.5 px-3.5 py-2 rounded-full text-[10px] font-medium whitespace-nowrap transition-all duration-200 active:scale-95"
-          [class]="
-            activeTab() === tab.id
-              ? 'bg-linear-to-br from-indigo-500 to-violet-600 text-white shadow-lg shadow-indigo-950/40'
-              : 'text-gray-400 hover:text-gray-200'
-          "
-        >
-          <svg
-            class="w-4.5 h-4.5"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="1.75"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            @switch (tab.id) {
-              @case ('monthly') {
-                <rect x="3.5" y="4.5" width="17" height="16" rx="2.5" />
-                <line x1="3.5" y1="9.5" x2="20.5" y2="9.5" />
-                <line x1="8" y1="2.5" x2="8" y2="6.5" />
-                <line x1="16" y1="2.5" x2="16" y2="6.5" />
+      <ul class="mx-auto flex max-w-lg">
+        @for (tab of tabs; track tab.id) {
+          <li class="flex-1">
+            <button
+              type="button"
+              (click)="onSelect(tab.id)"
+              class="relative flex w-full min-h-[54px] flex-col items-center justify-center gap-1 text-[11px] font-medium transition-colors duration-150 cursor-pointer"
+              [class]="activeTab() === tab.id ? 'text-ember-ink' : 'text-ink-3 hover:text-ink'"
+              [attr.aria-current]="activeTab() === tab.id ? 'page' : null"
+            >
+              @if (activeTab() === tab.id) {
+                <span class="absolute inset-x-6 top-0 h-[2px] rounded-b-full bg-ember" aria-hidden="true"></span>
               }
-              @case ('sumup') {
-                <path d="M12 2 2 7l10 5 10-5-10-5z" />
-                <path d="M2 17l10 5 10-5" />
-                <path d="M2 12l10 5 10-5" />
-              }
-              @case ('create') {
-                <line x1="12" y1="5" x2="12" y2="19" />
-                <line x1="5" y1="12" x2="19" y2="12" />
-              }
-              @case ('oneoffs') {
-                <path d="M13 2 3 14h7l-1 8 10-12h-7l1-8z" />
-              }
-              @case ('charts') {
-                <line x1="5" y1="20" x2="5" y2="11" />
-                <line x1="12" y1="20" x2="12" y2="5" />
-                <line x1="19" y1="20" x2="19" y2="14" />
-              }
-            }
-          </svg>
-          <span>{{ tab.label }}</span>
-        </button>
-      }
+              <svg
+                class="size-[22px]"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.7"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                @switch (tab.id) {
+                  @case ('monthly') {
+                    <path d="M3.5 7.5h17M3.5 12h17M3.5 16.5h10" />
+                  }
+                  @case ('sumup') {
+                    <path d="M12 2 2 7l10 5 10-5-10-5z" />
+                    <path d="M2 17l10 5 10-5" />
+                    <path d="M2 12l10 5 10-5" />
+                  }
+                  @case ('create') {
+                    <circle cx="12" cy="12" r="9" />
+                    <path d="M12 8v8M8 12h8" />
+                  }
+                  @case ('charts') {
+                    <path d="M5 20V11M12 20V5M19 20v-6" />
+                  }
+                }
+              </svg>
+              <span>{{ tab.label }}</span>
+            </button>
+          </li>
+        }
+      </ul>
     </nav>
   `,
 })
@@ -70,10 +70,9 @@ export class TabBarComponent {
   tabChange = output<AppTab>();
 
   readonly tabs: TabDef[] = [
-    { id: 'monthly', label: 'Monthly' },
-    { id: 'sumup', label: 'SumUp' },
-    { id: 'create', label: 'Create' },
-    { id: 'oneoffs', label: 'OneOffs' },
+    { id: 'monthly', label: 'Budget' },
+    { id: 'sumup', label: 'All time' },
+    { id: 'create', label: 'Add' },
     { id: 'charts', label: 'Charts' },
   ];
 

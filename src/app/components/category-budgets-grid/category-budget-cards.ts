@@ -18,40 +18,40 @@ export interface BudgetCardItem {
     <div class="grid grid-cols-4 gap-1">
       @for (item of budgets(); track item.category) {
         <div
-          class="bg-gray-800/40 border border-gray-800/60 rounded-2xl p-3.5 flex flex-col justify-between"
+          class="bg-raised/40 border border-raised/60 rounded-2xl p-3.5 flex flex-col justify-between"
         >
           <span
-            class="font-medium text-gray-400 block whitespace-nowrap"
+            class="font-medium text-ink-2 block whitespace-nowrap"
             [class]="getCategoryTextSize(item.category)"
           >
             {{ item.category }}
           </span>
 
           @if (isEditing()) {
-            <label class="mt-2 block text-[10px] text-gray-400">
+            <label class="mt-2 block text-[11px] text-ink-2">
               <span class="mb-1 block">Budget</span>
               <div
-                class="flex items-center gap-1 rounded-md border border-gray-700 bg-gray-950/70 px-2 py-1.5"
+                class="flex items-center gap-1 rounded-md border border-edge bg-ground/70 px-2 py-1.5"
               >
-                <span class="text-gray-400">€</span>
+                <span class="text-ink-2">€</span>
                 <input
                   type="text"
                   inputmode="numeric"
                   autocomplete="off"
                   pattern="[0-9]*"
-                  class="w-full bg-transparent text-sm text-white outline-none"
+                  class="w-full bg-transparent text-sm text-ink outline-none"
                   [ngModel]="draftBudgets()[item.category] ?? 0"
                   (ngModelChange)="budgetChange.emit({ category: item.category, value: $event })"
                 />
               </div>
               @if (item.suggestion !== null) {
-                <span class="mt-1 block text-[9px] text-indigo-300">
+                <span class="mt-1 block text-[11px] text-ember-ink">
                   suggested: €{{ item.suggestion | number: '1.0-0' }}
                 </span>
               }
             </label>
           } @else {
-            <span class="text-base font-semibold text-gray-100 mt-1" appSensitive>
+            <span class="text-base font-semibold text-ink mt-1" appSensitive>
               €{{ item.budget | number: '1.0-0' }}
             </span>
           }
@@ -68,7 +68,7 @@ export class CategoryBudgetCardsComponent {
   readonly budgetChange = output<{ category: string; value: string }>();
 
   getCategoryTextSize(category: string): string {
-    if (category.length > 9) return 'text-[8.5px]';
+    if (category.length > 9) return 'text-[11px]';
     return 'text-[11px]';
   }
 }

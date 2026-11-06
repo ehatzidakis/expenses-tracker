@@ -14,21 +14,21 @@ import { CategoryBudgetsPieChartComponent } from '../category-budgets-pie-chart/
   imports: [CommonModule, CategoryBudgetsBarChartComponent, CategoryBudgetsPieChartComponent],
   template: `
     <div
-      class="bg-gray-900/60 border border-gray-800/80 rounded-2xl p-4 space-y-4 backdrop-blur-sm overflow-hidden select-none"
+      class="bg-panel/60 border border-raised/80 rounded-2xl p-4 space-y-4 overflow-hidden select-none"
     >
       <div class="flex items-center justify-between gap-3">
         <div>
-          <h3 class="text-sm font-semibold text-gray-100">{{ chartHeader() }}</h3>
-          <p class="text-[11px] text-gray-400 mt-0.5">{{ chartSubheader() }}</p>
+          <h3 class="text-sm font-semibold text-ink">{{ chartHeader() }}</h3>
+          <p class="text-[11px] text-ink-2 mt-0.5">{{ chartSubheader() }}</p>
         </div>
 
-        <div class="inline-flex rounded-full border border-gray-700 bg-gray-950/80 p-1">
+        <div class="inline-flex rounded-full border border-edge bg-ground/80 p-1">
           <button
             type="button"
             class="rounded-full px-3 py-1.5 text-[11px] font-semibold transition-colors"
-            [class.bg-indigo-500]="selectedChart() === 'bar'"
-            [class.text-white]="selectedChart() === 'bar'"
-            [class.text-gray-400]="selectedChart() !== 'bar'"
+            [class.bg-ember]="selectedChart() === 'bar'"
+            [class.text-ground]="selectedChart() === 'bar'"
+            [class.text-ink-2]="selectedChart() !== 'bar'"
             (click)="selectedChart.set('bar')"
           >
             Bar
@@ -36,9 +36,9 @@ import { CategoryBudgetsPieChartComponent } from '../category-budgets-pie-chart/
           <button
             type="button"
             class="rounded-full px-3 py-1.5 text-[11px] font-semibold transition-colors"
-            [class.bg-indigo-500]="selectedChart() === 'pie'"
-            [class.text-white]="selectedChart() === 'pie'"
-            [class.text-gray-400]="selectedChart() !== 'pie'"
+            [class.bg-ember]="selectedChart() === 'pie'"
+            [class.text-ground]="selectedChart() === 'pie'"
+            [class.text-ink-2]="selectedChart() !== 'pie'"
             (click)="selectedChart.set('pie')"
           >
             Pie

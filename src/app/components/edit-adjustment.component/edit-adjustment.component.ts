@@ -35,16 +35,15 @@ function formatDateForInput(dateVal: Date | string): string {
   host: { class: 'block' },
   template: `
     <app-edit-form-shell
-      title="Edit Adjustment"
-      backClass="text-xs font-medium text-gray-400 hover:text-gray-200 flex items-center gap-1 transition-colors cursor-pointer"
+      [title]="adjustment().isTrip ? 'Edit trip' : 'Edit one-off'"
       [formInvalid]="adjustmentForm().invalid()"
       [submitting]="submitting()"
       [deleting]="deleting()"
       [privacyDisabled]="privacyService.isPrivacyMode()"
       [errorMessage]="errorMessage()"
-      deleteLabel="Delete Adjustment"
-      deleteTitle="Delete Adjustment?"
-      deleteMessage="Are you sure you want to delete this adjustment?"
+      [deleteLabel]="adjustment().isTrip ? 'Delete trip' : 'Delete one-off'"
+      [deleteTitle]="adjustment().isTrip ? 'Delete this trip?' : 'Delete this one-off?'"
+      deleteMessage="This can't be undone."
       [showDeleteConfirm]="showDeleteConfirm()"
       (back)="back.emit()"
       (submitted)="onSubmit($event)"
@@ -176,7 +175,7 @@ export class EditAdjustmentComponent {
       await this.queryClient.invalidateQueries({ queryKey: ['adjustments'] });
       this.updated.emit();
     } catch (err) {
-      this.errorMessage.set('Failed to update adjustment.');
+      this.errorMessage.set("Couldn't save the changes. Check your connection and try again.");
     } finally {
       this.submitting.set(false);
     }
@@ -197,7 +196,7 @@ export class EditAdjustmentComponent {
       await this.queryClient.invalidateQueries({ queryKey: ['adjustments'] });
       this.deleted.emit();
     } catch (err) {
-      this.errorMessage.set('Failed to delete adjustment.');
+      this.errorMessage.set("Couldn't delete it. Check your connection and try again.");
     } finally {
       this.deleting.set(false);
     }

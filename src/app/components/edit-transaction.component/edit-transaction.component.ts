@@ -41,14 +41,14 @@ import {
   host: { class: 'block' },
   template: `
     <app-edit-form-shell
-      title="Edit Transaction"
+      title="Edit transaction"
       [formInvalid]="transactionForm().invalid()"
       [submitting]="submitting()"
       [deleting]="deleting()"
       [privacyDisabled]="privacyService.isPrivacyMode()"
       [errorMessage]="errorMessage()"
-      deleteLabel="Delete Transaction"
-      deleteTitle="Delete Transaction?"
+      deleteLabel="Delete transaction"
+      deleteTitle="Delete this transaction?"
       deleteMessage="Are you sure you want to delete this transaction?"
       [showDeleteConfirm]="showDeleteConfirm()"
       (back)="back.emit()"

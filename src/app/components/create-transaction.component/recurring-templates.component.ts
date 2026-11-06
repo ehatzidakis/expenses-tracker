@@ -35,17 +35,17 @@ export interface TemplatePick {
             [attr.aria-pressed]="activeId() === item.template.id"
             [title]="item.added ? 'Already added for ' + monthName() : item.template.label"
             class="shrink-0 px-2.5 py-1 rounded-full text-[11px] font-semibold border whitespace-nowrap transition-colors cursor-pointer disabled:cursor-not-allowed disabled:opacity-60"
-            [class.bg-indigo-500/20]="activeId() === item.template.id"
-            [class.border-indigo-400/50]="activeId() === item.template.id"
-            [class.text-indigo-200]="activeId() === item.template.id"
-            [class.bg-gray-800/60]="activeId() !== item.template.id"
-            [class.border-gray-700/60]="activeId() !== item.template.id"
-            [class.text-gray-300]="activeId() !== item.template.id && !item.added"
-            [class.text-gray-500]="activeId() !== item.template.id && item.added"
+            [class.bg-ember/20]="activeId() === item.template.id"
+            [class.border-ember-ink/50]="activeId() === item.template.id"
+            [class.text-ember-soft]="activeId() === item.template.id"
+            [class.bg-raised/60]="activeId() !== item.template.id"
+            [class.border-edge/60]="activeId() !== item.template.id"
+            [class.text-ink-2]="activeId() !== item.template.id && !item.added"
+            [class.text-ink-3]="activeId() !== item.template.id && item.added"
           >
             {{ item.template.emoji }} {{ item.template.label }}
             @if (item.added) {
-              <span class="text-emerald-400">✓</span>
+              <span class="text-avocado-ink">✓</span>
             }
           </button>
         }
@@ -53,21 +53,21 @@ export interface TemplatePick {
 
       <!-- @if (confirming()) {
         <div
-          class="p-2.5 rounded-xl bg-gray-950/80 border border-gray-800 text-[11px] text-gray-300 space-y-2"
+          class="p-2.5 rounded-xl bg-ground/80 border border-raised text-[11px] text-ink-2 space-y-2"
         >
           <p>{{ confirmMessage() }}</p>
           <div class="flex gap-2 justify-end">
             <button
               type="button"
               (click)="confirming.set(false)"
-              class="px-3 py-1 rounded-lg text-gray-400 hover:text-gray-200 cursor-pointer"
+              class="px-3 py-1 rounded-lg text-ink-2 hover:text-ink cursor-pointer"
             >
               Cancel
             </button>
             <button
               type="button"
               (click)="addAllMonthly()"
-              class="px-3 py-1 rounded-lg font-semibold text-white bg-indigo-500/80 hover:bg-indigo-500 cursor-pointer"
+              class="px-3 py-1 rounded-lg font-semibold text-ground bg-ember/80 hover:bg-ember-ink cursor-pointer"
             >
               Add
             </button>
@@ -78,14 +78,14 @@ export interface TemplatePick {
           type="button"
           (click)="confirming.set(true)"
           [disabled]="saving() || disabled()"
-          class="text-[11px] font-semibold text-indigo-300 hover:text-indigo-200 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+          class="text-[11px] font-semibold text-ember-ink hover:text-ember-soft disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
         >
           {{ saving() ? 'Adding…' : '➕ Add all monthly (' + remainingCount() + ')' }}
         </button>
       } -->
 
       @if (errorMessage()) {
-        <p class="text-[11px] text-red-400">{{ errorMessage() }}</p>
+        <p class="text-[11px] text-cherry">{{ errorMessage() }}</p>
       }
     </div>
   `,

@@ -28,21 +28,21 @@ interface CategoryAverage {
   imports: [CommonModule, PagedEntriesListComponent, SensitiveDirective],
   template: `
     <div
-      class="bg-gray-900/60 border border-gray-800/80 rounded-2xl p-5 backdrop-blur-sm select-none"
+      class="bg-panel/60 border border-raised/80 rounded-2xl p-5 select-none"
     >
       <div class="mb-4 flex items-center justify-between gap-3">
         <div>
-          <h3 class="text-xs font-semibold text-gray-100">Transaction Averages</h3>
-          <p class="text-xs text-gray-400 mt-0.5">Average cost per entry</p>
+          <h3 class="text-xs font-semibold text-ink">Transaction Averages</h3>
+          <p class="text-xs text-ink-2 mt-0.5">Average cost per entry</p>
         </div>
 
-        <div class="inline-flex rounded-full border border-gray-700 bg-gray-950/80 p-1">
+        <div class="inline-flex rounded-full border border-edge bg-ground/80 p-1">
           <button
             type="button"
             class="rounded-full px-3 py-1.5 text-[11px] font-semibold transition-colors"
-            [class.bg-indigo-500]="viewMode() === 'food'"
-            [class.text-white]="viewMode() === 'food'"
-            [class.text-gray-400]="viewMode() !== 'food'"
+            [class.bg-ember]="viewMode() === 'food'"
+            [class.text-ground]="viewMode() === 'food'"
+            [class.text-ink-2]="viewMode() !== 'food'"
             (click)="viewMode.set('food')"
           >
             Food
@@ -50,9 +50,9 @@ interface CategoryAverage {
           <button
             type="button"
             class="rounded-full px-3 py-1.5 text-[11px] font-semibold transition-colors"
-            [class.bg-indigo-500]="viewMode() === 'tickets'"
-            [class.text-white]="viewMode() === 'tickets'"
-            [class.text-gray-400]="viewMode() !== 'tickets'"
+            [class.bg-ember]="viewMode() === 'tickets'"
+            [class.text-ground]="viewMode() === 'tickets'"
+            [class.text-ink-2]="viewMode() !== 'tickets'"
             (click)="viewMode.set('tickets')"
           >
             Tickets
@@ -60,9 +60,9 @@ interface CategoryAverage {
           <button
             type="button"
             class="rounded-full px-3 py-1.5 text-[11px] font-semibold transition-colors"
-            [class.bg-indigo-500]="viewMode() === 'games'"
-            [class.text-white]="viewMode() === 'games'"
-            [class.text-gray-400]="viewMode() !== 'games'"
+            [class.bg-ember]="viewMode() === 'games'"
+            [class.text-ground]="viewMode() === 'games'"
+            [class.text-ink-2]="viewMode() !== 'games'"
             (click)="viewMode.set('games')"
           >
             Games
@@ -74,7 +74,7 @@ interface CategoryAverage {
         @for (item of averages(); track item.key) {
           <div class="space-y-2">
             <div
-              class="flex items-center justify-between p-3 rounded-xl bg-gray-800/40 border border-gray-800/60 transition-colors hover:bg-gray-800/60 cursor-pointer"
+              class="flex items-center justify-between p-3 rounded-xl bg-raised/40 border border-raised/60 transition-colors hover:bg-raised/60 cursor-pointer"
               (click)="toggleCategory(item.key)"
             >
               <div class="flex items-center gap-3.5">
@@ -86,8 +86,8 @@ interface CategoryAverage {
                 </div>
 
                 <div>
-                  <span class="block text-sm font-medium text-gray-200">{{ item.label }}</span>
-                  <span class="block text-[10px] text-gray-500 mt-0.5">
+                  <span class="block text-sm font-medium text-ink">{{ item.label }}</span>
+                  <span class="block text-[11px] text-ink-3 mt-0.5">
                     Based on {{ item.count }} {{ item.count === 1 ? 'entry' : 'entries' }}
                   </span>
                 </div>
@@ -95,12 +95,12 @@ interface CategoryAverage {
 
               <div class="text-right">
                 @if (item.count > 0) {
-                  <span class="block text-sm font-bold text-gray-100" appSensitive>
+                  <span class="block text-sm font-bold text-ink" appSensitive>
                     €{{ item.average | number: '1.2-2' }}
                   </span>
-                  <span class="block text-[10px] text-gray-400 font-medium">/avg</span>
+                  <span class="block text-[11px] text-ink-2 font-medium">/avg</span>
                 } @else {
-                  <span class="block text-xs font-medium text-gray-500 italic">No data</span>
+                  <span class="block text-xs font-medium text-ink-3 italic">No data</span>
                 }
               </div>
             </div>
@@ -176,8 +176,8 @@ export class CategoryAverageComponent {
         subCategoryId: option.id,
         label: this.stripEmojiPrefix(option.label),
         ...this.statFor('Tickets', option.id),
-        iconColorClass: 'text-purple-400',
-        bgColorClass: 'bg-purple-500/15 border-purple-500/30',
+        iconColorClass: 'text-ember-ink',
+        bgColorClass: 'bg-ember/15 border-ember/30',
         emoji: subcategoryEmojiMap[option.name] ?? '🎟️',
       } satisfies CategoryAverage;
     });
@@ -189,8 +189,8 @@ export class CategoryAverageComponent {
         subCategoryId: option.id,
         label: this.stripEmojiPrefix(option.label),
         ...this.statFor('Gaming', option.id),
-        iconColorClass: 'text-cyan-400',
-        bgColorClass: 'bg-cyan-500/15 border-cyan-500/30',
+        iconColorClass: 'text-ember-ink',
+        bgColorClass: 'bg-ember/15 border-ember/30',
         emoji: subcategoryEmojiMap[option.name] ?? '🎮',
       } satisfies CategoryAverage;
     });
@@ -211,20 +211,20 @@ const FOOD_CONFIGS = [
   {
     category: 'Supermarket',
     label: 'Supermarket Visit',
-    iconColor: 'text-emerald-400',
-    bgColor: 'bg-emerald-500/15 border-emerald-500/30',
+    iconColor: 'text-avocado-ink',
+    bgColor: 'bg-avocado/15 border-avocado/30',
   },
   {
     category: 'EatingOut',
     label: 'Restaurant',
-    iconColor: 'text-rose-400',
-    bgColor: 'bg-rose-500/15 border-rose-500/30',
+    iconColor: 'text-cherry',
+    bgColor: 'bg-cherry-fill/15 border-cherry-fill/30',
   },
   {
     category: 'Takeaway',
     label: 'Takeaway Order',
-    iconColor: 'text-amber-400',
-    bgColor: 'bg-amber-500/15 border-amber-500/30',
+    iconColor: 'text-ember-soft',
+    bgColor: 'bg-ember/15 border-ember/30',
   },
 ];
 

@@ -8,9 +8,11 @@ import {
   PICKER_ACTIVE,
   PICKER_BASE,
   PICKER_IDLE,
+  PICKER_PANEL,
   PICKER_WRAPPER,
   PILL_BASE,
   QUICK_PILL,
+  QUICK_PILL_GROW,
 } from '../../utils/pill-styles';
 
 const QUICK_TRIPS = 2;
@@ -26,19 +28,23 @@ const QUICK_TRIPS = 2;
   },
   template: `
     <section class="flex items-center gap-2">
-      <!-- Singles: standalone pill -->
-      <button
-        type="button"
-        data-testid="singles-pill"
-        (click)="onSelect(null)"
-        [class]="pillBase + ' ' + (selectedId() === null ? activePill : idlePill)"
-        [attr.aria-pressed]="selectedId() === null"
-      >
-        Singles
-      </button>
+      @if (includeSingles()) {
+        <!-- One-offs: standalone pill -->
+        <button
+          type="button"
+          data-testid="singles-pill"
+          (click)="onSelect(null)"
+          [class]="pillBase + ' ' + (selectedId() === null ? activePill : idlePill)"
+          [attr.aria-pressed]="selectedId() === null"
+        >
+          One-offs
+        </button>
+      }
 
       @if (quickTrips().length) {
-        <span class="w-px self-stretch my-1 bg-gray-800 shrink-0" aria-hidden="true"></span>
+        @if (includeSingles()) {
+          <span class="w-px self-stretch my-1 bg-edge shrink-0" aria-hidden="true"></span>
+        }
 
         <!-- Recent trips: separate pills laid out directly in the row -->
         <div role="group" aria-label="Recent trips" class="contents">
@@ -47,11 +53,10 @@ const QUICK_TRIPS = 2;
               type="button"
               data-testid="trip-pill"
               (click)="onSelect(trip.id)"
-              [class]="quickPill + ' ' + (selectedId() === trip.id ? activePill : idlePill)"
+              [class]="selectedId() === trip.id ? quickPillGrow + ' ' + activePill : quickPill + ' ' + idlePill"
               [attr.aria-pressed]="selectedId() === trip.id"
               [attr.title]="trip.title"
             >
-              <span class="text-[10px] opacity-70" aria-hidden="true">✈</span>
               <span data-testid="trip-pill-title">{{ trip.title }}</span>
             </button>
           }
@@ -59,7 +64,7 @@ const QUICK_TRIPS = 2;
       }
 
       @if (showPicker()) {
-        <div [class]="pickerWrapper">
+        <div [class]="olderSelected() ? 'relative flex-none max-w-[60%]' : pickerWrapper">
           <button
             type="button"
             data-testid="trip-picker-toggle"
@@ -100,7 +105,7 @@ const QUICK_TRIPS = 2;
               role="dialog"
               aria-label="Pick a trip"
               data-testid="trip-picker"
-              class="absolute right-0 top-full mt-2 z-20 w-64 bg-gray-900 border border-gray-800 rounded-2xl p-3 shadow-xl"
+              [class]="pickerPanel"
             >
               <div class="flex items-center justify-between mb-3">
                 <button
@@ -109,11 +114,11 @@ const QUICK_TRIPS = 2;
                   (click)="prevYear()"
                   [disabled]="!prevYearValue()"
                   aria-label="Previous year"
-                  class="w-8 h-8 rounded-lg text-gray-300 hover:bg-gray-800 disabled:text-gray-700 disabled:hover:bg-transparent disabled:cursor-not-allowed"
+                  class="size-11 rounded-xl text-lg text-ink-2 hover:bg-raised-hi disabled:text-edge disabled:hover:bg-transparent disabled:cursor-not-allowed"
                 >
                   ‹
                 </button>
-                <span data-testid="view-year" class="text-sm font-medium text-gray-100">
+                <span data-testid="view-year" class="text-sm font-medium text-ink">
                   {{ viewYear() }}
                 </span>
                 <button
@@ -122,7 +127,7 @@ const QUICK_TRIPS = 2;
                   (click)="nextYear()"
                   [disabled]="!nextYearValue()"
                   aria-label="Next year"
-                  class="w-8 h-8 rounded-lg text-gray-300 hover:bg-gray-800 disabled:text-gray-700 disabled:hover:bg-transparent disabled:cursor-not-allowed"
+                  class="size-11 rounded-xl text-lg text-ink-2 hover:bg-raised-hi disabled:text-edge disabled:hover:bg-transparent disabled:cursor-not-allowed"
                 >
                   ›
                 </button>
@@ -137,17 +142,17 @@ const QUICK_TRIPS = 2;
                     [attr.aria-pressed]="selectedId() === trip.id"
                     [class]="
                       selectedId() === trip.id
-                        ? 'bg-indigo-600 text-white'
-                        : 'bg-gray-800/60 text-gray-300 hover:bg-gray-800'
+                        ? 'bg-ember text-ground'
+                        : 'bg-raised-hi/70 text-ink-2 hover:bg-raised-hi hover:text-ink'
                     "
-                    class="w-full text-left px-3 py-2 rounded-xl transition-colors duration-150"
+                    class="w-full min-h-11 text-left px-3 py-2 rounded-xl transition-colors duration-150 cursor-pointer"
                   >
-                    <span class="block text-xs font-medium truncate">{{ trip.title }}</span>
+                    <span class="block text-[13px] font-medium truncate">{{ trip.title }}</span>
                     <span
-                      class="block text-[10px] mt-0.5"
-                      [class]="selectedId() === trip.id ? 'text-indigo-200' : 'text-gray-500'"
+                      class="block text-[12px] mt-0.5"
+                      [class]="selectedId() === trip.id ? 'text-ground/75' : 'text-ink-3'"
                     >
-                      {{ trip.startDate | date: 'dd/MM' }} – {{ trip.endDate | date: 'dd/MM/yyyy' }}
+                      {{ trip.startDate | date: 'd MMM' }} – {{ trip.endDate | date: 'd MMM y' }}
                     </span>
                   </button>
                 }
@@ -159,7 +164,7 @@ const QUICK_TRIPS = 2;
     </section>
 
     <!-- Separates the trip navigation from the content below -->
-    <!-- <div class="h-px mt-4 bg-gray-800" aria-hidden="true"></div> -->
+    <!-- <div class="h-px mt-4 bg-raised" aria-hidden="true"></div> -->
   `,
 })
 export class AdjustmentSelectorComponent {
@@ -168,6 +173,8 @@ export class AdjustmentSelectorComponent {
   /** Expected newest-first by startDate. */
   adjustments = input.required<Adjustment[]>();
   selectedId = input<string | null>(null);
+  /** Show the standalone one-offs pill (off on the Budget page, where a switch handles it). */
+  includeSingles = input(true);
 
   selectionChanged = output<string | null>();
 
@@ -175,11 +182,13 @@ export class AdjustmentSelectorComponent {
   protected readonly activePill = ACTIVE_PILL;
   protected readonly idlePill = IDLE_PILL;
   protected readonly quickPill = QUICK_PILL;
+  protected readonly quickPillGrow = QUICK_PILL_GROW;
   protected readonly pickerWrapper = PICKER_WRAPPER;
   protected readonly pickerBase = PICKER_BASE;
   protected readonly pickerActive = PICKER_ACTIVE;
   protected readonly pickerIdle = PICKER_IDLE;
   protected readonly calendarIcon = CALENDAR_ICON_PATH;
+  protected readonly pickerPanel = PICKER_PANEL;
 
   readonly pickerOpen = signal(false);
   readonly viewYear = signal(new Date().getFullYear());

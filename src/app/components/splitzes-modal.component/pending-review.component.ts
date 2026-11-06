@@ -35,6 +35,7 @@ import {
   host: { class: 'block' },
   template: `
     <app-edit-form-shell
+      [showBack]="true"
       title="Review incoming"
       [formInvalid]="reviewForm().invalid()"
       [submitting]="submitting()"
@@ -57,25 +58,25 @@ import {
     >
       <div class="flex items-center justify-between gap-2 text-[11px]">
         <span
-          class="px-2.5 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-300 font-semibold"
+          class="px-2.5 py-1 rounded-full bg-ember/10 border border-ember/30 text-ember-soft font-semibold"
         >
           From {{ sourceLabel() }}
         </span>
-        <span class="text-gray-500 truncate">{{ addedOn() }}</span>
+        <span class="text-ink-3 truncate">{{ addedOn() }}</span>
       </div>
       @if (statusLabel(); as status) {
         <p
           class="rounded-xl border px-3 py-2 text-[11px]"
-          [class.border-sky-500/30]="pending().requestStatus === 'awaiting-kiosk'"
-          [class.text-sky-300]="pending().requestStatus === 'awaiting-kiosk'"
-          [class.border-emerald-500/30]="pending().requestStatus === 'answered'"
-          [class.text-emerald-300]="pending().requestStatus === 'answered'"
-          [class.border-red-500/30]="pending().requestStatus === 'declined'"
-          [class.text-red-300]="pending().requestStatus === 'declined'"
+          [class.border-ember/30]="pending().requestStatus === 'awaiting-kiosk'"
+          [class.text-ember-ink]="pending().requestStatus === 'awaiting-kiosk'"
+          [class.border-avocado/30]="pending().requestStatus === 'answered'"
+          [class.text-avocado-ink]="pending().requestStatus === 'answered'"
+          [class.border-cherry-fill/30]="pending().requestStatus === 'declined'"
+          [class.text-cherry]="pending().requestStatus === 'declined'"
         >
           {{ status }}
           @if (pending().requestStatus === 'awaiting-kiosk') {
-            <span class="block text-gray-500"
+            <span class="block text-ink-3"
               >You can still fill it in and accept it yourself.</span
             >
           }

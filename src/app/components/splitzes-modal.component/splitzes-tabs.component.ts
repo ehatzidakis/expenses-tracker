@@ -8,7 +8,7 @@ export type SplitzesTab = 'balances' | 'incoming' | 'history';
   host: { class: 'block' },
   template: `
     <div
-      class="relative flex bg-gray-950/80 p-1 rounded-xl border border-gray-800/80"
+      class="relative flex bg-ground/80 p-1 rounded-xl border border-raised/80"
       role="tablist"
     >
       @for (tab of tabs(); track tab.id) {
@@ -18,13 +18,13 @@ export type SplitzesTab = 'balances' | 'incoming' | 'history';
           [attr.aria-selected]="activeTab() === tab.id"
           (click)="tabChange.emit(tab.id)"
           class="relative z-10 flex-1 py-1.5 text-xs font-semibold transition-colors duration-200 text-center rounded-lg cursor-pointer flex items-center justify-center gap-1.5"
-          [class.text-white]="activeTab() === tab.id"
-          [class.text-gray-400]="activeTab() !== tab.id"
+          [class.text-ink]="activeTab() === tab.id"
+          [class.text-ink-2]="activeTab() !== tab.id"
         >
           {{ tab.label }}
           @if (tab.id === 'incoming' && incomingCount() > 0) {
             <span
-              class="min-w-4 h-4 px-1 rounded-full bg-amber-500 text-[10px] leading-4 text-gray-950 tabular-nums"
+              class="min-w-4 h-4 px-1 rounded-full bg-ember text-[11px] leading-4 text-ground tabular-nums"
             >
               {{ incomingCount() }}
             </span>
@@ -32,7 +32,7 @@ export type SplitzesTab = 'balances' | 'incoming' | 'history';
         </button>
       }
       <div
-        class="absolute top-1 bottom-1 left-1 bg-teal-600/90 rounded-lg transition-transform duration-200 ease-out"
+        class="absolute top-1 bottom-1 left-1 bg-ember/90 rounded-lg transition-transform duration-200 ease-out"
         [style.width]="indicatorWidth()"
         [style.transform]="indicatorTransform()"
       ></div>

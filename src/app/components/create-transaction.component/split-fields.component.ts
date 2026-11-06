@@ -35,17 +35,17 @@ export function toSplitState(
   template: `
     <div class="space-y-4">
       <div class="space-y-1.5">
-        <label class="text-xs font-medium text-gray-400">Go Splitzes</label>
-        <div class="grid grid-cols-2 gap-2 p-1 bg-gray-950/80 rounded-xl border border-gray-800">
+        <label class="text-xs font-medium text-ink-2">Go Splitzes</label>
+        <div class="grid grid-cols-2 gap-2 p-1 bg-ground/80 rounded-xl border border-raised">
           <button
             type="button"
             (click)="setEnabled(true)"
             class="py-2 rounded-lg text-xs font-semibold transition-all duration-150 flex items-center justify-center gap-1 cursor-pointer"
-            [class.bg-teal-500/20]="state().goesSplitzes"
-            [class.text-teal-400]="state().goesSplitzes"
+            [class.bg-ember/20]="state().goesSplitzes"
+            [class.text-ember-ink]="state().goesSplitzes"
             [class.border]="state().goesSplitzes"
-            [class.border-teal-500/30]="state().goesSplitzes"
-            [class.text-gray-400]="!state().goesSplitzes"
+            [class.border-ember/30]="state().goesSplitzes"
+            [class.text-ink-2]="!state().goesSplitzes"
           >
             ✂️ Yes
           </button>
@@ -53,11 +53,11 @@ export function toSplitState(
             type="button"
             (click)="reset.emit()"
             class="py-2 rounded-lg text-xs font-semibold transition-all duration-150 flex items-center justify-center gap-1 cursor-pointer"
-            [class.bg-gray-700/60]="!state().goesSplitzes"
-            [class.text-gray-200]="!state().goesSplitzes"
+            [class.bg-edge/60]="!state().goesSplitzes"
+            [class.text-ink]="!state().goesSplitzes"
             [class.border]="!state().goesSplitzes"
-            [class.border-gray-600/40]="!state().goesSplitzes"
-            [class.text-gray-400]="state().goesSplitzes"
+            [class.border-ink-4/40]="!state().goesSplitzes"
+            [class.text-ink-2]="state().goesSplitzes"
           >
             No
           </button>
@@ -66,19 +66,19 @@ export function toSplitState(
 
       @if (state().goesSplitzes) {
         <div class="space-y-2">
-          <label class="text-xs font-medium text-gray-400">Split With</label>
+          <label class="text-xs font-medium text-ink-2">Split With</label>
           <div class="flex flex-wrap gap-2">
             @for (person of people(); track person.id) {
               <button
                 type="button"
                 (click)="togglePerson(person.id)"
                 class="flex items-center gap-1.5 px-3 py-2 rounded-full text-xs font-semibold border transition-all duration-150 cursor-pointer"
-                [class.bg-teal-500/20]="state().splitWith.includes(person.id)"
-                [class.border-teal-500/40]="state().splitWith.includes(person.id)"
-                [class.text-teal-400]="state().splitWith.includes(person.id)"
-                [class.bg-gray-800/60]="!state().splitWith.includes(person.id)"
-                [class.border-gray-700/50]="!state().splitWith.includes(person.id)"
-                [class.text-gray-400]="!state().splitWith.includes(person.id)"
+                [class.bg-ember/20]="state().splitWith.includes(person.id)"
+                [class.border-ember/40]="state().splitWith.includes(person.id)"
+                [class.text-ember-ink]="state().splitWith.includes(person.id)"
+                [class.bg-raised/60]="!state().splitWith.includes(person.id)"
+                [class.border-edge/50]="!state().splitWith.includes(person.id)"
+                [class.text-ink-2]="!state().splitWith.includes(person.id)"
               >
                 {{ person.name }}
               </button>
@@ -88,7 +88,7 @@ export function toSplitState(
 
         @if (state().splitWith.length > 0) {
           <div class="space-y-1.5">
-            <label class="text-xs font-medium text-gray-400">Paid By</label>
+            <label class="text-xs font-medium text-ink-2">Paid By</label>
             <div class="flex flex-wrap gap-2">
               @for (opt of paidByOptions(); track opt.id) {
                 <button
@@ -96,12 +96,12 @@ export function toSplitState(
                   (click)="setPaidBy(opt.id)"
                   [attr.aria-pressed]="state().paidById === opt.id"
                   class="flex items-center gap-1.5 px-3 py-2 rounded-full text-xs font-semibold border transition-all duration-150 cursor-pointer"
-                  [class.bg-teal-500/20]="state().paidById === opt.id"
-                  [class.border-teal-500/40]="state().paidById === opt.id"
-                  [class.text-teal-400]="state().paidById === opt.id"
-                  [class.bg-gray-800/60]="state().paidById !== opt.id"
-                  [class.border-gray-700/50]="state().paidById !== opt.id"
-                  [class.text-gray-400]="state().paidById !== opt.id"
+                  [class.bg-ember/20]="state().paidById === opt.id"
+                  [class.border-ember/40]="state().paidById === opt.id"
+                  [class.text-ember-ink]="state().paidById === opt.id"
+                  [class.bg-raised/60]="state().paidById !== opt.id"
+                  [class.border-edge/50]="state().paidById !== opt.id"
+                  [class.text-ink-2]="state().paidById !== opt.id"
                 >
                   {{ opt.label }}
                 </button>
@@ -111,19 +111,19 @@ export function toSplitState(
 
           <!-- Not blurred: these numbers come from the amount just typed in the form -->
           @if (!state().customSplitMode) {
-            <div class="p-3 bg-teal-950/30 border border-teal-800/40 rounded-xl space-y-1">
-              <p class="text-xs font-medium text-teal-400">Split preview</p>
-              <p class="text-xs text-gray-400">
+            <div class="p-3 bg-ember-deep/30 border border-ember-deep/40 rounded-xl space-y-1">
+              <p class="text-xs font-medium text-ember-ink">Split preview</p>
+              <p class="text-xs text-ink-2">
                 Your share:
-                <span class="text-white font-semibold">€{{ myShare().toFixed(2) }}</span
-                ><span class="text-gray-500">
+                <span class="text-ink font-semibold">€{{ myShare().toFixed(2) }}</span
+                ><span class="text-ink-3">
                   (1 of {{ state().splitWith.length + 1 }} people)</span
                 >
               </p>
               @for (line of debtLines(); track $index) {
-                <p class="text-xs text-gray-400">
+                <p class="text-xs text-ink-2">
                   {{ line.label }}
-                  <span class="text-white font-semibold">€{{ line.amount.toFixed(2) }}</span>
+                  <span class="text-ink font-semibold">€{{ line.amount.toFixed(2) }}</span>
                 </p>
               }
             </div>
@@ -132,19 +132,19 @@ export function toSplitState(
 
         @if (allowCustom()) {
           <div class="space-y-1.5">
-            <label class="text-xs font-medium text-gray-400">Split Mode</label>
+            <label class="text-xs font-medium text-ink-2">Split Mode</label>
             <div
-              class="grid grid-cols-2 gap-2 p-1 bg-gray-950/80 rounded-xl border border-gray-800"
+              class="grid grid-cols-2 gap-2 p-1 bg-ground/80 rounded-xl border border-raised"
             >
               <button
                 type="button"
                 (click)="setCustom(false)"
                 class="py-2 rounded-lg text-xs font-semibold transition-all duration-150 flex items-center justify-center gap-1 cursor-pointer"
-                [class.bg-teal-500/20]="!state().customSplitMode"
-                [class.text-teal-400]="!state().customSplitMode"
+                [class.bg-ember/20]="!state().customSplitMode"
+                [class.text-ember-ink]="!state().customSplitMode"
                 [class.border]="!state().customSplitMode"
-                [class.border-teal-500/30]="!state().customSplitMode"
-                [class.text-gray-400]="state().customSplitMode"
+                [class.border-ember/30]="!state().customSplitMode"
+                [class.text-ink-2]="state().customSplitMode"
               >
                 👥 Halfsies
               </button>
@@ -152,11 +152,11 @@ export function toSplitState(
                 type="button"
                 (click)="setCustom(true)"
                 class="py-2 rounded-lg text-xs font-semibold transition-all duration-150 flex items-center justify-center gap-1 cursor-pointer"
-                [class.bg-indigo-500/20]="state().customSplitMode"
-                [class.text-indigo-400]="state().customSplitMode"
+                [class.bg-ember/20]="state().customSplitMode"
+                [class.text-ember-ink]="state().customSplitMode"
                 [class.border]="state().customSplitMode"
-                [class.border-indigo-500/30]="state().customSplitMode"
-                [class.text-gray-400]="!state().customSplitMode"
+                [class.border-ember/30]="state().customSplitMode"
+                [class.text-ink-2]="!state().customSplitMode"
               >
                 ⚙️ Custom
               </button>
@@ -165,15 +165,15 @@ export function toSplitState(
         }
 
         @if (state().customSplitMode && allowCustom()) {
-          <div class="space-y-3 rounded-xl border border-indigo-500/30 bg-indigo-950/20 p-3">
+          <div class="space-y-3 rounded-xl border border-ember/30 bg-ember-deep/20 p-3">
             <div class="flex items-center justify-between gap-3">
-              <p class="text-xs font-medium text-indigo-300">Custom split</p>
-              <span class="text-[11px] text-gray-300">{{ remainingLabel() }}</span>
+              <p class="text-xs font-medium text-ember-ink">Custom split</p>
+              <span class="text-[11px] text-ink-2">{{ remainingLabel() }}</span>
             </div>
             <div class="space-y-2">
               @for (person of participants(); track person) {
                 <div class="space-y-1">
-                  <label class="text-[11px] uppercase tracking-[0.12em] text-gray-400">{{
+                  <label class="text-[11px] uppercase tracking-[0.12em] text-ink-2">{{
                     personName(person)
                   }}</label>
                   <input
@@ -182,14 +182,14 @@ export function toSplitState(
                     autocomplete="off"
                     [value]="valueFor(person)"
                     (input)="onCustomInput($event, person)"
-                    class="w-full bg-gray-800/60 border border-gray-800 rounded-xl px-3 py-2 text-sm text-gray-100 placeholder:text-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/60 tabular-nums"
+                    class="w-full bg-raised/60 border border-raised rounded-xl px-3 py-2 text-sm text-ink placeholder:text-ink-4 focus:outline-none focus:ring-2 focus:ring-ember/60 tabular-nums"
                     placeholder="0.00"
                   />
                 </div>
               }
             </div>
             @if (!customValid()) {
-              <p class="text-[11px] text-amber-300">{{ remainingLabel() }}</p>
+              <p class="text-[11px] text-ember-soft">{{ remainingLabel() }}</p>
             }
           </div>
         }
