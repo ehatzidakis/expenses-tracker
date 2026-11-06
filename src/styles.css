@@ -74,6 +74,8 @@
 
 @layer base {
   html {
+    /* An app, not a page: no pinch or double-tap zoom (scrolling still works). */
+    touch-action: pan-x pan-y;
     background-color: var(--color-ground);
     color-scheme: dark;
     -webkit-text-size-adjust: 100%;
