@@ -53,7 +53,7 @@ const RANGES: ReadonlyArray<{ id: ChartRange; label: string }> = [
       </div>
 
       @if (average().count > 0) {
-        <div class="flex items-start justify-between gap-4 pt-1">
+        <div class="flex flex-wrap items-start justify-between gap-x-4 gap-y-3 pt-1">
           <div class="min-w-0">
             <p
               class="type-wide text-[clamp(30px,9vw,40px)] font-bold leading-none tracking-[-0.02em] text-ink"
@@ -63,7 +63,7 @@ const RANGES: ReadonlyArray<{ id: ChartRange; label: string }> = [
             </p>
             <p class="mt-2 text-[14px] text-ink-2">spent in an average month</p>
           </div>
-          <div class="shrink-0 pt-1 text-right">
+          <div class="ml-auto shrink-0 pt-1 text-right">
             <p
               class="type-wide text-[18px] font-semibold leading-none"
               [class]="average().saved >= 0 ? 'text-avocado' : 'text-cherry'"

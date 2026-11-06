@@ -41,13 +41,14 @@ interface AdjustmentFieldsModel {
           <span class="type-wide text-[26px] font-bold text-ink-3" aria-hidden="true">€</span>
           <input
             id="adj-amount"
+            size="1"
             type="text"
             inputmode="decimal"
             autocomplete="off"
             [value]="model().amount === 0 ? '' : model().amount.toString()"
             placeholder="0.00"
             (input)="onAmountInput($event)"
-            class="amount-display type-wide min-w-0 flex-1 bg-transparent text-[40px] font-bold leading-[1.1] tracking-[-0.02em] text-ink placeholder:text-ink-4 focus-visible:outline-none"
+            class="amount-display type-wide w-0 min-w-0 flex-1 bg-transparent text-[40px] font-bold leading-[1.1] tracking-[-0.02em] text-ink placeholder:text-ink-4 focus-visible:outline-none"
           />
         </div>
         @if (amountField()().touched() && amountField()().invalid()) {

@@ -19,28 +19,25 @@ export type { YearlyBreakdownEntry } from './overview-card.models';
       class="rounded-2xl border border-ink/10 bg-panel px-5 pt-4 pb-2 shadow-[inset_0_1px_0_rgb(241_230_210/0.06)]"
       aria-label="All time summary"
     >
-      <div class="flex items-start justify-between gap-4">
-        <div class="min-w-0">
-          <p
-            class="type-wide text-[clamp(30px,9vw,40px)] font-bold leading-none tracking-[-0.02em] text-ink"
-            appSensitive
-          >
-            €{{ totalSpend() | number: '1.2-2' }}
-          </p>
-          <p class="mt-2 text-[14px] text-ink-2">spent in total</p>
-        </div>
+      <!-- Stacked, not side by side: all-time totals grow past what fits beside each other. -->
+      <p
+        class="type-wide text-[clamp(30px,9vw,40px)] font-bold leading-none tracking-[-0.02em] text-ink"
+        appSensitive
+      >
+        €{{ totalSpend() | number: '1.2-2' }}
+      </p>
+      <p class="mt-2 text-[14px] text-ink-2">spent in total</p>
 
-        <div class="shrink-0 pt-1 text-right">
-          <p
-            class="type-wide text-[20px] font-semibold leading-none"
-            [class]="totalSaved() >= 0 ? 'text-avocado' : 'text-cherry'"
-            appSensitive="sm"
-          >
-            {{ sign(totalSaved()) }}€{{ abs(totalSaved()) | number: '1.2-2' }}
-          </p>
-          <p class="mt-1.5 text-[12px] text-ink-3">saved overall</p>
-        </div>
-      </div>
+      <p class="mt-3 flex items-baseline gap-2">
+        <span
+          class="type-wide text-[18px] font-semibold leading-none"
+          [class]="totalSaved() >= 0 ? 'text-avocado' : 'text-cherry'"
+          appSensitive="sm"
+        >
+          {{ sign(totalSaved()) }}€{{ abs(totalSaved()) | number: '1.2-2' }}
+        </span>
+        <span class="text-[13px] text-ink-3">saved overall</span>
+      </p>
 
       @if (rangeLine(); as range) {
         <p class="mt-3 text-[13px] text-ink-3">{{ range }}</p>

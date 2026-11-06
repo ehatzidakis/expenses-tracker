@@ -20,7 +20,7 @@ import { MonthTiming, ordinal } from '../../utils/period-pace';
       class="rounded-2xl border border-ink/10 bg-panel px-5 pt-4 pb-5 shadow-[inset_0_1px_0_rgb(241_230_210/0.06)]"
       aria-label="Month summary"
     >
-      <div class="flex items-start justify-between gap-4">
+      <div class="flex flex-wrap items-start justify-between gap-x-4 gap-y-3">
         <div class="min-w-0">
           <p class="type-wide flex items-baseline gap-2 font-bold leading-none" appSensitive>
             <span class="text-[40px] tracking-[-0.02em]" [class]="headlineTone()">
@@ -30,7 +30,7 @@ import { MonthTiming, ordinal } from '../../utils/period-pace';
           <p class=" text-[14px] text-ink-2">{{ headlineLabel() }}</p>
         </div>
 
-        <div class="shrink-0 pt-1 text-right">
+        <div class="ml-auto shrink-0 pt-1 text-right">
           <p class="type-wide text-[20px] font-semibold leading-none text-ink">{{ sideValue() }}</p>
           <p class="mt-1.5 text-[12px] text-ink-3">{{ sideLabel() }}</p>
         </div>

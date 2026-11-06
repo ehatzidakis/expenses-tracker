@@ -76,6 +76,8 @@
   html {
     /* An app, not a page: no pinch or double-tap zoom (scrolling still works). */
     touch-action: pan-x pan-y;
+    /* Nothing may make the page wider than the screen, or iOS zooms out to fit it. */
+    overflow-x: clip;
     background-color: var(--color-ground);
     color-scheme: dark;
     -webkit-text-size-adjust: 100%;
@@ -83,6 +85,7 @@
 
   body {
     min-height: 100dvh;
+    overflow-x: clip;
     background-color: var(--color-ground);
     color: var(--color-ink);
     font-variant-numeric: tabular-nums;
