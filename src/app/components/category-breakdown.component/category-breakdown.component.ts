@@ -15,21 +15,25 @@ import { SEGMENT_BASE, SEGMENT_FRAME, SEGMENT_OFF, SEGMENT_ON } from '../../util
 @Component({
   selector: 'app-category-breakdown',
   standalone: true,
-  imports: [CategoryBreakdownItemComponent, EditTransactionComponent, MonthBreakdownComponent, SheetComponent],
+  imports: [
+    CategoryBreakdownItemComponent,
+    EditTransactionComponent,
+    MonthBreakdownComponent,
+    SheetComponent,
+  ],
   host: { class: 'block' },
   template: `
     <section aria-labelledby="categories-heading">
       <div class="flex min-h-11 items-center justify-between gap-3">
-        <h2 id="categories-heading" class="type-wide text-[13px] font-semibold uppercase text-ink-2">
+        <h2
+          id="categories-heading"
+          class="type-wide text-[13px] font-semibold uppercase text-ink-2"
+        >
           {{ viewMode() === 'month' && showMonthView() ? 'Months' : 'Categories' }}
         </h2>
 
         @if (showMonthView()) {
-          <div
-            role="group"
-            aria-label="Group by"
-            [class]="segmentFrame + ' grid-cols-2'"
-          >
+          <div role="group" aria-label="Group by" [class]="segmentFrame + ' grid-cols-2'">
             @for (mode of modes; track mode.id) {
               <button
                 type="button"
@@ -47,7 +51,7 @@ import { SEGMENT_BASE, SEGMENT_FRAME, SEGMENT_OFF, SEGMENT_ON } from '../../util
       @if (viewMode() === 'month' && showMonthView()) {
         <app-month-breakdown class="mt-2 block" [months]="months()" [adjustments]="adjustments()" />
       } @else {
-        <div class="divide-y divide-ink/10 border-t border-ink/10">
+        <div class="mt-2 divide-y divide-ink/10 border-t border-ink/10">
           @for (category of activeCategories(); track category.name) {
             <app-category-breakdown-item
               [category]="category"
@@ -148,19 +152,21 @@ export class CategoryBreakdownComponent {
   /** Trouble first: over, ahead of pace, full, on pace, unbudgeted. Biggest gap leads each group. */
   readonly sortedCategories = computed(() => {
     const pace = this.pace();
-    return [...this.categories()]
-      .map((category) => {
-        const status = category.isAllTime
-          ? category.amount <= 0
-            ? 'quiet'
-            : category.isOverBudget
-              ? 'over'
-              : 'ok'
-          : budgetStatus(category.amount, category.budget, pace);
-        return { category, rank: STATUS_RANK[status] };
-      })
-      // Biggest spend first, whatever its budget; categories with nothing spent fold away below.
-      .sort((a, b) => b.category.amount - a.category.amount);
+    return (
+      [...this.categories()]
+        .map((category) => {
+          const status = category.isAllTime
+            ? category.amount <= 0
+              ? 'quiet'
+              : category.isOverBudget
+                ? 'over'
+                : 'ok'
+            : budgetStatus(category.amount, category.budget, pace);
+          return { category, rank: STATUS_RANK[status] };
+        })
+        // Biggest spend first, whatever its budget; categories with nothing spent fold away below.
+        .sort((a, b) => b.category.amount - a.category.amount)
+    );
   });
 
   readonly activeCategories = computed(() =>

@@ -106,7 +106,8 @@ export class MonthSummaryComponent {
     this.timing(); // recompute when the month changes
     const now = new Date();
     const weekday = now.toLocaleDateString('en-GB', { weekday: 'short' });
-    return `${weekday}. ${ordinal(now.getDate())}`;
+    const month = now.toLocaleDateString('en-GB', { month: 'short' });
+    return `${month}. ${weekday} ${ordinal(now.getDate())} `; // to do --> add month name eg `${weekday}. ${ordinal(now.getDate())} ${now.toLocaleDateString('en-GB', { month: 'long' })}`
   });
 
   readonly stripeLabel = computed(() => {

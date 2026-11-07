@@ -17,9 +17,9 @@ import { UtilitySumComponent } from '../utility-sum-component/utility-sum-compon
 import { CategoryAverageComponent } from '../category-average/category-average';
 
 const RANGES: ReadonlyArray<{ id: ChartRange; label: string }> = [
+  { id: 'all', label: 'All' },
   { id: '6m', label: '6M' },
   { id: '12m', label: '12M' },
-  { id: 'all', label: 'All' },
 ];
 
 /**
@@ -103,7 +103,9 @@ const RANGES: ReadonlyArray<{ id: ChartRange; label: string }> = [
       </p>
     } @else {
       <section aria-labelledby="chart-months" class="flex flex-col gap-3">
-        <h2 id="chart-months" class="type-wide text-[13px] font-semibold uppercase text-ink-2">Month by month</h2>
+        <h2 id="chart-months" class="type-wide text-[13px] font-semibold uppercase text-ink-2">
+          Month by month
+        </h2>
 
         @if (selected(); as m) {
           <div class="flex items-baseline justify-between gap-3" aria-live="polite">
@@ -120,11 +122,17 @@ const RANGES: ReadonlyArray<{ id: ChartRange; label: string }> = [
           </div>
           <p class="-mt-2 text-[13px]" appSensitive="xs">
             @if (m.current && m.budget > 0 && m.spent <= m.budget + 0.005) {
-              <span class="text-ink-3">€{{ m.budget - m.spent | number: '1.2-2' }} left to spend</span>
+              <span class="text-ink-3"
+                >€{{ m.budget - m.spent | number: '1.2-2' }} left to spend</span
+              >
             } @else if (m.budget > 0 && m.spent > m.budget + 0.005) {
-              <span class="font-semibold text-cherry">€{{ m.spent - m.budget | number: '1.2-2' }} over budget</span>
+              <span class="font-semibold text-cherry"
+                >€{{ m.spent - m.budget | number: '1.2-2' }} over budget</span
+              >
             } @else if (m.budget > 0) {
-              <span class="text-ink-3">€{{ m.budget - m.spent | number: '1.2-2' }} under budget</span>
+              <span class="text-ink-3"
+                >€{{ m.budget - m.spent | number: '1.2-2' }} under budget</span
+              >
             }
             <span class="text-ink-3"> · </span>
             <span [class]="m.saved >= 0 ? 'text-avocado' : 'text-cherry'"
@@ -133,12 +141,18 @@ const RANGES: ReadonlyArray<{ id: ChartRange; label: string }> = [
           </p>
         }
 
-        <app-month-chart [months]="months()" [selectedId]="selected()?.id ?? null" (select)="selectedId.set($event)" />
+        <app-month-chart
+          [months]="months()"
+          [selectedId]="selected()?.id ?? null"
+          (select)="selectedId.set($event)"
+        />
       </section>
 
       <section aria-labelledby="chart-typical" class="flex flex-col gap-2">
         <div class="flex items-baseline justify-between gap-3">
-          <h2 id="chart-typical" class="type-wide text-[13px] font-semibold uppercase text-ink-2">Typical month</h2>
+          <h2 id="chart-typical" class="type-wide text-[13px] font-semibold uppercase text-ink-2">
+            Typical month
+          </h2>
           <span class="text-[12px] text-ink-3">Monthly average vs budget</span>
         </div>
 
@@ -152,7 +166,11 @@ const RANGES: ReadonlyArray<{ id: ChartRange; label: string }> = [
               <li class="py-2.5">
                 <div class="flex items-baseline justify-between gap-3">
                   <span class="flex min-w-0 items-baseline gap-2">
-                    <span class="w-5 shrink-0 text-[13px] opacity-60 grayscale-[40%]" aria-hidden="true">{{ row.emoji }}</span>
+                    <span
+                      class="w-5 shrink-0 text-[13px] opacity-60 grayscale-[40%]"
+                      aria-hidden="true"
+                      >{{ row.emoji }}</span
+                    >
                     <span class="truncate text-[15px] font-medium text-ink">{{ row.label }}</span>
                   </span>
                   <span class="shrink-0 text-[13px] tabular-nums text-ink" appSensitive="xs">
@@ -185,7 +203,9 @@ const RANGES: ReadonlyArray<{ id: ChartRange; label: string }> = [
             }
           </ul>
           @if (unused().length) {
-            <p class="border-t border-ink/10 py-3 text-[13px] text-ink-3">Nothing spent · {{ unused() }}</p>
+            <p class="border-t border-ink/10 py-3 text-[13px] text-ink-3">
+              Nothing spent · {{ unused() }}
+            </p>
           }
         }
       </section>
@@ -193,7 +213,9 @@ const RANGES: ReadonlyArray<{ id: ChartRange; label: string }> = [
 
     <section aria-labelledby="chart-costs" class="flex flex-col gap-6">
       <div class="flex items-baseline justify-between gap-3">
-        <h2 id="chart-costs" class="type-wide text-[13px] font-semibold uppercase text-ink-2">Typical costs</h2>
+        <h2 id="chart-costs" class="type-wide text-[13px] font-semibold uppercase text-ink-2">
+          Typical costs
+        </h2>
         <span class="text-[12px] text-ink-3">All time</span>
       </div>
       <app-utility-sum />
@@ -208,7 +230,7 @@ export class ChartsPageComponent {
   protected readonly ranges = RANGES;
   protected readonly frame = SEGMENT_FRAME;
 
-  readonly range = signal<ChartRange>('12m');
+  readonly range = signal<ChartRange>('all');
   readonly selectedId = signal<string | null>(null);
 
   private readonly budgetFor = (name: string) => this.budgets.getCategoryBudget(name);
