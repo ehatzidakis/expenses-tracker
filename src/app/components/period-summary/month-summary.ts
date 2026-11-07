@@ -56,6 +56,9 @@ import { MonthTiming, ordinal } from '../../utils/period-pace';
         </span>
         <!-- <span class="shrink-0 text-ink-3">of €{{ budget() | number: '0.0-0' }} budget</span> -->
       </p>
+
+      <!-- Extra lines for the month, such as items waiting for review. -->
+      <ng-content />
     </section>
   `,
 })

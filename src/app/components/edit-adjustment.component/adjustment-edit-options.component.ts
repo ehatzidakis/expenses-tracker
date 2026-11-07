@@ -14,6 +14,8 @@ import {
   host: { class: 'block' },
   template: `
     <div class="flex flex-col gap-4">
+      <!-- A trip stays a trip and its total comes from its transactions: only Accepting expenses is left. -->
+      @if (!editingTrip()) {
       <div class="flex flex-col gap-1.5">
         <span id="adj-edit-type" [class]="fieldLabel">Type</span>
         <div role="group" aria-labelledby="adj-edit-type" [class]="frame + ' grid-cols-2'">
@@ -57,10 +59,11 @@ import {
           </button>
         </div>
       </div>
+      }
 
       @if (isTrip()) {
         <div class="flex flex-col gap-1.5">
-          <span id="adj-edit-open" [class]="fieldLabel">New transactions</span>
+          <span id="adj-edit-open" [class]="fieldLabel">Accepting expenses</span>
           <div role="group" aria-labelledby="adj-edit-open" [class]="frame + ' grid-cols-2'">
             <button
               type="button"
@@ -68,7 +71,7 @@ import {
               [attr.aria-pressed]="isSelectable()"
               (click)="selectableChange.emit(true)"
             >
-              Open
+              Yes
             </button>
             <button
               type="button"
@@ -76,7 +79,7 @@ import {
               [attr.aria-pressed]="!isSelectable()"
               (click)="selectableChange.emit(false)"
             >
-              Closed
+              No
             </button>
           </div>
         </div>
@@ -88,6 +91,8 @@ export class AdjustmentEditOptionsComponent {
   protected readonly frame = SEGMENT_FRAME;
   protected readonly fieldLabel = FIELD_LABEL;
 
+  /** Editing an existing trip: Type and Trip are hidden. */
+  readonly editingTrip = input(false);
   readonly isAddition = input.required<boolean>();
   readonly isTrip = input.required<boolean>();
   readonly isSelectable = input.required<boolean>();

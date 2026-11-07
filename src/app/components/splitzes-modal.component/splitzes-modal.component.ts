@@ -1,4 +1,4 @@
-import { Component, computed, inject, output, signal } from '@angular/core';
+import { Component, computed, inject, input, linkedSignal, output } from '@angular/core';
 import { AuthService } from '../../services/auth.service';
 import { TransactionService } from '../../services/transaction-service';
 import { SplitzBalancesComponent } from './splitz-balances.component';
@@ -57,8 +57,9 @@ export class SplitzesModalComponent {
     this.isAdmin() ? (this.pendingQuery.data()?.length ?? 0) : 0,
   );
 
-  // Always opens on Balances; pending items show as a count badge on the Incoming tab.
-  readonly activeTab = signal<SplitzesTab>('balances');
+  /** Balances from the header button; Incoming from the month panel's review line. */
+  readonly initialTab = input<SplitzesTab>('balances');
+  readonly activeTab = linkedSignal<SplitzesTab>(() => this.initialTab());
 
   selectTab(tab: SplitzesTab): void {
     this.activeTab.set(tab);

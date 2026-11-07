@@ -1,5 +1,7 @@
 import { Component, inject, signal } from '@angular/core';
 import { PrivacyService } from '../../services/privacy.service';
+import { SplitzesLauncher } from '../../services/splitzes-launcher.service';
+import { injectPendingAttention } from '../splitzes-modal.component/pending-attention';
 import { SettingsModalComponent } from '../settings-modal.component/settings-modal.component';
 import { SplitzesModalComponent } from '../splitzes-modal.component/splitzes-modal.component';
 
@@ -18,7 +20,10 @@ import { SplitzesModalComponent } from '../splitzes-modal.component/splitzes-mod
       <div class="flex items-center gap-2">
         <button
           type="button"
-          (click)="showSplitzesModal.set(true)"
+          (click)="splitzes.open()"
+          [attr.aria-label]="
+            attention().count ? 'Splitz, ' + attention().count + ' waiting for review' : null
+          "
           class="flex min-h-11 items-center gap-1.5 rounded-xl border border-edge px-3.5 text-[13px] font-medium text-ink-2 transition-colors hover:border-ink-4 hover:text-ink active:scale-[0.97] cursor-pointer"
         >
           <svg
@@ -35,6 +40,13 @@ import { SplitzesModalComponent } from '../splitzes-modal.component/splitzes-mod
             <path d="M20 4 8.1 15.9M14.5 14.5 20 20M8.1 8.1 12 12" />
           </svg>
           Splitz
+          @if (attention().count > 0) {
+            <span
+              class="min-w-5 rounded-full bg-cherry-fill px-1.5 text-center text-[11px] font-semibold leading-5 text-ink tabular-nums"
+              aria-hidden="true"
+              >{{ attention().count }}</span
+            >
+          }
         </button>
 
         <div class="relative">
@@ -67,13 +79,15 @@ import { SplitzesModalComponent } from '../splitzes-modal.component/splitzes-mod
       </div>
     </header>
 
-    @if (showSplitzesModal()) {
-      <app-splitzes-modal (close)="showSplitzesModal.set(false)" />
+    @if (splitzes.openTab(); as tab) {
+      <app-splitzes-modal [initialTab]="tab" (close)="splitzes.close()" />
     }
   `,
 })
 export class HeaderComponent {
   readonly privacyService = inject(PrivacyService);
   readonly showSettingsModal = signal<boolean>(false);
-  readonly showSplitzesModal = signal<boolean>(false);
+  readonly splitzes = inject(SplitzesLauncher);
+  /** Items waiting under Incoming, counted on the Splitz button. */
+  readonly attention = injectPendingAttention();
 }

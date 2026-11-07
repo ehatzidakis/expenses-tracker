@@ -73,6 +73,15 @@ interface TripCategoryRow {
       <p class="mt-2 text-[14px] text-ink-2" appSensitive="xs">
         {{ days() }} day{{ days() === 1 ? '' : 's' }} · €{{ perDay() | number: '1.2-2' }} a day
       </p>
+      @if (unitemised() > 0) {
+        <p class="trip-gap mt-1 text-[13px] text-ink-3" appSensitive="xs">
+          €{{ unitemised() | number: '1.2-2' }} not itemised
+        </p>
+      } @else if (unitemised() < 0) {
+        <p class="trip-gap mt-1 text-[13px] text-ink-3" appSensitive="xs">
+          Transactions add up to €{{ totalSpent() | number: '1.2-2' }}
+        </p>
+      }
     </section>
 
     <!-- Category breakdown -->
@@ -184,6 +193,16 @@ export class TripBreakdownComponent {
   readonly perDay = computed(() => this.trip().amount / this.days());
 
   readonly totalSpent = computed(() => this.transactions().reduce((sum, tx) => sum + tx.amount, 0));
+
+  /**
+   * The stored total minus what the transactions add up to. Adding a transaction keeps the two
+   * equal, so a gap means part of the total was entered by hand (older trips) or was edited.
+   */
+  readonly unitemised = computed(() => {
+    if (this.loading() || this.error()) return 0;
+    const gap = this.trip().amount - this.totalSpent();
+    return Math.abs(gap) < 0.005 ? 0 : gap;
+  });
 
   /** Biggest share first, the same reading order as a month's breakdown. */
   readonly categoryRows = computed<TripCategoryRow[]>(() => {

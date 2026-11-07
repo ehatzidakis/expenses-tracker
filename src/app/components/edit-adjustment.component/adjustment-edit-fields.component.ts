@@ -4,6 +4,7 @@ import { EditAmountFieldComponent } from '../edit-form/edit-amount-field.compone
 import { DateStepperComponent } from '../date-stepper/date-stepper.component';
 import { FIELD, FIELD_ERROR, FIELD_LABEL } from '../../utils/pill-styles';
 import { friendlyDate } from '../../utils/period-pace';
+import { dateFieldError } from '../../utils/date-order';
 
 @Component({
   selector: 'app-adjustment-edit-fields',
@@ -13,13 +14,11 @@ import { friendlyDate } from '../../utils/period-pace';
   template: `
     <div class="space-y-4">
       <div class="space-y-1.5">
-        <label for="adj-edit-description" [class]="fieldLabel"
-          >Description</label
-        >
+        <label for="adj-edit-description" [class]="fieldLabel">{{ isTrip() ? 'Trip name' : 'Description' }}</label>
         <input
           id="adj-edit-description"
           type="text"
-          placeholder="e.g. Annual Bonus"
+          [placeholder]="isTrip() ? 'Where to?' : 'e.g. Annual Bonus'"
           [formField]="descriptionField()"
           [class]="field"
         />
@@ -30,18 +29,19 @@ import { friendlyDate } from '../../utils/period-pace';
         }
       </div>
 
-      <app-edit-amount-field
-        inputId="adj-edit-amount"
-        [amount]="amount()"
-        [amountField]="amountField()"
-        (amountChange)="amountChange.emit($event)"
-      />
+      <!-- A trip's total is the sum of its transactions, so it has no amount to edit. -->
+      @if (!isTrip()) {
+        <app-edit-amount-field
+          inputId="adj-edit-amount"
+          [amount]="amount()"
+          [amountField]="amountField()"
+          (amountChange)="amountChange.emit($event)"
+        />
+      }
 
       <div class="grid grid-cols-1 gap-3">
         <div class="space-y-1.5">
-          <label for="adj-edit-start-date" [class]="fieldLabel"
-            >Start date</label
-          >
+          <label for="adj-edit-start-date" [class]="fieldLabel">{{ isTrip() ? 'First day' : 'Start date' }}</label>
           <app-date-stepper size="sm">
             <div class="relative min-w-0 flex-1">
               <input
@@ -66,7 +66,7 @@ import { friendlyDate } from '../../utils/period-pace';
         </div>
 
         <div class="space-y-1.5">
-          <label for="adj-edit-end-date" [class]="fieldLabel">End date</label>
+          <label for="adj-edit-end-date" [class]="fieldLabel">{{ isTrip() ? 'Last day' : 'End date' }}</label>
           <app-date-stepper size="sm">
             <div class="relative min-w-0 flex-1">
               <input
@@ -83,10 +83,8 @@ import { friendlyDate } from '../../utils/period-pace';
               >
             </div>
           </app-date-stepper>
-          @if (endDateField()().touched() && endDateField()().invalid()) {
-            <span [class]="fieldError">
-              {{ endDateField()().errors()[0]?.message }}
-            </span>
+          @if (endError(); as message) {
+            <span role="alert" [class]="fieldError">{{ message }}</span>
           }
         </div>
       </div>
@@ -94,6 +92,10 @@ import { friendlyDate } from '../../utils/period-pace';
   `,
 })
 export class AdjustmentEditFieldsComponent {
+  endError(): string | null {
+    return dateFieldError(this.endDateField());
+  }
+
   dateLabel(isoDate: string): string {
     return friendlyDate(isoDate) || 'Pick a date';
   }
@@ -102,6 +104,7 @@ export class AdjustmentEditFieldsComponent {
   protected readonly fieldLabel = FIELD_LABEL;
   protected readonly fieldError = FIELD_ERROR;
 
+  readonly isTrip = input(false);
   readonly amount = input.required<number>();
   readonly descriptionField = input.required<FieldTree<string>>();
   readonly amountField = input.required<FieldTree<number>>();

@@ -1,5 +1,6 @@
-import { Component, effect, inject, input, signal, untracked } from '@angular/core';
-import { form, maxLength, required } from '@angular/forms/signals';
+import { Component, computed, effect, inject, input, signal, untracked } from '@angular/core';
+import { form, maxLength, required, validate } from '@angular/forms/signals';
+import { DATE_ORDER, dateOrderMessage } from '../../utils/date-order';
 import { QueryClient } from '@tanstack/angular-query-experimental';
 import { AdjustmentService } from '../../services/adjustment-service';
 import { PrivacyService } from '../../services/privacy.service';
@@ -85,6 +86,13 @@ export class CreateAdjustmentFormComponent {
     });
     required(schemaPath.startDate, { message: 'Start date is required' });
     required(schemaPath.endDate, { message: 'End date is required' });
+    validate(schemaPath.endDate, ({ value, valueOf }) => {
+      const start = valueOf(schemaPath.startDate);
+      const end = value();
+      return start && end && end < start
+        ? { kind: DATE_ORDER, message: dateOrderMessage(!!this.adjustmentModel().isTrip) }
+        : null;
+    });
   });
 
   /** Set by the Add tab's top switch (One-off or Trip). */
@@ -95,11 +103,24 @@ export class CreateAdjustmentFormComponent {
     untracked(() => this.setIsTrip(trip));
   });
 
+  /** Moving the first day past the last one carries the last day along with it. */
+  private readonly startDate = computed(() => this.adjustmentModel().startDate);
+  private readonly keepEndAfterStart = effect(() => {
+    const start = this.startDate();
+    untracked(() => {
+      const model = this.adjustmentModel();
+      if (start && model.endDate && model.endDate < start) {
+        this.adjustmentModel.set({ ...model, endDate: start });
+      }
+    });
+  });
+
   setIsTrip(value: boolean): void {
     this.adjustmentModel.update((m) => ({
       ...m,
       isTrip: value,
-      isSelectable: value ? m.isSelectable : false,
+      // A new trip takes expenses straight away; it can be closed once it's over.
+      isSelectable: value,
       amount: value ? 0.0 : m.amount,
     }));
     if (value) {
@@ -146,7 +167,8 @@ export class CreateAdjustmentFormComponent {
       await this.queryClient.invalidateQueries({ queryKey: ['adjustments'] });
       await this.queryClient.invalidateQueries({ queryKey: ['splitTransactions'] });
 
-      this.adjustmentModel.set(defaultAdjustmentModel());
+      // Stay on the same kind of entry: the Trip tab keeps showing trip fields.
+      this.adjustmentModel.set({ ...defaultAdjustmentModel(), isTrip: this.isTrip(), isSelectable: this.isTrip() });
       this.adjustmentForm().reset();
       this.resetSplitFields();
       this.successMessage.set(added);

@@ -2,6 +2,7 @@ import { Component, input, output } from '@angular/core';
 import { FieldTree, FormField } from '@angular/forms/signals';
 import { normalizeDecimalInput, parseDecimalInput } from '../../utils/decimal-input';
 import { friendlyDate } from '../../utils/period-pace';
+import { dateFieldError } from '../../utils/date-order';
 import {
   FIELD,
   FIELD_ERROR,
@@ -133,14 +134,14 @@ interface AdjustmentFieldsModel {
           >
         </div>
       </app-date-stepper>
-      @if (endDateField()().touched() && endDateField()().invalid()) {
-        <p [class]="fieldError">{{ endDateField()().errors()[0]?.message }}</p>
+      @if (endError(); as message) {
+        <p role="alert" [class]="fieldError">{{ message }}</p>
       }
     </div>
 
     @if (model().isTrip) {
       <div class="flex flex-col gap-1.5">
-        <span id="adj-open-label" [class]="fieldLabel">New transactions</span>
+        <span id="adj-open-label" [class]="fieldLabel">Accepting expenses</span>
         <div role="group" aria-labelledby="adj-open-label" [class]="segmentFrame + ' grid-cols-2'">
           <button
             type="button"
@@ -148,7 +149,7 @@ interface AdjustmentFieldsModel {
             [attr.aria-pressed]="!!model().isSelectable"
             (click)="selectableChange.emit(true)"
           >
-            Open
+            Yes
           </button>
           <button
             type="button"
@@ -156,7 +157,7 @@ interface AdjustmentFieldsModel {
             [attr.aria-pressed]="!model().isSelectable"
             (click)="selectableChange.emit(false)"
           >
-            Closed
+            No
           </button>
         </div>
       </div>
@@ -178,6 +179,10 @@ export class AdjustmentFieldsComponent {
   readonly selectableChange = output<boolean>();
   readonly additionChange = output<boolean>();
   readonly amountChange = output<number>();
+
+  endError(): string | null {
+    return dateFieldError(this.endDateField());
+  }
 
   segment(active: boolean): string {
     return `${SEGMENT_BASE} ${active ? SEGMENT_ON : SEGMENT_OFF}`;

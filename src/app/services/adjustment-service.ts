@@ -97,13 +97,17 @@ export class AdjustmentService {
     return adjustmentRef.id;
   }
 
-  async updateAdjustment(id: string, input: NewAdjustmentInput): Promise<void> {
+  /** Leave `amount` out to keep the stored total, as a trip edit does. */
+  async updateAdjustment(
+    id: string,
+    input: Omit<NewAdjustmentInput, 'amount'> & { amount?: number },
+  ): Promise<void> {
     const adjRef = doc(db, 'adjustments', id);
 
     await updateDoc(adjRef, {
       title: input.description,
       adjType: input.isAddition,
-      amount: input.amount,
+      ...(input.amount === undefined ? {} : { amount: input.amount }),
       startDate: input.startDate,
       endDate: input.endDate,
       isTrip: input.isTrip ?? false,

@@ -4,7 +4,13 @@ import { injectQuery } from '@tanstack/angular-query-experimental';
 import { TransactionService, categoryStatKey } from '../../services/transaction-service';
 import { PagedEntriesListComponent } from '../paged-entries-list/paged-entries-list';
 import { SensitiveDirective } from '../../utils/sensitive.directive';
-import { SEGMENT_BASE, SEGMENT_FRAME, SEGMENT_OFF, SEGMENT_ON } from '../../utils/pill-styles';
+import {
+  BUTTON_SECONDARY,
+  SEGMENT_BASE,
+  SEGMENT_FRAME,
+  SEGMENT_OFF,
+  SEGMENT_ON,
+} from '../../utils/pill-styles';
 
 interface UtilityAverage {
   id: string;
@@ -44,6 +50,27 @@ interface UtilityAverage {
         </div>
       </div>
 
+      @if (!statsQuery.data() && statsQuery.isError()) {
+        <div role="alert" class="costs-error flex items-center justify-between gap-3 border-t border-ink/10 py-3">
+          <p class="text-[13px] text-cherry">Couldn't load your bills.</p>
+          <button type="button" [class]="secondary + ' shrink-0'" (click)="statsQuery.refetch()">Try again</button>
+        </div>
+      } @else if (statsQuery.isPending()) {
+        <ul class="costs-loading animate-pulse divide-y divide-ink/10 border-t border-ink/10" aria-label="Loading your bills">
+          @for (row of utilityAverages(); track $index) {
+            <li class="flex min-h-14 items-center justify-between gap-3 py-2.5">
+              <span class="flex items-center gap-3">
+                <span class="size-5 rounded bg-raised"></span>
+                <span class="flex flex-col gap-1.5">
+                  <span class="block h-3.5 w-28 rounded bg-raised"></span>
+                  <span class="block h-3 w-14 rounded bg-raised/70"></span>
+                </span>
+              </span>
+              <span class="block h-3.5 w-16 rounded bg-raised"></span>
+            </li>
+          }
+        </ul>
+      } @else {
       <ul class="divide-y divide-ink/10 border-t border-ink/10">
         @for (item of utilityAverages(); track item.id) {
           <li>
@@ -111,11 +138,13 @@ interface UtilityAverage {
           </li>
         }
       </ul>
+      }
     </section>
   `,
 })
 export class UtilitySumComponent {
   protected readonly frame = SEGMENT_FRAME;
+  protected readonly secondary = BUTTON_SECONDARY;
 
   segment(active: boolean): string {
     return `${SEGMENT_BASE} ${active ? SEGMENT_ON : SEGMENT_OFF}`;
@@ -134,7 +163,7 @@ export class UtilitySumComponent {
   private readonly transactionService = inject(TransactionService);
 
   // Totals per utility are calculated by Firestore and cached; saves refresh them.
-  private readonly statsQuery = injectQuery(() => ({
+  protected readonly statsQuery = injectQuery(() => ({
     queryKey: ['expenses', 'stats', 'utilities'],
     queryFn: () =>
       this.transactionService.fetchCategoryStats(

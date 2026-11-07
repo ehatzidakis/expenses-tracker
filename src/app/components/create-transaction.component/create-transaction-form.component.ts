@@ -165,7 +165,9 @@ import {
                   </div>
                   @if (linkWithAdjustment()) {
                     @if (selectableTrips().length === 0) {
-                      <p class="text-[13px] text-ink-3">No open trips. Open one from the One-off tab.</p>
+                      <p class="text-[13px] text-ink-3">
+                        No trip is accepting expenses. Add one from the Trip tab above, or reopen one in Budget › Trips.
+                      </p>
                     } @else {
                       <label for="tx-trip" class="sr-only">Which trip</label>
                       <div class="relative">

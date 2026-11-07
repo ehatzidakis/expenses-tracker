@@ -2,7 +2,8 @@ import { Component, effect, inject, signal, input, output } from '@angular/core'
 import { AdjustmentService } from '../../services/adjustment-service';
 import { QueryClient } from '@tanstack/angular-query-experimental';
 import { Adjustment } from '../../models/adjustments.model';
-import { form, maxLength, required } from '@angular/forms/signals';
+import { form, maxLength, required, validate } from '@angular/forms/signals';
+import { DATE_ORDER, dateOrderMessage } from '../../utils/date-order';
 import { PrivacyService } from '../../services/privacy.service';
 import { EditFormShellComponent } from '../edit-form/edit-form-shell.component';
 import { AdjustmentEditFieldsComponent } from './adjustment-edit-fields.component';
@@ -52,6 +53,7 @@ function formatDateForInput(dateVal: Date | string): string {
       (deleteCancelled)="showDeleteConfirm.set(false)"
     >
       <app-adjustment-edit-fields
+        [isTrip]="adjustment().isTrip ?? false"
         [amount]="adjustmentModel().amount"
         [descriptionField]="adjustmentForm.description"
         [amountField]="adjustmentForm.amount"
@@ -61,6 +63,7 @@ function formatDateForInput(dateVal: Date | string): string {
       />
 
       <app-adjustment-edit-options
+        [editingTrip]="adjustment().isTrip ?? false"
         [isAddition]="adjustmentModel().isAddition"
         [isTrip]="adjustmentModel().isTrip ?? false"
         [isSelectable]="adjustmentModel().isSelectable ?? false"
@@ -116,6 +119,13 @@ export class EditAdjustmentComponent {
     maxLength(schemaPath.description, 60, { message: 'Description must be 60 characters or less' });
     required(schemaPath.startDate, { message: 'Start date is required' });
     required(schemaPath.endDate, { message: 'End date is required' });
+    validate(schemaPath.endDate, ({ value, valueOf }) => {
+      const start = valueOf(schemaPath.startDate);
+      const end = value();
+      return start && end && end < start
+        ? { kind: DATE_ORDER, message: dateOrderMessage(!!this.adjustmentModel().isTrip) }
+        : null;
+    });
   });
 
   readonly submitting = signal(false);
@@ -153,7 +163,9 @@ export class EditAdjustmentComponent {
     }
 
     const value = this.adjustmentModel();
-    if (value.amount <= 0) {
+    // A trip's total comes from its transactions, so only a one-off needs an amount.
+    const editingTrip = this.adjustment().isTrip ?? false;
+    if (!editingTrip && value.amount <= 0) {
       this.errorMessage.set('Amount must be greater than 0');
       return;
     }
@@ -164,7 +176,7 @@ export class EditAdjustmentComponent {
     try {
       await this.adjustmentService.updateAdjustment(this.adjustment().id, {
         description: value.description.trim(),
-        amount: value.amount,
+        amount: editingTrip ? undefined : value.amount,
         startDate: value.startDate,
         endDate: value.endDate,
         isAddition: value.isAddition,

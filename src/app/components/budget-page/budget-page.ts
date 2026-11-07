@@ -15,6 +15,10 @@ import { SheetComponent } from '../sheet/sheet';
 import type { SinglesType } from '../singles-view/singles-view.util';
 import { monthTiming } from '../../utils/period-pace';
 import { SEGMENT_BASE, SEGMENT_FRAME, SEGMENT_OFF, SEGMENT_ON } from '../../utils/pill-styles';
+import { SplitzesLauncher } from '../../services/splitzes-launcher.service';
+import { injectPendingAttention } from '../splitzes-modal.component/pending-attention';
+import { DecimalPipe } from '@angular/common';
+import { SensitiveDirective } from '../../utils/sensitive.directive';
 
 /**
  * The Budget tab: one page for every period with money in it. A month, a trip and the one-offs
@@ -25,6 +29,8 @@ import { SEGMENT_BASE, SEGMENT_FRAME, SEGMENT_OFF, SEGMENT_ON } from '../../util
   standalone: true,
   imports: [
     NgTemplateOutlet,
+    DecimalPipe,
+    SensitiveDirective,
     MonthSelectorComponent,
     MonthSummaryComponent,
     CategoryBreakdownComponent,
@@ -86,7 +92,27 @@ import { SEGMENT_BASE, SEGMENT_FRAME, SEGMENT_OFF, SEGMENT_ON } from '../../util
             [totalWage]="state.selectedTotalWage()"
             [timing]="timing()"
             [monthName]="state.selectedExpense()?.MonthName ?? ''"
-          />
+          >
+            @if (attention().count > 0) {
+              <button
+                type="button"
+                class="review-line mt-4 flex min-h-11 w-full items-center justify-between gap-3 border-t border-ink/10 pt-1 text-left text-[13px] cursor-pointer"
+                (click)="splitzes.open('incoming')"
+              >
+                <span class="min-w-0">
+                  <span class="font-semibold text-ink">{{ attention().count }} waiting for review</span>
+                  <span class="text-ink-2" appSensitive="xs"> · €{{ attention().total | number: '1.2-2' }}</span>
+                </span>
+                <svg class="size-4 shrink-0 text-ink-3" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                  <path
+                    fill-rule="evenodd"
+                    clip-rule="evenodd"
+                    d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z"
+                  />
+                </svg>
+              </button>
+            }
+          </app-month-summary>
 
           <app-category-breakdown
             [categories]="state.categoryBreakdown()"
@@ -172,6 +198,9 @@ import { SEGMENT_BASE, SEGMENT_FRAME, SEGMENT_OFF, SEGMENT_ON } from '../../util
 })
 export class BudgetPageComponent {
   protected readonly segmentFrame = SEGMENT_FRAME;
+  readonly splitzes = inject(SplitzesLauncher);
+  /** Items waiting under Splitzes › Incoming, shown as a line in the month panel. */
+  readonly attention = injectPendingAttention();
 
   segment(active: boolean): string {
     return `${SEGMENT_BASE} ${active ? SEGMENT_ON : SEGMENT_OFF}`;
