@@ -46,6 +46,7 @@ import { SheetComponent } from '../sheet/sheet';
               [error]="error()"
               [showCategory]="!adjustmentId()"
               (selectTransaction)="selected.set($event)"
+              (retry)="retry()"
             />
           }
         </div>
@@ -100,4 +101,8 @@ export class RecentTransactionsComponent {
   });
   readonly loading = computed(() => this.listQuery.isPending());
   readonly error = computed(() => this.listQuery.isError());
+
+  retry(): void {
+    void this.listQuery.refetch();
+  }
 }

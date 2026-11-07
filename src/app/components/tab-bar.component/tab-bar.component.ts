@@ -12,9 +12,10 @@ interface TabDef {
   standalone: true,
   host: { class: 'block' },
   template: `
+    <!-- Only part of the home-indicator inset: the labels clear the indicator without dead space under them. -->
     <nav
       aria-label="Main"
-      class="fixed inset-x-0 bottom-0 z-40 border-t border-ink/10 bg-panel/90 pb-[env(safe-area-inset-bottom)] backdrop-blur-xl"
+      class="fixed inset-x-0 bottom-0 z-40 border-t border-ink/10 bg-panel/90 pb-[max(calc(env(safe-area-inset-bottom)-16px),8px)] backdrop-blur-xl"
     >
       <ul class="mx-auto flex max-w-lg">
         @for (tab of tabs; track tab.id) {
@@ -22,7 +23,7 @@ interface TabDef {
             <button
               type="button"
               (click)="onSelect(tab.id)"
-              class="relative flex w-full min-h-[54px] flex-col items-center justify-center gap-1 text-[11px] font-medium transition-colors duration-150 cursor-pointer"
+              class="relative flex w-full min-h-[50px] flex-col items-center justify-center gap-1 text-[11px] font-medium transition-colors duration-150 cursor-pointer"
               [class]="activeTab() === tab.id ? 'text-ember-ink' : 'text-ink-3 hover:text-ink'"
               [attr.aria-current]="activeTab() === tab.id ? 'page' : null"
             >

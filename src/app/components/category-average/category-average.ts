@@ -232,7 +232,7 @@ export class CategoryAverageComponent {
 const FOOD_CONFIGS = [
   {
     category: 'Supermarket',
-    label: 'Supermarket Visit',
+    label: 'Supermarket visit',
   },
   {
     category: 'EatingOut',
@@ -240,7 +240,7 @@ const FOOD_CONFIGS = [
   },
   {
     category: 'Takeaway',
-    label: 'Takeaway Order',
+    label: 'Takeaway order',
   },
 ];
 

@@ -5,6 +5,7 @@ import { Transaction } from '../../models/transaction.model';
 import { compareNewestFirst } from '../../services/transaction-service';
 import { SensitiveDirective } from '../../utils/sensitive.directive';
 import { categoryLabel } from '../../utils/period-pace';
+import { BUTTON_SECONDARY } from '../../utils/pill-styles';
 
 const PAGE_SIZE = 10;
 
@@ -25,9 +26,10 @@ const PAGE_SIZE = 10;
         }
       </div>
     } @else if (error()) {
-      <p role="alert" class="py-3 text-[13px] text-cherry">
-        Couldn't load these transactions. Check your connection, then close and reopen this list.
-      </p>
+      <div role="alert" class="flex items-center justify-between gap-3 py-3">
+        <p class="text-[13px] text-cherry">Couldn't load these transactions.</p>
+        <button type="button" [class]="secondary + ' shrink-0'" (click)="retry.emit()">Try again</button>
+      </div>
     } @else if (!sorted().length) {
       <p class="py-3 text-[13px] text-ink-3">No transactions found.</p>
     } @else {
@@ -110,6 +112,9 @@ export class TransactionListComponent {
   readonly showCategory = input(false);
 
   readonly selectTransaction = output<Transaction>();
+  /** Asked to load again after an error. */
+  readonly retry = output<void>();
+  protected readonly secondary = BUTTON_SECONDARY;
 
   private readonly visibleCount = signal(PAGE_SIZE);
 

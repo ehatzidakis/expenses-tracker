@@ -30,6 +30,13 @@ describe('EditAdjustmentComponent', () => {
     expect(component).toBeTruthy();
   });
 
+  it('names the one-off and its amount when asking to delete it', () => {
+    expect(component.deleteText()).toEqual({
+      title: 'Delete “Test”?',
+      message: "This income of €10.00 will be removed. This can't be undone.",
+    });
+  });
+
   it('refuses a last day before the first day and says why', async () => {
     component.adjustmentModel.update((m) => ({ ...m, startDate: '2026-09-10', endDate: '2026-09-08' }));
     await fixture.whenStable();

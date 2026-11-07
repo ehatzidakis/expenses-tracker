@@ -21,6 +21,7 @@ import { YearlyCategorySumsComponent } from '../yearly-category-sums/yearly-cate
           [loading]="monthQuery.isPending()"
           [error]="monthQuery.isError()"
           (selectTransaction)="selectTransaction.emit($event)"
+          (retry)="monthQuery.refetch()"
         />
       }
     } @loading {

@@ -1,4 +1,5 @@
-import { Component, effect, inject, signal, input, output } from '@angular/core';
+import { Component, computed, effect, inject, signal, input, output } from '@angular/core';
+import { euros } from '../../utils/confirm-text';
 import { AdjustmentService } from '../../services/adjustment-service';
 import { QueryClient } from '@tanstack/angular-query-experimental';
 import { Adjustment } from '../../models/adjustments.model';
@@ -43,8 +44,8 @@ function formatDateForInput(dateVal: Date | string): string {
       [privacyDisabled]="privacyService.isPrivacyMode()"
       [errorMessage]="errorMessage()"
       [deleteLabel]="adjustment().isTrip ? 'Delete trip' : 'Delete one-off'"
-      [deleteTitle]="adjustment().isTrip ? 'Delete this trip?' : 'Delete this one-off?'"
-      deleteMessage="This can't be undone."
+      [deleteTitle]="deleteText().title"
+      [deleteMessage]="deleteText().message"
       [showDeleteConfirm]="showDeleteConfirm()"
       (back)="back.emit()"
       (submitted)="onSubmit($event)"
@@ -82,6 +83,17 @@ export class EditAdjustmentComponent {
   readonly showDeleteConfirm = signal(false);
 
   readonly adjustment = input.required<Adjustment>();
+
+  /** Names the trip or one-off and its amount, so the right one goes. */
+  readonly deleteText = computed(() => {
+    const adj = this.adjustment();
+    const kind = adj.isTrip ? 'trip' : 'one-off';
+    const title = adj.title?.trim() ? `Delete “${adj.title.trim()}”?` : `Delete this ${kind}?`;
+    const amount = adj.isTrip
+      ? `The trip and its ${euros(adj.amount)} total will be removed.`
+      : `This ${adj.adjType ? 'income' : 'expense'} of ${euros(adj.amount)} will be removed.`;
+    return { title, message: `${amount} This can't be undone.` };
+  });
 
   readonly back = output<void>();
   readonly updated = output<void>();

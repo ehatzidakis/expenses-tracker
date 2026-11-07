@@ -74,7 +74,7 @@ import { SinglesType, filterSingles, singleYears, singlesTotals } from './single
                   <dt class="text-[12px] text-ink-3">Net</dt>
                   <dd
                     class="mt-1 type-wide text-[15px] font-semibold"
-                    [class]="totals().net >= 0 ? 'text-avocado' : 'text-cherry'"
+                    [class]="totals().net >= 0 ? 'text-avocado' : 'text-ink'"
                     appSensitive="sm"
                   >
                     {{ totals().net < 0 ? '−' : '' }}€{{ absNet() | number: '1.2-2' }}

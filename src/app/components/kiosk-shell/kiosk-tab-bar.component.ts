@@ -11,7 +11,7 @@ export type KioskTab = 'new' | 'requests';
     <nav
       role="tablist"
       aria-label="Kiosk sections"
-      class="fixed inset-x-0 bottom-0 z-40 flex justify-center border-t border-ink/10 bg-panel/90 pb-[env(safe-area-inset-bottom)] backdrop-blur-xl"
+      class="fixed inset-x-0 bottom-0 z-40 flex justify-center border-t border-ink/10 bg-panel/90 pb-[max(calc(env(safe-area-inset-bottom)-16px),8px)] backdrop-blur-xl"
     >
       @for (tab of tabs; track tab.id) {
         <button
@@ -19,7 +19,7 @@ export type KioskTab = 'new' | 'requests';
           role="tab"
           [attr.aria-selected]="activeTab() === tab.id"
           (click)="tabChange.emit(tab.id)"
-          class="relative flex min-h-[54px] w-full max-w-48 flex-1 flex-col items-center justify-center gap-1 text-[11px] font-medium whitespace-nowrap transition-colors duration-150 cursor-pointer"
+          class="relative flex min-h-[50px] w-full max-w-48 flex-1 flex-col items-center justify-center gap-1 text-[11px] font-medium whitespace-nowrap transition-colors duration-150 cursor-pointer"
           [class]="
             activeTab() === tab.id
               ? 'text-ember-ink shadow-[inset_0_2px_0_var(--color-ember)]'

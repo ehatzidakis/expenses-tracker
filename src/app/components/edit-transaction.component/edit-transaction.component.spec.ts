@@ -32,6 +32,13 @@ describe('EditTransactionComponent', () => {
     expect(component).toBeTruthy();
   });
 
+  it('names the transaction and its amount when asking to delete it', () => {
+    expect(component.deleteText()).toEqual({
+      title: 'Delete “Test transaction”?',
+      message: "€10.00 on 19 Aug 2026. This can't be undone.",
+    });
+  });
+
   const splitTx = {
     id: '2',
     monthName: 'October 2026',
