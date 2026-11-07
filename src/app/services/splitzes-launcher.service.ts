@@ -1,16 +1,23 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable, Injector, inject } from '@angular/core';
 import type { SplitzesTab } from '../components/splitzes-modal.component/splitzes-tabs.component';
+import { ExpenseStateService } from './expense-state.service';
 
-/** Opens the Splitzes sheet from anywhere (the header button, the month panel) on a chosen tab. */
+/** Goes to the Splitz tab on a chosen inner tab, e.g. Incoming from the month panel. */
 @Injectable({ providedIn: 'root' })
 export class SplitzesLauncher {
-  readonly openTab = signal<SplitzesTab | null>(null);
+  // Looked up on use, so components that only read the next tab don't create the app state.
+  private readonly injector = inject(Injector);
+  private nextTab: SplitzesTab | null = null;
 
   open(tab: SplitzesTab = 'balances'): void {
-    this.openTab.set(tab);
+    this.nextTab = tab;
+    this.injector.get(ExpenseStateService).setActiveTab('splitz');
   }
 
-  close(): void {
-    this.openTab.set(null);
+  /** The tab Splitz should open on, once; Balances by default. */
+  take(): SplitzesTab {
+    const tab = this.nextTab ?? 'balances';
+    this.nextTab = null;
+    return tab;
   }
 }

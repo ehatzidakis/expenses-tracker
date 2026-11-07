@@ -12,6 +12,7 @@ import { TripBreakdownComponent } from '../trip-breakdown/trip-breakdown';
 import { SinglesViewComponent } from '../singles-view/singles-view';
 import { EditAdjustmentComponent } from '../edit-adjustment.component/edit-adjustment.component';
 import { SheetComponent } from '../sheet/sheet';
+import { AllTimeViewComponent } from '../all-time-view/all-time-view';
 import type { SinglesType } from '../singles-view/singles-view.util';
 import { monthTiming } from '../../utils/period-pace';
 import { SEGMENT_BASE, SEGMENT_FRAME, SEGMENT_OFF, SEGMENT_ON } from '../../utils/pill-styles';
@@ -40,16 +41,17 @@ import { SensitiveDirective } from '../../utils/sensitive.directive';
     SinglesViewComponent,
     EditAdjustmentComponent,
     SheetComponent,
+    AllTimeViewComponent,
   ],
   host: { class: 'flex flex-col gap-5' },
   template: `
-    <div role="group" aria-label="Period" [class]="segmentFrame + ' grid-cols-3'">
+    <div role="group" aria-label="Period" [class]="segmentFrame + ' grid-cols-4'">
       @for (option of modes; track option.id) {
         <button
           type="button"
           [class]="segment(mode() === option.id)"
           [attr.aria-pressed]="mode() === option.id"
-          (click)="state.budgetMode.set(option.id)"
+          (click)="state.setBudgetMode(option.id)"
         >
           {{ option.label }}
         </button>
@@ -168,6 +170,10 @@ import { SensitiveDirective } from '../../utils/sensitive.directive';
           />
         }
       }
+
+      @case ('alltime') {
+        <app-all-time-view />
+      }
     }
 
     <ng-template #loadError let-what="what" let-retry="retry">
@@ -215,6 +221,7 @@ export class BudgetPageComponent {
     { id: 'month', label: 'Month' },
     { id: 'trips', label: 'Trips' },
     { id: 'oneoffs', label: 'One-offs' },
+    { id: 'alltime', label: 'All time' },
   ];
 
   readonly mode = this.state.budgetMode;

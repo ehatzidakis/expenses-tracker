@@ -1,6 +1,11 @@
+<!-- iOS 27 blurs the top of home-screen web apps unless a solid strip taller than 10px touches
+     the top edge. It needs the solid (black) status bar, so the page starts below the clock. This
+     strip matches the background, so it is invisible; pages start 16px down so it covers nothing. -->
+<div class="pointer-events-none fixed inset-x-0 top-0 z-[60] h-3 bg-ground" aria-hidden="true"></div>
+
 @if (isUpdating()) {
   <div
-    class="fixed inset-x-0 top-[max(env(safe-area-inset-top),12px)] z-50 flex justify-center pointer-events-none"
+    class="fixed inset-x-0 top-[max(env(safe-area-inset-top),20px)] z-50 flex justify-center pointer-events-none"
   >
     <div
       role="status"
@@ -73,55 +78,11 @@
   <app-kiosk-shell />
 } @else {
   <main
-    class="mx-auto flex min-h-dvh w-full max-w-lg min-w-0 flex-col gap-5 overflow-x-clip px-4 pt-[max(env(safe-area-inset-top),8px)] pb-[calc(env(safe-area-inset-bottom)+80px)]"
+    class="mx-auto flex min-h-dvh w-full max-w-lg min-w-0 flex-col gap-5 overflow-x-clip px-4 pt-[max(env(safe-area-inset-top),16px)] pb-[calc(env(safe-area-inset-bottom)+80px)]"
   >
-    <app-header></app-header>
-
     @switch (state.activeTab()) {
       @case ('monthly') {
         <app-budget-page />
-      }
-
-      @case ('sumup') {
-        @if (state.expensesQuery.isPending()) {
-          <div class="flex flex-col gap-5 animate-pulse" aria-label="Loading">
-            <div class="h-48 rounded-2xl bg-panel"></div>
-            <div class="h-64 rounded-xl bg-panel/60"></div>
-          </div>
-        } @else if (state.expensesQuery.isError()) {
-          <div role="alert" class="flex flex-col items-start gap-3 border-y border-ink/10 py-6">
-            <p class="text-[15px] text-ink">Couldn't load your months.</p>
-            <p class="text-[13px] text-ink-3">Check your connection and try again.</p>
-            <button
-              type="button"
-              class="min-h-11 rounded-xl border border-edge px-4 text-[14px] font-medium text-ink hover:border-ink-4 cursor-pointer"
-              (click)="state.expensesQuery.refetch()"
-            >
-              Try again
-            </button>
-          </div>
-        } @else if (state.selectedExpense()) {
-          @defer (on immediate) {
-            <app-overview-card
-              [totalSpend]="totalOutgoing()"
-              [totalSaved]="totalSaved()"
-              [monthlyExpenses]="state.totalMonthlySpend()"
-              [oneOffExpenses]="oneOffExpenses()"
-              [monthlySaved]="monthlySaved()"
-              [oneOffBonuses]="oneOffBonuses()"
-              [yearlyBreakdown]="yearlyBreakdown()"
-              [dateRangeInfo]="state.dateRangeInfo()"
-            >
-            </app-overview-card>
-
-            <app-category-breakdown
-              [categories]="state.allTimeCategoryBreakdown()"
-              [months]="state.expensesQuery.data() ?? []"
-              [adjustments]="adjustmentsQuery.data() ?? []"
-            >
-            </app-category-breakdown>
-          }
-        }
       }
 
       @case ('create') {
@@ -138,6 +99,14 @@
         } @loading {
           <div class="h-96 rounded-2xl bg-panel/60 animate-pulse"></div>
         }
+      }
+
+      @case ('splitz') {
+        <app-splitzes-page />
+      }
+
+      @case ('settings') {
+        <app-settings-page />
       }
     }
   </main>

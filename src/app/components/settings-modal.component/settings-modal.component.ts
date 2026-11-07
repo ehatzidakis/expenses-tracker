@@ -4,7 +4,6 @@ import {
   afterNextRender,
   inject,
   Injector,
-  output,
   signal,
   viewChild,
 } from '@angular/core';
@@ -22,16 +21,16 @@ import { StealthModeSettingComponent } from './stealth-mode-setting.component';
 import { StealthPasscodeSettingComponent } from './stealth-passcode-setting.component';
 import { DataExportSettingComponent } from './data-export-setting.component';
 import { NotificationSettingComponent } from './notification-setting.component';
-import { SheetComponent } from '../sheet/sheet';
 import { CategoryBudgetsGrid } from '../category-budgets-grid/category-budgets-grid';
 
 type PinAction = 'none' | 'set' | 'remove' | 'unlock-to-disable';
 
+/** The Settings tab. Budgets and wage open as a sub-view with Back. */
 @Component({
-  selector: 'app-settings-modal',
+  selector: 'app-settings-page',
   standalone: true,
+  host: { class: 'block' },
   imports: [
-    SheetComponent,
     CategoryBudgetsGrid,
     PinEntryFormComponent,
     SettingsFeedbackBannerComponent,
@@ -43,7 +42,7 @@ type PinAction = 'none' | 'set' | 'remove' | 'unlock-to-disable';
     NotificationSettingComponent,
   ],
   template: `
-    <app-sheet [label]="view() === 'budgets' ? 'Budgets and wage' : 'Settings'" (closed)="close.emit()">
+    <section [attr.aria-label]="view() === 'budgets' ? 'Budgets and wage' : 'Settings'">
       @if (view() === 'budgets') {
         <div class="flex min-h-11 items-center gap-2 pt-1.5">
           <button
@@ -57,13 +56,13 @@ type PinAction = 'none' | 'set' | 'remove' | 'unlock-to-disable';
             </svg>
             Back
           </button>
-          <h2 class="type-wide ml-1 text-[18px] font-semibold text-ink">Budgets and wage</h2>
+          <h1 class="type-wide ml-1 text-[18px] font-semibold text-ink">Budgets and wage</h1>
         </div>
         <div class="mt-4">
           <app-category-budgets-grid />
         </div>
       } @else {
-        <h2 class="type-wide text-[18px] font-semibold text-ink">Settings</h2>
+        <h1 class="type-wide text-[18px] font-semibold text-ink">Settings</h1>
 
         <div class="mt-3 flex flex-col gap-4">
           <app-settings-feedback-banner [message]="feedbackMessage()" />
@@ -146,20 +145,18 @@ type PinAction = 'none' | 'set' | 'remove' | 'unlock-to-disable';
           <app-settings-modal-footer [version]="appVersion" />
         </div>
       }
-    </app-sheet>
+    </section>
   `,
 })
-export class SettingsModalComponent {
+export class SettingsPageComponent {
   readonly privacyService = inject(PrivacyService);
   readonly authService = inject(AuthService);
-  readonly close = output<void>();
   readonly appVersion = APP_VERSION;
 
   readonly activeAction = signal<PinAction>('none');
-  /** Budgets opens inside this sheet, not as a second one on top. */
+  /** Budgets opens in place, with Back to return. */
   readonly view = signal<'main' | 'budgets'>('main');
   private readonly injector = inject(Injector);
-  private readonly sheet = viewChild(SheetComponent);
   private readonly backButton = viewChild<ElementRef<HTMLButtonElement>>('backButton');
   private readonly budgetsRow = viewChild<ElementRef<HTMLButtonElement>>('budgetsRow');
 
@@ -177,7 +174,7 @@ export class SettingsModalComponent {
   private afterSwap(focus: () => void): void {
     afterNextRender(
       () => {
-        this.sheet()?.scrollToTop();
+        window.scrollTo({ top: 0 });
         focus();
       },
       { injector: this.injector },
@@ -243,7 +240,6 @@ export class SettingsModalComponent {
   async handleSignOut(): Promise<void> {
     try {
       await this.authService.signOut();
-      this.close.emit();
     } catch (error) {
       console.error('Sign out failed:', error);
       this.setFeedback('error', 'Unable to sign out right now.');

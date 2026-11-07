@@ -63,9 +63,9 @@ import { FormsModule } from '@angular/forms';
       />
 
       @if (isEditing) {
-        <!-- Pinned to the foot of the sheet while the budgets scroll past -->
+        <!-- Pinned just above the tab bar while the budgets scroll past -->
         <app-category-budget-edit-controls
-          class="sticky bottom-[calc(-20px-env(safe-area-inset-bottom))] -mx-5 block border-t border-ink/10 bg-panel px-5 pt-3 pb-[calc(20px+env(safe-area-inset-bottom))]"
+          class="sticky bottom-[calc(max(calc(env(safe-area-inset-bottom)-16px),8px)+51px)] -mx-4 block border-t border-ink/10 bg-ground px-4 py-3"
           [isEditing]="isEditing"
           [draftWage]="draftWage"
           (wageChange)="setDraftWage($event)"

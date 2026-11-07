@@ -1,12 +1,8 @@
-import { Component, computed, effect, inject, Injector, signal } from '@angular/core';
+import { Component, effect, inject, Injector, signal, untracked } from '@angular/core';
 import { SwUpdate } from '@angular/service-worker';
 import { FormsModule } from '@angular/forms';
 import { filter } from 'rxjs';
 import { ExpenseStateService } from './services/expense-state.service';
-import { AdjustmentService } from './services/adjustment-service';
-import { OverviewCardComponent } from './components/overview-card.component/overview-card.component';
-import { HeaderComponent } from './components/header.component/header.component';
-import { CategoryBreakdownComponent } from './components/category-breakdown.component/category-breakdown.component';
 import { TabBarComponent } from './components/tab-bar.component/tab-bar.component';
 import { CreateTransactionComponent } from './components/create-transaction.component/create-transaction.component';
 import { ChartsPageComponent } from './components/charts-page/charts-page';
@@ -14,34 +10,26 @@ import { AuthService } from './services/auth.service';
 import { PendingBadgeService } from './services/pending-badge.service';
 import { KioskShellComponent } from './components/kiosk-shell/kiosk-shell.component';
 import { BudgetPageComponent } from './components/budget-page/budget-page';
-
-export interface YearlyBreakdownEntry {
-  year: number;
-  monthlyExpenses: number;
-  oneOffExpenses: number;
-  monthlySaved: number;
-  oneOffBonuses: number;
-}
+import { SplitzesPageComponent } from './components/splitzes-modal.component/splitzes-modal.component';
+import { SettingsPageComponent } from './components/settings-modal.component/settings-modal.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
   imports: [
     FormsModule,
-    HeaderComponent,
-    OverviewCardComponent,
-    CategoryBreakdownComponent,
     TabBarComponent,
     CreateTransactionComponent,
     ChartsPageComponent,
     BudgetPageComponent,
     KioskShellComponent,
+    SplitzesPageComponent,
+    SettingsPageComponent,
   ],
   templateUrl: './app.html',
 })
 export class AppComponent {
   state = inject(ExpenseStateService);
-  private adjustmentService = inject(AdjustmentService);
   private authService = inject(AuthService);
   private swUpdate = inject(SwUpdate);
   private injector = inject(Injector);
@@ -76,88 +64,12 @@ export class AppComponent {
       const role = this.currentRole();
       if (role) this.injector.get(PendingBadgeService).start(role);
     });
+
+    // Signing out from Settings: the next sign-in starts on Budget, not on Settings.
+    effect(() => {
+      if (this.authReady() && !this.isAuthenticated()) untracked(() => this.state.setActiveTab('monthly'));
+    });
   }
-
-  adjustmentsQuery = this.adjustmentService.getAdjustmentsQuery();
-
-  sortedAdjustments = computed(() =>
-    [...(this.adjustmentsQuery.data() ?? [])].sort(
-      (a, b) => b.startDate.getTime() - a.startDate.getTime(),
-    ),
-  );
-
-  readonly oneOffExpenses = computed(() =>
-    this.sortedAdjustments()
-      .filter((a) => !a.adjType)
-      .reduce((sum, a) => sum + a.amount, 0),
-  );
-
-  readonly oneOffBonuses = computed(() =>
-    this.sortedAdjustments()
-      .filter((a) => a.adjType)
-      .reduce((sum, a) => sum + a.amount, 0),
-  );
-
-  readonly monthlySaved = computed(
-    () => this.state.selectedTotalWage() - this.state.totalMonthlySpend(),
-  );
-
-  readonly yearlyBreakdown = computed<YearlyBreakdownEntry[]>(() => {
-    const byYear = new Map<number, YearlyBreakdownEntry>();
-
-    for (const expense of this.state.processedExpenses().filter((item) => item.id !== 'ALL')) {
-      const yearMatch = expense.MonthName.match(/(\d{4})$/);
-      const year = yearMatch ? Number(yearMatch[1]) : null;
-      if (!year) continue;
-
-      const existing = byYear.get(year) ?? {
-        year,
-        monthlyExpenses: 0,
-        oneOffExpenses: 0,
-        monthlySaved: 0,
-        oneOffBonuses: 0,
-      };
-
-      const monthlySpend = Object.entries(expense).reduce((sum, [key, value]) => {
-        if (key === 'id' || key === 'MonthName' || key === 'TotalWage') {
-          return sum;
-        }
-        return sum + (Number(value) || 0);
-      }, 0);
-
-      const wage = Number(expense.TotalWage) || 0;
-
-      existing.monthlyExpenses += monthlySpend;
-      existing.monthlySaved += wage - monthlySpend;
-      byYear.set(year, existing);
-    }
-
-    for (const adjustment of this.adjustmentsQuery.data() ?? []) {
-      const year = adjustment.startDate.getFullYear();
-      const existing = byYear.get(year) ?? {
-        year,
-        monthlyExpenses: 0,
-        oneOffExpenses: 0,
-        monthlySaved: 0,
-        oneOffBonuses: 0,
-      };
-
-      if (adjustment.adjType) {
-        existing.oneOffBonuses += adjustment.amount;
-      } else {
-        existing.oneOffExpenses += adjustment.amount;
-      }
-
-      byYear.set(year, existing);
-    }
-
-    return [...byYear.values()].sort((a, b) => a.year - b.year);
-  });
-
-  // Total incoming (wage + one-off bonuses) minus total outgoing (monthly + one-off expenses)
-  readonly totalOutgoing = computed(() => this.state.totalMonthlySpend() + this.oneOffExpenses());
-  readonly totalIncoming = computed(() => this.state.selectedTotalWage() + this.oneOffBonuses());
-  readonly totalSaved = computed(() => this.totalIncoming() - this.totalOutgoing());
 
   async signIn(): Promise<void> {
     const email = this.email().trim();

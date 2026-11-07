@@ -1,19 +1,19 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { QueryClient, provideTanStackQuery } from '@tanstack/angular-query-experimental';
 
-import { SettingsModalComponent } from './settings-modal.component';
+import { SettingsPageComponent } from './settings-modal.component';
 
-describe('SettingsModalComponent', () => {
-  let component: SettingsModalComponent;
-  let fixture: ComponentFixture<SettingsModalComponent>;
+describe('SettingsPageComponent', () => {
+  let component: SettingsPageComponent;
+  let fixture: ComponentFixture<SettingsPageComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [SettingsModalComponent],
+      imports: [SettingsPageComponent],
       providers: [provideTanStackQuery(new QueryClient())],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(SettingsModalComponent);
+    fixture = TestBed.createComponent(SettingsPageComponent);
     component = fixture.componentInstance;
     await fixture.whenStable();
   });

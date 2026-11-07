@@ -14,10 +14,10 @@ export interface CategorySpend {
   isOverBudget: boolean;
 }
 
-export type AppTab = 'monthly' | 'sumup' | 'create' | 'charts';
+export type AppTab = 'monthly' | 'charts' | 'create' | 'splitz' | 'settings';
 
 /** Which period the Budget tab shows. */
-export type BudgetMode = 'month' | 'trips' | 'oneoffs';
+export type BudgetMode = 'month' | 'trips' | 'oneoffs' | 'alltime';
 
 export interface CategorySubcategoryOption {
   id: number;
@@ -418,11 +418,18 @@ export class ExpenseStateService {
   }
 
   setActiveTab(tab: AppTab): void {
+    // A different tab starts at the top, not where the last one was scrolled to.
+    if (tab !== this.activeTab() && typeof window !== 'undefined') window.scrollTo({ top: 0 });
     this.activeTab.set(tab);
+  }
 
-    if (tab === 'sumup') {
+  /** Budget's switch. All time selects the 'ALL' entry; leaving it returns to the last month. */
+  setBudgetMode(mode: BudgetMode): void {
+    this.budgetMode.set(mode);
+
+    if (mode === 'alltime') {
       this.selectedExpenseId.set('ALL');
-    } else if (tab === 'monthly' && this.selectedExpenseId() === 'ALL') {
+    } else if (this.selectedExpenseId() === 'ALL') {
       this.selectedExpenseId.set(
         this.lastSelectedMonthId() ?? this.latestMonthExpense()?.id ?? null,
       );

@@ -1,28 +1,29 @@
-import { Component, computed, inject, input, linkedSignal, output } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { AuthService } from '../../services/auth.service';
 import { TransactionService } from '../../services/transaction-service';
 import { SplitzBalancesComponent } from './splitz-balances.component';
 import { SplitzHistoryComponent } from './splitz-history.component';
 import { SplitzIncomingComponent } from './splitz-incoming.component';
 import { SplitzesTab, SplitzesTabsComponent } from './splitzes-tabs.component';
-import { SheetComponent } from '../sheet/sheet';
+import { SplitzesLauncher } from '../../services/splitzes-launcher.service';
 
+/** The Splitz tab: balances with each person, items waiting for review, and settled history. */
 @Component({
-  selector: 'app-splitzes-modal',
+  selector: 'app-splitzes-page',
   standalone: true,
-  imports: [SheetComponent, 
+  host: { class: 'block' },
+  imports: [
     SplitzBalancesComponent,
     SplitzHistoryComponent,
     SplitzIncomingComponent,
     SplitzesTabsComponent,
   ],
   template: `
-    <app-sheet label="Splitzes" (closed)="close.emit()">
-      <h2 class="type-wide text-[18px] font-semibold text-ink">Splitzes</h2>
+    <section aria-labelledby="splitzes-heading">
+      <h1 id="splitzes-heading" class="type-wide text-[18px] font-semibold text-ink">Splitzes</h1>
       <p class="mt-1 text-[13px] text-ink-2">Who owes whom, and what's waiting for you</p>
 
-      <!-- A steady height keeps the tabs under the thumb whichever tab is open. -->
-      <div class="mt-4 flex min-h-[min(560px,72dvh)] flex-col gap-5">
+      <div class="mt-4 flex flex-col gap-5">
         <app-splitzes-tabs
           [activeTab]="activeTab()"
           [showIncoming]="isAdmin()"
@@ -42,12 +43,11 @@ import { SheetComponent } from '../sheet/sheet';
           }
         }
       </div>
-    </app-sheet>
+    </section>
   `,
 })
-export class SplitzesModalComponent {
+export class SplitzesPageComponent {
   private readonly transactionService = inject(TransactionService);
-  readonly close = output<void>();
 
   readonly isAdmin = inject(AuthService).isAdmin;
   readonly pendingQuery = this.transactionService.getPendingTransactionsQuery();
@@ -57,9 +57,8 @@ export class SplitzesModalComponent {
     this.isAdmin() ? (this.pendingQuery.data()?.length ?? 0) : 0,
   );
 
-  /** Balances from the header button; Incoming from the month panel's review line. */
-  readonly initialTab = input<SplitzesTab>('balances');
-  readonly activeTab = linkedSignal<SplitzesTab>(() => this.initialTab());
+  /** Balances from the tab bar; Incoming from the month panel's review line. */
+  readonly activeTab = signal<SplitzesTab>(inject(SplitzesLauncher).take());
 
   selectTab(tab: SplitzesTab): void {
     this.activeTab.set(tab);
