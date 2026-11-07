@@ -3,6 +3,7 @@ import { injectQuery, QueryClient } from '@tanstack/angular-query-experimental';
 import { TransactionService, monthTransactionsKey } from '../../services/transaction-service';
 import { Transaction } from '../../models/transaction.model';
 import { RECURRING_TEMPLATES, RecurringTemplate } from './recurring-templates';
+import { ACTIVE_PILL, FIELD_LABEL, IDLE_PILL, PILL_BASE } from '../../utils/pill-styles';
 import {
   buildMonthlyBatch,
   isTemplateAdded,
@@ -25,49 +26,55 @@ export interface TemplatePick {
   standalone: true,
   host: { class: 'block' },
   template: `
-    <div class="space-y-2">
-      <div class="flex gap-1.5 overflow-x-auto pb-1 -mx-1 px-1 scrollbar-none">
-        @for (item of chips(); track item.template.id) {
-          <button
-            type="button"
-            (click)="pick(item.template)"
-            [disabled]="item.added"
-            [attr.aria-pressed]="activeId() === item.template.id"
-            [title]="item.added ? 'Already added for ' + monthName() : item.template.label"
-            class="shrink-0 px-2.5 py-1 rounded-full text-[11px] font-semibold border whitespace-nowrap transition-colors cursor-pointer disabled:cursor-not-allowed disabled:opacity-60"
-            [class.bg-indigo-500/20]="activeId() === item.template.id"
-            [class.border-indigo-400/50]="activeId() === item.template.id"
-            [class.text-indigo-200]="activeId() === item.template.id"
-            [class.bg-gray-800/60]="activeId() !== item.template.id"
-            [class.border-gray-700/60]="activeId() !== item.template.id"
-            [class.text-gray-300]="activeId() !== item.template.id && !item.added"
-            [class.text-gray-500]="activeId() !== item.template.id && item.added"
-          >
-            {{ item.template.emoji }} {{ item.template.label }}
-            @if (item.added) {
-              <span class="text-emerald-400">✓</span>
-            }
-          </button>
-        }
+    <div class="flex flex-col gap-2">
+      <div class="flex flex-col gap-1.5 pt-1">
+        <span class="sr-only" id="recurring-label">Recurring transactions</span>
+        <div role="group" aria-labelledby="recurring-label" class="flex flex-wrap gap-2">
+          @for (item of chips(); track item.template.id) {
+            <button
+              type="button"
+              (click)="pick(item.template)"
+              [disabled]="item.added"
+              [attr.aria-pressed]="activeId() === item.template.id"
+              [title]="item.added ? 'Already added for ' + monthName() : item.template.label"
+              [class]="pillBase + ' flex items-center gap-1.5 disabled:cursor-not-allowed ' + (activeId() === item.template.id ? activePill : idlePill)"
+            >
+              @if (item.template.emoji) {
+                <span class="text-[12px] opacity-60 grayscale-[40%]" aria-hidden="true">{{ item.template.emoji }}</span>
+              }
+              {{ item.template.label }}
+              @if (item.added) {
+                <svg class="size-3.5 text-avocado" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                  <path
+                    fill-rule="evenodd"
+                    clip-rule="evenodd"
+                    d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z"
+                  />
+                </svg>
+                <span class="sr-only">(added this month)</span>
+              }
+            </button>
+          }
+        </div>
       </div>
 
       <!-- @if (confirming()) {
         <div
-          class="p-2.5 rounded-xl bg-gray-950/80 border border-gray-800 text-[11px] text-gray-300 space-y-2"
+          class="p-2.5 rounded-xl bg-ground/80 border border-raised text-[11px] text-ink-2 space-y-2"
         >
           <p>{{ confirmMessage() }}</p>
           <div class="flex gap-2 justify-end">
             <button
               type="button"
               (click)="confirming.set(false)"
-              class="px-3 py-1 rounded-lg text-gray-400 hover:text-gray-200 cursor-pointer"
+              class="min-h-11 px-4 rounded-lg text-ink-2 hover:text-ink cursor-pointer"
             >
               Cancel
             </button>
             <button
               type="button"
               (click)="addAllMonthly()"
-              class="px-3 py-1 rounded-lg font-semibold text-white bg-indigo-500/80 hover:bg-indigo-500 cursor-pointer"
+              class="min-h-11 px-4 rounded-lg font-semibold text-ground bg-ember/80 hover:bg-ember-ink cursor-pointer"
             >
               Add
             </button>
@@ -78,19 +85,24 @@ export interface TemplatePick {
           type="button"
           (click)="confirming.set(true)"
           [disabled]="saving() || disabled()"
-          class="text-[11px] font-semibold text-indigo-300 hover:text-indigo-200 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+          class="inline-flex min-h-11 items-center text-[13px] font-semibold text-ember-ink hover:text-ember-soft disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
         >
           {{ saving() ? 'Adding…' : '➕ Add all monthly (' + remainingCount() + ')' }}
         </button>
       } -->
 
       @if (errorMessage()) {
-        <p class="text-[11px] text-red-400">{{ errorMessage() }}</p>
+        <p class="text-[12px] text-cherry">{{ errorMessage() }}</p>
       }
     </div>
   `,
 })
 export class RecurringTemplatesComponent {
+  protected readonly pillBase = PILL_BASE;
+  protected readonly activePill = ACTIVE_PILL;
+  protected readonly idlePill = IDLE_PILL;
+  protected readonly fieldLabel = FIELD_LABEL;
+
   private readonly transactionService = inject(TransactionService);
   private readonly queryClient = inject(QueryClient);
 

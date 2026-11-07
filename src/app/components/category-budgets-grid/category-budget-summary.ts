@@ -8,33 +8,38 @@ import { SensitiveDirective } from '../../utils/sensitive.directive';
   host: { class: 'block' },
   imports: [CommonModule, SensitiveDirective],
   template: `
-    <div class="space-y-3">
-      <div class="grid grid-cols-2 gap-3">
-        <div
-          class="bg-indigo-950/30 border border-indigo-800/50 rounded-2xl p-2 flex items-center justify-between"
-        >
-          <span class="text-xs font-semibold uppercase tracking-wider text-indigo-300"
-            >Total Budgeted Sum</span
-          >
-          <span class="text-lg font-bold text-indigo-200" appSensitive>
-            €{{ totalBudget() | number: '1.0-0' }}
-          </span>
-        </div>
-        <div
-          class="bg-indigo-950/30 border border-indigo-800/50 rounded-2xl p-2 flex items-center justify-between"
-        >
-          <span class="text-xs font-semibold uppercase tracking-wider text-indigo-300"
-            >Monthly Savings</span
-          >
-          <span class="text-lg font-bold text-indigo-200" appSensitive>
-            €{{ projectedSave() | number: '1.0-0' }}
-          </span>
-        </div>
+    <dl class="grid grid-cols-3 gap-3">
+      <div>
+        <dt class="text-[12px] text-ink-3">Wage</dt>
+        <dd class="type-wide mt-1 text-[16px] font-semibold text-ink" appSensitive="sm">
+          €{{ wage() | number: '1.2-2' }}
+        </dd>
       </div>
-    </div>
+      <div>
+        <dt class="text-[12px] text-ink-3">Budgeted</dt>
+        <dd class="type-wide mt-1 text-[16px] font-semibold text-ink" appSensitive="sm">
+          €{{ totalBudget() | number: '1.2-2' }}
+        </dd>
+      </div>
+      <div class="text-right">
+        <dt class="text-[12px] text-ink-3">Left to save</dt>
+        <dd
+          class="type-wide mt-1 text-[16px] font-semibold"
+          [class]="projectedSave() >= 0 ? 'text-avocado' : 'text-cherry'"
+          appSensitive="sm"
+        >
+          {{ projectedSave() < 0 ? '−' : '' }}€{{ abs(projectedSave()) | number: '1.2-2' }}
+        </dd>
+      </div>
+    </dl>
   `,
 })
 export class CategoryBudgetSummaryComponent {
+  abs(value: number): number {
+    return Math.abs(value);
+  }
+
+  readonly wage = input(0);
   readonly totalBudget = input.required<number>();
   readonly projectedSave = input.required<number>();
 }

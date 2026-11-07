@@ -5,12 +5,13 @@ import { CreateTransactionComponent } from '../create-transaction.component/crea
 import { NotificationSettingComponent } from '../settings-modal.component/notification-setting.component';
 import { KioskRequestsComponent } from './kiosk-requests.component';
 import { KioskTab, KioskTabBarComponent } from './kiosk-tab-bar.component';
+import { SheetComponent } from '../sheet/sheet';
 
 /** Everything the kiosk user sees: header, the New/Requests tabs, and notification settings. */
 @Component({
   selector: 'app-kiosk-shell',
   standalone: true,
-  imports: [
+  imports: [SheetComponent, 
     CreateTransactionComponent,
     KioskRequestsComponent,
     KioskTabBarComponent,
@@ -19,15 +20,12 @@ import { KioskTab, KioskTabBarComponent } from './kiosk-tab-bar.component';
   host: { class: 'block' },
   template: `
     <main
-      class="min-h-screen bg-gray-950 text-gray-100 p-4 pb-28 max-w-md mx-auto md:max-w-3xl md:p-8 md:pb-28 flex flex-col gap-4"
+      class="mx-auto flex min-h-dvh w-full max-w-lg min-w-0 flex-col gap-5 overflow-x-clip px-4 pt-[max(env(safe-area-inset-top),16px)] pb-[calc(env(safe-area-inset-bottom)+80px)]"
     >
-      <header class="flex items-center justify-between pt-2">
-        <div class="flex items-center gap-3">
-          <img src="assets/favicon.svg" alt="Logo" class="w-10 h-10" />
-          <div>
-            <h1 class="text-xl font-bold tracking-tight text-white">Expenses Tracker</h1>
-            <p class="text-xs text-gray-400">Kiosk mode</p>
-          </div>
+      <header class="flex min-h-14 items-center justify-between gap-3">
+        <div class="flex items-center gap-2.5">
+          <img src="assets/favicon.svg" alt="" class="size-7" />
+          <h1 class="type-wide text-[17px] font-bold uppercase tracking-[0.02em] text-ink">Expenses</h1>
         </div>
 
         <div class="flex items-center gap-2">
@@ -36,7 +34,7 @@ import { KioskTab, KioskTabBarComponent } from './kiosk-tab-bar.component';
             (click)="showNotifications.set(true)"
             aria-label="Notification settings"
             title="Notifications"
-            class="h-9 w-9 flex items-center justify-center rounded-full border border-gray-700 bg-gray-900 text-gray-200 hover:border-gray-600 transition-colors cursor-pointer"
+            class="size-11 flex items-center justify-center rounded-full border border-edge bg-raised text-ink-2 hover:text-ink transition-colors cursor-pointer"
           >
             <svg
               class="w-4 h-4"
@@ -55,7 +53,7 @@ import { KioskTab, KioskTabBarComponent } from './kiosk-tab-bar.component';
           <button
             type="button"
             (click)="signOut()"
-            class="px-3 py-2 rounded-full border border-gray-700 bg-gray-900 text-xs font-medium text-gray-200 hover:border-gray-600 transition-colors cursor-pointer"
+            class="min-h-11 px-3.5 rounded-xl border border-edge text-[13px] font-medium text-ink-2 hover:border-ink-4 hover:text-ink transition-colors cursor-pointer"
           >
             Sign out
           </button>
@@ -76,30 +74,12 @@ import { KioskTab, KioskTabBarComponent } from './kiosk-tab-bar.component';
     />
 
     @if (showNotifications()) {
-      <div
-        class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4"
-        (click)="showNotifications.set(false)"
-      >
-        <div
-          role="dialog"
-          aria-label="Notifications"
-          class="bg-gray-900 border border-gray-800 rounded-3xl p-5 w-full max-w-sm shadow-2xl space-y-4 text-gray-100"
-          (click)="$event.stopPropagation()"
-        >
-          <div class="flex items-center justify-between">
-            <h2 class="text-base font-semibold text-white">Notifications</h2>
-            <button
-              type="button"
-              (click)="showNotifications.set(false)"
-              aria-label="Close"
-              class="h-8 w-8 flex items-center justify-center rounded-full text-gray-400 hover:text-gray-200 cursor-pointer"
-            >
-              ✕
-            </button>
-          </div>
-          <app-notification-setting />
+      <app-sheet label="Notifications" (closed)="showNotifications.set(false)">
+        <h2 class="type-wide text-[18px] font-semibold text-ink">Notifications</h2>
+        <div class="mt-2 border-y border-ink/10">
+          <app-notification-setting label="New request alerts" />
         </div>
-      </div>
+      </app-sheet>
     }
   `,
 })

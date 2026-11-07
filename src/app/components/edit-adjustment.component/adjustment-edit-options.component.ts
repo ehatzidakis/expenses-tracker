@@ -1,99 +1,85 @@
 import { Component, input, output } from '@angular/core';
+import {
+  FIELD_LABEL,
+  SEGMENT_BASE,
+  SEGMENT_FRAME,
+  SEGMENT_OFF,
+  SEGMENT_ON,
+} from '../../utils/pill-styles';
 
+/** Type, trip and open/closed for an existing one-off, as the shared segment switches. */
 @Component({
   selector: 'app-adjustment-edit-options',
   standalone: true,
   host: { class: 'block' },
   template: `
-    <div class="space-y-4">
-      <div class="space-y-1.5">
-        <label class="text-xs font-medium text-gray-400">Adjustment Type</label>
-        <div class="grid grid-cols-2 gap-2 p-1 bg-gray-950/80 rounded-xl border border-gray-800">
+    <div class="flex flex-col gap-4">
+      <!-- A trip stays a trip and its total comes from its transactions: only Accepting expenses is left. -->
+      @if (!editingTrip()) {
+      <div class="flex flex-col gap-1.5">
+        <span id="adj-edit-type" [class]="fieldLabel">Type</span>
+        <div role="group" aria-labelledby="adj-edit-type" [class]="frame + ' grid-cols-2'">
           <button
             type="button"
+            [class]="segment(isAddition())"
+            [attr.aria-pressed]="isAddition()"
             (click)="typeChange.emit(true)"
-            class="py-2 rounded-lg text-xs font-semibold transition-all duration-150 flex items-center justify-center gap-1 cursor-pointer"
-            [class.bg-emerald-500/20]="isAddition()"
-            [class.text-emerald-400]="isAddition()"
-            [class.border]="isAddition()"
-            [class.border-emerald-500/30]="isAddition()"
-            [class.text-gray-400]="!isAddition()"
           >
-            <span>↑</span> Bonus / Addition
+            Income
           </button>
-
           <button
             type="button"
+            [class]="segment(!isAddition())"
+            [attr.aria-pressed]="!isAddition()"
             (click)="typeChange.emit(false)"
-            class="py-2 rounded-lg text-xs font-semibold transition-all duration-150 flex items-center justify-center gap-1 cursor-pointer"
-            [class.bg-red-500/20]="!isAddition()"
-            [class.text-red-400]="!isAddition()"
-            [class.border]="!isAddition()"
-            [class.border-red-500/30]="!isAddition()"
-            [class.text-gray-400]="isAddition()"
           >
-            <span>↓</span> One-Off Expense
+            Expense
           </button>
         </div>
       </div>
 
-      <div class="space-y-1.5">
-        <label class="text-xs font-medium text-gray-400">Trip</label>
-        <div class="grid grid-cols-2 gap-2 p-1 bg-gray-950/80 rounded-xl border border-gray-800">
+      <div class="flex flex-col gap-1.5">
+        <span id="adj-edit-trip" [class]="fieldLabel">Trip</span>
+        <div role="group" aria-labelledby="adj-edit-trip" [class]="frame + ' grid-cols-2'">
           <button
             type="button"
+            [class]="segment(isTrip())"
+            [attr.aria-pressed]="isTrip()"
             (click)="tripChange.emit(true)"
-            class="py-2 rounded-lg text-xs font-semibold transition-all duration-150 flex items-center justify-center gap-1 cursor-pointer"
-            [class.bg-sky-500/20]="isTrip()"
-            [class.text-sky-400]="isTrip()"
-            [class.border]="isTrip()"
-            [class.border-sky-500/30]="isTrip()"
-            [class.text-gray-400]="!isTrip()"
           >
-            🛫 Yes
+            Yes
           </button>
           <button
             type="button"
+            [class]="segment(!isTrip())"
+            [attr.aria-pressed]="!isTrip()"
             (click)="tripChange.emit(false)"
-            class="py-2 rounded-lg text-xs font-semibold transition-all duration-150 flex items-center justify-center gap-1 cursor-pointer"
-            [class.bg-gray-700/60]="!isTrip()"
-            [class.text-gray-200]="!isTrip()"
-            [class.border]="!isTrip()"
-            [class.border-gray-600/40]="!isTrip()"
-            [class.text-gray-400]="isTrip()"
           >
             No
           </button>
         </div>
       </div>
+      }
 
       @if (isTrip()) {
-        <div class="space-y-1.5">
-          <label class="text-xs font-medium text-gray-400">Accept New Transactions</label>
-          <div class="grid grid-cols-2 gap-2 p-1 bg-gray-950/80 rounded-xl border border-gray-800">
+        <div class="flex flex-col gap-1.5">
+          <span id="adj-edit-open" [class]="fieldLabel">Accepting expenses</span>
+          <div role="group" aria-labelledby="adj-edit-open" [class]="frame + ' grid-cols-2'">
             <button
               type="button"
+              [class]="segment(isSelectable())"
+              [attr.aria-pressed]="isSelectable()"
               (click)="selectableChange.emit(true)"
-              class="py-2 rounded-lg text-xs font-semibold transition-all duration-150 flex items-center justify-center gap-1 cursor-pointer"
-              [class.bg-emerald-500/20]="isSelectable()"
-              [class.text-emerald-400]="isSelectable()"
-              [class.border]="isSelectable()"
-              [class.border-emerald-500/30]="isSelectable()"
-              [class.text-gray-400]="!isSelectable()"
             >
-              🔓 Open
+              Yes
             </button>
             <button
               type="button"
+              [class]="segment(!isSelectable())"
+              [attr.aria-pressed]="!isSelectable()"
               (click)="selectableChange.emit(false)"
-              class="py-2 rounded-lg text-xs font-semibold transition-all duration-150 flex items-center justify-center gap-1 cursor-pointer"
-              [class.bg-gray-700/60]="!isSelectable()"
-              [class.text-gray-200]="!isSelectable()"
-              [class.border]="!isSelectable()"
-              [class.border-gray-600/40]="!isSelectable()"
-              [class.text-gray-400]="isSelectable()"
             >
-              🔒 Closed
+              No
             </button>
           </div>
         </div>
@@ -102,6 +88,11 @@ import { Component, input, output } from '@angular/core';
   `,
 })
 export class AdjustmentEditOptionsComponent {
+  protected readonly frame = SEGMENT_FRAME;
+  protected readonly fieldLabel = FIELD_LABEL;
+
+  /** Editing an existing trip: Type and Trip are hidden. */
+  readonly editingTrip = input(false);
   readonly isAddition = input.required<boolean>();
   readonly isTrip = input.required<boolean>();
   readonly isSelectable = input.required<boolean>();
@@ -109,4 +100,8 @@ export class AdjustmentEditOptionsComponent {
   readonly typeChange = output<boolean>();
   readonly tripChange = output<boolean>();
   readonly selectableChange = output<boolean>();
+
+  segment(active: boolean): string {
+    return `${SEGMENT_BASE} ${active ? SEGMENT_ON : SEGMENT_OFF}`;
+  }
 }

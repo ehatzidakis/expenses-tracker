@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FieldTree } from '@angular/forms/signals';
 import { normalizeDecimalInput, parseDecimalInput } from '../../utils/decimal-input';
 import { SensitiveDirective } from '../../utils/sensitive.directive';
+import { FIELD, FIELD_ERROR, FIELD_LABEL } from '../../utils/pill-styles';
 
 @Component({
   selector: 'app-edit-amount-field',
@@ -11,7 +12,11 @@ import { SensitiveDirective } from '../../utils/sensitive.directive';
   host: { class: 'block' },
   template: `
     <div class="space-y-1.5">
-      <label [for]="inputId()" class="text-xs font-medium text-gray-400">{{ label() }}</label>
+      <label [for]="inputId()" [class]="fieldLabel">{{ label() }}</label>
+      <div
+        class="flex min-h-12 items-center gap-1 rounded-xl border border-edge bg-panel px-3.5 transition-colors focus-within:border-ember"
+      >
+      <span class="text-ink-3" aria-hidden="true">€</span>
       <input
         [id]="inputId()"
         type="text"
@@ -22,13 +27,14 @@ import { SensitiveDirective } from '../../utils/sensitive.directive';
         [value]="amount() === 0 ? '' : amount().toString()"
         placeholder="0.00"
         (input)="onInput($event)"
-        class="w-full bg-gray-800/60 border border-gray-800 rounded-xl px-3 py-2.5 text-sm text-gray-100 placeholder:text-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/60"
-        [class.text-gray-400]="readonly()"
+        class="w-full min-w-0 bg-transparent text-ink tabular-nums placeholder:text-ink-4 focus-visible:outline-none"
+        [class.text-ink-2]="readonly()"
         [class.cursor-not-allowed]="readonly()"
         appSensitive
       />
+      </div>
       @if (amountField()().touched() && amountField()().invalid()) {
-        <span class="text-[11px] text-red-400">
+        <span [class]="fieldError">
           {{ amountField()().errors()[0]?.message }}
         </span>
       }
@@ -36,6 +42,10 @@ import { SensitiveDirective } from '../../utils/sensitive.directive';
   `,
 })
 export class EditAmountFieldComponent {
+  protected readonly field = FIELD;
+  protected readonly fieldLabel = FIELD_LABEL;
+  protected readonly fieldError = FIELD_ERROR;
+
   readonly inputId = input.required<string>();
   readonly amount = input.required<number>();
   readonly amountField = input.required<FieldTree<number>>();

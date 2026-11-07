@@ -9,6 +9,7 @@ import {
   getSubcategoryOptions,
 } from '../../services/expense-state.service';
 import { Transaction } from '../../models/transaction.model';
+import { euros, shortDate } from '../../utils/confirm-text';
 import { PEOPLE } from '../../models/splitz.model';
 import { PrivacyService } from '../../services/privacy.service';
 import {
@@ -41,15 +42,15 @@ import {
   host: { class: 'block' },
   template: `
     <app-edit-form-shell
-      title="Edit Transaction"
+      title="Edit transaction"
       [formInvalid]="transactionForm().invalid()"
       [submitting]="submitting()"
       [deleting]="deleting()"
       [privacyDisabled]="privacyService.isPrivacyMode()"
       [errorMessage]="errorMessage()"
-      deleteLabel="Delete Transaction"
-      deleteTitle="Delete Transaction?"
-      deleteMessage="Are you sure you want to delete this transaction?"
+      deleteLabel="Delete transaction"
+      [deleteTitle]="deleteText().title"
+      [deleteMessage]="deleteText().message"
       [showDeleteConfirm]="showDeleteConfirm()"
       (back)="back.emit()"
       (submitted)="onSubmit($event)"
@@ -97,6 +98,17 @@ export class EditTransactionComponent {
   private queryClient = inject(QueryClient);
 
   readonly transaction = input.required<Transaction>();
+
+  /** "Delete “Coffee”?" / "€3.40 on 5 Nov 2026. This can't be undone." */
+  readonly deleteText = computed(() => {
+    const tx = this.transaction();
+    const name = tx.description?.trim() || 'this transaction';
+    const when = shortDate(tx.date);
+    return {
+      title: tx.description?.trim() ? `Delete “${name}”?` : 'Delete this transaction?',
+      message: `${euros(tx.amount)}${when ? ' on ' + when : ''}. This can't be undone.`,
+    };
+  });
   readonly categoryOverride = input<string[] | null>(null);
 
   readonly back = output<void>();

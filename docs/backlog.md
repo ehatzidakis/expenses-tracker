@@ -9,6 +9,17 @@ Evidence tags used below:
 
 Line numbers in links refer to the reviewed build and may drift; search by symbol name if a link is off.
 
+**Names since the November 2026 redesign.** The items below keep the names from the review:
+- Monthly → Budget (Month)
+- OneOffs → Budget (Trips / One-offs)
+- SumUp → All time
+- Create → Add
+- The Charts budget editor → Settings › Budgets and wage
+- Pending review → Splitzes › Incoming
+- The Splitzes and Settings modals → bottom sheets
+
+The tab ids in code are unchanged: `monthly | sumup | create | charts`.
+
 ## How to use this file
 
 - Give an agent the **Context** and **Conventions** sections plus exactly one item. Every item is self-contained: problem, specification, acceptance criteria.
@@ -20,7 +31,7 @@ Line numbers in links refer to the reviewed build and may drift; search by symbo
 ## Context
 
 - **Stack:** Angular 22 standalone components, zoneless change detection, signals and `computed()`. TanStack Query for reads (`staleTime` 5 min, no refetch on window focus). Tailwind 4. Vitest. Firestore through `firebase/firestore/lite` (no realtime listeners, no offline cache). The service worker is enabled in production builds only. A `.vercel` folder suggests deployment on Vercel.
-- **Navigation:** there is no Angular Router. The five tabs (Monthly, SumUp, Create, OneOffs, Charts) are the `ExpenseStateService.activeTab` signal.
+- **Navigation:** there is no Angular Router. The four tabs (Budget, All time, Add, Charts; ids `monthly | sumup | create | charts`) are the `ExpenseStateService.activeTab` signal. Budget has a Month | Trips | One-offs switch (`budgetMode`). Settings and Splitzes open as bottom sheets; pending review is the Incoming tab in Splitzes, and budgets are edited in Settings.
 - **Firestore collections:**
   - `transactions` - every expense, including split metadata and optional `adjustmentId` (trip link).
   - `expenses` - one document per month with an auto-generated ID, `MonthName` such as "October 2026", 12 category counters and `TotalWage`, mutated with `increment()`.
@@ -34,7 +45,7 @@ Line numbers in links refer to the reviewed build and may drift; search by symbo
 ## Conventions for agents
 
 - **Testing:** Vitest through `@angular/build:unit-test` (jsdom). Run `npx ng test --watch=false` (`npm test` also rewrites `src/environments/version.ts`). Specs import from `vitest`. Mock services with TestBed `providers: [{ provide: X, useValue: {...} }]`. Components that use `injectQuery` need `{ provide: QueryClient, useValue: new QueryClient() }`. `vi.mock` with relative paths throws in this builder; bare specifiers such as `firebase/firestore/lite` work.
-- **Formatting:** Prettier (`printWidth` 100, single quotes). Files in the working tree are CRLF, so check with `npx prettier --check --end-of-line auto <files>`.
+- **Formatting:** Prettier (`printWidth` 100, single quotes). Line endings in the working tree are mixed (CRLF and LF); keep each file's own and check with `npx prettier --check --end-of-line auto <files>`.
 - **Environment files:** `src/environments/environment.ts` and `environment.development.ts` are git-ignored (they hold the Firebase `apiKey`). A fresh clone has to create them locally (see PLAT-1).
 - **Production data:** a local `ng serve` talks to the production Firestore project. Until PLAT-1 is done, do not submit forms, accept or decline pending items, settle debts, save or delete while testing manually.
 - **Patterns to follow:** standalone components, `inject()`, signals, TanStack Query with `invalidateQueries` after writes, Tailwind classes, money shown as `€` with two decimals.
@@ -67,7 +78,7 @@ Line numbers in links refer to the reviewed build and may drift; search by symbo
 | FIX-4   | Stealth mode hides only some amounts           | Fix      | P2       | -                | Open   |
 | FIX-5   | One-off end date can be before its start date  | Fix      | P1       | -                | Open   |
 | FIX-6   | Access control relies on client-side logic     | Fix      | P2       | -                | Open   |
-| FIX-7   | Small defects and polish                       | Fix      | P1       | -                | Open   |
+| FIX-7   | Small defects and polish                       | Fix      | P1       | -                | Partly done   |
 | FEAT-1  | Recurring and scheduled transactions           | Feature  | P2       | FIX-1, FIX-3     | Open   |
 | FEAT-2  | Budget pace and month-end forecast             | Feature  | P2       | FIX-1, FEAT-1, 3 | Open   |
 | FEAT-3  | Income as a first-class concept                | Feature  | P2       | FIX-1            | Open   |
@@ -83,8 +94,8 @@ Line numbers in links refer to the reviewed build and may drift; search by symbo
 | FEAT-13 | Richer transaction data                        | Feature  | P3       | FEAT-5, PLAT-1   | Open   |
 | FEAT-14 | Offline-first entry                            | Feature  | P3       | -                | Open   |
 | UX-1    | Router and deep links                          | UX       | P2       | -                | Open   |
-| UX-2    | Month navigation and category list             | UX       | P3       | FIX-1            | Open   |
-| UX-3    | Editing experience                             | UX       | P2       | FIX-2            | Open   |
+| UX-2    | Month navigation and category list             | UX       | P3       | FIX-1            | Partly done   |
+| UX-3    | Editing experience                             | UX       | P2       | FIX-2            | Partly done   |
 | PLAT-1  | Environment separation and read-only mode      | Platform | P1       | -                | Open   |
 | PLAT-2  | Data model and query efficiency                | Platform | P3       | FIX-6            | Open   |
 | PLAT-3  | Quality gates and documentation                | Platform | P2       | PLAT-1           | Open   |
@@ -251,12 +262,19 @@ Line numbers in links refer to the reviewed build and may drift; search by symbo
 Each line below is an independent task.
 
 - [ ] **One-off form:** the Description placeholder literally reads "Placeholder". Replace it with a real hint. The default adjustment type is "Addition" (income) ([create-adjustment-form.component.ts](../src/app/components/create-transaction.component/create-adjustment-form.component.ts#L73)); default to Expense or require an explicit choice.
+  - Partly done _(Nov 2026 redesign)_: the placeholder is now "What was it?" / "Where to?". Still open: the type still defaults to Income.
 - [ ] **Over-budget state uses colour only** (a red number with no "over" text). Add explicit wording ("over by €X") and an icon. Budget bars need `role="progressbar"` with `aria-valuenow`, `aria-valuemin`, `aria-valuemax` and a label. Raise the minimum text size; much secondary text is 10px.
-- [ ] **Zoom is disabled** by the viewport meta ([index.html](../src/index.html#L9)): remove `maximum-scale=1, user-scalable=0` and use 16px inputs to avoid the iOS focus-zoom instead.
+  - Partly done _(Nov 2026 redesign)_: rows, tiles and Typical month say "€X over" in words, and nothing is under 11px. Still open: `role="progressbar"` on bars and an icon.
+- [x] **Zoom is disabled** by the viewport meta ([index.html](../src/index.html#L9)): remove `maximum-scale=1, user-scalable=0` and use 16px inputs to avoid the iOS focus-zoom instead.
+  - Resolved differently _(Nov 2026 redesign)_: every field is 16px, and zoom stays locked on purpose because the owner wants the PWA to feel like a native app.
 - [ ] **Latest transactions:** rows are not tappable, the list is capped at 10 and cannot load more. Make rows open the edit view, add "Load more", and offer sorting by transaction date or by added date.
-- [ ] **Profile button:** its `title` says "Toggle Stealth Mode" but it opens Settings. Change the title and aria-label to "Settings".
-- [ ] **Debug logging:** [transaction-grid.component.ts](../src/app/components/transaction-grid.component/transaction-grid.component.ts#L98) logs transaction data, and [category-budgets-chart.ts](../src/app/components/category-budgets-chart/category-budgets-chart.ts#L139-L141) logs the user role. Remove both.
-- [ ] **`topCategory`** ([expense-state.service.ts](../src/app/services/expense-state.service.ts#L404)) is computed and passed to the overview card but never rendered, and it returns the first category rather than the largest. Render "Top category" (largest spend) or delete it.
+  - Partly done _(Nov 2026 redesign)_: rows open the edit sheet and "Load more" pages through all of them. Still open: sorting by added date.
+- [x] **Profile button:** its `title` says "Toggle Stealth Mode" but it opens Settings. Change the title and aria-label to "Settings".
+  - Done _(Nov 2026 redesign)_: the button's aria-label is "Settings" (with a stealth-mode variant).
+- [x] **Debug logging:** [transaction-grid.component.ts](../src/app/components/transaction-grid.component/transaction-grid.component.ts#L98) logs transaction data, and [category-budgets-chart.ts](../src/app/components/category-budgets-chart/category-budgets-chart.ts#L139-L141) logs the user role. Remove both.
+  - Done _(Nov 2026 redesign)_: both components were removed, and no `console.log` is left outside the commented-out seed file.
+- [x] **`topCategory`** ([expense-state.service.ts](../src/app/services/expense-state.service.ts#L404)) is computed and passed to the overview card but never rendered, and it returns the first category rather than the largest. Render "Top category" (largest spend) or delete it.
+  - Done _(Nov 2026 redesign)_: deleted.
 - [ ] **Budget defaults:** code defaults in `CATEGORY_BUDGETS` (for example Medical 200, Utilities 110, Gym 65) differ from the saved budgets, and the 1600 wage fallback is repeated in several places (`DEFAULT_TOTAL_WAGE`, the chart fallback). Keep a single source of truth.
 - [ ] **Dead branch:** `resolvePendingCategoryOptions` returns the same value on both ternary branches ([transaction-service.ts](../src/app/services/transaction-service.ts#L128)), and its hard-coded lists duplicate `TRIP_CATEGORY_NAMES` and `CATEGORY_NAMES`.
 - [ ] **Formatting (optional):** amounts use en-US formatting ("€1,313.60") while the data is Greek. Decide whether to use `el-GR` formatting.
@@ -675,6 +693,7 @@ Each line below is an independent task.
 **Acceptance criteria**
 
 - [ ] Jumping to any month takes at most two taps.
+  - Partly done _(Nov 2026 redesign)_: a month picker with year arrows, category rows sorted by spend, and "€X over" wording. Still open: persistence, sparklines, and two taps across years.
 - [ ] Sort and filter choices persist per device.
 - [ ] Sparklines respect stealth mode.
 
@@ -697,6 +716,7 @@ Each line below is an independent task.
 **Acceptance criteria**
 
 - [ ] Editing no longer nests inside the category card, and closing with unsaved changes asks for confirmation.
+  - Partly done _(Nov 2026 redesign)_: editing opens in a bottom sheet, no longer nested. Still open: the unsaved-changes guard.
 - [ ] Deleting shows Undo for several seconds and restores the transaction and the counters.
 - [ ] History entries are written for updates and deletes.
 

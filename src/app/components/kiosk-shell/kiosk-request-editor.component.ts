@@ -20,6 +20,8 @@ import {
   formatPendingDate,
   pendingToFormModel,
 } from '../splitzes-modal.component/pending-review.model';
+import { BUTTON_DANGER, BUTTON_SECONDARY, FIELD, FIELD_LABEL } from '../../utils/pill-styles';
+import { BUTTON_SECONDARY_LG } from '../../utils/pill-styles';
 
 /** Kiosk: fill in a request from the admin and send it back, or say why it can't be filled. */
 @Component({
@@ -29,6 +31,8 @@ import {
   host: { class: 'block' },
   template: `
     <app-edit-form-shell
+      [showActions]="!showDecline()"
+      [showBack]="true"
       title="Fill in request"
       [formInvalid]="requestForm().invalid()"
       [submitting]="submitting()"
@@ -46,14 +50,7 @@ import {
       (submitted)="onSend($event)"
       (deleteRequested)="showDecline.set(true)"
     >
-      <div class="flex items-center justify-between gap-2 text-[11px]">
-        <span
-          class="px-2.5 py-1 rounded-full bg-sky-500/10 border border-sky-500/30 text-sky-300 font-semibold"
-        >
-          Request
-        </span>
-        <span class="text-gray-500 truncate">{{ requestedFor() }}</span>
-      </div>
+      <p class="text-[13px] text-ink-2">Request <span class="text-ink-3">· {{ requestedFor() }}</span></p>
 
       <app-transaction-edit-fields
         [model]="model()"
@@ -72,32 +69,26 @@ import {
       />
 
       @if (showDecline()) {
-        <div class="space-y-2 rounded-xl border border-red-800/50 bg-red-950/20 p-3">
-          <label for="kiosk-decline-reason" class="text-xs font-medium text-red-200">
-            Why can't you fill it in?
-          </label>
+        <div class="flex flex-col gap-3 border-t border-ink/10 pt-4">
+          <label for="kiosk-decline-reason" [class]="fieldLabel">Why can't you fill it in?</label>
           <textarea
             id="kiosk-decline-reason"
             rows="2"
             [maxLength]="noteMax"
             [value]="declineReason()"
             (input)="declineReason.set($any($event.target).value)"
-            placeholder="e.g. Not mine, or I don't have the receipt"
-            class="w-full bg-gray-800/60 border border-gray-800 rounded-xl px-3 py-2 text-sm text-gray-100 focus:outline-none focus:ring-2 focus:ring-red-500/50"
+            placeholder="For example: not mine, or no receipt"
+            [class]="field + ' resize-none py-3'"
           ></textarea>
-          <div class="grid grid-cols-2 gap-2">
-            <button
-              type="button"
-              (click)="showDecline.set(false)"
-              class="py-2 rounded-xl text-xs font-semibold text-gray-300 border border-gray-700 bg-gray-800/70"
-            >
+          <div class="grid grid-cols-2 gap-3">
+            <button type="button" [class]="secondaryLg" (click)="showDecline.set(false)">
               Cancel
             </button>
             <button
               type="button"
-              (click)="onDecline()"
+              [class]="danger"
               [disabled]="!declineReason().trim() || declining()"
-              class="py-2 rounded-xl text-xs font-semibold text-red-200 border border-red-800/60 bg-red-900/40 disabled:opacity-40"
+              (click)="onDecline()"
             >
               {{ declining() ? 'Sending…' : 'Send reason' }}
             </button>
@@ -108,6 +99,12 @@ import {
   `,
 })
 export class KioskRequestEditorComponent {
+  protected readonly secondaryLg = BUTTON_SECONDARY_LG;
+  protected readonly field = FIELD;
+  protected readonly fieldLabel = FIELD_LABEL;
+  protected readonly secondary = BUTTON_SECONDARY;
+  protected readonly danger = BUTTON_DANGER;
+
   private readonly transactionService = inject(TransactionService);
   private readonly pushNotifications = inject(PushNotificationService);
   private readonly queryClient = inject(QueryClient);

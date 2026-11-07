@@ -34,7 +34,7 @@ describe('AppComponent', () => {
         },
         {
           provide: ExpenseStateService,
-          useValue: {},
+          useValue: { setActiveTab: () => undefined },
         },
         {
           provide: SwUpdate,

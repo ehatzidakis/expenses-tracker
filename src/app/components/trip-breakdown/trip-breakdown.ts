@@ -1,24 +1,17 @@
-import {
-  Component,
-  computed,
-  effect,
-  inject,
-  input,
-  output,
-  signal,
-  untracked,
-} from '@angular/core';
+import { Component, computed, effect, inject, input, signal, untracked } from '@angular/core';
+import { DatePipe, DecimalPipe } from '@angular/common';
 import { injectQuery } from '@tanstack/angular-query-experimental';
 import { EditTransactionComponent } from '../edit-transaction.component/edit-transaction.component';
-import { CommonModule } from '@angular/common';
 import { TransactionService, tripTransactionsKey } from '../../services/transaction-service';
 import { Adjustment } from '../../models/adjustments.model';
-import { TRIP_CATEGORY_NAMES } from '../../services/expense-state.service';
+import { TRIP_CATEGORY_NAMES, getCategoryMeta } from '../../services/expense-state.service';
 import { Transaction } from '../../models/transaction.model';
-import { AdjustmentCardComponent } from '../adjustment-card.component/adjustment-card.component';
 import { EditAdjustmentComponent } from '../edit-adjustment.component/edit-adjustment.component';
 import { SensitiveDirective } from '../../utils/sensitive.directive';
 import { TransactionListComponent } from '../transaction-list/transaction-list';
+import { BreakdownRowComponent } from '../breakdown-row/breakdown-row';
+import { SheetComponent } from '../sheet/sheet';
+import { daysInRange } from '../../utils/period-pace';
 
 interface TripCategoryRow {
   name: string;
@@ -30,44 +23,135 @@ interface TripCategoryRow {
   selector: 'app-trip-breakdown',
   standalone: true,
   imports: [
-    CommonModule,
+    DatePipe,
+    DecimalPipe,
     EditTransactionComponent,
-    AdjustmentCardComponent,
     EditAdjustmentComponent,
     SensitiveDirective,
     TransactionListComponent,
+    BreakdownRowComponent,
+    SheetComponent,
   ],
-  host: { class: 'block' },
+  host: { class: 'flex flex-col gap-5' },
   template: `
-    <div class="space-y-4">
-      <!-- Trip header card -->
-      <app-adjustment-card
-        [adjustment]="trip()"
-        (cardClick)="editingAdjustment.set(trip())"
-      ></app-adjustment-card>
-      @if (editingAdjustment(); as selectedAdj) {
-        <!-- EDIT VIEW -->
-        <app-edit-adjustment
-          [adjustment]="selectedAdj"
-          (back)="editingAdjustment.set(null)"
-          (updated)="editingAdjustment.set(null)"
-          (deleted)="editingAdjustment.set(null)"
-        />
-      }
+    <!-- Trip summary -->
+    <section
+      class="rounded-2xl border border-ink/10 bg-panel px-5 pt-4 pb-5 shadow-[inset_0_1px_0_rgb(241_230_210/0.06)]"
+      aria-label="Trip summary"
+    >
+      <div class="flex items-start justify-between gap-3">
+        <div class="min-w-0">
+          <h2 class="type-wide text-[18px] font-semibold leading-tight text-ink line-clamp-2">
+            {{ trip().title }}
+          </h2>
+          <p class="mt-1 text-[13px] text-ink-2">
+            @if (days() === 1) {
+              {{ trip().startDate | date: 'd MMM y' }}
+            } @else {
+              {{ trip().startDate | date: 'd MMM' }} – {{ trip().endDate | date: 'd MMM y' }}
+            }
+            <span
+              class="ml-1.5 inline-flex items-center rounded-md border px-1.5 py-px text-[11px] font-medium"
+              [class]="trip().isSelectable ? 'border-avocado/40 text-avocado' : 'border-edge text-ink-3'"
+            >
+              {{ trip().isSelectable ? 'Open' : 'Closed' }}
+            </span>
+          </p>
+        </div>
+        <button
+          type="button"
+          class="-mr-1 shrink-0 min-h-11 rounded-xl border border-edge px-3.5 text-[13px] font-medium text-ink-2 hover:border-ink-4 hover:text-ink cursor-pointer"
+          (click)="editingTrip.set(true)"
+        >
+          Edit trip
+        </button>
+      </div>
 
-      <!-- Loading / error states -->
+      <p class="mt-4 type-wide text-[40px] font-bold leading-none tracking-[-0.02em] text-ink" appSensitive>
+        €{{ trip().amount | number: '1.2-2' }}
+      </p>
+      <p class="mt-2 text-[14px] text-ink-2" appSensitive="xs">
+        {{ days() }} day{{ days() === 1 ? '' : 's' }} · €{{ perDay() | number: '1.2-2' }} a day
+      </p>
+      @if (unitemised() > 0) {
+        <p class="trip-gap mt-1 text-[13px] text-ink-3" appSensitive="xs">
+          €{{ unitemised() | number: '1.2-2' }} not itemised
+        </p>
+      } @else if (unitemised() < 0) {
+        <p class="trip-gap mt-1 text-[13px] text-ink-3" appSensitive="xs">
+          Transactions add up to €{{ totalSpent() | number: '1.2-2' }}
+        </p>
+      }
+    </section>
+
+    <!-- Category breakdown -->
+    <section aria-labelledby="trip-categories-heading">
+      <h2
+        id="trip-categories-heading"
+        class="type-wide flex min-h-11 items-center text-[13px] font-semibold uppercase text-ink-2"
+      >
+        Categories
+      </h2>
+
       @if (loading()) {
-        <div class="flex flex-col gap-3 animate-pulse">
+        <div class="space-y-2 animate-pulse" aria-label="Loading trip transactions">
           @for (i of [1, 2, 3]; track i) {
-            <div class="h-14 bg-gray-900/60 rounded-2xl"></div>
+            <div class="h-14 rounded-lg bg-raised/70"></div>
           }
         </div>
       } @else if (error()) {
-        <div class="p-4 bg-red-950/40 border border-red-800/60 text-red-300 rounded-xl text-sm">
-          Unable to load trip transactions.
+        <div role="alert" class="flex items-center justify-between gap-3 border-t border-ink/10 py-3">
+          <p class="text-[13px] text-cherry">Couldn't load this trip's transactions.</p>
+          <button
+            type="button"
+            class="min-h-11 shrink-0 rounded-xl border border-edge px-3.5 text-[13px] font-medium text-ink-2 hover:text-ink cursor-pointer"
+            (click)="retry()"
+          >
+            Try again
+          </button>
         </div>
-      } @else if (selectedTransaction(); as tx) {
-        <!-- Edit transaction overlay -->
+      } @else if (categoryRows().length === 0) {
+        <p class="border-t border-ink/10 py-3 text-[13px] text-ink-3">No transactions yet.</p>
+      } @else {
+        <div class="divide-y divide-ink/10 border-t border-ink/10">
+          @for (row of categoryRows(); track row.name) {
+            <app-breakdown-row
+              [label]="row.name"
+              [emoji]="emoji(row.name)"
+              [amount]="row.amount"
+              [ratio]="share(row)"
+              tone="share"
+              [statusText]="formatPercent(share(row) * 100) + '% of the trip'"
+              [meta]="row.transactions.length + ' transaction' + (row.transactions.length === 1 ? '' : 's')"
+              [expanded]="expandedCategory() === row.name"
+              [dimmed]="expandedCategory() !== null && expandedCategory() !== row.name"
+              (toggle)="toggleCategory(row.name)"
+            >
+              @if (expandedCategory() === row.name) {
+                <app-transaction-list
+                  [transactions]="row.transactions"
+                  (selectTransaction)="selectedTransaction.set($event)"
+                />
+              }
+            </app-breakdown-row>
+          }
+        </div>
+      }
+    </section>
+
+    @if (editingTrip()) {
+      <app-sheet label="Edit trip" (closed)="editingTrip.set(false)">
+        <app-edit-adjustment
+          [adjustment]="trip()"
+          (back)="editingTrip.set(false)"
+          (updated)="editingTrip.set(false)"
+          (deleted)="editingTrip.set(false)"
+        />
+      </app-sheet>
+    }
+
+    @if (selectedTransaction(); as tx) {
+      <app-sheet label="Edit transaction" (closed)="selectedTransaction.set(null)">
         <app-edit-transaction
           [transaction]="tx"
           [categoryOverride]="tripCategories"
@@ -75,82 +159,17 @@ interface TripCategoryRow {
           (updated)="selectedTransaction.set(null)"
           (deleted)="selectedTransaction.set(null)"
         />
-      } @else {
-        <!-- Category breakdown -->
-        <div
-          class="bg-gray-900/60 border border-gray-800/80 rounded-2xl p-2 space-y-3 backdrop-blur-sm"
-        >
-          <!-- <h3 class="text-sm font-semibold text-gray-200">Trip Budget</h3> -->
-
-          @if (categoryRows().length === 0) {
-            <div class="text-center text-xs text-gray-500 py-4">No transactions yet.</div>
-          }
-
-          <div class="space-y-3.5">
-            @for (row of categoryRows(); track row.name) {
-              <div class="space-y-1.5 border border-gray-800/80 rounded-2xl bg-gray-950/20 p-3">
-                <!-- Category header row -->
-                <div
-                  class="flex items-center justify-between text-xs py-0.5 cursor-pointer"
-                  (click)="toggleCategory(row.name)"
-                >
-                  <div class="flex items-center gap-2">
-                    <!-- <span
-                      class="text-[10px] transition-transform duration-150"
-                      [class.rotate-90]="expandedCategory() === row.name"
-                      >▶</span
-                    > -->
-                    <span class="font-medium text-gray-300">{{ row.name }}</span>
-                    <span class="text-gray-400 tabular-nums font-medium">
-                      ({{
-                        formatPercent(totalSpent() > 0 ? (row.amount / totalSpent()) * 100 : 0)
-                      }}%)
-                    </span>
-                  </div>
-                  <span class="font-semibold text-white tabular-nums" appSensitive>
-                    €{{ row.amount | number: '1.2-2' }}
-                  </span>
-                </div>
-
-                <!-- Progress bar -->
-                <div class="h-1.5 w-full bg-gray-800 rounded-full overflow-hidden">
-                  <div
-                    class="h-full rounded-full bg-linear-to-r from-sky-500 to-indigo-500 transition-all duration-300"
-                    [style.width.%]="totalSpent() > 0 ? (row.amount / totalSpent()) * 100 : 0"
-                  ></div>
-                </div>
-
-                <div class="text-[10px] text-gray-500 pt-1">
-                  {{ row.transactions.length }} transaction{{
-                    row.transactions.length !== 1 ? 's' : ''
-                  }}
-                </div>
-
-                <!-- Expanded transactions -->
-                @if (expandedCategory() === row.name) {
-                  <app-transaction-list
-                    [transactions]="row.transactions"
-                    (selectTransaction)="selectedTransaction.set($event)"
-                  />
-                }
-              </div>
-            }
-          </div>
-        </div>
-      }
-    </div>
+      </app-sheet>
+    }
   `,
 })
 export class TripBreakdownComponent {
   private transactionService = inject(TransactionService);
 
-  readonly editingAdjustment = signal<Adjustment | null>(null);
-
   trip = input.required<Adjustment>();
 
-  refreshed = output<void>();
-
   readonly tripCategories = TRIP_CATEGORY_NAMES;
+  readonly editingTrip = signal(false);
 
   // Shares the trip cache with Recent Transactions, so the trip is read once. Saves refresh
   // it through the ['expenses'] invalidation, so there is no manual reload after an edit.
@@ -165,23 +184,35 @@ export class TripBreakdownComponent {
   readonly expandedCategory = signal<string | null>(null);
   readonly selectedTransaction = signal<Transaction | null>(null);
 
-  readonly isSameDay = computed(() => {
+  readonly days = computed(() => {
     const t = this.trip();
-    if (!t.startDate || !t.endDate) return true;
-    return t.startDate.toDateString() === t.endDate.toDateString();
+    if (!t.startDate || !t.endDate) return 1;
+    return daysInRange(t.startDate, t.endDate);
   });
+
+  readonly perDay = computed(() => this.trip().amount / this.days());
 
   readonly totalSpent = computed(() => this.transactions().reduce((sum, tx) => sum + tx.amount, 0));
 
+  /**
+   * The stored total minus what the transactions add up to. Adding a transaction keeps the two
+   * equal, so a gap means part of the total was entered by hand (older trips) or was edited.
+   */
+  readonly unitemised = computed(() => {
+    if (this.loading() || this.error()) return 0;
+    const gap = this.trip().amount - this.totalSpent();
+    return Math.abs(gap) < 0.005 ? 0 : gap;
+  });
+
+  /** Biggest share first, the same reading order as a month's breakdown. */
   readonly categoryRows = computed<TripCategoryRow[]>(() => {
-    const txs = this.transactions();
     const rowMap = new Map<string, TripCategoryRow>();
 
     for (const cat of TRIP_CATEGORY_NAMES) {
       rowMap.set(cat, { name: cat, amount: 0, transactions: [] });
     }
 
-    for (const tx of txs) {
+    for (const tx of this.transactions()) {
       const row = rowMap.get(tx.category);
       if (row) {
         row.amount += tx.amount;
@@ -191,7 +222,9 @@ export class TripBreakdownComponent {
       }
     }
 
-    return [...rowMap.values()].filter((r) => r.transactions.length > 0);
+    return [...rowMap.values()]
+      .filter((r) => r.transactions.length > 0)
+      .sort((a, b) => b.amount - a.amount);
   });
 
   constructor() {
@@ -201,8 +234,19 @@ export class TripBreakdownComponent {
       untracked(() => {
         this.expandedCategory.set(null);
         this.selectedTransaction.set(null);
+        this.editingTrip.set(false);
       });
     });
+  }
+
+  share(row: TripCategoryRow): number {
+    const total = this.totalSpent();
+    return total > 0 ? row.amount / total : 0;
+  }
+
+  emoji(name: string): string | null {
+    const emoji = getCategoryMeta(name).emoji;
+    return emoji === '•' ? null : emoji;
   }
 
   formatPercent(value: number): string {
@@ -212,5 +256,9 @@ export class TripBreakdownComponent {
 
   toggleCategory(name: string): void {
     this.expandedCategory.update((cur) => (cur === name ? null : name));
+  }
+
+  retry(): void {
+    void this.tripQuery.refetch();
   }
 }

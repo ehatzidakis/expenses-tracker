@@ -36,11 +36,22 @@ describe('RecentTransactionsComponent', () => {
     totalAmount: 85,
   };
 
-  const toggle = async () => {
-    const button = fixture.nativeElement.querySelector('button') as HTMLButtonElement;
-    button.click();
+  const header = () => fixture.nativeElement.querySelector('[aria-expanded]') as HTMLButtonElement;
+  const rows = () =>
+    fixture.nativeElement.querySelectorAll('app-transaction-list li').length as number;
+
+  /** Creates the list and, unless told otherwise, opens it (it starts hidden). */
+  async function create(monthName: string | null, adjustmentId: string | null = null, open = true) {
+    fixture = TestBed.createComponent(RecentTransactionsComponent);
+    component = fixture.componentInstance;
+    fixture.componentRef.setInput('monthName', monthName);
+    fixture.componentRef.setInput('adjustmentId', adjustmentId);
     await settle(fixture);
-  };
+    if (open) {
+      header().click();
+      await settle(fixture);
+    }
+  }
 
   beforeEach(async () => {
     fetchMonthTransactions.mockReset();
@@ -49,7 +60,7 @@ describe('RecentTransactionsComponent', () => {
     await TestBed.configureTestingModule({
       imports: [RecentTransactionsComponent],
       providers: [
-        // Same cache time as the app, so re-opening the card reuses the cached month.
+        // Same cache time as the app, so re-opening the list reuses the cached month.
         provideTanStackQuery(
           new QueryClient({ defaultOptions: { queries: { retry: false, staleTime: 300_000 } } }),
         ),
@@ -59,91 +70,71 @@ describe('RecentTransactionsComponent', () => {
         },
       ],
     }).compileComponents();
-
-    fixture = TestBed.createComponent(RecentTransactionsComponent);
-    component = fixture.componentInstance;
-    fixture.componentRef.setInput('monthName', 'September 2026');
-    await fixture.whenStable();
   });
 
-  it('starts collapsed and does not query until expanded', async () => {
+  it('starts hidden and loads nothing until opened', async () => {
+    await create('September 2026', null, false);
+
     expect(component.expanded()).toBe(false);
+    expect(header().getAttribute('aria-expanded')).toBe('false');
     expect(fetchMonthTransactions).not.toHaveBeenCalled();
-    expect(fixture.nativeElement.querySelector('[aria-expanded="false"]')).toBeTruthy();
     expect(fixture.nativeElement.textContent).not.toContain('Dinner');
-
-    await toggle();
-
-    expect(fetchMonthTransactions).toHaveBeenCalledTimes(1);
-    expect(fetchMonthTransactions).toHaveBeenCalledWith('September 2026');
   });
 
-  it('expands to show transaction values without edit controls', async () => {
-    await toggle();
+  it('shows the month through the shared month query once opened', async () => {
+    await create('September 2026');
 
     expect(component.expanded()).toBe(true);
-    expect(fixture.nativeElement.querySelector('[aria-expanded="true"]')).toBeTruthy();
+    expect(header().getAttribute('aria-expanded')).toBe('true');
+    expect(fetchMonthTransactions).toHaveBeenCalledTimes(1);
+    expect(fetchMonthTransactions).toHaveBeenCalledWith('September 2026');
+
+    const text = fixture.nativeElement.textContent as string;
+    expect(text).toContain('Dinner');
+    expect(text).toContain('Eating out');
+    expect(text).toContain('Restaurant');
+    expect(text).toContain('Team dinner');
+  });
+
+  it('hides and shows the list without refetching', async () => {
+    await create('September 2026');
+
+    header().click();
+    await settle(fixture);
+    expect(component.expanded()).toBe(false);
+    expect(fixture.nativeElement.textContent).not.toContain('Dinner');
+
+    header().click();
+    await settle(fixture);
     expect(fixture.nativeElement.textContent).toContain('Dinner');
-    expect(fixture.nativeElement.textContent).toContain('EatingOut');
-    expect(fixture.nativeElement.textContent).toContain('Restaurant');
-    expect(fixture.nativeElement.textContent).toContain('Team dinner');
-    expect(fixture.nativeElement.textContent).not.toContain('Edit');
-  });
-
-  it('does not refetch when collapsed and expanded again', async () => {
-    await toggle();
-    await toggle();
-    await toggle();
-
     expect(fetchMonthTransactions).toHaveBeenCalledTimes(1);
-  });
-
-  it('does not fetch a new month while collapsed, only on the next expand', async () => {
-    await toggle();
-    await toggle();
-    fixture.componentRef.setInput('monthName', 'October 2026');
-    await fixture.whenStable();
-
-    expect(fetchMonthTransactions).toHaveBeenCalledTimes(1);
-
-    await toggle();
-
-    expect(fetchMonthTransactions).toHaveBeenCalledTimes(2);
-    expect(fetchMonthTransactions).toHaveBeenLastCalledWith('October 2026');
   });
 
   it('pages through transactions 10 at a time without refetching', async () => {
-    const many = Array.from({ length: 25 }, (_, i) => ({
-      ...transaction,
-      id: `tx-${i}`,
-      description: `Item ${i}`,
-    }));
-    fetchMonthTransactions.mockResolvedValue(many);
-    await toggle();
+    fetchMonthTransactions.mockResolvedValue(
+      Array.from({ length: 25 }, (_, i) => ({ ...transaction, id: `tx-${i}`, description: `Item ${i}` })),
+    );
+    await create('September 2026');
 
-    const articles = () => fixture.nativeElement.querySelectorAll('article').length;
-    const showMore = () =>
-      Array.from(
-        fixture.nativeElement.querySelectorAll('button') as NodeListOf<HTMLButtonElement>,
-      ).find((button) => button.textContent?.includes('Show more'));
+    const loadMore = () =>
+      Array.from(fixture.nativeElement.querySelectorAll('button') as NodeListOf<HTMLButtonElement>).find(
+        (button) => button.textContent?.trim() === 'Load more',
+      );
 
-    expect(articles()).toBe(10);
-    expect(fixture.nativeElement.textContent).toContain('10 of 25 shown');
-
-    showMore()!.click();
+    expect(rows()).toBe(10);
+    loadMore()!.click();
     await fixture.whenStable();
-    expect(articles()).toBe(20);
-
-    showMore()!.click();
+    expect(rows()).toBe(20);
+    loadMore()!.click();
     await fixture.whenStable();
-    expect(articles()).toBe(25);
-    expect(showMore()).toBeUndefined();
+    expect(rows()).toBe(25);
+    expect(loadMore()).toBeUndefined();
     expect(fetchMonthTransactions).toHaveBeenCalledTimes(1);
   });
 
   it('shows the empty state', async () => {
     fetchMonthTransactions.mockResolvedValue([]);
-    await toggle();
+    await create('September 2026');
 
     expect(fixture.nativeElement.textContent).toContain('No transactions yet.');
   });
@@ -154,7 +145,7 @@ describe('RecentTransactionsComponent', () => {
       { ...transaction, id: 'trip', description: 'Trip lunch', adjustmentId: 'trip-1' },
       { ...transaction, id: 'new', description: 'Newer', date: '2026-09-28' },
     ]);
-    await toggle();
+    await create('September 2026');
 
     expect(component.transactions().map((item) => item.id)).toEqual(['new', 'old']);
   });
@@ -163,12 +154,18 @@ describe('RecentTransactionsComponent', () => {
     fetchTripTransactions.mockResolvedValue([
       { ...transaction, id: 'trip', description: 'Trip lunch', adjustmentId: 'trip-1' },
     ]);
-    fixture.componentRef.setInput('monthName', null);
-    fixture.componentRef.setInput('adjustmentId', 'trip-1');
-    await toggle();
+    await create(null, 'trip-1');
 
     expect(fetchTripTransactions).toHaveBeenCalledWith('trip-1');
     expect(fetchMonthTransactions).not.toHaveBeenCalled();
     expect(fixture.nativeElement.textContent).toContain('Trip lunch');
+  });
+
+  it('selects a transaction for editing when its row is tapped', async () => {
+    await create('September 2026');
+
+    (fixture.nativeElement.querySelector('app-transaction-list li button') as HTMLButtonElement).click();
+
+    expect(component.selected()?.id).toBe('tx-1');
   });
 });

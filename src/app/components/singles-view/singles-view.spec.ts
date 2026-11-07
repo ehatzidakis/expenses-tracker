@@ -48,17 +48,17 @@ describe('SinglesViewComponent', () => {
 
   it('shows every single and the all-in totals with no filter', () => {
     expect(cardTitles()).toEqual(['Bonus', 'Car', 'TV']);
-    expect(totalsText()).toBe('3 items In €800.00 Out €920.00 Net −€120.00');
+    expect(totalsText()).toBe('3 one-offs · all years In €800.00 Out €920.00 Net −€120.00');
     expect(query('year-toggle')?.textContent?.trim()).toBe('All years');
   });
 
-  it('toggles a type filter on and off', async () => {
+  it('switches the type filter and back to all', async () => {
     await click(query('filter-subtraction'));
     expect(component.type()).toBe('subtraction');
     expect(cardTitles()).toEqual(['Car', 'TV']);
-    expect(totalsText()).toBe('2 items Total €920.00');
+    expect(totalsText()).toBe('2 one-offs · all years €920.00 Spent');
 
-    await click(query('filter-subtraction'));
+    await click(query('filter-all'));
     expect(component.type()).toBeNull();
     expect(cardTitles()).toEqual(['Bonus', 'Car', 'TV']);
   });
@@ -74,7 +74,7 @@ describe('SinglesViewComponent', () => {
     expect(query('year-menu')).toBeNull();
     expect(query('year-toggle')?.textContent?.trim()).toBe('2026');
     expect(cardTitles()).toEqual(['Car']);
-    expect(totalsText()).toBe('1 item Total €320.00');
+    expect(totalsText()).toBe('1 one-off · 2026 €320.00 Spent');
 
     await click(query('year-toggle'));
     await click(yearOptions()[0]);
@@ -100,7 +100,7 @@ describe('SinglesViewComponent', () => {
     const edited: Adjustment[] = [];
     component.edit.subscribe((a) => edited.push(a));
 
-    (el.querySelector('app-adjustment-card > div') as HTMLElement).click();
+    (el.querySelector('app-adjustment-card > button') as HTMLElement).click();
 
     expect(edited.map((a) => a.id)).toEqual(['Bonus']);
   });
@@ -109,7 +109,7 @@ describe('SinglesViewComponent', () => {
     fixture.componentRef.setInput('adjustments', []);
     await fixture.whenStable();
 
-    expect(el.textContent).toContain('No singles yet');
+    expect(el.textContent).toContain('No one-offs yet');
     expect(query('filter-addition')).toBeNull();
   });
 });

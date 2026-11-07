@@ -1,33 +1,29 @@
-import { Component, computed, inject, output, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { AuthService } from '../../services/auth.service';
 import { TransactionService } from '../../services/transaction-service';
 import { SplitzBalancesComponent } from './splitz-balances.component';
 import { SplitzHistoryComponent } from './splitz-history.component';
 import { SplitzIncomingComponent } from './splitz-incoming.component';
-import { SplitzesModalHeaderComponent } from './splitzes-modal-header.component';
 import { SplitzesTab, SplitzesTabsComponent } from './splitzes-tabs.component';
+import { SplitzesLauncher } from '../../services/splitzes-launcher.service';
 
+/** The Splitz tab: balances with each person, items waiting for review, and settled history. */
 @Component({
-  selector: 'app-splitzes-modal',
+  selector: 'app-splitzes-page',
   standalone: true,
+  host: { class: 'block' },
   imports: [
     SplitzBalancesComponent,
     SplitzHistoryComponent,
     SplitzIncomingComponent,
-    SplitzesModalHeaderComponent,
     SplitzesTabsComponent,
   ],
   template: `
-    <div
-      class="fixed inset-0 z-100 bg-black/60 backdrop-blur-sm flex items-end justify-center sm:items-center overflow-hidden"
-      (click)="close.emit()"
-    >
-      <div
-        class="w-full max-w-md max-h-[85vh] overflow-y-auto bg-gray-900 border border-gray-800/80 rounded-t-3xl sm:rounded-3xl p-6 space-y-5 shadow-2xl text-gray-100"
-        (click)="$event.stopPropagation()"
-      >
-        <app-splitzes-modal-header (close)="close.emit()" />
+    <section aria-labelledby="splitzes-heading">
+      <h1 id="splitzes-heading" class="type-wide text-[18px] font-semibold text-ink">Splitzes</h1>
+      <p class="mt-1 text-[13px] text-ink-2">Who owes whom, and what's waiting for you</p>
 
+      <div class="mt-4 flex flex-col gap-5">
         <app-splitzes-tabs
           [activeTab]="activeTab()"
           [showIncoming]="isAdmin()"
@@ -47,12 +43,11 @@ import { SplitzesTab, SplitzesTabsComponent } from './splitzes-tabs.component';
           }
         }
       </div>
-    </div>
+    </section>
   `,
 })
-export class SplitzesModalComponent {
+export class SplitzesPageComponent {
   private readonly transactionService = inject(TransactionService);
-  readonly close = output<void>();
 
   readonly isAdmin = inject(AuthService).isAdmin;
   readonly pendingQuery = this.transactionService.getPendingTransactionsQuery();
@@ -62,8 +57,8 @@ export class SplitzesModalComponent {
     this.isAdmin() ? (this.pendingQuery.data()?.length ?? 0) : 0,
   );
 
-  // Always opens on Balances; pending items show as a count badge on the Incoming tab.
-  readonly activeTab = signal<SplitzesTab>('balances');
+  /** Balances from the tab bar; Incoming from the month panel's review line. */
+  readonly activeTab = signal<SplitzesTab>(inject(SplitzesLauncher).take());
 
   selectTab(tab: SplitzesTab): void {
     this.activeTab.set(tab);

@@ -6,7 +6,7 @@ import { AuthService } from '../../services/auth.service';
 import { SplitzService } from '../../services/splitz.service';
 import { SplitzSettlementService } from '../../services/splitz-settlement.service';
 import { PendingTransaction, TransactionService } from '../../services/transaction-service';
-import { SplitzesModalComponent } from './splitzes-modal.component';
+import { SplitzesPageComponent } from './splitzes-modal.component';
 
 function pendingTransaction(id: string): PendingTransaction {
   return {
@@ -24,9 +24,9 @@ function pendingTransaction(id: string): PendingTransaction {
 async function setup(
   isAdmin: boolean,
   pending: PendingTransaction[] = [],
-): Promise<ComponentFixture<SplitzesModalComponent>> {
+): Promise<ComponentFixture<SplitzesPageComponent>> {
   await TestBed.configureTestingModule({
-    imports: [SplitzesModalComponent],
+    imports: [SplitzesPageComponent],
     providers: [
       { provide: QueryClient, useValue: new QueryClient() },
       { provide: AuthService, useValue: { isAdmin: signal(isAdmin) } },
@@ -56,29 +56,29 @@ async function setup(
       },
       {
         provide: SplitzSettlementService,
-        useValue: { getHistoryQuery: () => ({ isPending: () => false, data: () => [] }) },
+        useValue: { getHistoryQuery: () => ({ isPending: () => false, isError: () => false, data: () => [] }) },
       },
     ],
   }).compileComponents();
 
-  const fixture = TestBed.createComponent(SplitzesModalComponent);
+  const fixture = TestBed.createComponent(SplitzesPageComponent);
   fixture.detectChanges();
   return fixture;
 }
 
-const tabLabels = (fixture: ComponentFixture<SplitzesModalComponent>): string[] =>
+const tabLabels = (fixture: ComponentFixture<SplitzesPageComponent>): string[] =>
   Array.from<HTMLElement>(fixture.nativeElement.querySelectorAll('[role="tab"]')).map(
     (tab) => tab.textContent?.replace(/\s+/g, ' ').trim() ?? '',
   );
 
-const clickTab = (fixture: ComponentFixture<SplitzesModalComponent>, label: string): void => {
+const clickTab = (fixture: ComponentFixture<SplitzesPageComponent>, label: string): void => {
   Array.from<HTMLButtonElement>(fixture.nativeElement.querySelectorAll('[role="tab"]'))
     .find((tab) => tab.textContent?.trim().startsWith(label))
     ?.click();
   fixture.detectChanges();
 };
 
-describe('SplitzesModalComponent', () => {
+describe('SplitzesPageComponent', () => {
   it('hides the Incoming tab for non-admins', async () => {
     const fixture = await setup(false, [pendingTransaction('p1')]);
 

@@ -5,7 +5,7 @@ import { CreateEntryTabsComponent } from './create-entry-tabs.component';
 import { CreateTransactionFormComponent } from './create-transaction-form.component';
 import { CreateAdjustmentFormComponent } from './create-adjustment-form.component';
 import { SplitStateStore } from './split-state.store';
-import { EntryType } from './create-transaction.models';
+import { EntryKind } from './create-transaction.models';
 
 @Component({
   selector: 'app-create-transaction',
@@ -19,19 +19,17 @@ import { EntryType } from './create-transaction.models';
   providers: [SplitStateStore],
   host: { class: 'block' },
   template: `
-    <div
-      class="bg-gray-900/60 border border-gray-800/80 rounded-2xl p-5 space-y-4 backdrop-blur-sm"
-    >
+    <div class="flex flex-col gap-5">
       @if (isKioskMode()) {
         <app-kiosk-balance />
       } @else {
-        <app-create-entry-tabs [activeTab]="activeTab()" (tabChange)="setTab($event)" />
+        <app-create-entry-tabs [activeTab]="entry()" (tabChange)="setTab($event)" />
       }
 
-      @if (activeTab() === 'transaction') {
+      @if (entry() === 'transaction') {
         <app-create-transaction-form />
       } @else {
-        <app-create-adjustment-form />
+        <app-create-adjustment-form [isTrip]="entry() === 'trip'" />
       }
     </div>
   `,
@@ -41,24 +39,24 @@ export class CreateTransactionComponent {
   private splitStore = inject(SplitStateStore);
   readonly isKioskMode = this.authService.isKiosk;
 
-  readonly activeTab = signal<EntryType>('transaction');
+  readonly entry = signal<EntryKind>('transaction');
 
   constructor() {
     effect(() => {
       if (this.authService.isKiosk()) {
-        this.activeTab.set('transaction');
+        this.entry.set('transaction');
         this.splitStore.reset();
       }
     });
   }
 
-  setTab(tab: EntryType): void {
-    if (this.isKioskMode() && tab === 'adjustment') {
-      this.activeTab.set('transaction');
+  setTab(tab: EntryKind): void {
+    if (this.isKioskMode() && tab !== 'transaction') {
+      this.entry.set('transaction');
       return;
     }
 
-    this.activeTab.set(tab);
+    this.entry.set(tab);
     this.splitStore.reset();
   }
 }

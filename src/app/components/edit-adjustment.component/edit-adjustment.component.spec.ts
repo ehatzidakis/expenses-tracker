@@ -29,4 +29,39 @@ describe('EditAdjustmentComponent', () => {
   it('should create', () => {
     expect(component).toBeTruthy();
   });
+
+  it('names the one-off and its amount when asking to delete it', () => {
+    expect(component.deleteText()).toEqual({
+      title: 'Delete “Test”?',
+      message: "This income of €10.00 will be removed. This can't be undone.",
+    });
+  });
+
+  it('refuses a last day before the first day and says why', async () => {
+    component.adjustmentModel.update((m) => ({ ...m, startDate: '2026-09-10', endDate: '2026-09-08' }));
+    await fixture.whenStable();
+    expect(component.adjustmentForm().invalid()).toBe(true);
+    expect((fixture.nativeElement as HTMLElement).textContent).toContain(
+      "The end date can't be before the start date.",
+    );
+  });
+
+  it('edits a trip by name, dates and Accepting expenses only', async () => {
+    fixture.componentRef.setInput('adjustment', {
+      id: '2',
+      title: 'Weekend',
+      adjType: false,
+      amount: 0,
+      startDate: new Date('2026-09-01'),
+      endDate: new Date('2026-09-04'),
+      isTrip: true,
+      isSelectable: true,
+    });
+    await fixture.whenStable();
+    const text = (fixture.nativeElement as HTMLElement).textContent ?? '';
+    expect(text).toContain('Trip name');
+    expect(text).toContain('Accepting expenses');
+    expect(text).not.toContain('Income');
+    expect((fixture.nativeElement as HTMLElement).querySelector('#adj-edit-amount')).toBeNull();
+  });
 });

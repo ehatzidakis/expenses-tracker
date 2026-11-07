@@ -70,4 +70,31 @@ describe('UtilitySumComponent', () => {
     expect(monthWater?.average).toBe(90);
     expect(monthEnergy?.average).toBe(50);
   });
+
+  it('shows skeleton rows, not "No bills yet", while the totals load', async () => {
+    fetchCategoryStats.mockReturnValue(new Promise(() => undefined));
+    TestBed.inject(QueryClient).clear();
+    const loading = TestBed.createComponent(UtilitySumComponent);
+    loading.detectChanges();
+    await loading.whenStable();
+    const el = loading.nativeElement as HTMLElement;
+    expect(el.querySelector('.costs-loading')).not.toBeNull();
+    expect(el.textContent).not.toContain('No bills yet');
+  });
+
+  it('says the bills failed to load and offers Try again', async () => {
+    fetchCategoryStats.mockRejectedValue(new Error('offline'));
+    TestBed.inject(QueryClient).clear();
+    const failed = TestBed.createComponent(UtilitySumComponent);
+    failed.detectChanges();
+    await settle(failed);
+    const el = failed.nativeElement as HTMLElement;
+    expect(el.querySelector('.costs-error')?.textContent).toContain("Couldn't load your bills.");
+    expect(el.textContent).not.toContain('No bills yet');
+
+    fetchCategoryStats.mockResolvedValue({ 'Utilities:12': { count: 1, sum: 50 } });
+    (el.querySelector('.costs-error button') as HTMLButtonElement).click();
+    await settle(failed);
+    expect(el.querySelector('.costs-error')).toBeNull();
+  });
 });

@@ -2,7 +2,7 @@ import { Component, input, output } from '@angular/core';
 
 export type KioskTab = 'new' | 'requests';
 
-/** Bottom tab bar for kiosk mode. Same floating pill look as the admin's TabBarComponent. */
+/** Bottom tab bar for kiosk mode. Docked smoked glass, like the admin's TabBarComponent. */
 @Component({
   selector: 'app-kiosk-tab-bar',
   standalone: true,
@@ -11,7 +11,7 @@ export type KioskTab = 'new' | 'requests';
     <nav
       role="tablist"
       aria-label="Kiosk sections"
-      class="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 flex items-center gap-1 px-1.5 py-1.5 rounded-full bg-gray-900/70 border border-gray-800/70 backdrop-blur-xl shadow-2xl shadow-black/50"
+      class="fixed inset-x-0 bottom-0 z-40 flex justify-center border-t border-ink/10 bg-panel/90 pb-[max(calc(env(safe-area-inset-bottom)-16px),8px)] backdrop-blur-xl"
     >
       @for (tab of tabs; track tab.id) {
         <button
@@ -19,15 +19,15 @@ export type KioskTab = 'new' | 'requests';
           role="tab"
           [attr.aria-selected]="activeTab() === tab.id"
           (click)="tabChange.emit(tab.id)"
-          class="relative flex flex-col items-center justify-center gap-0.5 px-5 py-2 rounded-full text-[10px] font-medium whitespace-nowrap transition-all duration-200 active:scale-95 cursor-pointer"
+          class="relative flex min-h-[50px] w-full max-w-48 flex-1 flex-col items-center justify-center gap-1 text-[11px] font-medium whitespace-nowrap transition-colors duration-150 cursor-pointer"
           [class]="
             activeTab() === tab.id
-              ? 'bg-linear-to-br from-indigo-500 to-violet-600 text-white shadow-lg shadow-indigo-950/40'
-              : 'text-gray-400 hover:text-gray-200'
+              ? 'text-ember-ink shadow-[inset_0_2px_0_var(--color-ember)]'
+              : 'text-ink-3 hover:text-ink'
           "
         >
           <svg
-            class="w-4.5 h-4.5"
+            class="size-[22px]"
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
@@ -49,7 +49,7 @@ export type KioskTab = 'new' | 'requests';
           <span>{{ tab.label }}</span>
           @if (tab.id === 'requests' && requestCount() > 0) {
             <span
-              class="absolute -top-1 right-1 min-w-4 h-4 px-1 rounded-full bg-red-500 text-white text-[9px] font-bold leading-4 text-center"
+              class="absolute top-1.5 left-1/2 ml-2 min-w-4 h-4 px-1 rounded-full bg-cherry-fill text-ink text-[11px] font-bold leading-4 text-center"
               [attr.aria-label]="requestCount() + ' requests waiting'"
             >
               {{ requestCount() }}

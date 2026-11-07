@@ -7,6 +7,7 @@ import {
   PICKER_ACTIVE,
   PICKER_BASE,
   PICKER_IDLE,
+  PICKER_PANEL,
   PICKER_WRAPPER,
   QUICK_PILL,
 } from '../../utils/pill-styles';
@@ -79,16 +80,6 @@ const QUICK_COUNT = 3;
             aria-haspopup="dialog"
             [attr.aria-expanded]="pickerOpen()"
           >
-            @if (!olderSelected()) {
-              <svg
-                class="w-3 h-3 shrink-0"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-                aria-hidden="true"
-              >
-                <path fill-rule="evenodd" clip-rule="evenodd" [attr.d]="calendarIcon" />
-              </svg>
-            }
             <span class="min-w-0 truncate">{{ olderSelected()?.shortLabel ?? 'More' }}</span>
             <svg
               class="w-3 h-3 transition-transform duration-150"
@@ -110,7 +101,7 @@ const QUICK_COUNT = 3;
               role="dialog"
               aria-label="Pick a month"
               data-testid="month-picker"
-              class="absolute right-0 top-full mt-2 z-20 w-64 bg-gray-900 border border-gray-800 rounded-2xl p-3 shadow-xl"
+              [class]="pickerPanel"
             >
               <div class="flex items-center justify-between mb-3">
                 <button
@@ -119,11 +110,11 @@ const QUICK_COUNT = 3;
                   (click)="prevYear()"
                   [disabled]="viewYear() <= minYear()"
                   aria-label="Previous year"
-                  class="w-8 h-8 rounded-lg text-gray-300 hover:bg-gray-800 disabled:text-gray-700 disabled:hover:bg-transparent disabled:cursor-not-allowed"
+                  class="flex size-11 items-center justify-center rounded-xl text-ink-2 hover:bg-raised-hi disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent"
                 >
-                  ‹
+                  <svg class="size-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" clip-rule="evenodd" d="M12.79 5.23a.75.75 0 01-.02 1.06L8.832 10l3.938 3.71a.75.75 0 11-1.04 1.08l-4.5-4.25a.75.75 0 010-1.08l4.5-4.25a.75.75 0 011.06.02z" /></svg>
                 </button>
-                <span data-testid="view-year" class="text-sm font-medium text-gray-100">
+                <span data-testid="view-year" class="text-sm font-medium text-ink">
                   {{ viewYear() }}
                 </span>
                 <button
@@ -132,9 +123,9 @@ const QUICK_COUNT = 3;
                   (click)="nextYear()"
                   [disabled]="viewYear() >= maxYear()"
                   aria-label="Next year"
-                  class="w-8 h-8 rounded-lg text-gray-300 hover:bg-gray-800 disabled:text-gray-700 disabled:hover:bg-transparent disabled:cursor-not-allowed"
+                  class="flex size-11 items-center justify-center rounded-xl text-ink-2 hover:bg-raised-hi disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent"
                 >
-                  ›
+                  <svg class="size-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" clip-rule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z" /></svg>
                 </button>
               </div>
 
@@ -149,12 +140,12 @@ const QUICK_COUNT = 3;
                     [attr.aria-pressed]="cell.selected"
                     [class]="
                       cell.selected
-                        ? 'bg-indigo-600 text-white font-medium'
+                        ? 'bg-ember text-ground font-medium'
                         : cell.id
-                          ? 'bg-gray-800/60 text-gray-300 hover:bg-gray-800'
-                          : 'text-gray-600 cursor-not-allowed'
+                          ? 'bg-raised-hi/70 text-ink-2 hover:bg-raised-hi hover:text-ink'
+                          : 'text-ink-4 cursor-not-allowed'
                     "
-                    class="py-2 rounded-xl text-xs transition-colors duration-150"
+                    class="min-h-11 rounded-xl text-[13px] transition-colors duration-150 cursor-pointer"
                   >
                     {{ cell.short }}
                   </button>
@@ -182,6 +173,7 @@ export class MonthSelectorComponent {
   protected readonly pickerActive = PICKER_ACTIVE;
   protected readonly pickerIdle = PICKER_IDLE;
   protected readonly calendarIcon = CALENDAR_ICON_PATH;
+  protected readonly pickerPanel = PICKER_PANEL;
 
   readonly pickerOpen = signal(false);
   readonly viewYear = signal(new Date().getFullYear());

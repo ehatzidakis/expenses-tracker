@@ -35,6 +35,7 @@ import {
   host: { class: 'block' },
   template: `
     <app-edit-form-shell
+      [showBack]="true"
       title="Review incoming"
       [formInvalid]="reviewForm().invalid()"
       [submitting]="submitting()"
@@ -55,27 +56,19 @@ import {
       (deleteConfirmed)="onDecline()"
       (deleteCancelled)="showDeclineConfirm.set(false)"
     >
-      <div class="flex items-center justify-between gap-2 text-[11px]">
-        <span
-          class="px-2.5 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-300 font-semibold"
-        >
-          From {{ sourceLabel() }}
-        </span>
-        <span class="text-gray-500 truncate">{{ addedOn() }}</span>
-      </div>
+      <p class="text-[13px] text-ink-2">
+        From {{ sourceLabel() }} <span class="text-ink-3">· {{ addedOn() }}</span>
+      </p>
       @if (statusLabel(); as status) {
         <p
-          class="rounded-xl border px-3 py-2 text-[11px]"
-          [class.border-sky-500/30]="pending().requestStatus === 'awaiting-kiosk'"
-          [class.text-sky-300]="pending().requestStatus === 'awaiting-kiosk'"
-          [class.border-emerald-500/30]="pending().requestStatus === 'answered'"
-          [class.text-emerald-300]="pending().requestStatus === 'answered'"
-          [class.border-red-500/30]="pending().requestStatus === 'declined'"
-          [class.text-red-300]="pending().requestStatus === 'declined'"
+          class="-mt-2 text-[13px] font-medium"
+          [class.text-ink-2]="pending().requestStatus === 'awaiting-kiosk'"
+          [class.text-avocado-ink]="pending().requestStatus === 'answered'"
+          [class.text-cherry]="pending().requestStatus === 'declined'"
         >
           {{ status }}
           @if (pending().requestStatus === 'awaiting-kiosk') {
-            <span class="block text-gray-500"
+            <span class="mt-0.5 block text-[12px] font-normal text-ink-3"
               >You can still fill it in and accept it yourself.</span
             >
           }

@@ -1,47 +1,32 @@
 import { Component, input, output } from '@angular/core';
+import { BUTTON_DANGER_SM, BUTTON_SECONDARY } from '../../utils/pill-styles';
 
 @Component({
   selector: 'app-stealth-passcode-setting',
   standalone: true,
   host: { class: 'block' },
   template: `
-    <div class="space-y-3">
-      <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider block px-1"
-        >Security</span
-      >
-
-      <div
-        class="flex items-center justify-between bg-gray-800/40 p-3.5 rounded-2xl border border-gray-800/80"
-      >
-        <div>
-          <span class="text-sm font-medium text-gray-200 block">Stealth Passcode</span>
-          <span class="text-[11px] text-gray-400 block">
-            {{ hasPassword() ? 'Protected with PIN' : 'No PIN set' }}
-          </span>
-        </div>
-
-        @if (hasPassword()) {
-          <button
-            type="button"
-            (click)="remove.emit()"
-            class="px-3 py-1.5 text-xs font-semibold text-red-400 bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 rounded-xl transition-all cursor-pointer"
-          >
-            Remove
-          </button>
-        } @else {
-          <button
-            type="button"
-            (click)="set.emit()"
-            class="px-3 py-1.5 text-xs font-semibold text-indigo-400 bg-indigo-500/10 hover:bg-indigo-500/20 border border-indigo-500/20 rounded-xl transition-all cursor-pointer"
-          >
-            Set PIN
-          </button>
-        }
-      </div>
+    <div class="flex min-h-14 items-center justify-between gap-4 py-2.5">
+      <span class="min-w-0">
+        <span class="block text-[15px] font-medium text-ink">Stealth passcode</span>
+        <span class="mt-0.5 block text-[12px] text-ink-2">
+          {{ hasPassword() ? 'A PIN is needed to turn stealth off' : 'No PIN set' }}
+        </span>
+      </span>
+      @if (hasPassword()) {
+        <button type="button" [class]="dangerSm + ' shrink-0'" (click)="remove.emit()">
+          Remove PIN
+        </button>
+      } @else {
+        <button type="button" [class]="secondary + ' shrink-0'" (click)="set.emit()">Set PIN</button>
+      }
     </div>
   `,
 })
 export class StealthPasscodeSettingComponent {
+  protected readonly secondary = BUTTON_SECONDARY;
+  protected readonly dangerSm = BUTTON_DANGER_SM;
+
   readonly hasPassword = input(false);
   readonly set = output<void>();
   readonly remove = output<void>();

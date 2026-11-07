@@ -1,66 +1,60 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal, input } from '@angular/core';
 import { AuthService } from '../../services/auth.service';
 import { PushNotificationService } from '../../services/push-notification.service';
+import { SwitchComponent } from '../switch/switch';
+import { BUTTON_SECONDARY } from '../../utils/pill-styles';
 
 @Component({
   selector: 'app-notification-setting',
   standalone: true,
+  imports: [SwitchComponent],
   host: { class: 'block' },
   template: `
-    <div class="space-y-2 bg-gray-800/40 p-3.5 rounded-2xl border border-gray-800/80">
-      <div class="flex items-center justify-between gap-3">
-        <div class="space-y-0.5">
-          <span class="text-sm font-medium text-gray-200 block">Notifications</span>
-          <span class="text-[11px] text-gray-400 block">{{ subtitle() }}</span>
+    <div class="py-1">
+      @if (canToggle()) {
+        <app-switch
+          [label]="label()"
+          [caption]="subtitle()"
+          [checked]="isOn()"
+          [disabled]="busy()"
+          (toggled)="toggle()"
+        />
+      } @else {
+        <div class="min-h-14 py-2.5">
+          <span class="block text-[15px] font-medium text-ink">{{ label() }}</span>
+          <span class="mt-0.5 block text-[12px] text-ink-2">{{ subtitle() }}</span>
         </div>
-
-        @if (canToggle()) {
-          <button
-            type="button"
-            role="switch"
-            aria-label="Notifications"
-            [attr.aria-checked]="isOn()"
-            [disabled]="busy()"
-            (click)="toggle()"
-            class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none disabled:opacity-50"
-            [class]="isOn() ? 'bg-indigo-600' : 'bg-gray-700'"
-          >
-            <span
-              class="pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"
-              [class]="isOn() ? 'translate-x-5' : 'translate-x-0'"
-            ></span>
-          </button>
-        }
-      </div>
+      }
 
       @switch (push.status()) {
         @case ('needs-install') {
-          <p class="text-[11px] text-amber-300">
+          <p class="pb-3 text-[12px] font-semibold text-ember-ink">
             Add the app to your Home Screen and open it from there to turn these on.
           </p>
         }
         @case ('unsupported') {
-          <p class="text-[11px] text-gray-500">Not available here. Use the installed app.</p>
+          <p class="pb-3 text-[12px] text-ink-3">Not available here. Use the installed app.</p>
         }
         @case ('blocked') {
-          <p class="text-[11px] text-amber-300">
+          <p class="pb-3 text-[12px] font-semibold text-ember-ink">
             Blocked. Allow them in your phone's Settings → Notifications → expenses.
           </p>
         }
         @case ('on') {
-          <button
-            type="button"
-            [disabled]="busy()"
-            (click)="sendTest()"
-            class="rounded-xl border border-gray-700 bg-gray-800/70 px-3 py-1.5 text-xs text-gray-200 transition hover:bg-gray-700 disabled:opacity-50"
-          >
-            Send test notification
-          </button>
+          <div class="pb-3">
+            <button type="button" [class]="secondary" [disabled]="busy()" (click)="sendTest()">
+              Send test notification
+            </button>
+          </div>
         }
       }
 
       @if (message(); as message) {
-        <p class="text-[11px]" [class.text-emerald-300]="!error()" [class.text-red-300]="error()">
+        <p
+          class="pb-3 text-[12px]"
+          [class]="error() ? 'text-cherry' : 'text-avocado-ink'"
+          [attr.role]="error() ? 'alert' : 'status'"
+        >
           {{ message }}
         </p>
       }
@@ -68,6 +62,10 @@ import { PushNotificationService } from '../../services/push-notification.servic
   `,
 })
 export class NotificationSettingComponent {
+  /** The row's name; the kiosk sheet is already titled Notifications. */
+  readonly label = input('Notifications');
+  protected readonly secondary = BUTTON_SECONDARY;
+
   readonly push = inject(PushNotificationService);
   private readonly isKiosk = inject(AuthService).isKiosk;
 

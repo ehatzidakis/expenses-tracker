@@ -1,7 +1,17 @@
-import { CommonModule } from '@angular/common';
 import { Component, input, output } from '@angular/core';
 import { FieldTree, FormField } from '@angular/forms/signals';
 import { normalizeDecimalInput, parseDecimalInput } from '../../utils/decimal-input';
+import { friendlyDate } from '../../utils/period-pace';
+import { dateFieldError } from '../../utils/date-order';
+import {
+  FIELD,
+  FIELD_ERROR,
+  FIELD_LABEL,
+  SEGMENT_BASE,
+  SEGMENT_FRAME,
+  SEGMENT_OFF,
+  SEGMENT_ON,
+} from '../../utils/pill-styles';
 import { DateStepperComponent } from '../date-stepper/date-stepper.component';
 
 interface AdjustmentFieldsModel {
@@ -13,190 +23,174 @@ interface AdjustmentFieldsModel {
   isSelectable?: boolean;
 }
 
+/**
+ * New one-off or trip. A one-off leads with its amount like a transaction; a trip has no amount
+ * of its own (its transactions add up), so it leads with its name and dates.
+ */
 @Component({
   selector: 'app-adjustment-fields',
   standalone: true,
-  imports: [CommonModule, FormField, DateStepperComponent],
-  host: { class: 'block' },
+  imports: [FormField, DateStepperComponent],
+  host: { class: 'flex flex-col gap-5' },
   template: `
-    <div class="space-y-4">
-      <div class="space-y-1.5">
-        <label class="text-xs font-medium text-gray-400">Trip</label>
-        <div class="grid grid-cols-2 gap-2 p-1 bg-gray-950/80 rounded-xl border border-gray-800">
-          <button
-            type="button"
-            (click)="tripChange.emit(true)"
-            class="py-2 rounded-lg text-xs font-semibold transition-all duration-150 flex items-center justify-center gap-1 cursor-pointer"
-            [class.bg-sky-500/20]="model().isTrip"
-            [class.text-sky-400]="model().isTrip"
-            [class.border]="model().isTrip"
-            [class.border-sky-500/30]="model().isTrip"
-            [class.text-gray-400]="!model().isTrip"
-          >
-            🛫 Yes
-          </button>
-          <button
-            type="button"
-            (click)="tripChange.emit(false)"
-            class="py-2 rounded-lg text-xs font-semibold transition-all duration-150 flex items-center justify-center gap-1 cursor-pointer"
-            [class.bg-gray-700/60]="!model().isTrip"
-            [class.text-gray-200]="!model().isTrip"
-            [class.border]="!model().isTrip"
-            [class.border-gray-600/40]="!model().isTrip"
-            [class.text-gray-400]="model().isTrip"
-          >
-            No
-          </button>
-        </div>
-      </div>
-
-      @if (model().isTrip) {
-        <div class="space-y-1.5">
-          <label class="text-xs font-medium text-gray-400">Accept New Transactions</label>
-          <div class="grid grid-cols-2 gap-2 p-1 bg-gray-950/80 rounded-xl border border-gray-800">
-            <button
-              type="button"
-              (click)="selectableChange.emit(true)"
-              class="py-2 rounded-lg text-xs font-semibold transition-all duration-150 flex items-center justify-center gap-1 cursor-pointer"
-              [class.bg-emerald-500/20]="model().isSelectable"
-              [class.text-emerald-400]="model().isSelectable"
-              [class.border]="model().isSelectable"
-              [class.border-emerald-500/30]="model().isSelectable"
-              [class.text-gray-400]="!model().isSelectable"
-            >
-              🔓 Open
-            </button>
-            <button
-              type="button"
-              (click)="selectableChange.emit(false)"
-              class="py-2 rounded-lg text-xs font-semibold transition-all duration-150 flex items-center justify-center gap-1 cursor-pointer"
-              [class.bg-gray-700/60]="!model().isSelectable"
-              [class.text-gray-200]="!model().isSelectable"
-              [class.border]="!model().isSelectable"
-              [class.border-gray-600/40]="!model().isSelectable"
-              [class.text-gray-400]="model().isSelectable"
-            >
-              🔒 Closed
-            </button>
-          </div>
-        </div>
-      }
-
-      <div class="space-y-1.5">
-        <label for="adj-description" class="text-xs font-medium text-gray-400">Description</label>
-        <input
-          id="adj-description"
-          type="text"
-          placeholder="Add description"
-          [formField]="descriptionField()"
-          class="w-full bg-gray-800/60 border border-gray-800 rounded-xl px-3 py-2.5 text-sm text-gray-100 placeholder:text-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/60"
-        />
-        @if (descriptionField()().touched() && descriptionField()().invalid()) {
-          <span class="text-[11px] text-red-400">{{
-            descriptionField()().errors()[0]?.message
-          }}</span>
-        }
-      </div>
-
-      @if (!model().isTrip) {
-        <div class="space-y-1.5">
-          <label for="adj-amount" class="text-xs font-medium text-gray-400">Amount</label>
+    @if (!model().isTrip) {
+      <div>
+        <label for="adj-amount" class="sr-only">Amount</label>
+        <div
+          class="flex items-baseline gap-1.5 border-b border-edge pb-2 transition-colors focus-within:border-ember"
+        >
+          <span class="type-wide text-[26px] font-bold text-ink-3" aria-hidden="true">€</span>
           <input
             id="adj-amount"
+            size="1"
             type="text"
             inputmode="decimal"
             autocomplete="off"
             [value]="model().amount === 0 ? '' : model().amount.toString()"
             placeholder="0.00"
             (input)="onAmountInput($event)"
-            class="w-full bg-gray-800/60 border border-gray-800 rounded-xl px-3 py-2.5 text-sm text-gray-100 placeholder:text-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/60 tabular-nums"
+            class="amount-display type-wide w-0 min-w-0 flex-1 bg-transparent text-[40px] font-bold leading-[1.1] tracking-[-0.02em] text-ink placeholder:text-ink-4 focus-visible:outline-none"
           />
-          @if (amountField()().touched() && amountField()().invalid()) {
-            <span class="text-[11px] text-red-400">{{ amountField()().errors()[0]?.message }}</span>
-          }
         </div>
+        @if (amountField()().touched() && amountField()().invalid()) {
+          <p [class]="fieldError + ' mt-1.5'">{{ amountField()().errors()[0]?.message }}</p>
+        }
+      </div>
+    }
+
+    <div class="flex flex-col gap-1.5">
+      <label for="adj-description" [class]="fieldLabel">{{ model().isTrip ? 'Trip name' : 'Title' }}</label>
+      <input
+        id="adj-description"
+        type="text"
+        [placeholder]="model().isTrip ? 'Where to?' : 'What was it?'"
+        [formField]="descriptionField()"
+        [class]="field"
+      />
+      @if (descriptionField()().touched() && descriptionField()().invalid()) {
+        <p [class]="fieldError">{{ descriptionField()().errors()[0]?.message }}</p>
       }
-
-      <div class="grid grid-cols-2 gap-3">
-        <div class="space-y-1.5">
-          <label for="adj-start-date" class="text-xs font-medium text-gray-400">Start Date</label>
-          <app-date-stepper size="sm">
-            <input
-              #dateInput
-              id="adj-start-date"
-              type="date"
-              [formField]="startDateField()"
-              class="flex-1 min-w-0 appearance-none scheme-dark bg-gray-800/60 border border-gray-800 rounded-xl px-2 py-2 text-xs text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/60"
-            />
-          </app-date-stepper>
-          @if (startDateField()().touched() && startDateField()().invalid()) {
-            <span class="text-[11px] text-red-400">{{
-              startDateField()().errors()[0]?.message
-            }}</span>
-          }
-        </div>
-        <div class="space-y-1.5">
-          <label for="adj-end-date" class="text-xs font-medium text-gray-400">End Date</label>
-          <app-date-stepper size="sm">
-            <input
-              #dateInput
-              id="adj-end-date"
-              type="date"
-              [formField]="endDateField()"
-              class="flex-1 min-w-0 appearance-none scheme-dark bg-gray-800/60 border border-gray-800 rounded-xl px-2 py-2 text-xs text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/60"
-            />
-          </app-date-stepper>
-          @if (endDateField()().touched() && endDateField()().invalid()) {
-            <span class="text-[11px] text-red-400">{{
-              endDateField()().errors()[0]?.message
-            }}</span>
-          }
-        </div>
-      </div>
-
-      <div class="space-y-1.5">
-        <label class="text-xs font-medium text-gray-400">Adjustment Type</label>
-        <div class="grid grid-cols-2 gap-2 p-1 bg-gray-950/80 rounded-xl border border-gray-800">
-          <button
-            type="button"
-            (click)="additionChange.emit(true)"
-            class="py-2 rounded-lg text-xs font-semibold transition-all duration-150 flex items-center justify-center gap-1 cursor-pointer"
-            [class.bg-emerald-500/20]="addition()"
-            [class.text-emerald-400]="addition()"
-            [class.border]="addition()"
-            [class.border-emerald-500/30]="addition()"
-            [class.text-gray-400]="!addition()"
-          >
-            <span>+</span> Addition
-          </button>
-          <button
-            type="button"
-            (click)="additionChange.emit(false)"
-            class="py-2 rounded-lg text-xs font-semibold transition-all duration-150 flex items-center justify-center gap-1 cursor-pointer"
-            [class.bg-red-500/20]="!addition()"
-            [class.text-red-400]="!addition()"
-            [class.border]="!addition()"
-            [class.border-red-500/30]="!addition()"
-            [class.text-gray-400]="addition()"
-          >
-            <span>-</span> Subtraction
-          </button>
-        </div>
-      </div>
     </div>
+
+    @if (!model().isTrip) {
+      <div role="group" aria-label="Type" [class]="segmentFrame + ' grid-cols-2'">
+        <button
+          type="button"
+          [class]="segment(addition())"
+          [attr.aria-pressed]="addition()"
+          (click)="additionChange.emit(true)"
+        >
+          Income
+        </button>
+        <button
+          type="button"
+          [class]="segment(!addition())"
+          [attr.aria-pressed]="!addition()"
+          (click)="additionChange.emit(false)"
+        >
+          Expense
+        </button>
+      </div>
+    }
+
+    <div class="flex flex-col gap-1.5">
+      <label for="adj-start-date" [class]="fieldLabel">{{ model().isTrip ? 'First day' : 'Start date' }}</label>
+      <app-date-stepper>
+        <div class="relative min-w-0 flex-1">
+          <input
+            #dateInput
+            id="adj-start-date"
+            type="date"
+            [formField]="startDateField()"
+            [class]="field + ' scheme-dark text-transparent [-webkit-text-fill-color:transparent]'"
+          />
+          <span
+            class="pointer-events-none absolute inset-0 flex items-center px-3.5 text-[15px] text-ink"
+            aria-hidden="true"
+            >{{ dateLabel(model().startDate) }}</span
+          >
+        </div>
+      </app-date-stepper>
+      @if (startDateField()().touched() && startDateField()().invalid()) {
+        <p [class]="fieldError">{{ startDateField()().errors()[0]?.message }}</p>
+      }
+    </div>
+
+    <div class="flex flex-col gap-1.5">
+      <label for="adj-end-date" [class]="fieldLabel">{{ model().isTrip ? 'Last day' : 'End date' }}</label>
+      <app-date-stepper>
+        <div class="relative min-w-0 flex-1">
+          <input
+            #dateInput
+            id="adj-end-date"
+            type="date"
+            [formField]="endDateField()"
+            [class]="field + ' scheme-dark text-transparent [-webkit-text-fill-color:transparent]'"
+          />
+          <span
+            class="pointer-events-none absolute inset-0 flex items-center px-3.5 text-[15px] text-ink"
+            aria-hidden="true"
+            >{{ dateLabel(model().endDate) }}</span
+          >
+        </div>
+      </app-date-stepper>
+      @if (endError(); as message) {
+        <p role="alert" [class]="fieldError">{{ message }}</p>
+      }
+    </div>
+
+    @if (model().isTrip) {
+      <div class="flex flex-col gap-1.5">
+        <span id="adj-open-label" [class]="fieldLabel">Accepting expenses</span>
+        <div role="group" aria-labelledby="adj-open-label" [class]="segmentFrame + ' grid-cols-2'">
+          <button
+            type="button"
+            [class]="segment(!!model().isSelectable)"
+            [attr.aria-pressed]="!!model().isSelectable"
+            (click)="selectableChange.emit(true)"
+          >
+            Yes
+          </button>
+          <button
+            type="button"
+            [class]="segment(!model().isSelectable)"
+            [attr.aria-pressed]="!model().isSelectable"
+            (click)="selectableChange.emit(false)"
+          >
+            No
+          </button>
+        </div>
+      </div>
+    }
   `,
 })
 export class AdjustmentFieldsComponent {
+  protected readonly field = FIELD;
+  protected readonly fieldLabel = FIELD_LABEL;
+  protected readonly fieldError = FIELD_ERROR;
+  protected readonly segmentFrame = SEGMENT_FRAME;
+
   readonly model = input.required<AdjustmentFieldsModel>();
   readonly addition = input.required<boolean>();
   readonly descriptionField = input.required<FieldTree<string>>();
   readonly amountField = input.required<FieldTree<number>>();
   readonly startDateField = input.required<FieldTree<string>>();
   readonly endDateField = input.required<FieldTree<string>>();
-  readonly tripChange = output<boolean>();
   readonly selectableChange = output<boolean>();
   readonly additionChange = output<boolean>();
   readonly amountChange = output<number>();
+
+  endError(): string | null {
+    return dateFieldError(this.endDateField());
+  }
+
+  segment(active: boolean): string {
+    return `${SEGMENT_BASE} ${active ? SEGMENT_ON : SEGMENT_OFF}`;
+  }
+
+  dateLabel(isoDate: string): string {
+    return friendlyDate(isoDate) || 'Pick a date';
+  }
 
   onAmountInput(event: Event): void {
     const input = event.target as HTMLInputElement;

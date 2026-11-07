@@ -1,4 +1,4 @@
-import { Component, computed, input, output, signal } from '@angular/core';
+import { Component, computed, input, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Adjustment } from '../../models/adjustments.model';
 import { SensitiveDirective } from '../../utils/sensitive.directive';
@@ -12,65 +12,79 @@ function formatDateForInput(dateVal: Date | string): string {
   const day = String(d.getDate()).padStart(2, '0');
   return `${year}-${month}-${day}`;
 }
+
+/** One one-off (or trip) as a row. Income reads avocado; spending stays neutral cream. */
 @Component({
   selector: 'app-adjustment-card',
   standalone: true,
   imports: [CommonModule, SensitiveDirective],
   host: { class: 'block' },
   template: `
-    <div
-      class="flex items-start justify-between gap-3 bg-gray-900/60 border border-gray-800/80 rounded-2xl px-4 py-3.5 hover:border-gray-700/80 active:scale-[0.99] transition-all duration-200 cursor-pointer"
+    <button
+      type="button"
+      class="flex w-full min-h-14 items-center justify-between gap-3 py-3 text-left hover:bg-ink/[0.03] cursor-pointer"
       (click)="cardClick.emit()"
     >
-      <div class="flex items-start gap-3 min-w-0">
-        <div
-          class="h-9 w-9 shrink-0 rounded-full flex items-center justify-center text-base font-bold"
-          [class]="
-            adjustment().isTrip
-              ? 'bg-emerald-500/15 text-emerald-400'
-              : isAddition()
-                ? 'bg-emerald-500/15 text-emerald-400'
-                : 'bg-red-500/15 text-red-400'
-          "
+      <span class="flex min-w-0 items-center gap-3">
+        <span
+          class="flex size-6 shrink-0 items-center justify-center"
+          [class]="isAddition() ? 'text-avocado' : 'text-ink-3'"
+          aria-hidden="true"
         >
-          {{ adjustment().isTrip ? '🛫' : isAddition() ? '↑' : '↓' }}
-        </div>
-        <div class="min-w-0">
-          <div class="flex items-center gap-1.5 flex-wrap">
+          <svg
+            class="size-5"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            @if (adjustment().isTrip) {
+              <path
+                d="M2.5 19h19M3.6 12.6l2.4 2.3 5.2-1.4L6 6.5l2.2-.6 6.9 5.4 4.2-1.1a1.6 1.6 0 0 1 .8 3.1l-13 3.5-3.6-3.4z"
+              />
+            } @else if (isAddition()) {
+              <path d="M12 19V5M6 11l6-6 6 6" />
+            } @else {
+              <path d="M12 5v14M6 13l6 6 6-6" />
+            }
+          </svg>
+        </span>
+        <span class="min-w-0">
+          <span class="flex items-center gap-1.5">
+            <span class="truncate text-[15px] font-medium text-ink">{{ adjustment().title }}</span>
             @if (adjustment().isTrip) {
               <span
-                class="text-[10px] px-1.5 py-0.5 rounded-md font-semibold shrink-0"
+                class="shrink-0 rounded-md border px-1.5 py-px text-[11px] font-medium"
                 [class]="
                   adjustment().isSelectable
-                    ? 'bg-sky-500/15 text-sky-400 border border-sky-500/30'
-                    : 'bg-gray-700/60 text-gray-400 border border-gray-600/40'
+                    ? 'border-avocado/40 text-avocado'
+                    : 'border-edge text-ink-3'
                 "
               >
-                {{ adjustment().isSelectable ? '🔓' : '🔒' }}
+                {{ adjustment().isSelectable ? 'Open' : 'Closed' }}
               </span>
             }
-            <span class="text-sm font-medium text-gray-200 truncate">{{ adjustment().title }}</span>
-          </div>
-          @if (isSameDay()) {
-            <span class="text-[11px] text-gray-500 block mt-0.5">
-              Date: {{ adjustment().startDate | date: 'dd/MM/yyyy' }}
-            </span>
-          } @else {
-            <span class="text-[11px] text-gray-500 block mt-0.5">
-              From: {{ adjustment().startDate | date: 'dd/MM/yyyy' }} To:
-              {{ adjustment().endDate | date: 'dd/MM/yyyy' }}
-            </span>
-          }
-        </div>
-      </div>
+          </span>
+          <span class="mt-0.5 block text-[12px] text-ink-3">
+            @if (isSameDay()) {
+              {{ adjustment().startDate | date: 'd MMM y' }}
+            } @else {
+              {{ adjustment().startDate | date: 'd MMM' }} –
+              {{ adjustment().endDate | date: 'd MMM y' }}
+            }
+          </span>
+        </span>
+      </span>
       <span
-        class="text-sm font-semibold shrink-0"
-        [class]="adjustment().isTrip || isAddition() ? 'text-emerald-400' : 'text-red-400'"
+        class="shrink-0 text-[15px] font-semibold tabular-nums"
+        [class]="isAddition() ? 'text-avocado' : 'text-ink'"
         appSensitive
       >
-        €{{ adjustment().amount | number: '1.2-2' }}
+        {{ isAddition() ? '+' : '-' }}€{{ adjustment().amount | number: '1.2-2' }}
       </span>
-    </div>
+    </button>
   `,
 })
 export class AdjustmentCardComponent {
@@ -78,7 +92,7 @@ export class AdjustmentCardComponent {
 
   readonly cardClick = output<void>();
 
-  readonly isAddition = computed(() => this.adjustment().adjType);
+  readonly isAddition = computed(() => !this.adjustment().isTrip && this.adjustment().adjType);
 
   readonly isSameDay = computed(() => {
     const adj = this.adjustment();

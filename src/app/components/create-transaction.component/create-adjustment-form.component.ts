@@ -1,6 +1,6 @@
-import { CommonModule } from '@angular/common';
-import { Component, inject, signal } from '@angular/core';
-import { form, maxLength, required } from '@angular/forms/signals';
+import { Component, computed, effect, inject, input, signal, untracked } from '@angular/core';
+import { form, maxLength, required, validate } from '@angular/forms/signals';
+import { DATE_ORDER, dateOrderMessage } from '../../utils/date-order';
 import { QueryClient } from '@tanstack/angular-query-experimental';
 import { AdjustmentService } from '../../services/adjustment-service';
 import { PrivacyService } from '../../services/privacy.service';
@@ -14,10 +14,10 @@ import { buildAdjustmentPayload } from './transaction-payload';
 @Component({
   selector: 'app-create-adjustment-form',
   standalone: true,
-  imports: [CommonModule, AdjustmentFieldsComponent, SplitFieldsComponent],
+  imports: [AdjustmentFieldsComponent, SplitFieldsComponent],
   host: { class: 'block' },
   template: `
-    <form (submit)="onSubmit($event)" class="space-y-4">
+    <form (submit)="onSubmit($event)" class="flex flex-col gap-5">
       <app-adjustment-fields
         [model]="adjustmentModel()"
         [addition]="isAddition()"
@@ -25,7 +25,6 @@ import { buildAdjustmentPayload } from './transaction-payload';
         [amountField]="adjustmentForm.amount"
         [startDateField]="adjustmentForm.startDate"
         [endDateField]="adjustmentForm.endDate"
-        (tripChange)="setIsTrip($event)"
         (selectableChange)="setIsSelectable($event)"
         (additionChange)="isAddition.set($event)"
         (amountChange)="adjustmentModel.update((model) => ({ ...model, amount: $event }))"
@@ -42,24 +41,27 @@ import { buildAdjustmentPayload } from './transaction-payload';
       <button
         type="submit"
         [disabled]="adjustmentForm().invalid() || submitting() || privacyService.isPrivacyMode()"
-        class="w-full py-3 rounded-xl text-sm font-semibold text-white bg-linear-to-br from-indigo-500 to-violet-600 shadow-lg disabled:opacity-40 disabled:cursor-not-allowed active:scale-[0.99] transition-all cursor-pointer"
+        class="min-h-12 w-full rounded-xl bg-ember text-[15px] font-semibold text-ground transition-[background-color,transform] duration-150 hover:bg-ember-ink active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-40 cursor-pointer"
       >
-        {{ submitting() ? 'Adding…' : 'Add One-Off' }}
+        {{ submitting() ? 'Adding…' : adjustmentModel().isTrip ? 'Add trip' : 'Add one-off' }}
       </button>
     </form>
 
-    @if (successMessage()) {
-      <div
-        class="p-3 bg-emerald-950/40 border border-emerald-800/60 text-emerald-300 rounded-xl text-xs"
-      >
-        <span>{{ successMessage() }}</span>
-      </div>
-    }
-    @if (errorMessage()) {
-      <div class="p-3 bg-red-950/40 border border-red-800/60 text-red-300 rounded-xl text-xs">
-        {{ errorMessage() }}
-      </div>
-    }
+    <div class="mt-4 flex flex-col gap-3" aria-live="polite">
+      @if (successMessage()) {
+        <p class="border-t border-ink/10 pt-3 text-[13px] font-semibold text-avocado-ink">
+          {{ successMessage() }}
+        </p>
+      }
+      @if (errorMessage()) {
+        <p
+          role="alert"
+          class="rounded-xl border border-cherry/30 bg-cherry-deep/60 px-3.5 py-3 text-[13px] text-cherry"
+        >
+          {{ errorMessage() }}
+        </p>
+      }
+    </div>
   `,
 })
 export class CreateAdjustmentFormComponent {
@@ -84,13 +86,41 @@ export class CreateAdjustmentFormComponent {
     });
     required(schemaPath.startDate, { message: 'Start date is required' });
     required(schemaPath.endDate, { message: 'End date is required' });
+    validate(schemaPath.endDate, ({ value, valueOf }) => {
+      const start = valueOf(schemaPath.startDate);
+      const end = value();
+      return start && end && end < start
+        ? { kind: DATE_ORDER, message: dateOrderMessage(!!this.adjustmentModel().isTrip) }
+        : null;
+    });
+  });
+
+  /** Set by the Add tab's top switch (One-off or Trip). */
+  readonly isTrip = input(false);
+
+  private readonly syncTrip = effect(() => {
+    const trip = this.isTrip();
+    untracked(() => this.setIsTrip(trip));
+  });
+
+  /** Moving the first day past the last one carries the last day along with it. */
+  private readonly startDate = computed(() => this.adjustmentModel().startDate);
+  private readonly keepEndAfterStart = effect(() => {
+    const start = this.startDate();
+    untracked(() => {
+      const model = this.adjustmentModel();
+      if (start && model.endDate && model.endDate < start) {
+        this.adjustmentModel.set({ ...model, endDate: start });
+      }
+    });
   });
 
   setIsTrip(value: boolean): void {
     this.adjustmentModel.update((m) => ({
       ...m,
       isTrip: value,
-      isSelectable: value ? m.isSelectable : false,
+      // A new trip takes expenses straight away; it can be closed once it's over.
+      isSelectable: value,
       amount: value ? 0.0 : m.amount,
     }));
     if (value) {
@@ -129,17 +159,21 @@ export class CreateAdjustmentFormComponent {
       }
 
       await this.adjustmentService.createAdjustment(result.payload);
+      const added = result.payload.isTrip
+        ? `Trip added: ${result.payload.description}`
+        : `One-off added: ${result.payload.description}`;
 
       await this.queryClient.invalidateQueries({ queryKey: ['expenses'] });
       await this.queryClient.invalidateQueries({ queryKey: ['adjustments'] });
       await this.queryClient.invalidateQueries({ queryKey: ['splitTransactions'] });
 
-      this.adjustmentModel.set(defaultAdjustmentModel());
+      // Stay on the same kind of entry: the Trip tab keeps showing trip fields.
+      this.adjustmentModel.set({ ...defaultAdjustmentModel(), isTrip: this.isTrip(), isSelectable: this.isTrip() });
       this.adjustmentForm().reset();
       this.resetSplitFields();
-      this.successMessage.set('One-Off adjustment added successfully');
+      this.successMessage.set(added);
     } catch (err) {
-      this.errorMessage.set('Unable to add adjustment. Please try again.');
+      this.errorMessage.set("Couldn't add it. Check your connection and try again.");
     } finally {
       this.submitting.set(false);
     }

@@ -9,6 +9,13 @@ import {
 import { CATEGORY_META, getSubcategoryOptions } from '../../services/expense-state.service';
 import { PagedEntriesListComponent } from '../paged-entries-list/paged-entries-list';
 import { SensitiveDirective } from '../../utils/sensitive.directive';
+import {
+  BUTTON_SECONDARY,
+  SEGMENT_BASE,
+  SEGMENT_FRAME,
+  SEGMENT_OFF,
+  SEGMENT_ON,
+} from '../../utils/pill-styles';
 
 interface CategoryAverage {
   key: string;
@@ -17,8 +24,6 @@ interface CategoryAverage {
   label: string;
   average: number;
   count: number;
-  iconColorClass: string;
-  bgColorClass: string;
   emoji: string;
 }
 
@@ -27,103 +32,126 @@ interface CategoryAverage {
   standalone: true,
   imports: [CommonModule, PagedEntriesListComponent, SensitiveDirective],
   template: `
-    <div
-      class="bg-gray-900/60 border border-gray-800/80 rounded-2xl p-5 backdrop-blur-sm select-none"
-    >
-      <div class="mb-4 flex items-center justify-between gap-3">
-        <div>
-          <h3 class="text-xs font-semibold text-gray-100">Transaction Averages</h3>
-          <p class="text-xs text-gray-400 mt-0.5">Average cost per entry</p>
-        </div>
-
-        <div class="inline-flex rounded-full border border-gray-700 bg-gray-950/80 p-1">
-          <button
-            type="button"
-            class="rounded-full px-3 py-1.5 text-[11px] font-semibold transition-colors"
-            [class.bg-indigo-500]="viewMode() === 'food'"
-            [class.text-white]="viewMode() === 'food'"
-            [class.text-gray-400]="viewMode() !== 'food'"
-            (click)="viewMode.set('food')"
-          >
-            Food
-          </button>
-          <button
-            type="button"
-            class="rounded-full px-3 py-1.5 text-[11px] font-semibold transition-colors"
-            [class.bg-indigo-500]="viewMode() === 'tickets'"
-            [class.text-white]="viewMode() === 'tickets'"
-            [class.text-gray-400]="viewMode() !== 'tickets'"
-            (click)="viewMode.set('tickets')"
-          >
-            Tickets
-          </button>
-          <button
-            type="button"
-            class="rounded-full px-3 py-1.5 text-[11px] font-semibold transition-colors"
-            [class.bg-indigo-500]="viewMode() === 'games'"
-            [class.text-white]="viewMode() === 'games'"
-            [class.text-gray-400]="viewMode() !== 'games'"
-            (click)="viewMode.set('games')"
-          >
-            Games
-          </button>
+    <section aria-labelledby="costs-purchase" class="flex flex-col gap-2">
+      <div class="flex items-center justify-between gap-3">
+        <h3 id="costs-purchase" class="text-[15px] font-medium text-ink">Per purchase</h3>
+        <div role="group" aria-label="Kind" [class]="frame + ' grid-cols-3'">
+          @for (mode of modes; track mode.id) {
+            <button
+              type="button"
+              [class]="segment(viewMode() === mode.id) + ' px-3'"
+              [attr.aria-pressed]="viewMode() === mode.id"
+              (click)="viewMode.set(mode.id)"
+            >
+              {{ mode.label }}
+            </button>
+          }
         </div>
       </div>
 
-      <div class="space-y-3">
+      @if (!statsQuery.data() && statsQuery.isError()) {
+        <div role="alert" class="costs-error flex items-center justify-between gap-3 border-t border-ink/10 py-3">
+          <p class="text-[13px] text-cherry">Couldn't load these averages.</p>
+          <button type="button" [class]="secondary + ' shrink-0'" (click)="statsQuery.refetch()">Try again</button>
+        </div>
+      } @else if (statsQuery.isPending()) {
+        <ul class="costs-loading animate-pulse divide-y divide-ink/10 border-t border-ink/10" aria-label="Loading these averages">
+          @for (row of averages(); track $index) {
+            <li class="flex min-h-14 items-center justify-between gap-3 py-2.5">
+              <span class="flex items-center gap-3">
+                <span class="size-5 rounded bg-raised"></span>
+                <span class="flex flex-col gap-1.5">
+                  <span class="block h-3.5 w-28 rounded bg-raised"></span>
+                  <span class="block h-3 w-14 rounded bg-raised/70"></span>
+                </span>
+              </span>
+              <span class="block h-3.5 w-16 rounded bg-raised"></span>
+            </li>
+          }
+        </ul>
+      } @else {
+      <ul class="divide-y divide-ink/10 border-t border-ink/10">
         @for (item of averages(); track item.key) {
-          <div class="space-y-2">
-            <div
-              class="flex items-center justify-between p-3 rounded-xl bg-gray-800/40 border border-gray-800/60 transition-colors hover:bg-gray-800/60 cursor-pointer"
+          <li>
+            <button
+              type="button"
+              class="flex min-h-14 w-full items-center justify-between gap-3 py-2.5 text-left"
+              [class.cursor-pointer]="item.category !== 'Supermarket'"
+              [attr.aria-expanded]="item.category !== 'Supermarket' ? expandedCategory() === item.key : null"
               (click)="toggleCategory(item.key)"
             >
-              <div class="flex items-center gap-3.5">
-                <div
-                  class="flex items-center justify-center w-10 h-10 rounded-full border text-lg"
-                  [ngClass]="item.bgColorClass"
-                >
-                  <span>{{ item.emoji }}</span>
-                </div>
-
-                <div>
-                  <span class="block text-sm font-medium text-gray-200">{{ item.label }}</span>
-                  <span class="block text-[10px] text-gray-500 mt-0.5">
-                    Based on {{ item.count }} {{ item.count === 1 ? 'entry' : 'entries' }}
+              <span class="flex min-w-0 items-center gap-3">
+                <span class="w-5 shrink-0 text-center text-[13px] opacity-60 grayscale-[40%]" aria-hidden="true">{{
+                  item.emoji
+                }}</span>
+                <span class="min-w-0">
+                  <span class="block truncate text-[15px] font-medium text-ink">{{ item.label }}</span>
+                  <span class="block text-[12px] text-ink-3">
+                    {{ item.count }} {{ item.count === 1 ? 'purchase' : 'purchases' }}
                   </span>
-                </div>
-              </div>
-
-              <div class="text-right">
+                </span>
+              </span>
+              <span class="ml-auto shrink-0 text-right">
                 @if (item.count > 0) {
-                  <span class="block text-sm font-bold text-gray-100" appSensitive>
+                  <span class="block text-[13px] text-ink tabular-nums" appSensitive="xs">
                     €{{ item.average | number: '1.2-2' }}
                   </span>
-                  <span class="block text-[10px] text-gray-400 font-medium">/avg</span>
+                  <span class="block text-[12px] text-ink-3">each, on average</span>
                 } @else {
-                  <span class="block text-xs font-medium text-gray-500 italic">No data</span>
+                  <span class="block text-[12px] text-ink-3">None yet</span>
                 }
-              </div>
-            </div>
-
+              </span>
+              @if (item.category !== 'Supermarket') {
+                <svg
+                  class="size-3.5 shrink-0 text-ink-3 transition-transform duration-200"
+                  [class.rotate-180]="expandedCategory() === item.key"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                  aria-hidden="true"
+                >
+                  <path
+                    fill-rule="evenodd"
+                    clip-rule="evenodd"
+                    d="M5.23 7.21a.75.75 0 011.06.02L10 11.17l3.71-3.94a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z"
+                  />
+                </svg>
+              }
+            </button>
             @if (expandedCategory() === item.key && item.category !== 'Supermarket') {
-              <app-paged-entries-list
-                [title]="item.label"
-                mode="category"
-                [filterValue]="item.category"
-                [subCategoryId]="item.subCategoryId ?? null"
-              />
+              <div class="pb-3">
+                <app-paged-entries-list
+                  [title]="item.label"
+                  mode="category"
+                  [filterValue]="item.category"
+                  [subCategoryId]="item.subCategoryId ?? null"
+                />
+              </div>
             }
-          </div>
+          </li>
         }
-      </div>
-    </div>
+      </ul>
+      }
+    </section>
   `,
 })
 export class CategoryAverageComponent {
+  protected readonly frame = SEGMENT_FRAME;
+  protected readonly secondary = BUTTON_SECONDARY;
+
+  segment(active: boolean): string {
+    return `${SEGMENT_BASE} ${active ? SEGMENT_ON : SEGMENT_OFF}`;
+  }
+
+  protected readonly modes = [
+    { id: 'food', label: 'Food' },
+    { id: 'tickets', label: 'Tickets' },
+    { id: 'games', label: 'Games' },
+  ] as const;
+
   private readonly transactionService = inject(TransactionService);
 
   // Totals per row are calculated by Firestore and cached; saves refresh them.
-  private readonly statsQuery = injectQuery(() => ({
+  protected readonly statsQuery = injectQuery(() => ({
     queryKey: ['expenses', 'stats', 'category-averages'],
     queryFn: () => this.transactionService.fetchCategoryStats(statGroups()),
   }));
@@ -150,8 +178,6 @@ export class CategoryAverageComponent {
       category: cfg.category,
       label: cfg.label,
       ...this.statFor(cfg.category),
-      iconColorClass: cfg.iconColor,
-      bgColorClass: cfg.bgColor,
       emoji: CATEGORY_META[cfg.category]?.emoji ?? '📌',
     }));
 
@@ -176,8 +202,6 @@ export class CategoryAverageComponent {
         subCategoryId: option.id,
         label: this.stripEmojiPrefix(option.label),
         ...this.statFor('Tickets', option.id),
-        iconColorClass: 'text-purple-400',
-        bgColorClass: 'bg-purple-500/15 border-purple-500/30',
         emoji: subcategoryEmojiMap[option.name] ?? '🎟️',
       } satisfies CategoryAverage;
     });
@@ -189,8 +213,6 @@ export class CategoryAverageComponent {
         subCategoryId: option.id,
         label: this.stripEmojiPrefix(option.label),
         ...this.statFor('Gaming', option.id),
-        iconColorClass: 'text-cyan-400',
-        bgColorClass: 'bg-cyan-500/15 border-cyan-500/30',
         emoji: subcategoryEmojiMap[option.name] ?? '🎮',
       } satisfies CategoryAverage;
     });
@@ -210,21 +232,15 @@ export class CategoryAverageComponent {
 const FOOD_CONFIGS = [
   {
     category: 'Supermarket',
-    label: 'Supermarket Visit',
-    iconColor: 'text-emerald-400',
-    bgColor: 'bg-emerald-500/15 border-emerald-500/30',
+    label: 'Supermarket visit',
   },
   {
     category: 'EatingOut',
     label: 'Restaurant',
-    iconColor: 'text-rose-400',
-    bgColor: 'bg-rose-500/15 border-rose-500/30',
   },
   {
     category: 'Takeaway',
-    label: 'Takeaway Order',
-    iconColor: 'text-amber-400',
-    bgColor: 'bg-amber-500/15 border-amber-500/30',
+    label: 'Takeaway order',
   },
 ];
 

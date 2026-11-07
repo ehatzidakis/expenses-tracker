@@ -21,10 +21,11 @@ import { YearlyCategorySumsComponent } from '../yearly-category-sums/yearly-cate
           [loading]="monthQuery.isPending()"
           [error]="monthQuery.isError()"
           (selectTransaction)="selectTransaction.emit($event)"
+          (retry)="monthQuery.refetch()"
         />
       }
     } @loading {
-      <div class="mt-3 h-24 bg-gray-800/40 rounded-xl animate-pulse"></div>
+      <div class="mt-3 h-24 bg-raised/40 rounded-xl animate-pulse"></div>
     }
   `,
 })

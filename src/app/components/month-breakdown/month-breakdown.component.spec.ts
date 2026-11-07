@@ -68,7 +68,7 @@ describe('MonthBreakdownComponent', () => {
 
     const savedAmount = fixture.nativeElement.querySelector('.saved-amount');
     expect(component.monthSummaries()[0].saved).toBe(-100);
-    expect(savedAmount.classList.contains('text-red-300')).toBe(true);
-    expect(savedAmount.classList.contains('text-emerald-300')).toBe(false);
+    expect(savedAmount.classList.contains('text-cherry')).toBe(true);
+    expect(savedAmount.classList.contains('text-avocado-ink')).toBe(false);
   });
 });

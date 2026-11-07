@@ -1,0 +1,673 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-06T23:30:00Z",
+  "title": "Design System: Expenses Tracker",
+  "extensions": {
+    "colorMeta": {
+      "ground": {
+        "role": "neutral",
+        "displayName": "Walnut Ground",
+        "canonical": "#120d0a",
+        "oklch": "oklch(16.4% 0.011 52.7)",
+        "tonalRamp": [
+          "oklch(15.0% 0.003 52.7)",
+          "oklch(26.4% 0.005 52.7)",
+          "oklch(37.9% 0.007 52.7)",
+          "oklch(49.3% 0.009 52.7)",
+          "oklch(60.7% 0.010 52.7)",
+          "oklch(72.1% 0.008 52.7)",
+          "oklch(83.6% 0.006 52.7)",
+          "oklch(95.0% 0.004 52.7)"
+        ]
+      },
+      "panel": {
+        "role": "neutral",
+        "displayName": "Smoked Glass",
+        "canonical": "#1c1511",
+        "oklch": "oklch(20.3% 0.014 51.4)",
+        "tonalRamp": [
+          "oklch(15.0% 0.003 51.4)",
+          "oklch(26.4% 0.006 51.4)",
+          "oklch(37.9% 0.009 51.4)",
+          "oklch(49.3% 0.011 51.4)",
+          "oklch(60.7% 0.014 51.4)",
+          "oklch(72.1% 0.011 51.4)",
+          "oklch(83.6% 0.008 51.4)",
+          "oklch(95.0% 0.006 51.4)"
+        ]
+      },
+      "raised": {
+        "role": "neutral",
+        "displayName": "Raised Glass",
+        "canonical": "#261d17",
+        "oklch": "oklch(23.9% 0.018 55.4)",
+        "tonalRamp": [
+          "oklch(15.0% 0.004 55.4)",
+          "oklch(26.4% 0.008 55.4)",
+          "oklch(37.9% 0.011 55.4)",
+          "oklch(49.3% 0.015 55.4)",
+          "oklch(60.7% 0.018 55.4)",
+          "oklch(72.1% 0.014 55.4)",
+          "oklch(83.6% 0.011 55.4)",
+          "oklch(95.0% 0.007 55.4)"
+        ]
+      },
+      "raised-hi": {
+        "role": "neutral",
+        "displayName": "Raised Glass High",
+        "canonical": "#30251d",
+        "oklch": "oklch(27.5% 0.022 57.7)",
+        "tonalRamp": [
+          "oklch(15.0% 0.005 57.7)",
+          "oklch(26.4% 0.010 57.7)",
+          "oklch(37.9% 0.014 57.7)",
+          "oklch(49.3% 0.018 57.7)",
+          "oklch(60.7% 0.022 57.7)",
+          "oklch(72.1% 0.017 57.7)",
+          "oklch(83.6% 0.013 57.7)",
+          "oklch(95.0% 0.009 57.7)"
+        ]
+      },
+      "edge": {
+        "role": "neutral",
+        "displayName": "Teak Edge",
+        "canonical": "#3d2f25",
+        "oklch": "oklch(31.8% 0.027 57.1)",
+        "tonalRamp": [
+          "oklch(15.0% 0.007 57.1)",
+          "oklch(26.4% 0.012 57.1)",
+          "oklch(37.9% 0.017 57.1)",
+          "oklch(49.3% 0.022 57.1)",
+          "oklch(60.7% 0.026 57.1)",
+          "oklch(72.1% 0.021 57.1)",
+          "oklch(83.6% 0.016 57.1)",
+          "oklch(95.0% 0.011 57.1)"
+        ]
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "Cream",
+        "canonical": "#f1e6d2",
+        "oklch": "oklch(92.8% 0.029 82.6)",
+        "tonalRamp": [
+          "oklch(15.0% 0.007 82.6)",
+          "oklch(26.4% 0.013 82.6)",
+          "oklch(37.9% 0.018 82.6)",
+          "oklch(49.3% 0.024 82.6)",
+          "oklch(60.7% 0.029 82.6)",
+          "oklch(72.1% 0.023 82.6)",
+          "oklch(83.6% 0.018 82.6)",
+          "oklch(95.0% 0.012 82.6)"
+        ]
+      },
+      "ink-2": {
+        "role": "neutral",
+        "displayName": "Cream 2",
+        "canonical": "#d3c6b1",
+        "oklch": "oklch(83.2% 0.032 79.9)",
+        "tonalRamp": [
+          "oklch(15.0% 0.008 79.9)",
+          "oklch(26.4% 0.014 79.9)",
+          "oklch(37.9% 0.020 79.9)",
+          "oklch(49.3% 0.026 79.9)",
+          "oklch(60.7% 0.032 79.9)",
+          "oklch(72.1% 0.026 79.9)",
+          "oklch(83.6% 0.019 79.9)",
+          "oklch(95.0% 0.013 79.9)"
+        ]
+      },
+      "ink-3": {
+        "role": "neutral",
+        "displayName": "Cream 3",
+        "canonical": "#b0a08c",
+        "oklch": "oklch(71.4% 0.034 73.4)",
+        "tonalRamp": [
+          "oklch(15.0% 0.008 73.4)",
+          "oklch(26.4% 0.015 73.4)",
+          "oklch(37.9% 0.021 73.4)",
+          "oklch(49.3% 0.028 73.4)",
+          "oklch(60.7% 0.033 73.4)",
+          "oklch(72.1% 0.027 73.4)",
+          "oklch(83.6% 0.021 73.4)",
+          "oklch(95.0% 0.014 73.4)"
+        ]
+      },
+      "ink-4": {
+        "role": "neutral",
+        "displayName": "Cream 4",
+        "canonical": "#95836f",
+        "oklch": "oklch(62.1% 0.036 70.0)",
+        "tonalRamp": [
+          "oklch(15.0% 0.009 70.0)",
+          "oklch(26.4% 0.016 70.0)",
+          "oklch(37.9% 0.023 70.0)",
+          "oklch(49.3% 0.030 70.0)",
+          "oklch(60.7% 0.036 70.0)",
+          "oklch(72.1% 0.029 70.0)",
+          "oklch(83.6% 0.022 70.0)",
+          "oklch(95.0% 0.015 70.0)"
+        ]
+      },
+      "ember": {
+        "role": "primary",
+        "displayName": "Ember",
+        "canonical": "#e5703a",
+        "oklch": "oklch(67.4% 0.160 43.6)",
+        "tonalRamp": [
+          "oklch(15.0% 0.040 43.6)",
+          "oklch(26.4% 0.071 43.6)",
+          "oklch(37.9% 0.101 43.6)",
+          "oklch(49.3% 0.132 43.6)",
+          "oklch(60.7% 0.158 43.6)",
+          "oklch(72.1% 0.128 43.6)",
+          "oklch(83.6% 0.097 43.6)",
+          "oklch(95.0% 0.067 43.6)"
+        ]
+      },
+      "ember-ink": {
+        "role": "primary",
+        "displayName": "Ember Ink",
+        "canonical": "#ee7d48",
+        "oklch": "oklch(70.8% 0.155 44.4)",
+        "tonalRamp": [
+          "oklch(15.0% 0.039 44.4)",
+          "oklch(26.4% 0.068 44.4)",
+          "oklch(37.9% 0.098 44.4)",
+          "oklch(49.3% 0.127 44.4)",
+          "oklch(60.7% 0.153 44.4)",
+          "oklch(72.1% 0.123 44.4)",
+          "oklch(83.6% 0.094 44.4)",
+          "oklch(95.0% 0.064 44.4)"
+        ]
+      },
+      "ember-soft": {
+        "role": "primary",
+        "displayName": "Ember Soft",
+        "canonical": "#f2ae85",
+        "oklch": "oklch(80.6% 0.097 52.0)",
+        "tonalRamp": [
+          "oklch(15.0% 0.024 52.0)",
+          "oklch(26.4% 0.043 52.0)",
+          "oklch(37.9% 0.061 52.0)",
+          "oklch(49.3% 0.080 52.0)",
+          "oklch(60.7% 0.096 52.0)",
+          "oklch(72.1% 0.077 52.0)",
+          "oklch(83.6% 0.059 52.0)",
+          "oklch(95.0% 0.040 52.0)"
+        ]
+      },
+      "ember-deep": {
+        "role": "primary",
+        "displayName": "Ember Deep",
+        "canonical": "#3a1d10",
+        "oklch": "oklch(26.8% 0.051 44.2)",
+        "tonalRamp": [
+          "oklch(15.0% 0.013 44.2)",
+          "oklch(26.4% 0.022 44.2)",
+          "oklch(37.9% 0.032 44.2)",
+          "oklch(49.3% 0.042 44.2)",
+          "oklch(60.7% 0.050 44.2)",
+          "oklch(72.1% 0.040 44.2)",
+          "oklch(83.6% 0.031 44.2)",
+          "oklch(95.0% 0.021 44.2)"
+        ]
+      },
+      "avocado": {
+        "role": "secondary",
+        "displayName": "Avocado",
+        "canonical": "#8fa35a",
+        "oklch": "oklch(68.3% 0.101 121.7)",
+        "tonalRamp": [
+          "oklch(15.0% 0.025 121.7)",
+          "oklch(26.4% 0.044 121.7)",
+          "oklch(37.9% 0.064 121.7)",
+          "oklch(49.3% 0.083 121.7)",
+          "oklch(60.7% 0.100 121.7)",
+          "oklch(72.1% 0.080 121.7)",
+          "oklch(83.6% 0.061 121.7)",
+          "oklch(95.0% 0.042 121.7)"
+        ]
+      },
+      "avocado-ink": {
+        "role": "secondary",
+        "displayName": "Avocado Ink",
+        "canonical": "#a9bc74",
+        "oklch": "oklch(76.4% 0.098 120.8)",
+        "tonalRamp": [
+          "oklch(15.0% 0.024 120.8)",
+          "oklch(26.4% 0.043 120.8)",
+          "oklch(37.9% 0.062 120.8)",
+          "oklch(49.3% 0.080 120.8)",
+          "oklch(60.7% 0.097 120.8)",
+          "oklch(72.1% 0.078 120.8)",
+          "oklch(83.6% 0.059 120.8)",
+          "oklch(95.0% 0.041 120.8)"
+        ]
+      },
+      "avocado-deep": {
+        "role": "secondary",
+        "displayName": "Avocado Deep",
+        "canonical": "#263016",
+        "oklch": "oklch(29.2% 0.046 126.3)",
+        "tonalRamp": [
+          "oklch(15.0% 0.011 126.3)",
+          "oklch(26.4% 0.020 126.3)",
+          "oklch(37.9% 0.029 126.3)",
+          "oklch(49.3% 0.038 126.3)",
+          "oklch(60.7% 0.045 126.3)",
+          "oklch(72.1% 0.036 126.3)",
+          "oklch(83.6% 0.028 126.3)",
+          "oklch(95.0% 0.019 126.3)"
+        ]
+      },
+      "cherry": {
+        "role": "secondary",
+        "displayName": "Cherry",
+        "canonical": "#f0566b",
+        "oklch": "oklch(66.4% 0.189 15.9)",
+        "tonalRamp": [
+          "oklch(15.0% 0.047 15.9)",
+          "oklch(26.4% 0.083 15.9)",
+          "oklch(37.9% 0.119 15.9)",
+          "oklch(49.3% 0.155 15.9)",
+          "oklch(60.7% 0.186 15.9)",
+          "oklch(72.1% 0.151 15.9)",
+          "oklch(83.6% 0.115 15.9)",
+          "oklch(95.0% 0.079 15.9)"
+        ]
+      },
+      "cherry-fill": {
+        "role": "secondary",
+        "displayName": "Cherry Fill",
+        "canonical": "#a8283b",
+        "oklch": "oklch(48.7% 0.163 17.9)",
+        "tonalRamp": [
+          "oklch(15.0% 0.041 17.9)",
+          "oklch(26.4% 0.072 17.9)",
+          "oklch(37.9% 0.103 17.9)",
+          "oklch(49.3% 0.134 17.9)",
+          "oklch(60.7% 0.161 17.9)",
+          "oklch(72.1% 0.130 17.9)",
+          "oklch(83.6% 0.099 17.9)",
+          "oklch(95.0% 0.068 17.9)"
+        ]
+      },
+      "cherry-deep": {
+        "role": "secondary",
+        "displayName": "Cherry Deep",
+        "canonical": "#3a1418",
+        "oklch": "oklch(25.2% 0.060 16.1)",
+        "tonalRamp": [
+          "oklch(15.0% 0.015 16.1)",
+          "oklch(26.4% 0.027 16.1)",
+          "oklch(37.9% 0.038 16.1)",
+          "oklch(49.3% 0.050 16.1)",
+          "oklch(60.7% 0.060 16.1)",
+          "oklch(72.1% 0.048 16.1)",
+          "oklch(83.6% 0.037 16.1)",
+          "oklch(95.0% 0.025 16.1)"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "The period headline figure (money spent this month, trip total, the average month on Charts) and the Add tab amount. One per screen; All time and the average month clamp 30-40px."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Sign-in title, and the cream-3 euro sign beside the Add tab amount."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Sheet and dialog titles (Settings, Splitzes, Budgets and wage, confirmations), trip name, days-to-go count, secondary panel figures, the 18px saved figure beside the average month (18–20px; one-off In and Spent at 32px)."
+      },
+      "figure": {
+        "displayName": "Figure",
+        "purpose": "Inline panel totals: the saved figure under the month bar, In / Out / Net, and the Wage · Budgeted · Left to save summary (13-16px)."
+      },
+      "brand": {
+        "displayName": "Brand",
+        "purpose": "The uppercase Expenses wordmark in the header."
+      },
+      "section-heading": {
+        "displayName": "Section Heading",
+        "purpose": "Uppercase wide list headings: Categories, Recent, Month by month, Typical month, Typical costs, the kiosk's Requests. Never a kicker."
+      },
+      "body-lg": {
+        "displayName": "Body Large",
+        "purpose": "Row labels, setting and switch labels, primary, large secondary and destructive button labels, the friendly date label, the selected month on Charts, sub-section titles."
+      },
+      "field": {
+        "displayName": "Field",
+        "purpose": "Text inside every input, select and textarea, so iOS never zooms. The amount field is exempt."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Transaction descriptions, panel captions, disclosure labels."
+      },
+      "body-sm": {
+        "displayName": "Body Small",
+        "purpose": "Row amounts, pills, segment labels, tile names, field labels, secondary buttons, meta lines."
+      },
+      "caption": {
+        "displayName": "Caption",
+        "purpose": "Row status lines, captions under setting rows, a tile's EUR left figure, field errors, labels under panel figures, the version line."
+      },
+      "micro": {
+        "displayName": "Micro",
+        "purpose": "Tab labels, the date caption over the bar's notch (Fri. 6th), and every label inside the month chart: EUR ticks, months and years, the selected cap value, Budget and Wage labels."
+      }
+    },
+    "shadows": [
+      {
+        "name": "glass-top-edge",
+        "value": "inset 0 1px 0 rgb(241 230 210 / 0.06)",
+        "purpose": "Every summary panel: light catching the glass edge."
+      },
+      {
+        "name": "dropdown",
+        "value": "0 18px 40px -12px rgb(0 0 0 / 0.7)",
+        "purpose": "The More picker panel."
+      },
+      {
+        "name": "sheet",
+        "value": "0 -24px 60px -20px rgb(0 0 0 / 0.8)",
+        "purpose": "Bottom sheet, cast upward."
+      },
+      {
+        "name": "dialog",
+        "value": "0 24px 60px -20px rgb(0 0 0 / 0.8)",
+        "purpose": "The centred dialog, cast downward."
+      },
+      {
+        "name": "toast",
+        "value": "0 10px 30px -10px rgb(0 0 0 / 0.8)",
+        "purpose": "The update notice."
+      },
+      {
+        "name": "notch-ring",
+        "value": "0 0 0 2px var(--color-ground)",
+        "purpose": "Ground-coloured knockout around the budget bar's notch and the typical-month budget tick; not a glow."
+      },
+      {
+        "name": "sheet-backdrop",
+        "value": "background: rgb(8 5 4 / 0.72); backdrop-filter: blur(3px)",
+        "purpose": "Scrim behind the bottom sheet and the centred dialog."
+      },
+      {
+        "name": "label-knockout",
+        "value": "stroke: var(--color-ground); stroke-width: 3; paint-order: stroke",
+        "purpose": "Lifts the month chart's in-place Budget and Wage labels off their lines; a knockout, not a glow."
+      },
+      {
+        "name": "chart-scroll-fade",
+        "value": "28px linear-gradient(to right, var(--color-ground), transparent) overlay",
+        "purpose": "Over the month chart's left plot edge only while older months are scrolled out of view."
+      }
+    ],
+    "motion": [
+      {
+        "name": "ease-out-expo",
+        "value": "cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "The single curve for entrances and overlays."
+      },
+      {
+        "name": "bar-in",
+        "value": "scaleX(0) to scaleX(1) from the left, 700ms ease-out-expo",
+        "purpose": "Opt-in entrance (animate); used only by the month summary bar and the Add tab after-save bar."
+      },
+      {
+        "name": "sheet-up",
+        "value": "translateY(24px) and opacity 0 to rest, 380ms ease-out-expo",
+        "purpose": "Bottom sheet opening."
+      },
+      {
+        "name": "fade-in",
+        "value": "translateY(8px) scale(0.98) and opacity 0 to rest, 240ms ease-out-expo",
+        "purpose": "Centred dialogs settling in."
+      },
+      {
+        "name": "state-colour",
+        "value": "150ms",
+        "purpose": "Colour, border and opacity changes on pills, segments, tiles, fields, tabs, buttons and month chart columns; the switch thumb slides in the same 150ms."
+      },
+      {
+        "name": "chevron-turn",
+        "value": "200ms",
+        "purpose": "Disclosure chevrons turning over."
+      },
+      {
+        "name": "row-dim",
+        "value": "300ms",
+        "purpose": "Sibling rows dimming when one expands."
+      },
+      {
+        "name": "bar-width",
+        "value": "500ms ease-out",
+        "purpose": "Bar fill easing to new data."
+      },
+      {
+        "name": "typical-bar",
+        "value": "width and left 500ms ease-out-expo",
+        "purpose": "Typical-month bars and budget ticks easing to a new range."
+      },
+      {
+        "name": "reduced-motion",
+        "value": "animation-duration and transition-duration 0.01ms",
+        "purpose": "Global collapse under prefers-reduced-motion: reduce."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "base",
+        "value": "0px",
+        "note": "A single centred column, max 512px, 16px gutters, safe-area aware. It does not widen on desktop."
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The one solid ember action at the foot of a form or empty state.",
+      "html": "<button class=\"ds-btn-primary\">Save expense</button>",
+      "css": ".ds-btn-primary { min-height: 48px; padding: 0 16px; border: none; border-radius: 12px; background: var(--color-ember, #e5703a); color: var(--color-ground, #120d0a); font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif; font-size: 15px; font-weight: 600; cursor: pointer; transition: background-color 150ms, transform 150ms; } .ds-btn-primary:hover { background: var(--color-ember-ink, #ee7d48); } .ds-btn-primary:active { transform: scale(0.99); } .ds-btn-primary:focus-visible { outline: 2px solid var(--color-ember, #e5703a); outline-offset: 2px; } .ds-btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Outline row action: Settle up, Set passcode, data export, Try again. A 48px Secondary Large (15px) is its own style for a Cancel beside a 48px action.",
+      "html": "<button class=\"ds-btn-secondary\">Try again</button>",
+      "css": ".ds-btn-secondary { min-height: 44px; padding: 0 16px; border: 1px solid var(--color-edge, #3d2f25); border-radius: 12px; background: transparent; color: var(--color-ink-2, #d3c6b1); font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif; font-size: 13px; font-weight: 500; cursor: pointer; transition: color 150ms, border-color 150ms; } .ds-btn-secondary:hover { border-color: var(--color-ink-4, #95836f); color: var(--color-ink, #f1e6d2); } .ds-btn-secondary:focus-visible { outline: 2px solid var(--color-ember, #e5703a); outline-offset: 2px; } .ds-btn-secondary:disabled { opacity: 0.4; cursor: not-allowed; }"
+    },
+    {
+      "name": "Destructive Button",
+      "kind": "button",
+      "refersTo": "button-danger",
+      "description": "Delete, Sign out, Send reason: a cherry outline, never a solid red fill. A 44px, 13px Destructive Small is its own style for setting rows.",
+      "html": "<button class=\"ds-btn-danger\">Delete expense</button>",
+      "css": ".ds-btn-danger { min-height: 48px; padding: 0 16px; border: 1px solid rgb(240 86 107 / 0.35); border-radius: 12px; background: transparent; color: var(--color-cherry, #f0566b); font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif; font-size: 15px; font-weight: 500; cursor: pointer; transition: background-color 150ms;  } .ds-btn-danger:hover { background: rgb(58 20 24 / 0.5); } .ds-btn-danger:focus-visible { outline: 2px solid var(--color-ember, #e5703a); outline-offset: 2px; } .ds-btn-danger:disabled { opacity: 0.4; cursor: not-allowed; }"
+    },
+    {
+      "name": "Period Pills",
+      "kind": "chip",
+      "refersTo": "pill-active",
+      "description": "Shared 44px pills: recent months or trips sharing one row with a dashed More picker; the same pills carry the split row and recurring picks.",
+      "html": "<div class=\"ds-pills\"><button class=\"ds-pill ds-pill--on\">Nov 2026</button><button class=\"ds-pill\">Oct 2026</button><button class=\"ds-pill\">Sep 2026</button><button class=\"ds-pill ds-pill--more\">More <svg width=\"12\" height=\"12\" viewBox=\"0 0 20 20\" fill=\"currentColor\" aria-hidden=\"true\"><path fill-rule=\"evenodd\" d=\"M5.23 7.21a.75.75 0 011.06.02L10 11.17l3.71-3.94a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z\" clip-rule=\"evenodd\"/></svg></button></div>",
+      "css": ".ds-pills { display: flex; gap: 8px; max-width: 360px; } .ds-pill { flex: 1 1 0; min-width: 0; min-height: 44px; padding: 0 12px; border: 1px solid var(--color-edge, #3d2f25); border-radius: 12px; background: transparent; color: var(--color-ink-2, #d3c6b1); font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif; font-size: 13px; font-weight: 500; white-space: nowrap; cursor: pointer; transition: color 150ms, border-color 150ms; } .ds-pill:hover { border-color: var(--color-ink-4, #95836f); color: var(--color-ink, #f1e6d2); } .ds-pill--on, .ds-pill--on:hover { background: var(--color-ember, #e5703a); border-color: var(--color-ember, #e5703a); color: var(--color-ground, #120d0a); } .ds-pill--more { flex: 1.3 1 0; display: inline-flex; align-items: center; justify-content: center; gap: 4px; border-style: dashed; } .ds-pill:focus-visible { outline: 2px solid var(--color-ember, #e5703a); outline-offset: 2px; }"
+    },
+    {
+      "name": "Segmented Switch",
+      "kind": "chip",
+      "refersTo": "segment-active",
+      "description": "Month / Trips / One-offs, Transaction / Trip / One-off, and two-way form choices, from the shared segment styles.",
+      "html": "<div class=\"ds-seg\" role=\"group\" aria-label=\"Period\"><button class=\"ds-seg-btn ds-seg-btn--on\" aria-pressed=\"true\">Month</button><button class=\"ds-seg-btn\" aria-pressed=\"false\">Trips</button><button class=\"ds-seg-btn\" aria-pressed=\"false\">One-offs</button></div>",
+      "css": ".ds-seg { display: grid; grid-template-columns: repeat(3, 1fr); padding: 2px; border: 1px solid var(--color-edge, #3d2f25); border-radius: 12px; max-width: 360px; } .ds-seg-btn { min-height: 44px; border: none; border-radius: 10px; background: transparent; color: var(--color-ink-3, #b0a08c); font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif; font-size: 13px; font-weight: 500; cursor: pointer; transition: color 150ms, background-color 150ms; } .ds-seg-btn:hover { color: var(--color-ink, #f1e6d2); } .ds-seg-btn--on { background: rgb(229 112 58 / 0.2); color: var(--color-ink, #f1e6d2); box-shadow: inset 0 0 0 1px rgb(229 112 58 / 0.6); } .ds-seg-btn:focus-visible { outline: 2px solid var(--color-ember, #e5703a); outline-offset: 2px; }"
+    },
+    {
+      "name": "Text Field",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "The shared field: 48px smoked glass, teak edge, 16px text; the border turns ember on focus.",
+      "html": "<label class=\"ds-field\">Description<input class=\"ds-input\" type=\"text\" placeholder=\"What was it?\"></label>",
+      "css": ".ds-field { display: flex; flex-direction: column; gap: 6px; max-width: 320px; color: var(--color-ink-2, #d3c6b1); font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif; font-size: 13px; font-weight: 500; } .ds-input { min-height: 48px; padding: 0 14px; border: 1px solid var(--color-edge, #3d2f25); border-radius: 12px; background: var(--color-panel, #1c1511); color: var(--color-ink, #f1e6d2); font-family: inherit; font-size: 16px; outline: none; caret-color: var(--color-ember, #e5703a); transition: border-color 150ms; } .ds-input::placeholder { color: var(--color-ink-4, #95836f); opacity: 1; } .ds-input:focus { border-color: var(--color-ember, #e5703a); }"
+    },
+    {
+      "name": "Amount Field",
+      "kind": "input",
+      "refersTo": "amount-field",
+      "description": "The Add tab headline: the amount typed at display size over a bottom rule that turns ember on focus.",
+      "html": "<label class=\"ds-amount\"><span class=\"ds-amount-eur\" aria-hidden=\"true\">€</span><input class=\"ds-amount-input\" type=\"text\" inputmode=\"decimal\" placeholder=\"0.00\" aria-label=\"Amount\"></label>",
+      "css": ".ds-amount { display: flex; align-items: baseline; gap: 6px; max-width: 360px; padding-bottom: 8px; border-bottom: 1px solid var(--color-edge, #3d2f25); transition: border-color 150ms; } .ds-amount:focus-within { border-color: var(--color-ember, #e5703a); } .ds-amount-eur { font-family: 'Archivo', ui-sans-serif, system-ui, sans-serif; font-stretch: 125%; font-size: 26px; font-weight: 700; color: var(--color-ink-3, #b0a08c); } .ds-amount-input { flex: 1; min-width: 0; border: none; outline: none; background: transparent; color: var(--color-ink, #f1e6d2); caret-color: var(--color-ember, #e5703a); font-family: 'Archivo', ui-sans-serif, system-ui, sans-serif; font-stretch: 125%; font-variant-numeric: tabular-nums; font-size: 40px; font-weight: 700; line-height: 1.1; letter-spacing: -0.02em; } .ds-amount-input::placeholder { color: var(--color-ink-4, #95836f); opacity: 1; }"
+    },
+    {
+      "name": "Category Picker",
+      "kind": "custom",
+      "refersTo": "category-tile",
+      "description": "The Add tab's category keyboard: 3-column tiles showing what is left this month; the picked tile takes the ember well.",
+      "html": "<div class=\"ds-tiles\" role=\"group\" aria-label=\"Category\"><button class=\"ds-tile\" aria-pressed=\"false\"><span class=\"ds-tile-name\">Groceries</span><span class=\"ds-tile-room\"><span class=\"ds-tile-glyph\" aria-hidden=\"true\">🛒</span><span class=\"ds-left\">€180.00 left</span></span></button><button class=\"ds-tile ds-tile--on\" aria-pressed=\"true\"><span class=\"ds-tile-name\">Eating out</span><span class=\"ds-tile-room\"><span class=\"ds-tile-glyph\" aria-hidden=\"true\">🍽️</span><span class=\"ds-over\">€20.00 over</span></span></button><button class=\"ds-tile\" aria-pressed=\"false\"><span class=\"ds-tile-name\">Takeaway</span><span class=\"ds-tile-room\"><span class=\"ds-tile-glyph\" aria-hidden=\"true\">🥡</span><span class=\"ds-left\">€55.00 left</span></span></button><button class=\"ds-tile\" aria-pressed=\"false\"><span class=\"ds-tile-name\">Pets</span><span class=\"ds-tile-room\"><span class=\"ds-tile-glyph\" aria-hidden=\"true\">🐈</span><span class=\"ds-left\">€30.00 left</span></span></button><button class=\"ds-tile\" aria-pressed=\"false\"><span class=\"ds-tile-name\">Gym</span><span class=\"ds-tile-room\"><span class=\"ds-tile-glyph\" aria-hidden=\"true\">🏋️</span><span class=\"ds-none\">No budget</span></span></button><button class=\"ds-tile\" aria-pressed=\"false\"><span class=\"ds-tile-name\">Travel</span><span class=\"ds-tile-room\"><span class=\"ds-tile-glyph\" aria-hidden=\"true\">🚆</span><span class=\"ds-left\">€40.00 left</span></span></button></div>",
+      "css": ".ds-tiles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; max-width: 360px; } .ds-tile { display: flex; flex-direction: column; justify-content: center; gap: 4px; min-width: 0; min-height: 60px; padding: 8px; border: 1px solid var(--color-edge, #3d2f25); border-radius: 12px; background: transparent; text-align: left; font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif; cursor: pointer; transition: border-color 150ms, background-color 150ms; } .ds-tile:hover { border-color: var(--color-ink-4, #95836f); } .ds-tile--on, .ds-tile--on:hover { border-color: transparent; background: rgb(229 112 58 / 0.2); box-shadow: inset 0 0 0 1px rgb(229 112 58 / 0.6); } .ds-tile:focus-visible { outline: 2px solid var(--color-ember, #e5703a); outline-offset: 2px; } .ds-tile-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 13px; font-weight: 500; line-height: 1.25; color: var(--color-ink, #f1e6d2); } .ds-tile-room { display: flex; align-items: center; gap: 6px; min-width: 0; font-size: 12px; font-variant-numeric: tabular-nums; } .ds-tile-room span:last-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; } .ds-tile-glyph { font-size: 11px; opacity: 0.6; filter: grayscale(40%); } .ds-left { color: var(--color-ink-3, #b0a08c); } .ds-over { color: var(--color-cherry, #f0566b); font-weight: 600; } .ds-none { color: var(--color-ink-4, #95836f); }"
+    },
+    {
+      "name": "Docked Tab Bar",
+      "kind": "nav",
+      "refersTo": "tab-bar",
+      "description": "Four tabs on smoked glass, docked to the bottom edge; an ember rule tops the current one.",
+      "html": "<nav class=\"ds-tabs\" aria-label=\"Main\"><button class=\"ds-tab ds-tab--on\" aria-current=\"page\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.7\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M3.5 7.5h17M3.5 12h17M3.5 16.5h10\"/></svg>Budget</button><button class=\"ds-tab\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.7\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M12 2 2 7l10 5 10-5-10-5z\"/><path d=\"M2 17l10 5 10-5\"/><path d=\"M2 12l10 5 10-5\"/></svg>All time</button><button class=\"ds-tab\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.7\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"12\" r=\"9\"/><path d=\"M12 8v8M8 12h8\"/></svg>Add</button><button class=\"ds-tab\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.7\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M5 20V11M12 20V5M19 20v-6\"/></svg>Charts</button></nav>",
+      "css": ".ds-tabs { display: flex; max-width: 390px; border-top: 1px solid rgb(241 230 210 / 0.1); background: rgb(28 21 17 / 0.9); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); } .ds-tab { position: relative; flex: 1; min-height: 54px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; border: none; background: transparent; color: var(--color-ink-3, #b0a08c); font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif; font-size: 11px; font-weight: 500; cursor: pointer; transition: color 150ms; } .ds-tab svg { width: 22px; height: 22px; } .ds-tab:hover { color: var(--color-ink, #f1e6d2); } .ds-tab--on, .ds-tab--on:hover { color: var(--color-ember-ink, #ee7d48); } .ds-tab--on::before { content: ''; position: absolute; top: 0; left: 24px; right: 24px; height: 2px; border-radius: 0 0 9999px 9999px; background: var(--color-ember, #e5703a); } .ds-tab:focus-visible { outline: 2px solid var(--color-ember, #e5703a); outline-offset: -2px; }"
+    },
+    {
+      "name": "Month Summary Panel",
+      "kind": "card",
+      "refersTo": "summary-panel",
+      "description": "The only panel on the page: money spent this month, days to go, the large bar notched at today, and saved (wage minus spent).",
+      "html": "<section class=\"ds-sum\"><div class=\"ds-sum-top\"><div><p class=\"ds-sum-hero\">€420.00</p><p class=\"ds-sum-cap\">spent this month</p></div><div class=\"ds-sum-side\"><p class=\"ds-sum-days\">24</p><p class=\"ds-sum-meta\">days to go</p></div></div><div class=\"ds-bar-lg\" style=\"--fill:35%;--notch:20%\"><span class=\"ds-today\">Fri. 6th</span><span class=\"ds-track\"><i></i></span><b></b></div><p class=\"ds-sum-saved\"><span class=\"ds-sum-good\">€780.00</span> saved this month</p></section>",
+      "css": ".ds-sum { max-width: 360px; padding: 16px 20px 20px; border: 1px solid rgb(241 230 210 / 0.1); border-radius: 16px; background: var(--color-panel, #1c1511); box-shadow: inset 0 1px 0 rgb(241 230 210 / 0.06); color: var(--color-ink, #f1e6d2); font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif; } .ds-sum p { margin: 0; } .ds-sum-top { display: flex; justify-content: space-between; gap: 16px; } .ds-sum-hero { font-family: 'Archivo', ui-sans-serif, system-ui, sans-serif; font-stretch: 125%; font-variant-numeric: tabular-nums; font-size: 40px; font-weight: 700; line-height: 1; letter-spacing: -0.02em; } .ds-sum .ds-sum-cap { margin-top: 8px; font-size: 14px; color: var(--color-ink-2, #d3c6b1); } .ds-sum-side { padding-top: 4px; text-align: right; } .ds-sum-days { font-family: 'Archivo', ui-sans-serif, system-ui, sans-serif; font-stretch: 125%; font-variant-numeric: tabular-nums; font-size: 20px; font-weight: 600; line-height: 1; } .ds-sum .ds-sum-meta { margin-top: 6px; font-size: 12px; color: var(--color-ink-3, #b0a08c); } .ds-bar-lg { position: relative; padding: 22px 0 6px; } .ds-track { display: block; height: 8px; border-radius: 9999px; background: rgb(241 230 210 / 0.07); overflow: hidden; } .ds-track i { display: block; height: 100%; width: var(--fill); border-radius: 9999px; background: var(--color-ember, #e5703a); transform-origin: left center; animation: ds-bar-in 700ms cubic-bezier(0.16, 1, 0.3, 1) both; } .ds-bar-lg.ds-over .ds-track i { background: var(--color-cherry, #f0566b); } .ds-bar-lg b { position: absolute; top: 16px; bottom: 0; left: var(--notch); width: 2px; transform: translateX(-50%); border-radius: 9999px; background: var(--color-ink, #f1e6d2); box-shadow: 0 0 0 2px var(--color-ground, #120d0a); } .ds-today { position: absolute; top: 0; left: var(--notch); transform: translateX(-50%); font-size: 11px; line-height: 1; white-space: nowrap; color: var(--color-ink-2, #d3c6b1); } @keyframes ds-bar-in { from { transform: scaleX(0); } to { transform: scaleX(1); } } .ds-sum .ds-sum-saved { margin-top: 8px; font-size: 13px; color: var(--color-ink-2, #d3c6b1); } .ds-sum-good { font-family: 'Archivo', ui-sans-serif, system-ui, sans-serif; font-stretch: 125%; font-variant-numeric: tabular-nums; font-weight: 600; color: var(--color-avocado, #8fa35a); } @media (prefers-reduced-motion: reduce) { .ds-track i { animation: none; } }"
+    },
+    {
+      "name": "Breakdown Row",
+      "kind": "custom",
+      "refersTo": "breakdown-row",
+      "description": "A category on the ground between hairlines: label, amount over budget, the small single bar (no notch), and a status line. Sorted by amount spent.",
+      "html": "<div class=\"ds-rows\"><button class=\"ds-row\"><span class=\"ds-row-top\"><span class=\"ds-row-name\">Eating out</span><span class=\"ds-row-amt\">€140.00 <em>/ €120.00</em></span></span><span class=\"ds-bar-sm ds-over\"><span class=\"ds-track-sm\"><i style=\"width:100%\"></i></span></span><span class=\"ds-row-foot\"><span class=\"ds-st-over\">€20.00 over</span><span class=\"ds-row-meta\">4 transactions <svg width=\"14\" height=\"14\" viewBox=\"0 0 20 20\" fill=\"currentColor\" aria-hidden=\"true\"><path fill-rule=\"evenodd\" d=\"M5.23 7.21a.75.75 0 011.06.02L10 11.17l3.71-3.94a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z\" clip-rule=\"evenodd\"/></svg></span></span></button><button class=\"ds-row\"><span class=\"ds-row-top\"><span class=\"ds-row-name\">Groceries</span><span class=\"ds-row-amt\">€120.00 <em>/ €300.00</em></span></span><span class=\"ds-bar-sm\"><span class=\"ds-track-sm\"><i style=\"width:40%\"></i></span></span><span class=\"ds-row-foot\"><span class=\"ds-st-ok\">€180.00 left</span><span class=\"ds-row-meta\">6 transactions <svg width=\"14\" height=\"14\" viewBox=\"0 0 20 20\" fill=\"currentColor\" aria-hidden=\"true\"><path fill-rule=\"evenodd\" d=\"M5.23 7.21a.75.75 0 011.06.02L10 11.17l3.71-3.94a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z\" clip-rule=\"evenodd\"/></svg></span></span></button><button class=\"ds-row\"><span class=\"ds-row-top\"><span class=\"ds-row-name\">Takeaway</span><span class=\"ds-row-amt\">€45.00 <em>/ €100.00</em></span></span><span class=\"ds-bar-sm\"><span class=\"ds-track-sm\"><i style=\"width:45%\"></i></span></span><span class=\"ds-row-foot\"><span class=\"ds-st-ahead\">€25.00 ahead of pace</span><span class=\"ds-row-meta\">2 transactions <svg width=\"14\" height=\"14\" viewBox=\"0 0 20 20\" fill=\"currentColor\" aria-hidden=\"true\"><path fill-rule=\"evenodd\" d=\"M5.23 7.21a.75.75 0 011.06.02L10 11.17l3.71-3.94a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z\" clip-rule=\"evenodd\"/></svg></span></span></button></div>",
+      "css": ".ds-rows { max-width: 360px; border-top: 1px solid rgb(241 230 210 / 0.1); } .ds-row { display: block; width: 100%; min-height: 56px; padding: 10px 0; border: none; border-bottom: 1px solid rgb(241 230 210 / 0.1); background: transparent; text-align: left; color: var(--color-ink, #f1e6d2); font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif; cursor: pointer; } .ds-row:focus-visible { outline: 2px solid var(--color-ember, #e5703a); outline-offset: 2px; } .ds-row-top, .ds-row-foot { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; } .ds-row-name { font-size: 15px; font-weight: 500; } .ds-row-amt { font-size: 13px; font-variant-numeric: tabular-nums; } .ds-row-amt em { font-style: normal; color: var(--color-ink-3, #b0a08c); } .ds-bar-sm { display: block; margin-top: 4px; padding: 4px 0; } .ds-track-sm { display: block; height: 4px; border-radius: 9999px; background: rgb(241 230 210 / 0.07); overflow: hidden; } .ds-track-sm i { display: block; height: 100%; border-radius: 9999px; background: var(--color-ember, #e5703a); transition: width 500ms ease-out; } .ds-bar-sm.ds-over .ds-track-sm i { background: var(--color-cherry, #f0566b); } .ds-row-foot { font-size: 12px; color: var(--color-ink-3, #b0a08c); } .ds-row-meta { display: inline-flex; align-items: center; gap: 4px; } .ds-st-over { color: var(--color-cherry, #f0566b); font-weight: 600; } .ds-st-ahead { color: var(--color-ember-ink, #ee7d48); font-weight: 600; } .ds-st-ok { color: var(--color-avocado, #8fa35a); }"
+    },
+    {
+      "name": "Month Chart",
+      "kind": "custom",
+      "refersTo": "chart-column",
+      "description": "Ember columns on hairline EUR gridlines with a fixed tick column, the budget as one cream-3 line and each month's wage as a short avocado mark, labelled in place. Unselected at 50%; over-budget months solid cherry-fill.",
+      "html": "<div class=\"ds-mc\"><div class=\"ds-mc-axis\" aria-hidden=\"true\"><span style=\"top:22px\">€1,500</span><span style=\"top:96px\">€750</span><span style=\"top:170px\">€0</span></div><svg width=\"300\" height=\"206\" viewBox=\"0 0 300 206\" role=\"group\" aria-label=\"Spending per month\"><line class=\"ds-mc-grid\" x1=\"0\" x2=\"296\" y1=\"22.5\" y2=\"22.5\"/><line class=\"ds-mc-grid\" x1=\"0\" x2=\"296\" y1=\"96.5\" y2=\"96.5\"/><line class=\"ds-mc-grid\" x1=\"0\" x2=\"296\" y1=\"170.5\" y2=\"170.5\"/><line class=\"ds-mc-budget\" x1=\"0\" x2=\"296\" y1=\"60.5\" y2=\"60.5\"/><text class=\"ds-mc-lbl ds-mc-lbl-b\" x=\"296\" y=\"55\" text-anchor=\"end\">Budget €1,200</text><text class=\"ds-mc-lbl ds-mc-lbl-w\" x=\"296\" y=\"30\" text-anchor=\"end\">Wage €1,400</text><line class=\"ds-mc-wage\" x1=\"9\" x2=\"55\" y1=\"36\" y2=\"36\"/><line class=\"ds-mc-wage\" x1=\"59\" x2=\"105\" y1=\"36\" y2=\"36\"/><line class=\"ds-mc-wage\" x1=\"109\" x2=\"155\" y1=\"36\" y2=\"36\"/><line class=\"ds-mc-wage\" x1=\"159\" x2=\"205\" y1=\"36\" y2=\"36\"/><line class=\"ds-mc-wage\" x1=\"209\" x2=\"255\" y1=\"36\" y2=\"36\"/><path class=\"ds-mc-col\" d=\"M20,170 V94 Q20,90 24,90 H40 Q44,90 44,94 V170 Z\"/><path class=\"ds-mc-col\" d=\"M70,170 V84 Q70,80 74,80 H90 Q94,80 94,84 V170 Z\"/><path class=\"ds-mc-col ds-mc-over\" d=\"M120,170 V44 Q120,40 124,40 H140 Q144,40 144,44 V170 Z\"/><path class=\"ds-mc-col\" d=\"M170,170 V104 Q170,100 174,100 H190 Q194,100 194,104 V170 Z\"/><path class=\"ds-mc-col ds-mc-sel\" d=\"M220,170 V124 Q220,120 224,120 H240 Q244,120 244,124 V170 Z\"/><text class=\"ds-mc-cap\" x=\"232\" y=\"114\" text-anchor=\"middle\">€420</text><text class=\"ds-mc-m\" x=\"32\" y=\"185\" text-anchor=\"middle\">Jul</text><text class=\"ds-mc-m\" x=\"32\" y=\"199\" text-anchor=\"middle\">'26</text><text class=\"ds-mc-m\" x=\"82\" y=\"185\" text-anchor=\"middle\">Aug</text><text class=\"ds-mc-m\" x=\"132\" y=\"185\" text-anchor=\"middle\">Sep</text><text class=\"ds-mc-m\" x=\"182\" y=\"185\" text-anchor=\"middle\">Oct</text><text class=\"ds-mc-m ds-mc-m-on\" x=\"232\" y=\"185\" text-anchor=\"middle\">Nov</text><rect class=\"ds-mc-hit\" x=\"0\" y=\"0\" width=\"300\" height=\"206\" fill=\"transparent\" tabindex=\"0\" role=\"slider\" aria-label=\"Month\" aria-valuemin=\"0\" aria-valuemax=\"4\" aria-valuenow=\"4\" aria-valuetext=\"November 2026\"/></svg><p class=\"ds-mc-key\"><i aria-hidden=\"true\"></i>Red months went over budget</p></div>",
+      "css": ".ds-mc { position: relative; display: flex; flex-wrap: wrap; max-width: 360px; font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif; } .ds-mc-axis { position: relative; width: 44px; height: 206px; flex-shrink: 0; } .ds-mc-axis span { position: absolute; right: 8px; transform: translateY(-50%); font-size: 11px; line-height: 1; color: var(--color-ink-3, #b0a08c); font-variant-numeric: tabular-nums; } .ds-mc svg { display: block; overflow: visible; } .ds-mc-grid { stroke: rgb(241 230 210 / 0.1); stroke-width: 1; shape-rendering: crispEdges; } .ds-mc-budget { stroke: var(--color-ink-3, #b0a08c); stroke-width: 1; shape-rendering: crispEdges; } .ds-mc-wage { stroke: var(--color-avocado, #8fa35a); stroke-width: 2; stroke-linecap: round; } .ds-mc-lbl { font-size: 11px; stroke: var(--color-ground, #120d0a); stroke-width: 3; paint-order: stroke; } .ds-mc-lbl-b { fill: var(--color-ink-3, #b0a08c); } .ds-mc-lbl-w { fill: var(--color-avocado-ink, #a9bc74); } .ds-mc-col { fill: var(--color-ember, #e5703a); opacity: 0.5; transition: opacity 150ms; } .ds-mc-sel { opacity: 1; } .ds-mc-over { fill: var(--color-cherry-fill, #a8283b); opacity: 1; } .ds-mc-over.ds-mc-sel { fill: var(--color-cherry, #f0566b); } .ds-mc-cap { font-size: 11px; font-weight: 500; fill: var(--color-ink-2, #d3c6b1); font-variant-numeric: tabular-nums; } .ds-mc-m { font-size: 11px; fill: var(--color-ink-3, #b0a08c); } .ds-mc-m-on { fill: var(--color-ink, #f1e6d2); font-weight: 600; } .ds-mc-hit { cursor: pointer; outline: none; stroke-width: 2; } .ds-mc-hit:focus-visible { stroke: var(--color-ember, #e5703a); } .ds-mc-key { flex-basis: 100%; display: flex; align-items: center; gap: 6px; margin: 8px 0 0; font-size: 12px; color: var(--color-ink-3, #b0a08c); } .ds-mc-key i { width: 10px; height: 10px; border-radius: 2px; background: var(--color-cherry-fill, #a8283b); }"
+    },
+    {
+      "name": "Typical Month Row",
+      "kind": "custom",
+      "refersTo": "typical-row",
+      "description": "Ranked categories by monthly average on one shared EUR scale: an ember bar (cherry when over) and a cream budget tick cut out by a ground ring. Eases 500ms on expo-out when the range changes.",
+      "html": "<ul class=\"ds-tm\"><li><div class=\"ds-tm-top\"><span class=\"ds-tm-name\"><i aria-hidden=\"true\">🛒</i>Groceries</span><span class=\"ds-tm-amt\">€240.00 <em>/ €280</em></span></div><div class=\"ds-tm-bar\" aria-hidden=\"true\"><span class=\"ds-tm-track\"></span><span class=\"ds-tm-fill\" style=\"width:86%\"></span><span class=\"ds-tm-tick\" style=\"left:100%\"></span></div></li><li><div class=\"ds-tm-top\"><span class=\"ds-tm-name\"><i aria-hidden=\"true\">🚆</i>Travel</span><span class=\"ds-tm-amt\">€60.00 <em>/ €30</em></span></div><div class=\"ds-tm-bar\" aria-hidden=\"true\"><span class=\"ds-tm-track\"></span><span class=\"ds-tm-fill ds-tm-over\" style=\"width:21%\"></span><span class=\"ds-tm-tick\" style=\"left:11%\"></span></div><p class=\"ds-tm-warn\">€30.00 over budget on average</p></li><li><div class=\"ds-tm-top\"><span class=\"ds-tm-name\"><i aria-hidden=\"true\">🐈</i>Pets</span><span class=\"ds-tm-amt\">€40.00 <em>/ €50</em></span></div><div class=\"ds-tm-bar\" aria-hidden=\"true\"><span class=\"ds-tm-track\"></span><span class=\"ds-tm-fill\" style=\"width:14%\"></span><span class=\"ds-tm-tick\" style=\"left:18%\"></span></div></li></ul>",
+      "css": ".ds-tm { max-width: 360px; margin: 0; padding: 0; list-style: none; border-top: 1px solid rgb(241 230 210 / 0.1); font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif; } .ds-tm li { padding: 10px 0; border-bottom: 1px solid rgb(241 230 210 / 0.1); } .ds-tm-top { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; } .ds-tm-name { display: flex; align-items: baseline; gap: 8px; font-size: 15px; font-weight: 500; color: var(--color-ink, #f1e6d2); } .ds-tm-name i { width: 20px; font-style: normal; font-size: 13px; opacity: 0.6; filter: grayscale(40%); } .ds-tm-amt { font-size: 13px; font-variant-numeric: tabular-nums; color: var(--color-ink, #f1e6d2); } .ds-tm-amt em { font-style: normal; color: var(--color-ink-3, #b0a08c); } .ds-tm-bar { position: relative; height: 12px; margin: 6px 0 0 28px; } .ds-tm-track, .ds-tm-fill { position: absolute; left: 0; top: 4px; height: 4px; border-radius: 9999px; } .ds-tm-track { right: 0; background: rgb(241 230 210 / 0.07); } .ds-tm-fill { background: var(--color-ember, #e5703a); transition: width 500ms cubic-bezier(0.16, 1, 0.3, 1); } .ds-tm-over { background: var(--color-cherry, #f0566b); } .ds-tm-tick { position: absolute; top: 0; width: 2px; height: 12px; transform: translateX(-50%); border-radius: 9999px; background: var(--color-ink, #f1e6d2); box-shadow: 0 0 0 2px var(--color-ground, #120d0a); transition: left 500ms cubic-bezier(0.16, 1, 0.3, 1); } .ds-tm-warn { margin: 4px 0 0 28px; font-size: 12px; font-weight: 600; color: var(--color-cherry, #f0566b); }"
+    },
+    {
+      "name": "Setting Rows with Switch",
+      "kind": "custom",
+      "refersTo": "setting-row",
+      "description": "The Settings ledger: 56px hairline rows with a 15px label and 12px caption. An on/off row is one role=\"switch\" control with a 48x28 track, ember when on, raised-hi with a teak edge when off; a navigation row ends in a chevron.",
+      "html": "<div class=\"ds-set\"><button type=\"button\" class=\"ds-set-row\" role=\"switch\" aria-checked=\"true\" onclick=\"this.setAttribute('aria-checked', this.getAttribute('aria-checked') !== 'true')\"><span><span class=\"ds-set-label\">Stealth mode</span><span class=\"ds-set-cap\">Hides amounts on this device</span></span><span class=\"ds-switch\" aria-hidden=\"true\"><span class=\"ds-thumb\"></span></span></button><button type=\"button\" class=\"ds-set-row\" role=\"switch\" aria-checked=\"false\" onclick=\"this.setAttribute('aria-checked', this.getAttribute('aria-checked') !== 'true')\"><span><span class=\"ds-set-label\">Notifications</span><span class=\"ds-set-cap\">Requests and splits on this phone</span></span><span class=\"ds-switch\" aria-hidden=\"true\"><span class=\"ds-thumb\"></span></span></button><button type=\"button\" class=\"ds-set-row\"><span><span class=\"ds-set-label\">Budgets and wage</span><span class=\"ds-set-cap\">Your wage and each category's monthly budget</span></span><span class=\"ds-chev\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 20 20\" fill=\"currentColor\" aria-hidden=\"true\"><path fill-rule=\"evenodd\" clip-rule=\"evenodd\" d=\"M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z\"/></svg></span></button></div>",
+      "css": ".ds-set { max-width: 360px; border-top: 1px solid rgb(241 230 210 / 0.1); font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif; } .ds-set-row { display: flex; width: 100%; min-height: 56px; align-items: center; justify-content: space-between; gap: 16px; padding: 10px 0; border: none; border-bottom: 1px solid rgb(241 230 210 / 0.1); background: transparent; text-align: left; cursor: pointer; } .ds-set-row:focus-visible { outline: 2px solid var(--color-ember, #e5703a); outline-offset: 2px; } .ds-set-label { display: block; font-size: 15px; font-weight: 500; color: var(--color-ink, #f1e6d2); } .ds-set-cap { display: block; margin-top: 2px; font-size: 12px; color: var(--color-ink-2, #d3c6b1); } .ds-chev { display: inline-flex; flex-shrink: 0; color: var(--color-ink-3, #b0a08c); } .ds-switch { position: relative; display: inline-flex; flex-shrink: 0; align-items: center; width: 48px; height: 28px; border-radius: 9999px; border: 1px solid var(--color-edge, #3d2f25); background: var(--color-raised-hi, #30251d); transition: background-color 150ms, border-color 150ms; } .ds-thumb { position: absolute; left: 2px; width: 22px; height: 22px; border-radius: 9999px; background: var(--color-ink-3, #b0a08c); transition: transform 150ms, background-color 150ms; } [aria-checked=\"true\"] .ds-switch { border-color: var(--color-ember, #e5703a); background: var(--color-ember, #e5703a); } [aria-checked=\"true\"] .ds-thumb { transform: translateX(20px); background: var(--color-ink, #f1e6d2); }"
+    },
+    {
+      "name": "Centred Dialog",
+      "kind": "custom",
+      "refersTo": "dialog",
+      "description": "Confirmations on the walnut scrim: 16px corners, teak edge, black dialog shadow, a wide 18px title, Cancel first as the 48px secondary, then a cherry-outline or ember confirm. Stacks above an open sheet.",
+      "html": "<div class=\"ds-scrim\"><div class=\"ds-dlg\" role=\"dialog\" aria-labelledby=\"ds-dlg-t\"><h3 id=\"ds-dlg-t\" class=\"ds-dlg-title\">Delete expense?</h3><p class=\"ds-dlg-msg\">This action cannot be undone.</p><div class=\"ds-dlg-actions\"><button type=\"button\" class=\"ds-dlg-cancel\">Cancel</button><button type=\"button\" class=\"ds-dlg-danger\">Delete</button></div></div></div>",
+      "css": ".ds-scrim { display: grid; place-items: center; padding: 24px 16px; background: rgb(8 5 4 / 0.72); backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px); } .ds-dlg { width: 100%; max-width: 384px; padding: 20px; border: 1px solid var(--color-edge, #3d2f25); border-radius: 16px; background: var(--color-panel, #1c1511); box-shadow: 0 24px 60px -20px rgb(0 0 0 / 0.8); font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif; } .ds-dlg-title { margin: 0; font-family: 'Archivo', ui-sans-serif, system-ui, sans-serif; font-stretch: 125%; font-size: 18px; font-weight: 600; color: var(--color-ink, #f1e6d2); } .ds-dlg-msg { margin: 8px 0 0; font-size: 14px; line-height: 1.625; color: var(--color-ink-2, #d3c6b1); } .ds-dlg-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 20px; } .ds-dlg-cancel, .ds-dlg-danger { min-height: 48px; padding: 0 16px; border-radius: 12px; background: transparent; font-family: inherit; font-size: 15px; font-weight: 500; cursor: pointer; transition: color 150ms, border-color 150ms, background-color 150ms; } .ds-dlg-cancel { border: 1px solid var(--color-edge, #3d2f25); color: var(--color-ink-2, #d3c6b1); } .ds-dlg-cancel:hover { border-color: var(--color-ink-4, #95836f); color: var(--color-ink, #f1e6d2); } .ds-dlg-danger { border: 1px solid rgb(240 86 107 / 0.35); color: var(--color-cherry, #f0566b); } .ds-dlg-danger:hover { background: rgb(58 20 24 / 0.5); } .ds-dlg-cancel:focus-visible, .ds-dlg-danger:focus-visible { outline: 2px solid var(--color-ember, #e5703a); outline-offset: 2px; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "Teak & Smoked Glass",
+    "overview": "The app is a walnut room at night. The page is near-black wood, the few raised surfaces are smoked glass, and all the writing is in cream. Most of the screen is quiet: lists sit straight on the ground and are split by hairlines. Colour only shows up when it means something. The one recurring signature is the budget bar: a single rounded ember bar on a faint cream track, which turns cherry when a budget is blown and carries a cream notch at today on the month's headline bar. Looking back, the same materials become a ledger: ember columns on hairline € gridlines, with the budget as one cream line.\n\nIt is an installed iPhone PWA used one-handed, so it is dark-only and dense. A phone screen shows the month's headline, the bar and most category rows without scrolling, and every control is still at least thumb-sized. Wide, flat-topped figures in Archivo carry the numbers and headings. The system UI face does the reading.\n\nThe world was chosen in place of the previous cool indigo-glass dashboard of equal cards, and it leaves that dashboard's habits behind: no gradients on controls, no floating pill tab bar and no coloured status tints on every row.",
+    "keyCharacteristics": [
+      "Dark-only. Walnut ground, two smoked-glass steps, cream ink in four tiers. No ambient light or wash.",
+      "Colour carries meaning: ember for selection and action, avocado for on pace or money kept, cherry for over budget.",
+      "Archivo at 125% width for figures and headings; system UI for body text; tabular figures everywhere.",
+      "Budget bars sit on one fixed 0–100% scale: ember, cherry when over, cream 4 when muted. Comparisons across months or categories share one € scale instead.",
+      "Rows sit on the ground between hairlines. Panels are kept for period summaries and for chrome.",
+      "Every target is at least 44px; every field is 48px at 16px type. Every text tier is at least 4.5:1 on every surface."
+    ],
+    "rules": [
+      {
+        "name": "The Meaning Rule",
+        "body": "A hue appears only when it says something: ember means selected, acting or running ahead of pace; avocado means on pace or money kept; cherry means over or wrong. Everything else is walnut and cream.",
+        "section": "colors"
+      },
+      {
+        "name": "The No Yellow Rule",
+        "body": "No yellow, gold or amber anywhere, including charts, and no neon or saturated glow. Warnings are ember-ink in semibold, not yellow.",
+        "section": "colors"
+      },
+      {
+        "name": "The Cream-Text Floor Rule",
+        "body": "Text uses only the four cream tiers or a status hue, and every pairing clears 4.5:1 on ground, panel and raised. Never create a dimmer text tone with opacity.",
+        "section": "colors"
+      },
+      {
+        "name": "The Wide For Figures Rule",
+        "body": "Money headlines, panel figures and headings are set in wide Archivo. Running text, labels and list rows stay in the system face, and amounts in rows stay in the system face with tabular numbers.",
+        "section": "typography"
+      },
+      {
+        "name": "The Tabular Rule",
+        "body": "Every amount uses tabular figures, written as € with two decimals, so columns line up and numbers do not jitter.",
+        "section": "typography"
+      },
+      {
+        "name": "The Sixteen Rule",
+        "body": "Every form field is set at 16px so iOS does not zoom into it. Only the display-size amount field is exempt.",
+        "section": "typography"
+      },
+      {
+        "name": "The Float Earns The Shadow Rule",
+        "body": "Only sheets, dialogs, dropdowns and the toast cast a shadow, and it is always black. Nothing in the page flow casts one, and no shadow, halo or wash is ever coloured.",
+        "section": "elevation"
+      },
+      {
+        "name": "The Own Constant Rule",
+        "body": "A sized variant is its own named style. Never append a class to a shared button style to override its height, type size or padding; add a variant instead. Appending layout only (full width, a margin) is fine.",
+        "section": "components"
+      }
+    ],
+    "dos": [
+      "Do draw every budget bar with the shared bar on the fixed 0–100% scale: ember, cherry when over, cream 4 when muted.",
+      "Do put rows or columns that compare across categories or months on one shared € scale, with the budget as a cream tick or line.",
+      "Do put list rows straight on the walnut ground, split by 10% cream hairlines.",
+      "Do keep every tappable thing at least 44px in its smallest dimension, and every field 48px.",
+      "Do set money headlines and panel figures in wide Archivo, and every amount in tabular figures as € with two decimals.",
+      "Do mark every amount that stealth mode should hide with the sensitive directive.",
+      "Do use the shared pill, segment, field, button, well and dialog styles instead of restyling them; when a new size is needed, add it as its own named style.",
+      "Do make an on/off setting the shared switch, with the whole row as the control.",
+      "Do open secondary surfaces in the shared bottom sheet, step into a sub-view inside the same sheet, and confirm in the centred dialog with Cancel first.",
+      "Do sort category rows by what they measure, largest first (spent on Budget, average on Typical month, budget in the budgets sheet), and fold categories with nothing spent into one quiet line.",
+      "Do give every chart a single keyboard stop and a screen-reader table, and label its lines in place rather than in a legend.",
+      "Do give a new surface a black shadow only if it floats over the page."
+    ],
+    "donts": [
+      "Don't use yellow, gold, amber, neon, or any coloured glow, halo or ambient wash.",
+      "Don't use ember, avocado or cherry for decoration, category identity or headings.",
+      "Don't wrap rows or forms in cards, or put a card inside a panel. Panels are for period summaries, chrome and overlays.",
+      "Don't add a light theme or light surfaces.",
+      "Don't draw pie, donut or gradient-area charts, or add a chart package; charts are plain SVG with d3-scale.",
+      "Don't use a gradient fill on a button, tab, pill or bar.",
+      "Don't add an entrance animation to in-flow content other than an opted-in headline bar, and never animate row bars.",
+      "Don't set a form field below 16px, except the display-size amount.",
+      "Don't append a class to a shared button style to change its size; use or add a sized variant.",
+      "Don't fill a destructive button with solid red; it is always the cherry outline.",
+      "Don't open a sheet on top of a sheet; only a centred dialog may stack above one.",
+      "Don't set a text colour below cream 4, or dim text with opacity, except for the dimming of sibling rows behind an expanded one."
+    ]
+  }
+}

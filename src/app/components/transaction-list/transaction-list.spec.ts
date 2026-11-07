@@ -78,6 +78,17 @@ describe('TransactionListComponent', () => {
     expect(loadMoreButton()).toBeUndefined();
   });
 
+  it('offers Try again when the list fails to load', async () => {
+    fixture.componentRef.setInput('error', true);
+    await fixture.whenStable();
+    let retried = 0;
+    fixture.componentInstance.retry.subscribe(() => retried++);
+    const el = fixture.nativeElement as HTMLElement;
+    expect(el.querySelector('[role=alert]')?.textContent).toContain("Couldn't load these transactions.");
+    (el.querySelector('[role=alert] button') as HTMLButtonElement).click();
+    expect(retried).toBe(1);
+  });
+
   it('emits the clicked transaction', async () => {
     const selected: Transaction[] = [];
     fixture.componentInstance.selectTransaction.subscribe((value) => selected.push(value));

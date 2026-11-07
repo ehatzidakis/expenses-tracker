@@ -79,9 +79,28 @@ describe('TripBreakdownComponent', () => {
     component.expandedCategory.set('Food');
     await settle(fixture);
 
-    const text = fixture.nativeElement.textContent as string;
-    expect(text).toContain('✂️');
-    expect(text).toContain('of €60.00');
+    const el = fixture.nativeElement as HTMLElement;
+    expect(el.querySelector('[aria-label="Split transaction"]')).not.toBeNull();
+    expect(el.textContent).toContain('of €60.00');
+  });
+
+  it('says when the transactions add up to more than the stored total', () => {
+    const gap = (fixture.nativeElement as HTMLElement).querySelector('.trip-gap');
+    expect(component.unitemised()).toBe(-30);
+    expect(gap?.textContent).toContain('Transactions add up to €30.00');
+  });
+
+  it('shows the part of the total that no transaction explains', async () => {
+    fixture.componentRef.setInput('trip', { ...component.trip(), amount: 50 });
+    await settle(fixture);
+    const gap = (fixture.nativeElement as HTMLElement).querySelector('.trip-gap');
+    expect(gap?.textContent).toContain('€20.00 not itemised');
+  });
+
+  it('shows no gap line when the total matches its transactions', async () => {
+    fixture.componentRef.setInput('trip', { ...component.trip(), amount: 30 });
+    await settle(fixture);
+    expect((fixture.nativeElement as HTMLElement).querySelector('.trip-gap')).toBeNull();
   });
 
   it('keeps the open category after a save refreshes the trip', async () => {

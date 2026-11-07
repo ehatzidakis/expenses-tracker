@@ -1,9 +1,18 @@
-import { Component, ElementRef, computed, inject, input, model, output, signal } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  computed,
+  inject,
+  input,
+  model,
+  output,
+  signal,
+} from '@angular/core';
 import { DecimalPipe } from '@angular/common';
 import type { Adjustment } from '../../models/adjustments.model';
 import { AdjustmentCardComponent } from '../adjustment-card.component/adjustment-card.component';
 import { SensitiveDirective } from '../../utils/sensitive.directive';
-import { ACTIVE_PILL, IDLE_PILL, PILL_BASE } from '../../utils/pill-styles';
+import { PICKER_PANEL } from '../../utils/pill-styles';
 import { SinglesType, filterSingles, singleYears, singlesTotals } from './singles-view.util';
 
 @Component({
@@ -11,45 +20,110 @@ import { SinglesType, filterSingles, singleYears, singlesTotals } from './single
   standalone: true,
   imports: [DecimalPipe, AdjustmentCardComponent, SensitiveDirective],
   host: {
-    class: 'flex flex-col gap-3',
+    class: 'flex flex-col gap-5',
     '(document:click)': 'onDocumentClick($event)',
     '(document:keydown.escape)': 'closeYearMenu()',
   },
   template: `
     @if (adjustments().length) {
+      <!-- Totals for the current filters -->
+      @if (filtered().length) {
+        <section
+          data-testid="singles-totals"
+          aria-label="One-offs summary"
+          class="rounded-2xl border border-ink/10 bg-panel px-5 py-4 shadow-[inset_0_1px_0_rgb(241_230_210/0.06)]"
+        >
+          <p class="text-[13px] text-ink-2">
+            {{ totals().count }} one-off{{ totals().count !== 1 ? 's' : '' }} ·
+            {{ year() ?? 'all years' }}
+          </p>
+          @switch (type()) {
+            @case ('addition') {
+              <p
+                class="mt-2 type-wide text-[32px] font-bold leading-none text-avocado"
+                appSensitive
+              >
+                +€{{ totals().incoming | number: '1.2-2' }}
+              </p>
+              <p class="mt-1.5 text-[12px] text-ink-3">Income</p>
+            }
+            @case ('subtraction') {
+              <p class="mt-2 type-wide text-[32px] font-bold leading-none text-ink" appSensitive>
+                €{{ totals().outgoing | number: '1.2-2' }}
+              </p>
+              <p class="mt-1.5 text-[12px] text-ink-3">Spent</p>
+            }
+            @default {
+              <dl class="mt-3 grid grid-cols-3 gap-3">
+                <div>
+                  <dt class="text-[12px] text-ink-3">In</dt>
+                  <dd
+                    class="mt-1 type-wide text-[15px] font-semibold text-avocado"
+                    appSensitive="sm"
+                  >
+                    €{{ totals().incoming | number: '1.2-2' }}
+                  </dd>
+                </div>
+                <div>
+                  <dt class="text-[12px] text-ink-3">Out</dt>
+                  <dd class="mt-1 type-wide text-[15px] font-semibold text-ink" appSensitive="sm">
+                    €{{ totals().outgoing | number: '1.2-2' }}
+                  </dd>
+                </div>
+                <div>
+                  <dt class="text-[12px] text-ink-3">Net</dt>
+                  <dd
+                    class="mt-1 type-wide text-[15px] font-semibold"
+                    [class]="totals().net >= 0 ? 'text-avocado' : 'text-ink'"
+                    appSensitive="sm"
+                  >
+                    {{ totals().net < 0 ? '−' : '' }}€{{ absNet() | number: '1.2-2' }}
+                  </dd>
+                </div>
+              </dl>
+            }
+          }
+        </section>
+      }
+
       <!-- Filters -->
-      <section class="flex items-center gap-2">
-        <button
-          type="button"
-          data-testid="filter-addition"
-          (click)="toggleType('addition')"
-          [class]="pillBase + ' ' + (type() === 'addition' ? activePill : idlePill)"
-          [attr.aria-pressed]="type() === 'addition'"
-        >
-          ↑ Additions
-        </button>
-        <button
-          type="button"
-          data-testid="filter-subtraction"
-          (click)="toggleType('subtraction')"
-          [class]="pillBase + ' ' + (type() === 'subtraction' ? activePill : idlePill)"
-          [attr.aria-pressed]="type() === 'subtraction'"
-        >
-          ↓ Subtractions
-        </button>
+      <div class="flex items-center gap-2">
+        <div role="group" aria-label="Show" class="inline-flex rounded-xl border border-edge p-0.5">
+          @for (option of typeOptions; track option.label) {
+            <button
+              type="button"
+              [attr.data-testid]="option.testId"
+              class="min-h-11 rounded-[10px] px-3.5 text-[13px] font-medium transition-colors cursor-pointer"
+              [class]="
+                type() === option.value
+                  ? 'bg-ember/20 text-ink ring-1 ring-inset ring-ember/60'
+                  : 'text-ink-3 hover:text-ink'
+              "
+              [attr.aria-pressed]="type() === option.value"
+              (click)="type.set(option.value)"
+            >
+              {{ option.label }}
+            </button>
+          }
+        </div>
 
         <div class="relative ml-auto shrink-0">
           <button
             type="button"
             data-testid="year-toggle"
             (click)="toggleYearMenu()"
-            [class]="pillBase + ' flex items-center gap-1 ' + (year() !== null ? activePill : idlePill)"
+            class="flex min-h-11 items-center gap-1 rounded-xl border px-3.5 text-[13px] font-medium transition-colors cursor-pointer"
+            [class]="
+              year() !== null
+                ? 'border-ember text-ember-ink'
+                : 'border-edge text-ink-2 hover:text-ink'
+            "
             aria-haspopup="menu"
             [attr.aria-expanded]="yearMenuOpen()"
           >
             {{ year() ?? 'All years' }}
             <svg
-              class="w-3 h-3 transition-transform duration-150"
+              class="size-3.5 transition-transform duration-150"
               [class.rotate-180]="yearMenuOpen()"
               viewBox="0 0 20 20"
               fill="currentColor"
@@ -67,7 +141,7 @@ import { SinglesType, filterSingles, singleYears, singlesTotals } from './single
             <div
               role="menu"
               data-testid="year-menu"
-              class="absolute right-0 top-full mt-2 z-20 w-36 bg-gray-900 border border-gray-800 rounded-2xl p-2 shadow-xl flex flex-col gap-1"
+              [class]="menuPanel + ' !w-40 flex flex-col gap-1 !p-2'"
             >
               <button
                 type="button"
@@ -76,7 +150,7 @@ import { SinglesType, filterSingles, singleYears, singlesTotals } from './single
                 (click)="pickYear(null)"
                 [attr.aria-checked]="year() === null"
                 [class]="year() === null ? menuActive : menuIdle"
-                class="w-full text-left px-3 py-2 rounded-xl text-xs transition-colors duration-150"
+                class="w-full min-h-11 text-left px-3 rounded-xl text-[13px] transition-colors duration-150 cursor-pointer"
               >
                 All years
               </button>
@@ -88,7 +162,7 @@ import { SinglesType, filterSingles, singleYears, singlesTotals } from './single
                   (click)="pickYear(y)"
                   [attr.aria-checked]="year() === y"
                   [class]="year() === y ? menuActive : menuIdle"
-                  class="w-full text-left px-3 py-2 rounded-xl text-xs transition-colors duration-150"
+                  class="w-full min-h-11 text-left px-3 rounded-xl text-[13px] transition-colors duration-150 cursor-pointer"
                 >
                   {{ y }}
                 </button>
@@ -96,89 +170,42 @@ import { SinglesType, filterSingles, singleYears, singlesTotals } from './single
             </div>
           }
         </div>
-      </section>
+      </div>
 
       @if (filtered().length) {
-        <!-- Totals for the current filters -->
-        <div
-          data-testid="singles-totals"
-          class="flex flex-wrap items-center gap-x-3 gap-y-1 px-1 text-[11px] text-gray-500"
-        >
-          <span>{{ totals().count }} item{{ totals().count !== 1 ? 's' : '' }}</span>
-          @switch (type()) {
-            @case ('addition') {
-              <span>
-                Total
-                <span class="font-semibold text-emerald-400 tabular-nums" appSensitive
-                  >€{{ totals().incoming | number: '1.2-2' }}</span
-                >
-              </span>
-            }
-            @case ('subtraction') {
-              <span>
-                Total
-                <span class="font-semibold text-red-400 tabular-nums" appSensitive
-                  >€{{ totals().outgoing | number: '1.2-2' }}</span
-                >
-              </span>
-            }
-            @default {
-              <span>
-                In
-                <span class="font-semibold text-emerald-400 tabular-nums" appSensitive
-                  >€{{ totals().incoming | number: '1.2-2' }}</span
-                >
-              </span>
-              <span>
-                Out
-                <span class="font-semibold text-red-400 tabular-nums" appSensitive
-                  >€{{ totals().outgoing | number: '1.2-2' }}</span
-                >
-              </span>
-              <span>
-                Net
-                <span
-                  class="font-semibold tabular-nums"
-                  [class]="totals().net >= 0 ? 'text-emerald-400' : 'text-red-400'"
-                  appSensitive
-                  >{{ totals().net < 0 ? '−' : '' }}€{{
-                    absNet() | number: '1.2-2'
-                  }}</span
-                >
-              </span>
-            }
-          }
-        </div>
-
-        <div class="flex flex-col gap-3">
+        <ul class="-mt-2 divide-y divide-ink/10 border-t border-ink/10">
           @for (adjustment of filtered(); track adjustment.id) {
-            <app-adjustment-card
-              [adjustment]="adjustment"
-              (cardClick)="edit.emit(adjustment)"
-            ></app-adjustment-card>
+            <li>
+              <app-adjustment-card
+                [adjustment]="adjustment"
+                (cardClick)="edit.emit(adjustment)"
+              ></app-adjustment-card>
+            </li>
           }
-        </div>
+        </ul>
       } @else {
         <div
           data-testid="singles-no-match"
-          class="flex flex-col items-center justify-center gap-3 text-center py-12 px-4 bg-gray-900/60 border border-gray-800/80 rounded-2xl text-gray-500 text-sm"
+          class="flex flex-col items-center justify-center gap-3 border-t border-ink/10 py-12 text-center text-[14px] text-ink-3"
         >
-          No singles match these filters
+          No one-offs match these filters
           <button
             type="button"
             data-testid="clear-filters"
             (click)="clearFilters()"
-            class="px-3 py-1.5 rounded-lg text-xs font-medium border border-gray-700 text-gray-300 hover:border-gray-600 transition-colors"
+            class="min-h-11 rounded-xl border border-edge px-4 text-[13px] font-medium text-ink-2 hover:text-ink cursor-pointer"
           >
             Clear filters
           </button>
         </div>
       }
     } @else {
-      <div
-        class="flex flex-col items-center justify-center gap-2 text-center py-16 px-4 bg-gray-900/60 border border-gray-800/80 rounded-2xl text-gray-500 text-sm"
-      >
-        No singles yet
+      <div class="flex flex-col items-center gap-2 border-y border-ink/10 py-14 text-center">
+        <p class="text-[15px] text-ink">No one-offs yet</p>
+        <p class="max-w-64 text-[13px] text-ink-3">
+          One-off income and expenses, like a bonus or a new laptop, show up here once you add them
+          from the Add tab.
+        </p>
       </div>
     }
   `,
@@ -186,18 +213,21 @@ import { SinglesType, filterSingles, singleYears, singlesTotals } from './single
 export class SinglesViewComponent {
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
 
-  /** Non-trip adjustments, newest first. */
+  /** Non-trip one-offs, newest first. */
   adjustments = input.required<Adjustment[]>();
   type = model<SinglesType | null>(null);
   year = model<number | null>(null);
 
   edit = output<Adjustment>();
 
-  protected readonly pillBase = PILL_BASE;
-  protected readonly activePill = ACTIVE_PILL;
-  protected readonly idlePill = IDLE_PILL;
-  protected readonly menuActive = 'bg-indigo-600 text-white font-medium';
-  protected readonly menuIdle = 'text-gray-300 hover:bg-gray-800';
+  protected readonly typeOptions: { label: string; value: SinglesType | null; testId: string }[] = [
+    { label: 'All', value: null, testId: 'filter-all' },
+    { label: 'Income', value: 'addition', testId: 'filter-addition' },
+    { label: 'Expense', value: 'subtraction', testId: 'filter-subtraction' },
+  ];
+  protected readonly menuPanel = PICKER_PANEL;
+  protected readonly menuActive = 'bg-ember text-ground font-medium';
+  protected readonly menuIdle = 'text-ink-2 hover:bg-raised-hi';
 
   readonly yearMenuOpen = signal(false);
 

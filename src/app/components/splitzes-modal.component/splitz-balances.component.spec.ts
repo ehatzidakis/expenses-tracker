@@ -73,7 +73,7 @@ describe('SplitzBalancesComponent', () => {
     expect(debts.map((debt) => debt.transactionId)).toEqual(['older', 'newer']);
   });
 
-  it('shows owed and full amounts and colors each card by who paid', () => {
+  it('shows owed and full amounts and marks who paid on each row', () => {
     getDebtsBetweenMeAndPerson.mockReturnValue([
       {
         transactionId: 'paid-by-me',
@@ -107,15 +107,17 @@ describe('SplitzBalancesComponent', () => {
     fixture.detectChanges();
 
     const cards = Array.from<HTMLElement>(
-      fixture.nativeElement.querySelectorAll('.settlement-transaction-card'),
+      fixture.nativeElement.querySelectorAll('.settlement-debt-row'),
     );
     expect(cards).toHaveLength(2);
     expect(cards[0].textContent).toContain('I paid');
-    expect(cards[0].textContent).toContain('Owed: €7.00');
+    expect(cards[0].textContent).toContain('Owes you €7.00');
     expect(cards[0].textContent).toContain('Full amount: €21.00');
-    expect(cards[0].classList.contains('border-teal-500/40')).toBe(true);
+    expect(cards[0].dataset['payer']).toBe('me');
+    expect(cards[0].querySelector('.settlement-owed')?.classList.contains('text-avocado-ink')).toBe(true);
     expect(cards[1].textContent).toContain('Alex paid');
-    expect(cards[1].textContent).toContain('Owed: €5.00');
-    expect(cards[1].classList.contains('border-amber-500/40')).toBe(true);
+    expect(cards[1].textContent).toContain('You owe €5.00');
+    expect(cards[1].dataset['payer']).toBe('them');
+    expect(cards[1].querySelector('.settlement-owed')?.classList.contains('text-avocado-ink')).toBe(false);
   });
 });

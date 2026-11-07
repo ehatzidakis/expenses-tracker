@@ -71,20 +71,23 @@ describe('CategoryBreakdownComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should use the selected month without the year in the budget title', () => {
-    fixture.componentRef.setInput('categories', []);
-    fixture.componentRef.setInput('monthName', 'August 2026');
-    fixture.detectChanges();
+  it('shows the budget left beside the heading, without the budget total', async () => {
+    fixture.componentRef.setInput('categories', [
+      { ...categories[0], amount: 25, budget: 110 },
+      { ...categories[0], name: 'Gym', amount: 20.55, budget: 65 },
+    ]);
+    fixture.componentRef.setInput('pace', 0.4);
+    await fixture.whenStable();
+    const left = () => (fixture.nativeElement as HTMLElement).querySelector('.budget-left')?.textContent?.trim();
+    expect(left()).toBe('€129.45 left on budget');
 
-    expect(component.budgetTitle()).toBe("August's Budget");
-  });
+    fixture.componentRef.setInput('pace', 1);
+    await fixture.whenStable();
+    expect(left()).toBe('€129.45 under budget');
 
-  it('should use an all-time title when no month is selected', () => {
-    fixture.componentRef.setInput('categories', []);
-    fixture.componentRef.setInput('monthName', '');
-    fixture.detectChanges();
-
-    expect(component.budgetTitle()).toBe('All-Time Budget');
+    fixture.componentRef.setInput('categories', [{ ...categories[0], amount: 120, budget: 110 }]);
+    await fixture.whenStable();
+    expect(left()).toBe('€10.00 over budget');
   });
 
   it('does not load anything without a month', async () => {

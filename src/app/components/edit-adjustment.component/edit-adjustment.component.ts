@@ -1,8 +1,10 @@
-import { Component, effect, inject, signal, input, output } from '@angular/core';
+import { Component, computed, effect, inject, signal, input, output } from '@angular/core';
+import { euros } from '../../utils/confirm-text';
 import { AdjustmentService } from '../../services/adjustment-service';
 import { QueryClient } from '@tanstack/angular-query-experimental';
 import { Adjustment } from '../../models/adjustments.model';
-import { form, maxLength, required } from '@angular/forms/signals';
+import { form, maxLength, required, validate } from '@angular/forms/signals';
+import { DATE_ORDER, dateOrderMessage } from '../../utils/date-order';
 import { PrivacyService } from '../../services/privacy.service';
 import { EditFormShellComponent } from '../edit-form/edit-form-shell.component';
 import { AdjustmentEditFieldsComponent } from './adjustment-edit-fields.component';
@@ -35,16 +37,15 @@ function formatDateForInput(dateVal: Date | string): string {
   host: { class: 'block' },
   template: `
     <app-edit-form-shell
-      title="Edit Adjustment"
-      backClass="text-xs font-medium text-gray-400 hover:text-gray-200 flex items-center gap-1 transition-colors cursor-pointer"
+      [title]="adjustment().isTrip ? 'Edit trip' : 'Edit one-off'"
       [formInvalid]="adjustmentForm().invalid()"
       [submitting]="submitting()"
       [deleting]="deleting()"
       [privacyDisabled]="privacyService.isPrivacyMode()"
       [errorMessage]="errorMessage()"
-      deleteLabel="Delete Adjustment"
-      deleteTitle="Delete Adjustment?"
-      deleteMessage="Are you sure you want to delete this adjustment?"
+      [deleteLabel]="adjustment().isTrip ? 'Delete trip' : 'Delete one-off'"
+      [deleteTitle]="deleteText().title"
+      [deleteMessage]="deleteText().message"
       [showDeleteConfirm]="showDeleteConfirm()"
       (back)="back.emit()"
       (submitted)="onSubmit($event)"
@@ -53,6 +54,7 @@ function formatDateForInput(dateVal: Date | string): string {
       (deleteCancelled)="showDeleteConfirm.set(false)"
     >
       <app-adjustment-edit-fields
+        [isTrip]="adjustment().isTrip ?? false"
         [amount]="adjustmentModel().amount"
         [descriptionField]="adjustmentForm.description"
         [amountField]="adjustmentForm.amount"
@@ -62,6 +64,7 @@ function formatDateForInput(dateVal: Date | string): string {
       />
 
       <app-adjustment-edit-options
+        [editingTrip]="adjustment().isTrip ?? false"
         [isAddition]="adjustmentModel().isAddition"
         [isTrip]="adjustmentModel().isTrip ?? false"
         [isSelectable]="adjustmentModel().isSelectable ?? false"
@@ -80,6 +83,17 @@ export class EditAdjustmentComponent {
   readonly showDeleteConfirm = signal(false);
 
   readonly adjustment = input.required<Adjustment>();
+
+  /** Names the trip or one-off and its amount, so the right one goes. */
+  readonly deleteText = computed(() => {
+    const adj = this.adjustment();
+    const kind = adj.isTrip ? 'trip' : 'one-off';
+    const title = adj.title?.trim() ? `Delete “${adj.title.trim()}”?` : `Delete this ${kind}?`;
+    const amount = adj.isTrip
+      ? `The trip and its ${euros(adj.amount)} total will be removed.`
+      : `This ${adj.adjType ? 'income' : 'expense'} of ${euros(adj.amount)} will be removed.`;
+    return { title, message: `${amount} This can't be undone.` };
+  });
 
   readonly back = output<void>();
   readonly updated = output<void>();
@@ -117,6 +131,13 @@ export class EditAdjustmentComponent {
     maxLength(schemaPath.description, 60, { message: 'Description must be 60 characters or less' });
     required(schemaPath.startDate, { message: 'Start date is required' });
     required(schemaPath.endDate, { message: 'End date is required' });
+    validate(schemaPath.endDate, ({ value, valueOf }) => {
+      const start = valueOf(schemaPath.startDate);
+      const end = value();
+      return start && end && end < start
+        ? { kind: DATE_ORDER, message: dateOrderMessage(!!this.adjustmentModel().isTrip) }
+        : null;
+    });
   });
 
   readonly submitting = signal(false);
@@ -154,7 +175,9 @@ export class EditAdjustmentComponent {
     }
 
     const value = this.adjustmentModel();
-    if (value.amount <= 0) {
+    // A trip's total comes from its transactions, so only a one-off needs an amount.
+    const editingTrip = this.adjustment().isTrip ?? false;
+    if (!editingTrip && value.amount <= 0) {
       this.errorMessage.set('Amount must be greater than 0');
       return;
     }
@@ -165,7 +188,7 @@ export class EditAdjustmentComponent {
     try {
       await this.adjustmentService.updateAdjustment(this.adjustment().id, {
         description: value.description.trim(),
-        amount: value.amount,
+        amount: editingTrip ? undefined : value.amount,
         startDate: value.startDate,
         endDate: value.endDate,
         isAddition: value.isAddition,
@@ -176,7 +199,7 @@ export class EditAdjustmentComponent {
       await this.queryClient.invalidateQueries({ queryKey: ['adjustments'] });
       this.updated.emit();
     } catch (err) {
-      this.errorMessage.set('Failed to update adjustment.');
+      this.errorMessage.set("Couldn't save the changes. Check your connection and try again.");
     } finally {
       this.submitting.set(false);
     }
@@ -197,7 +220,7 @@ export class EditAdjustmentComponent {
       await this.queryClient.invalidateQueries({ queryKey: ['adjustments'] });
       this.deleted.emit();
     } catch (err) {
-      this.errorMessage.set('Failed to delete adjustment.');
+      this.errorMessage.set("Couldn't delete it. Check your connection and try again.");
     } finally {
       this.deleting.set(false);
     }

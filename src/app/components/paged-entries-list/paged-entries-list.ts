@@ -13,85 +13,116 @@ export type EntryListMode = 'category' | 'description';
   imports: [CommonModule, SensitiveDirective],
   host: { class: 'block' },
   template: `
-    <div class="mt-3 pt-3 border-t border-gray-800/60 space-y-3">
+    <div class="mt-1 flex flex-col gap-3">
       @if (loading()) {
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 animate-pulse">
+        <ul class="animate-pulse divide-y divide-ink/10" aria-label="Loading entries">
           @for (i of [1, 2, 3, 4]; track i) {
-            <div class="h-12 bg-gray-800/60 rounded-xl"></div>
+            <li class="py-3"><span class="block h-4 w-40 rounded bg-raised"></span></li>
           }
-        </div>
+        </ul>
       } @else if (error()) {
-        <div class="p-3 bg-red-950/40 border border-red-800/60 text-red-300 rounded-xl text-xs">
-          Unable to load entries.
-        </div>
+        <p role="alert" class="rounded-xl border border-cherry/30 bg-cherry-deep/60 px-3.5 py-3 text-[13px] text-cherry">
+          Couldn't load these entries. Check your connection and try again.
+        </p>
       } @else if (items().length) {
-        @for (entry of items(); track entry.id) {
-          <button
-            type="button"
-            (click)="onItemClick(entry)"
-            class="w-full text-left p-3.5 border-none bg-gray-900/60 hover:bg-gray-800/80 border border-gray-800/80 rounded-xl flex items-center justify-between transition-colors cursor-pointer group"
-          >
-            <div class="min-w-0">
-              <span class="text-xs font-medium text-gray-200 truncate flex items-center gap-1.5">
-                <span class="truncate">{{ entry.description }}</span>
-                @if (entry.isSplit) {
-                  <span
-                    aria-label="Split transaction"
-                    title="Split transaction"
-                    class="text-[11px] leading-none"
-                    >✂️</span
-                  >
-                }
-                @if (entry.comment) {
-                  <span
-                    aria-label="Transaction has a comment"
-                    title="Transaction has a comment"
-                    class="text-[11px] leading-none"
-                    >💬</span
-                  >
-                }
-              </span>
-              <span class="text-[10px] text-gray-500 block mt-0.5">
-                {{ entry.date | date: 'dd/MM/yyyy' }}
-              </span>
-            </div>
-            <span class="text-xs font-semibold text-white shrink-0 ml-2 tabular-nums" appSensitive>
-              €{{ entry.amount | number: '1.2-2' }}
-            </span>
-          </button>
-        }
+        <ul class="divide-y divide-ink/10 border-y border-ink/10">
+          @for (entry of items(); track entry.id) {
+            <li>
+              <button
+                type="button"
+                class="flex min-h-12 w-full items-center justify-between gap-3 py-2.5 text-left cursor-pointer"
+                (click)="onItemClick(entry)"
+              >
+                <span class="min-w-0">
+                  <span class="flex items-center gap-1.5 text-[14px] text-ink">
+                    <span class="truncate">{{ entry.description }}</span>
+                    @if (entry.isSplit) {
+                      <svg
+                        class="size-3.5 shrink-0 text-ink-3"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.8"
+                        stroke-linecap="round"
+                        role="img"
+                        aria-label="Split transaction"
+                      >
+                        <circle cx="6" cy="6" r="3" />
+                        <circle cx="6" cy="18" r="3" />
+                        <path d="M20 4 8.1 15.9M14.5 14.5 20 20M8.1 8.1 12 12" />
+                      </svg>
+                    }
+                    @if (entry.comment) {
+                      <svg
+                        class="size-3.5 shrink-0 text-ink-3"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.8"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        role="img"
+                        aria-label="Has comment"
+                      >
+                        <path d="M4 5h16v11H9l-5 4z" />
+                      </svg>
+                    }
+                  </span>
+                  <span class="mt-0.5 block text-[12px] text-ink-3">{{ entry.date | date: 'd MMM yyyy' }}</span>
+                </span>
+                <span class="shrink-0 text-[13px] font-medium text-ink tabular-nums" appSensitive="xs">
+                  €{{ entry.amount | number: '1.2-2' }}
+                </span>
+              </button>
+            </li>
+          }
+        </ul>
 
-        <div class="flex items-center justify-between pt-1 gap-2">
+        <div class="flex items-center justify-between gap-2">
           <button
             type="button"
+            class="min-h-11 rounded-xl border border-edge px-4 text-[13px] font-medium text-ink-2 transition-colors hover:border-ink-4 hover:text-ink cursor-pointer"
             (click)="toggleSortByAmount()"
-            class="px-2.5 py-1.5 rounded-lg text-[10px] font-medium border border-gray-800 text-gray-300 hover:border-gray-700 transition-colors"
           >
-            {{ sortByAmount() ? 'Sort: high → low' : 'Sort: newest' }}
+            {{ sortByAmount() ? 'Highest first' : 'Newest first' }}
           </button>
 
           <div class="flex items-center gap-2">
             <button
               type="button"
-              (click)="back()"
+              aria-label="Previous page"
+              class="flex size-11 items-center justify-center rounded-xl border border-edge text-ink-2 transition-colors hover:border-ink-4 hover:text-ink disabled:cursor-not-allowed disabled:opacity-40 cursor-pointer"
               [disabled]="page() === 1"
-              class="px-3 py-1.5 rounded-lg text-xs font-medium border border-gray-800 text-gray-300 disabled:opacity-30 disabled:cursor-not-allowed hover:border-gray-700 transition-colors"
+              (click)="back()"
             >
-              ← Back
+              <svg class="size-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                <path
+                  fill-rule="evenodd"
+                  clip-rule="evenodd"
+                  d="M12.79 5.23a.75.75 0 01-.02 1.06L8.832 10l3.938 3.71a.75.75 0 11-1.04 1.08l-4.5-4.25a.75.75 0 010-1.08l4.5-4.25a.75.75 0 011.06.02z"
+                />
+              </svg>
             </button>
-            <span class="text-[11px] text-gray-500">Page {{ page() }}</span>
+            <span class="min-w-14 text-center text-[12px] text-ink-3">Page {{ page() }}</span>
             <button
               type="button"
-              (click)="next()"
+              aria-label="Next page"
+              class="flex size-11 items-center justify-center rounded-xl border border-edge text-ink-2 transition-colors hover:border-ink-4 hover:text-ink disabled:cursor-not-allowed disabled:opacity-40 cursor-pointer"
               [disabled]="!hasMore()"
-              class="px-3 py-1.5 rounded-lg text-xs font-medium border border-gray-800 text-gray-300 disabled:opacity-30 disabled:cursor-not-allowed hover:border-gray-700 transition-colors"
+              (click)="next()"
             >
-              Next →
+              <svg class="size-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                <path
+                  fill-rule="evenodd"
+                  clip-rule="evenodd"
+                  d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z"
+                />
+              </svg>
             </button>
           </div>
         </div>
       } @else {
-        <div class="text-center text-xs text-gray-500 py-4">No entries found.</div>
+        <p class="py-4 text-[13px] text-ink-3">No entries found.</p>
       }
     </div>
   `,

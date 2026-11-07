@@ -1,7 +1,16 @@
 import { Component, input, output, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import {
+  BUTTON_DANGER,
+  BUTTON_PRIMARY,
+  FIELD,
+  FIELD_LABEL,
+  BUTTON_SECONDARY_LG,
+} from '../../utils/pill-styles';
 
-type PinFormVariant = 'indigo' | 'red';
+type PinFormTone = 'primary' | 'danger';
+
+let nextPinId = 0;
 
 @Component({
   selector: 'app-pin-entry-form',
@@ -9,32 +18,27 @@ type PinFormVariant = 'indigo' | 'red';
   imports: [FormsModule],
   host: { class: 'block' },
   template: `
-    <div class="bg-gray-800/60 border border-gray-700 p-4 rounded-2xl space-y-3">
-      <span class="text-xs font-medium text-gray-300 block" [class.text-center]="centerTitle()">
-        {{ title() }}
-      </span>
+    <div class="flex flex-col gap-3 py-3">
+      <label [for]="uid" [class]="fieldLabel">{{ title() }}</label>
       <input
+        [id]="uid"
         type="password"
+        inputmode="numeric"
+        autocomplete="off"
         [ngModel]="value()"
         (ngModelChange)="setValue($event)"
         [placeholder]="placeholder()"
         [autofocus]="autofocus()"
-        class="w-full bg-gray-900 border border-gray-700 rounded-xl px-3.5 py-2 text-sm text-gray-100 placeholder:text-gray-600 tracking-widest focus:outline-none focus:border-indigo-500"
-        [class.text-center]="centerTitle()"
+        [class]="field + ' tracking-widest'"
       />
-      <div class="flex gap-2">
-        <button
-          type="button"
-          (click)="cancel.emit()"
-          class="flex-1 py-2 text-xs text-gray-400 bg-gray-800 rounded-xl hover:text-white cursor-pointer"
-        >
+      <div class="grid grid-cols-2 gap-3">
+        <button type="button" [class]="secondaryLg" (click)="cancel.emit()">
           Cancel
         </button>
         <button
           type="button"
+          [class]="tone() === 'danger' ? danger : primary"
           (click)="submitted.emit(value())"
-          class="flex-1 py-2 text-xs font-semibold text-white rounded-xl cursor-pointer"
-          [class]="submitButtonClass()"
         >
           {{ submitLabel() }}
         </button>
@@ -43,11 +47,17 @@ type PinFormVariant = 'indigo' | 'red';
   `,
 })
 export class PinEntryFormComponent {
+  protected readonly secondaryLg = BUTTON_SECONDARY_LG;
+  protected readonly uid = `pin-${nextPinId++}`;
+  protected readonly field = FIELD;
+  protected readonly fieldLabel = FIELD_LABEL;
+  protected readonly primary = BUTTON_PRIMARY;
+  protected readonly danger = BUTTON_DANGER;
+
   readonly title = input.required<string>();
   readonly placeholder = input.required<string>();
   readonly submitLabel = input.required<string>();
-  readonly variant = input<PinFormVariant>('indigo');
-  readonly centerTitle = input(false);
+  readonly tone = input<PinFormTone>('primary');
   readonly autofocus = input(false);
 
   readonly cancel = output<void>();
@@ -60,9 +70,4 @@ export class PinEntryFormComponent {
     this.valueChange.emit(value);
   }
 
-  submitButtonClass(): string {
-    return this.variant() === 'red'
-      ? 'bg-red-600 hover:bg-red-500'
-      : 'bg-indigo-600 hover:bg-indigo-500';
-  }
 }
