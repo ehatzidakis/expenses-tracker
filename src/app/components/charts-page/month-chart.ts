@@ -46,7 +46,7 @@ const AXIS_W = 44;
     </div>
     <div
       #scroller
-      class="-mr-4 min-w-0 flex-1 overflow-x-auto pr-4 [scrollbar-width:none] sm:mr-0 sm:pr-0"
+      class="min-w-0 flex-1 overflow-x-auto overscroll-x-contain [scrollbar-width:none]"
       (scroll)="onScroll($event)"
     >
       <svg

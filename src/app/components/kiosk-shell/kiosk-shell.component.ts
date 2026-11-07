@@ -20,7 +20,7 @@ import { SheetComponent } from '../sheet/sheet';
   host: { class: 'block' },
   template: `
     <main
-      class="mx-auto flex min-h-dvh max-w-lg flex-col gap-5 px-4 pt-[max(env(safe-area-inset-top),8px)] pb-[calc(env(safe-area-inset-bottom)+92px)]"
+      class="mx-auto flex min-h-dvh w-full max-w-lg min-w-0 flex-col gap-5 overflow-x-clip px-4 pt-[max(env(safe-area-inset-top),8px)] pb-[calc(env(safe-area-inset-bottom)+92px)]"
     >
       <header class="flex min-h-14 items-center justify-between gap-3">
         <div class="flex items-center gap-2.5">

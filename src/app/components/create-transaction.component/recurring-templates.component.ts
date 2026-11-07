@@ -27,13 +27,9 @@ export interface TemplatePick {
   host: { class: 'block' },
   template: `
     <div class="flex flex-col gap-2">
-      <div class="flex flex-col gap-1.5">
-        <span [class]="fieldLabel" id="recurring-label">Recurring</span>
-        <div
-          role="group"
-          aria-labelledby="recurring-label"
-          class="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none] sm:mx-0 sm:px-0"
-        >
+      <div class="flex flex-col gap-1.5 pt-1">
+        <span class="sr-only" id="recurring-label">Recurring transactions</span>
+        <div role="group" aria-labelledby="recurring-label" class="flex flex-wrap gap-2">
           @for (item of chips(); track item.template.id) {
             <button
               type="button"

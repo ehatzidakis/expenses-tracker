@@ -69,7 +69,27 @@ import {
         (amountHintUse)="transactionModel.update((model) => ({ ...model, amount: $event }))"
       >
         @if (showRecurring()) {
+          <button
+            descriptionAction
+            type="button"
+            class="flex min-h-12 shrink-0 items-center gap-1.5 rounded-xl border px-3 text-[13px] font-medium transition-colors cursor-pointer"
+            [class]="recurringOpen() ? 'border-ember bg-ember/20 text-ink' : 'border-edge text-ink-2 hover:border-ink-4 hover:text-ink'"
+            [attr.aria-expanded]="recurringOpen()"
+            aria-controls="tx-recurring"
+            (click)="recurringOpen.set(!recurringOpen())"
+          >
+            <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M17 2l3 3-3 3" />
+              <path d="M4 11V9a4 4 0 014-4h12" />
+              <path d="M7 22l-3-3 3-3" />
+              <path d="M20 13v2a4 4 0 01-4 4H4" />
+            </svg>
+            Recurring
+          </button>
+        }
+        @if (showRecurring() && recurringOpen()) {
           <app-recurring-templates
+            id="tx-recurring"
             recurringRow
             [targetDate]="transactionModel().date"
             [activeId]="activeTemplateId()"
@@ -295,6 +315,8 @@ export class CreateTransactionFormComponent {
   readonly hasComment = signal<boolean>(false);
   readonly activeTemplateId = signal<string | null>(null);
   readonly moreOpen = signal(false);
+  /** The recurring picks stay folded behind the button beside Description. */
+  readonly recurringOpen = signal(false);
   /** The last posted transaction, shown with what it did to its category this month. */
   readonly lastSaved = signal<{ category: string; monthName: string } | null>(null);
   // Admin only: save as a request for the kiosk to fill in, instead of a transaction.
@@ -477,6 +499,7 @@ export class CreateTransactionFormComponent {
   }
 
   onTemplatePicked({ template, lastAmount }: TemplatePick): void {
+    this.recurringOpen.set(false);
     this.transactionModel.update((model) => applyTemplate(model, template));
     this.transactionForm().reset();
     this.activeTemplateId.set(template.id);

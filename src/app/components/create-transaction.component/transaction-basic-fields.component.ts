@@ -101,18 +101,20 @@ interface TransactionFieldsModel {
       }
     </div>
 
-    <ng-content select="[recurringRow]" />
-
     <div class="flex flex-col gap-1.5">
       <label for="tx-description" [class]="fieldLabel">Description</label>
-      <input
-        #descriptionInput
-        id="tx-description"
-        type="text"
-        placeholder="What was it?"
-        [formField]="descriptionField()"
-        [class]="field"
-      />
+      <div class="flex items-stretch gap-2">
+        <input
+          #descriptionInput
+          id="tx-description"
+          type="text"
+          placeholder="What was it?"
+          [formField]="descriptionField()"
+          [class]="field + ' min-w-0 flex-1'"
+        />
+        <ng-content select="[descriptionAction]" />
+      </div>
+      <ng-content select="[recurringRow]" />
       @if (descriptionField()().touched() && descriptionField()().invalid()) {
         <p [class]="fieldError">{{ descriptionField()().errors()[0]?.message }}</p>
       }
