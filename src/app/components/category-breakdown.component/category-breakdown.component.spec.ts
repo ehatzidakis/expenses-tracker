@@ -71,6 +71,25 @@ describe('CategoryBreakdownComponent', () => {
     expect(component).toBeTruthy();
   });
 
+  it('shows the budget left beside the heading, without the budget total', async () => {
+    fixture.componentRef.setInput('categories', [
+      { ...categories[0], amount: 25, budget: 110 },
+      { ...categories[0], name: 'Gym', amount: 20.55, budget: 65 },
+    ]);
+    fixture.componentRef.setInput('pace', 0.4);
+    await fixture.whenStable();
+    const left = () => (fixture.nativeElement as HTMLElement).querySelector('.budget-left')?.textContent?.trim();
+    expect(left()).toBe('€129.45 left on budget');
+
+    fixture.componentRef.setInput('pace', 1);
+    await fixture.whenStable();
+    expect(left()).toBe('€129.45 under budget');
+
+    fixture.componentRef.setInput('categories', [{ ...categories[0], amount: 120, budget: 110 }]);
+    await fixture.whenStable();
+    expect(left()).toBe('€10.00 over budget');
+  });
+
   it('does not load anything without a month', async () => {
     fixture.componentRef.setInput('categories', categories);
     await fixture.whenStable();

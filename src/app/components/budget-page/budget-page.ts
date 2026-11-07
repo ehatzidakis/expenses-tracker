@@ -96,7 +96,7 @@ import { SensitiveDirective } from '../../utils/sensitive.directive';
             @if (attention().count > 0) {
               <button
                 type="button"
-                class="review-line mt-4 flex min-h-11 w-full items-center justify-between gap-3 border-t border-ink/10 pt-1 text-left text-[13px] cursor-pointer"
+                class="review-line mt-2.5 -mb-2.5 flex min-h-11 w-full items-center justify-between gap-3 border-t border-ink/10 text-left text-[13px] cursor-pointer"
                 (click)="splitzes.open('incoming')"
               >
                 <span class="min-w-0">

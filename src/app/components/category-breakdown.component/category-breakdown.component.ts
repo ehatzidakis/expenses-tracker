@@ -1,4 +1,6 @@
 import { Component, computed, inject, input, signal } from '@angular/core';
+import { DecimalPipe } from '@angular/common';
+import { SensitiveDirective } from '../../utils/sensitive.directive';
 import { injectQuery } from '@tanstack/angular-query-experimental';
 import { Adjustment } from '../../models/adjustments.model';
 import { Expense } from '../../models/expenses.model';
@@ -16,6 +18,8 @@ import { SEGMENT_BASE, SEGMENT_FRAME, SEGMENT_OFF, SEGMENT_ON } from '../../util
   selector: 'app-category-breakdown',
   standalone: true,
   imports: [
+    DecimalPipe,
+    SensitiveDirective,
     CategoryBreakdownItemComponent,
     EditTransactionComponent,
     MonthBreakdownComponent,
@@ -45,6 +49,14 @@ import { SEGMENT_BASE, SEGMENT_FRAME, SEGMENT_OFF, SEGMENT_ON } from '../../util
               </button>
             }
           </div>
+        } @else if (budgetLeft(); as left) {
+          <p
+            class="budget-left text-[13px]"
+            [class]="left.amount < 0 ? 'text-cherry' : 'text-ink-3'"
+            appSensitive="xs"
+          >
+            €{{ abs(left.amount) | number: '1.2-2' }} {{ left.label }}
+          </p>
         }
       </div>
 
@@ -144,6 +156,24 @@ export class CategoryBreakdownComponent {
   ];
 
   readonly showMonthView = computed(() => this.months().length > 0);
+
+  /**
+   * For a month: the budget left (all budgets minus everything spent), the same maths as the
+   * month bar. "left on budget" while the month runs, "under budget" once it's closed.
+   */
+  readonly budgetLeft = computed<{ amount: number; label: string } | null>(() => {
+    const categories = this.categories();
+    if (!categories.length || categories.some((c) => c.isAllTime)) return null;
+    const budget = categories.reduce((sum, c) => sum + (c.budget ?? 0), 0);
+    if (budget <= 0) return null;
+    const amount = budget - categories.reduce((sum, c) => sum + c.amount, 0);
+    if (amount < 0) return { amount, label: 'over budget' };
+    return { amount, label: this.pace() === 1 ? 'under budget' : 'left on budget' };
+  });
+
+  abs(value: number): number {
+    return Math.abs(value);
+  }
 
   readonly expandedCategory = signal<string | null>(null);
   readonly selectedTransaction = signal<Transaction | null>(null);

@@ -6,8 +6,8 @@ import { SensitiveDirective } from '../../utils/sensitive.directive';
 import { MonthTiming, ordinal } from '../../utils/period-pace';
 
 /**
- * The month at a glance: what's left of the budget, how far through the month we are, and the
- * stripe notched at today. "Saved from monthly budget" keeps its long-standing maths:
+ * The month at a glance: spent and saved side by side, and a thick bar notched at today that
+ * carries the date and the days left. "Saved from monthly budget" keeps its long-standing maths:
  * wage minus category spend.
  */
 @Component({
@@ -17,45 +17,41 @@ import { MonthTiming, ordinal } from '../../utils/period-pace';
   host: { class: 'block' },
   template: `
     <section
-      class="rounded-2xl border border-ink/10 bg-panel px-5 pt-4 pb-5 shadow-[inset_0_1px_0_rgb(241_230_210/0.06)]"
+      class="rounded-2xl border border-ink/10 bg-panel px-5 pt-3.5 pb-4 shadow-[inset_0_1px_0_rgb(241_230_210/0.06)]"
       aria-label="Month summary"
     >
-      <div class="flex flex-wrap items-start justify-between gap-x-4 gap-y-3">
+      <div class="flex flex-wrap items-end justify-between gap-x-4 gap-y-2">
         <div class="min-w-0">
-          <p class="type-wide flex items-baseline gap-2 font-bold leading-none" appSensitive>
-            <span class="text-[40px] tracking-[-0.02em]" [class]="headlineTone()">
-              €{{ headlineAmount() | number: '1.2-2' }}
-            </span>
+          <p
+            class="type-wide text-[34px] font-bold leading-none tracking-[-0.02em]"
+            [class]="headlineTone()"
+            appSensitive
+          >
+            €{{ headlineAmount() | number: '1.2-2' }}
           </p>
-          <p class=" text-[14px] text-ink-2">{{ headlineLabel() }}</p>
+          <p class="mt-1 text-[13px] text-ink-2">{{ headlineLabel() }}</p>
         </div>
 
-        <div class="ml-auto shrink-0 pt-1 text-right">
-          <p class="type-wide text-[20px] font-semibold leading-none text-ink">{{ sideValue() }}</p>
-          <p class="mt-1.5 text-[12px] text-ink-3">{{ sideLabel() }}</p>
+        <div class="ml-auto shrink-0 text-right">
+          <p
+            class="type-wide text-[22px] font-semibold leading-none"
+            [class]="saved() >= 0 ? 'text-avocado' : 'text-cherry'"
+            appSensitive="xs"
+          >
+            {{ saved() < 0 ? '−' : '' }}€{{ abs(saved()) | number: '1.2-2' }}
+          </p>
+          <p class="mt-1.5 text-[12px] text-ink-3">{{ savedLabel() }}</p>
         </div>
       </div>
 
       <app-stripe
-        size="lg"
-        [notchLabel]="todayLabel()"
+        class="mt-3"
+        [startLabel]="barStart()"
+        [endLabel]="barEnd()"
         [animate]="true"
         [ratio]="ratio()"
-        [pace]="timing().kind === 'current' ? timing().pace : null"
         [label]="stripeLabel()"
       />
-
-      <p class="mt-2 flex items-baseline justify-between gap-3 text-[13px]" appSensitive="xs">
-        <span>
-          <span
-            class="type-wide font-semibold"
-            [class]="saved() >= 0 ? 'text-avocado' : 'text-cherry'"
-            >{{ saved() < 0 ? '−' : '' }}€{{ abs(saved()) | number: '1.2-2' }}</span
-          >
-          <span class="text-ink-2"> {{ savedLabel() }}</span>
-        </span>
-        <!-- <span class="shrink-0 text-ink-3">of €{{ budget() | number: '0.0-0' }} budget</span> -->
-      </p>
 
       <!-- Extra lines for the month, such as items waiting for review. -->
       <ng-content />
@@ -90,27 +86,29 @@ export class MonthSummaryComponent {
     this.saved() >= 0 ? `saved ${this.when()}` : `more than the wage ${this.when()}`,
   );
 
-  readonly sideValue = computed(() => {
-    const t = this.timing();
-    if (t.kind === 'current') return String(t.daysLeft);
-    if (t.kind === 'future') return String(t.daysInMonth);
-    return 'Final';
+  /** Left end of the bar: today ("Sat 7th Nov"), or the month's state. */
+  readonly barStart = computed(() => {
+    const kind = this.timing().kind;
+    if (kind === 'current') return this.todayLabel();
+    if (kind === 'future') return 'Not started';
+    return 'Month closed';
   });
 
-  readonly sideLabel = computed(() => {
+  /** Right end of the bar: "24 days left" while the month runs, its length before it starts. */
+  readonly barEnd = computed(() => {
     const t = this.timing();
-    if (t.kind === 'current') return t.daysLeft === 1 ? 'day to go' : 'days to go';
-    if (t.kind === 'future') return 'days, not started';
-    return 'month closed';
+    if (t.kind === 'current') return `${t.daysLeft} ${t.daysLeft === 1 ? 'day' : 'days'} left`;
+    if (t.kind === 'future') return `${t.daysInMonth} days`;
+    return '';
   });
 
-  /** Today as "Fri. 13th", shown above the bar's notch. */
+  /** Today as "Fri 13th Nov", shown at the left end of the bar. */
   readonly todayLabel = computed(() => {
     this.timing(); // recompute when the month changes
     const now = new Date();
     const weekday = now.toLocaleDateString('en-GB', { weekday: 'short' });
     const month = now.toLocaleDateString('en-GB', { month: 'short' });
-    return `${month}. ${weekday} ${ordinal(now.getDate())} `; // to do --> add month name eg `${weekday}. ${ordinal(now.getDate())} ${now.toLocaleDateString('en-GB', { month: 'long' })}`
+    return `${weekday} ${ordinal(now.getDate())} ${month}`;
   });
 
   readonly stripeLabel = computed(() => {
@@ -120,7 +118,8 @@ export class MonthSummaryComponent {
       t.kind === 'current' && t.pace !== null
         ? `, ${Math.round(t.pace * 100)}% of the month gone`
         : '';
-    return `${pct}% of the budget spent${pace}`;
+    const days = t.kind === 'current' ? `, ${t.daysLeft} ${t.daysLeft === 1 ? 'day' : 'days'} left` : '';
+    return `${pct}% of the budget spent${pace}${days}`;
   });
 
   abs(value: number): number {

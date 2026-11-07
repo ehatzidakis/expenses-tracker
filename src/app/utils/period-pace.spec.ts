@@ -40,6 +40,17 @@ describe('budgetStatus', () => {
     expect(budgetStatus(20, null, 0.6)).toBe('none');
   });
 
+  it('ignores a small lead over the pace', () => {
+    // Gym: €16.25 of €65 a week into the month is €1.08 ahead: noise.
+    expect(budgetStatus(16.25, 65, 7 / 30)).toBe('ok');
+    // A €30 budget needs the €5 floor, not 10% (€3).
+    expect(budgetStatus(19, 30, 0.5)).toBe('ok');
+    expect(budgetStatus(20, 30, 0.5)).toBe('ahead');
+    // A €450 budget needs 10% (€45), not €5.
+    expect(budgetStatus(310, 450, 0.6)).toBe('ok');
+    expect(budgetStatus(316, 450, 0.6)).toBe('ahead');
+  });
+
   it('never calls a finished month ahead of pace', () => {
     expect(budgetStatus(400, 450, 1)).toBe('ok');
   });

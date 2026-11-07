@@ -61,16 +61,23 @@ export function monthTiming(monthName: string, now: Date = new Date()): MonthTim
 
 export type BudgetStatus = 'over' | 'ahead' | 'full' | 'ok' | 'none' | 'quiet';
 
+/** Smallest gap worth calling "ahead of pace": at least €5 and at least a tenth of the budget. */
+export const AHEAD_MIN_EUR = 5;
+export const AHEAD_MIN_SHARE = 0.1;
+
 /**
- * How a category stands against its budget. "Ahead" means spent above where the month's pace
- * says it should be by today, but not over the budget yet.
+ * How a category stands against its budget. "Ahead" means spent clearly above where the month's
+ * pace says it should be by today (see AHEAD_MIN_*), but not over the budget yet.
  */
 export function budgetStatus(amount: number, budget: number | null, pace: number | null): BudgetStatus {
   if (amount <= 0) return 'quiet';
   if (budget === null || budget <= 0) return 'none';
   if (amount > budget + 0.005) return 'over';
   if (amount >= budget - 0.005) return 'full';
-  if (pace !== null && pace < 1 && amount > budget * pace + 0.005) return 'ahead';
+  if (pace !== null && pace < 1) {
+    const gap = amount - budget * pace;
+    if (gap >= Math.max(AHEAD_MIN_EUR, budget * AHEAD_MIN_SHARE)) return 'ahead';
+  }
   return 'ok';
 }
 
