@@ -121,11 +121,11 @@ const AXIS_W = 44;
               stroke-linecap="round"
             />
           }
-          <!-- Dimmed when not selected; an over-budget month stays solid red so it never reads as ember -->
+          <!-- Dimmed when not selected; over-budget months dim less so the red stays deep -->
           <path
             [attr.d]="bar.path"
-            [class]="bar.over ? (bar.id === selectedId() ? 'fill-cherry' : 'fill-cherry-fill') : 'fill-ember'"
-            [attr.opacity]="bar.over || bar.id === selectedId() ? 1 : 0.5"
+            [class]="bar.over ? 'fill-cherry-fill' : 'fill-ember'"
+            [attr.opacity]="bar.id === selectedId() ? 1 : bar.over ? 0.75 : 0.5"
             class="transition-opacity duration-150"
           />
           @if (bar.id === selectedId()) {

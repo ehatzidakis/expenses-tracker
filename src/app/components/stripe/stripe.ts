@@ -54,7 +54,8 @@ import { Component, computed, input } from '@angular/core';
           <span [class]="labelClass + ' right-3'">{{ endLabel() }}</span>
         </span>
         <span
-          class="absolute inset-0 text-ground"
+          class="absolute inset-0"
+          [class]="over() ? 'text-ink' : 'text-ground'"
           [class.clip-in]="animate()"
           [style.clip-path]="'inset(0 ' + (100 - fill()) + '% 0 0)'"
           aria-hidden="true"
@@ -110,10 +111,11 @@ export class StripeComponent {
   protected readonly labelClass =
     'absolute top-1/2 block max-w-[calc(50%-16px)] -translate-y-1/2 truncate whitespace-nowrap text-[11px] font-semibold leading-none tabular-nums';
 
+  readonly over = computed(() => this.ratio() > 1.00005 || this.tone() === 'over');
+
   readonly barColor = computed(() => {
-    const tone = this.ratio() > 1.00005 ? 'over' : this.tone();
-    if (tone === 'over') return 'bg-cherry';
-    if (tone === 'muted') return 'bg-ink-4';
+    if (this.over()) return 'bg-cherry-fill';
+    if (this.tone() === 'muted') return 'bg-ink-4';
     return 'bg-ember';
   });
 }

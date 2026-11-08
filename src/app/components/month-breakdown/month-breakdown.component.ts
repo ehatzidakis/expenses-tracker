@@ -6,9 +6,11 @@ import { SensitiveDirective } from '../../utils/sensitive.directive';
 
 interface MonthSummary {
   name: string;
-  wage: number;
   spend: number;
+  /** Wage minus monthly spend. */
   saved: number;
+  /** Saved, plus income one-offs, minus trips and expense one-offs ending that month. */
+  net: number;
   adjustments: Adjustment[];
 }
 
@@ -22,17 +24,19 @@ interface MonthSummary {
         <li class="py-3">
           <div class="flex items-baseline justify-between gap-3">
             <h3 class="text-[15px] font-medium text-ink">{{ month.name }}</h3>
+            <!-- What the month left in the end: saved, plus income one-offs, minus trips and expenses. -->
             <span
-              class="saved-amount shrink-0 text-[14px] font-medium tabular-nums"
-              [class.text-avocado-ink]="month.saved >= 0"
-              [class.text-cherry]="month.saved < 0"
+              class="month-net shrink-0 text-[14px] font-medium tabular-nums"
+              [class.text-avocado-ink]="month.net >= 0"
+              [class.text-cherry]="month.net < 0"
               appSensitive="xs"
             >
-              {{ month.saved < 0 ? '−' : '' }}€{{ abs(month.saved) | number: '1.2-2' }} saved
+              {{ month.net < 0 ? '−' : '' }}€{{ abs(month.net) | number: '1.2-2' }} net
             </span>
           </div>
           <p class="mt-0.5 text-[12px] text-ink-3 tabular-nums" appSensitive="xs">
-            Spent €{{ month.spend | number: '1.2-2' }} · Wage €{{ month.wage | number: '1.2-2' }}
+            Spent €{{ month.spend | number: '1.2-2' }} · Saved
+            {{ month.saved < 0 ? '−' : '' }}€{{ abs(month.saved) | number: '1.2-2' }}
           </p>
           @if (month.adjustments.length) {
             <ul class="mt-1.5 space-y-0.5">
@@ -42,11 +46,8 @@ interface MonthSummary {
                     {{ adjustment.title }}
                     <span class="text-ink-3">· {{ adjustment.endDate | date: 'd MMM' }}</span>
                   </span>
-                  <span
-                    class="shrink-0 tabular-nums"
-                    [class]="adjustment.adjType ? 'text-avocado-ink' : 'text-ink-2'"
-                    appSensitive="xs"
-                  >
+                  <!-- Plain cream: only the net above carries colour. -->
+                  <span class="shrink-0 tabular-nums text-ink-2" appSensitive="xs">
                     {{ adjustment.adjType ? '+' : '−' }}€{{ adjustment.amount | number: '1.2-2' }}
                   </span>
                 </li>
@@ -100,13 +101,17 @@ export class MonthBreakdownComponent {
           (adjustment) =>
             this.monthKeyFromDate(adjustment.endDate) === this.monthKey(expense.MonthName),
         );
-        const wage = Number(expense.TotalWage) || 0;
+        const saved = (Number(expense.TotalWage) || 0) - spend;
+        const net = adjustments.reduce(
+          (sum, adjustment) => sum + (adjustment.adjType ? adjustment.amount : -adjustment.amount),
+          saved,
+        );
 
         return {
           name: expense.MonthName,
-          wage,
           spend,
-          saved: wage - spend,
+          saved,
+          net,
           adjustments,
         };
       });
