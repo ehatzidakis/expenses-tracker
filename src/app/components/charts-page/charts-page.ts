@@ -184,7 +184,7 @@ const RANGES: ReadonlyArray<{ id: ChartRange; label: string }> = [
                   <div class="absolute inset-x-0 top-1 h-1 rounded-full bg-ink/[0.07]"></div>
                   <div
                     class="absolute left-0 top-1 h-1 rounded-full transition-[width] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]"
-                    [class]="row.over ? 'bg-cherry' : 'bg-ember'"
+                    [class]="row.over ? 'bg-cherry-fill' : 'bg-ember'"
                     [style.width.%]="row.barPct"
                   ></div>
                   @if (row.budgetPct !== null) {

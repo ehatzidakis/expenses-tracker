@@ -30,18 +30,20 @@
   --color-ink-3: #b0a08c;
   --color-ink-4: #95836f;
 
-  --color-ember: #e5703a;
-  --color-ember-ink: #ee7d48;
-  --color-ember-soft: #f2ae85;
-  --color-ember-deep: #3a1d10;
+  /* Trial: a pastel blue in the selection role (was amber #e5703a). */
+  --color-ember: #9db9e0;
+  --color-ember-ink: #b0c9ea;
+  --color-ember-soft: #cddcf2;
+  --color-ember-deep: #172030;
 
   --color-avocado: #8fa35a;
   --color-avocado-ink: #a9bc74;
   --color-avocado-deep: #263016;
 
-  --color-cherry: #f0566b;
-  --color-cherry-fill: #a8283b;
-  --color-cherry-deep: #3a1418;
+  /* Trial: a truer red for text, and a deep crimson for bars and badges (was #f0566b / #a8283b). */
+  --color-cherry: #e8524a;
+  --color-cherry-fill: #b3192b;
+  --color-cherry-deep: #3a1210;
 
   --font-sans: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif,
     'Apple Color Emoji', 'Segoe UI Emoji';
