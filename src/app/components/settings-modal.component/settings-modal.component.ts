@@ -21,6 +21,7 @@ import { StealthModeSettingComponent } from './stealth-mode-setting.component';
 import { StealthPasscodeSettingComponent } from './stealth-passcode-setting.component';
 import { DataExportSettingComponent } from './data-export-setting.component';
 import { NotificationSettingComponent } from './notification-setting.component';
+import { AppLockSettingComponent } from './app-lock-setting.component';
 import { CategoryBudgetsGrid } from '../category-budgets-grid/category-budgets-grid';
 
 type PinAction = 'none' | 'set' | 'remove' | 'unlock-to-disable';
@@ -40,6 +41,7 @@ type PinAction = 'none' | 'set' | 'remove' | 'unlock-to-disable';
     StealthPasscodeSettingComponent,
     DataExportSettingComponent,
     NotificationSettingComponent,
+    AppLockSettingComponent,
   ],
   template: `
     <section [attr.aria-label]="view() === 'budgets' ? 'Budgets and wage' : 'Settings'">
@@ -135,6 +137,8 @@ type PinAction = 'none' | 'set' | 'remove' | 'unlock-to-disable';
               </button>
 
               <app-notification-setting />
+
+              <app-lock-setting />
             }
           </div>
 

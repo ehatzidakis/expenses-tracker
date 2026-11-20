@@ -12,6 +12,8 @@ import { KioskShellComponent } from './components/kiosk-shell/kiosk-shell.compon
 import { BudgetPageComponent } from './components/budget-page/budget-page';
 import { SplitzesPageComponent } from './components/splitzes-modal.component/splitzes-modal.component';
 import { SettingsPageComponent } from './components/settings-modal.component/settings-modal.component';
+import { LockScreenComponent } from './components/lock-screen/lock-screen';
+import { AppLockService } from './services/app-lock.service';
 
 @Component({
   selector: 'app-root',
@@ -25,12 +27,15 @@ import { SettingsPageComponent } from './components/settings-modal.component/set
     KioskShellComponent,
     SplitzesPageComponent,
     SettingsPageComponent,
+    LockScreenComponent,
   ],
   templateUrl: './app.html',
 })
 export class AppComponent {
   state = inject(ExpenseStateService);
   private authService = inject(AuthService);
+  /** Face ID lock, admin only: the lock screen is rendered in the admin branch of the template. */
+  readonly lock = inject(AppLockService);
   private swUpdate = inject(SwUpdate);
   private injector = inject(Injector);
 

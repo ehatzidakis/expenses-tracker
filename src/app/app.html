@@ -115,4 +115,8 @@
     [activeTab]="state.activeTab()"
     (tabChange)="state.setActiveTab($event)"
   ></app-tab-bar>
+
+  @if (lock.locked() || lock.covered()) {
+    <app-lock-screen />
+  }
 }

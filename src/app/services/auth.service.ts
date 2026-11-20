@@ -9,6 +9,7 @@ import {
 import { doc, getDoc, setDoc } from 'firebase/firestore/lite';
 import { auth, db } from '../firebase.config';
 import { QueryPersistenceService } from './query-persistence';
+import { AppLockService } from './app-lock.service';
 
 export type UserRole = 'admin' | 'kiosk';
 
@@ -102,6 +103,8 @@ export class AuthService {
     await signOut(auth);
     // Don't leave this account's data on the device. Looked up lazily to keep tests simple.
     await this.injector.get(QueryPersistenceService).clear();
+    // The Face ID lock belongs to the signed-in account; signing in again starts without it.
+    this.injector.get(AppLockService).disable();
   }
 
   async signOut(): Promise<void> {
