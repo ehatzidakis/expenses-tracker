@@ -93,6 +93,7 @@ The tab ids in code are unchanged: `monthly | sumup | create | charts`.
 | FEAT-12 | Import, backup and reconcile                   | Feature  | P3       | PLAT-2           | Open   |
 | FEAT-13 | Richer transaction data                        | Feature  | P3       | FEAT-5, PLAT-1   | Open   |
 | FEAT-14 | Offline-first entry                            | Feature  | P3       | -                | Open   |
+| FEAT-15 | Face ID lock (admin)                           | Feature  | P3       | -                | Built, parked |
 | UX-1    | Router and deep links                          | UX       | P2       | -                | Open   |
 | UX-2    | Month navigation and category list             | UX       | P3       | FIX-1            | Partly done   |
 | UX-3    | Editing experience                             | UX       | P2       | FIX-2            | Partly done   |
@@ -648,6 +649,35 @@ Each line below is an independent task.
 - [ ] A transaction created in airplane mode appears after reconnect exactly once, with the month counters updated once.
 - [ ] The offline banner and queue badge appear and clear correctly.
 - [ ] Tests cover outbox replay: failure, retry and duplicate protection.
+
+---
+
+### FEAT-15 - Face ID lock (admin)
+
+**Type:** Feature - **Priority:** P3 - **Evidence:** Code - **Depends on:** none
+
+**Status: built and parked, not merged.** The work is on the branch `face-id-lock` (commit `24723b6`, built on `main` at `e447757`). It was deployed once as a Vercel preview (2026-11-20) for phone testing. The decision whether to ship it is still open.
+
+**What the branch does**
+
+- Settings gets a **Require Face ID** switch, admin only. Turning it on creates a passkey on the phone (WebAuthn, platform authenticator, user verification required). iOS asks for Face ID, with the phone's passcode as its own fallback.
+- A full-screen lock (a modal `<dialog>`, so it sits above open sheets) appears on launch and after more than 60 s in the background. It asks for Face ID automatically and offers an **Unlock with Face ID** button and a **Sign out instead** link.
+- The app is blanked while in the background, to hide it in the app switcher. Signing out turns the lock off.
+- Files: `src/app/services/app-lock.service.ts` (+ spec), `src/app/components/lock-screen/lock-screen.ts`, `src/app/components/settings-modal.component/app-lock-setting.component.ts`, small wiring in `app.ts`, `app.html`, `settings-modal.component.ts` and `auth.service.ts`.
+
+**Limits to weigh**
+
+- It is a gate in the app, not encryption: the Firebase session and the cached query data stay on the device. The passkey response is checked in the browser only; no server verifies it.
+- A passkey belongs to one domain. A passkey made on a preview URL does not work on production; the switch has to be turned on again there.
+- Turning the switch off leaves the passkey in the phone's Passwords app until deleted there.
+
+**Still to check on a phone before merging**
+
+- [ ] Whether iOS shows Face ID on its own at launch or only after tapping the button.
+- [ ] That the app switcher shows a blank screen.
+- [ ] Re-lock after a minute away, and no prompt when returning sooner.
+
+**To ship:** rebase `face-id-lock` on `main`, run the tests, open a PR. **To drop:** delete the branch and this item.
 
 ---
 
