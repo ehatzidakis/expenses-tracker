@@ -158,3 +158,13 @@ input[type='time']::-webkit-calendar-picker-indicator {
     transition-duration: 0.01ms !important;
   }
 }
+
+/*
+ * FitRowDirective sets sizes and measures them straight away. Any transition on those elements
+ * (including the reduced-motion rule above, which makes every property transition) would hand
+ * it the old size, so transitions are off for the moment it measures.
+ */
+[data-fit-measuring],
+[data-fit-measuring] * {
+  transition: none !important;
+}

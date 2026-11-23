@@ -3,6 +3,7 @@ import { Component, computed, input } from '@angular/core';
 import { CategorySpend } from '../../services/expense-state.service';
 import { StripeComponent } from '../stripe/stripe';
 import { SensitiveDirective } from '../../utils/sensitive.directive';
+import { FitRowDirective } from '../../utils/fit-row.directive';
 import { MonthTiming, ordinal } from '../../utils/period-pace';
 
 /**
@@ -13,34 +14,35 @@ import { MonthTiming, ordinal } from '../../utils/period-pace';
 @Component({
   selector: 'app-month-summary',
   standalone: true,
-  imports: [DecimalPipe, StripeComponent, SensitiveDirective],
+  imports: [DecimalPipe, StripeComponent, SensitiveDirective, FitRowDirective],
   host: { class: 'block' },
   template: `
     <section
       class="rounded-2xl border border-ink/10 bg-panel px-5 pt-3.5 pb-4 shadow-[inset_0_1px_0_rgb(241_230_210/0.06)]"
       aria-label="Month summary"
     >
-      <div class="flex flex-wrap items-end justify-between gap-x-4 gap-y-2">
-        <div class="min-w-0">
+      <!-- Spent and saved always share one line; appFitRow shrinks both figures together to fit. -->
+      <div class="flex items-end justify-between gap-x-4" appFitRow>
+        <div class="shrink-0">
           <p
-            class="type-wide text-[34px] font-bold leading-none tracking-[-0.02em]"
+            class="type-wide text-[length:calc(34px*var(--fit,1))] font-bold leading-none tracking-[-0.02em] whitespace-nowrap"
             [class]="headlineTone()"
             appSensitive
           >
             €{{ headlineAmount() | number: '1.2-2' }}
           </p>
-          <p class="mt-1 text-[13px] text-ink-2">{{ headlineLabel() }}</p>
+          <p class="mt-1 text-[13px] whitespace-nowrap text-ink-2">{{ headlineLabel() }}</p>
         </div>
 
         <div class="ml-auto shrink-0 text-right">
           <p
-            class="type-wide text-[22px] font-semibold leading-none"
+            class="type-wide text-[length:calc(22px*var(--fit,1))] font-semibold leading-none whitespace-nowrap"
             [class]="saved() >= 0 ? 'text-avocado' : 'text-cherry'"
             appSensitive="xs"
           >
             {{ saved() < 0 ? '−' : '' }}€{{ abs(saved()) | number: '1.2-2' }}
           </p>
-          <p class="mt-1.5 text-[12px] text-ink-3">{{ savedLabel() }}</p>
+          <p class="mt-1.5 text-[12px] whitespace-nowrap text-ink-3">{{ savedLabel() }}</p>
         </div>
       </div>
 

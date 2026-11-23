@@ -26,6 +26,23 @@ export interface CategoryAverage {
   budget: number | null;
 }
 
+/** How much one category moves from month to month. */
+export interface CategorySwing {
+  name: string;
+  /** Average per month. */
+  mean: number;
+  /** Sample standard deviation per month. */
+  sd: number;
+  /** Coefficient of variation: sd ÷ mean (0.25 = a typical swing of 25% of the average). */
+  cv: number;
+  /** mean ± sd, floored at 0: where most months land. */
+  low: number;
+  high: number;
+}
+
+/** Fewer finished months than this and a spread says nothing. */
+export const MIN_SWING_MONTHS = 3;
+
 const MONTHS = [
   'january', 'february', 'march', 'april', 'may', 'june',
   'july', 'august', 'september', 'october', 'november', 'december',
@@ -110,4 +127,30 @@ export function categoryAverages(
       records.reduce((sum, e) => sum + (Number(e[name as keyof Expense]) || 0), 0) / records.length,
     budget: budgetFor(name),
   })).sort((a, b) => b.average - a.average);
+}
+
+/**
+ * Month-to-month variation per category over the given finished months, least steady first.
+ * Months with nothing spent count as 0. Categories never used are left out.
+ */
+export function categorySwings(expenses: Expense[], months: MonthTotal[]): CategorySwing[] {
+  const ids = new Set(finished(months).map((m) => m.id));
+  const records = expenses.filter((e) => ids.has(e.id));
+  const n = records.length;
+  if (n < MIN_SWING_MONTHS) return [];
+  return CATEGORY_NAMES.map((name) => {
+    const values = records.map((e) => Number(e[name as keyof Expense]) || 0);
+    const mean = values.reduce((sum, v) => sum + v, 0) / n;
+    const sd = Math.sqrt(values.reduce((sum, v) => sum + (v - mean) ** 2, 0) / (n - 1));
+    return {
+      name,
+      mean,
+      sd,
+      cv: mean > 0 ? sd / mean : 0,
+      low: Math.max(0, mean - sd),
+      high: mean + sd,
+    };
+  })
+    .filter((row) => row.mean > 0.005)
+    .sort((a, b) => b.cv - a.cv);
 }

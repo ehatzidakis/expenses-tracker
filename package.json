@@ -4,7 +4,7 @@
   "scripts": {
     "ng": "ng",
     "prestart": "node scripts/write-version.js",
-    "start": "ng serve",
+    "start": "ng serve --host 0.0.0.0 --port 3000",
     "prebuild": "node scripts/write-version.js && node scripts/write-environment.js",
     "build": "ng build",
     "watch": "node scripts/write-version.js && ng build --watch --configuration development",
