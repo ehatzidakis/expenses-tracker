@@ -16,6 +16,8 @@ export interface CategorySortOption {
   label: string;
   /** Short wording, for the button beside the heading. */
   short: string;
+  /** Marks the sorts measured as a share of the budget rather than in euros. */
+  percent?: boolean;
 }
 
 /** Menu order: the default, then each sort with its reverse right under it. */
@@ -25,8 +27,8 @@ export const CATEGORY_SORTS: readonly CategorySortOption[] = [
   { id: 'spent-asc', label: 'Least spent', short: 'Least spent' },
   { id: 'left-desc', label: 'Most left', short: 'Most left' },
   { id: 'left-asc', label: 'Least left', short: 'Least left' },
-  { id: 'over-desc', label: 'Most over budget', short: 'Most over' },
-  { id: 'over-asc', label: 'Furthest under budget', short: 'Most under' },
+  { id: 'over-desc', label: 'Most over budget', short: '% over', percent: true },
+  { id: 'over-asc', label: 'Furthest under budget', short: '% under', percent: true },
 ];
 
 export function isCategorySort(value: unknown): value is CategorySort {

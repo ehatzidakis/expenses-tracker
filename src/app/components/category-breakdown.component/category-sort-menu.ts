@@ -54,7 +54,18 @@ const GROUP_STARTS = new Set<CategorySort>(['spent-desc', 'left-desc', 'over-des
             [class]="option.id === value() ? 'font-medium text-ink' : 'text-ink-2'"
             (click)="pick(option.id)"
           >
-            {{ option.label }}
+            <span class="flex items-center gap-2">
+              {{ option.label }}
+              @if (option.percent) {
+                <!-- Ranked by share of the budget used, not euros -->
+                <span
+                  class="rounded-md border border-edge px-1.5 text-[11px] font-medium leading-[18px] text-ink-3"
+                  aria-hidden="true"
+                  >%</span
+                >
+                <span class="sr-only">, by percentage of budget</span>
+              }
+            </span>
             @if (option.id === value()) {
               <svg class="size-4 shrink-0 text-ember" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                 <path
