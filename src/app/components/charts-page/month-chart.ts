@@ -22,10 +22,24 @@ const PAD = { top: 22, right: 4, bottom: 36, left: 0 };
 const MIN_SLOT = 24;
 /** The € tick labels sit in their own column so they stay put while the months scroll. */
 const AXIS_W = 44;
+/** Surface gap between a column and its over-budget cap; the budget line shows through it. */
+const GAP = 2;
+/** An over-budget cap never drawn thinner than this, so a few euros over still shows. */
+const MIN_CAP = 3;
+
+/** What the columns measure: money spent (against the budget) or money kept (wage − spent). */
+export type MonthChartMode = 'spent' | 'saved';
+
+interface Segment {
+  path: string;
+  fill: string;
+  opacity: number;
+}
 
 /**
- * Spending per month as columns on one € axis, with the total budget as a line and each
- * month's wage as a short mark. Tapping a column selects that month.
+ * One column per month on a single € axis. Spending: ember columns with the budget as one
+ * line, and only the part above that line in cherry. Saving: wage minus spending, avocado above
+ * a zero line and cherry below it. Tapping a column selects that month.
  */
 @Component({
   selector: 'app-month-chart',
@@ -34,173 +48,166 @@ const AXIS_W = 44;
   host: { class: 'block' },
   template: `
     <div class="relative flex">
-    <div class="relative shrink-0" [style.width.px]="axisW" [style.height.px]="height" aria-hidden="true">
-      @for (tick of ticks(); track tick.value) {
-        <span
-          class="absolute right-2 -translate-y-1/2 text-[11px] leading-none text-ink-3 tabular-nums"
-          [style.top.px]="tick.y"
-          appSensitive="xs"
-          >{{ tick.label }}</span
-        >
-      }
-    </div>
-    <div
-      #scroller
-      class="min-w-0 flex-1 overflow-x-auto overscroll-x-contain [scrollbar-width:none]"
-      (scroll)="onScroll($event)"
-    >
-      <svg
-        [attr.width]="width()"
-        [attr.height]="height"
-        [attr.viewBox]="'0 0 ' + width() + ' ' + height"
-        class="block overflow-visible"
-        role="group"
-        aria-label="Spending per month"
-      >
-        <!-- Gridlines and € ticks -->
+      <div class="relative shrink-0" [style.width.px]="axisW" [style.height.px]="height" aria-hidden="true">
         @for (tick of ticks(); track tick.value) {
-          <line
-            [attr.x1]="pad.left"
-            [attr.x2]="width() - pad.right"
-            [attr.y1]="tick.y"
-            [attr.y2]="tick.y"
-            class="stroke-ink/10"
-            stroke-width="1"
-            shape-rendering="crispEdges"
-          />
-        }
-
-        <!-- Budget: one line, since budgets are the same for every month -->
-        @if (budgetY(); as y) {
-          <line
-            [attr.x1]="pad.left"
-            [attr.x2]="width() - pad.right"
-            [attr.y1]="y"
-            [attr.y2]="y"
-            class="stroke-ink-3"
-            stroke-width="1"
-            shape-rendering="crispEdges"
-          />
-        }
-
-        @if (budgetY(); as y) {
-          <text
-            [attr.x]="width() - pad.right"
-            [attr.y]="y - 5"
-            text-anchor="end"
-            class="fill-ink-3 stroke-ground text-[11px] [paint-order:stroke]"
-            stroke-width="3"
+          <span
+            class="absolute right-2 -translate-y-1/2 text-[11px] leading-none text-ink-3 tabular-nums"
+            [style.top.px]="tick.y"
             appSensitive="xs"
+            >{{ tick.label }}</span
           >
-            Budget €{{ months()[0]?.budget | number: '1.0-0' }}
-          </text>
         }
-        @if (wageLabel(); as wage) {
-          <text
-            [attr.x]="width() - pad.right"
-            [attr.y]="wage.y - 6"
-            text-anchor="end"
-            class="fill-avocado-ink stroke-ground text-[11px] [paint-order:stroke]"
-            stroke-width="3"
-            appSensitive="xs"
-          >
-            Wage €{{ wage.value | number: '1.0-0' }}
-          </text>
-        }
-
-        @for (bar of bars(); track bar.id) {
-          <!-- Wage for that month -->
-          @if (bar.wageY !== null) {
-            <line
-              [attr.x1]="bar.slotX + 2"
-              [attr.x2]="bar.slotX + bar.slotW - 2"
-              [attr.y1]="bar.wageY"
-              [attr.y2]="bar.wageY"
-              class="stroke-avocado"
-              stroke-width="2"
-              stroke-linecap="round"
-            />
-          }
-          <!-- Dimmed when not selected; over-budget months dim less so the red stays deep -->
-          <path
-            [attr.d]="bar.path"
-            [class]="bar.over ? 'fill-cherry-fill' : 'fill-ember'"
-            [attr.opacity]="bar.id === selectedId() ? 1 : bar.over ? 0.75 : 0.5"
-            class="transition-opacity duration-150"
-          />
-          @if (bar.id === selectedId()) {
-            <text
-              [attr.x]="bar.cx"
-              [attr.y]="bar.top - 6"
-              text-anchor="middle"
-              class="fill-ink-2 text-[11px] font-medium tabular-nums"
-              appSensitive="xs"
-            >
-              €{{ bar.spent | number: '1.0-0' }}
-            </text>
-          }
-          <text
-            [attr.x]="bar.cx"
-            [attr.y]="height - 21"
-            text-anchor="middle"
-            class="text-[11px]"
-            [class]="bar.id === selectedId() ? 'fill-ink font-semibold' : 'fill-ink-3'"
-          >
-            {{ bar.label }}
-          </text>
-          @if (bar.year) {
-            <text [attr.x]="bar.cx" [attr.y]="height - 7" text-anchor="middle" class="fill-ink-3 text-[11px]">
-              {{ bar.year }}
-            </text>
-          }
-        }
-
-        <!-- One pointer surface over the plot: a tap anywhere picks the nearest month, so the
-             target is the whole chart, not a 24px slot. Keyboard: one stop, arrows move. -->
-        <rect
-          [attr.x]="0"
-          [attr.y]="0"
+      </div>
+      <div
+        #scroller
+        class="min-w-0 flex-1 overflow-x-auto overscroll-x-contain [scrollbar-width:none]"
+        (scroll)="onScroll($event)"
+      >
+        <svg
           [attr.width]="width()"
           [attr.height]="height"
-          fill="transparent"
-          class="cursor-pointer outline-none focus-visible:stroke-ember"
-          stroke-width="2"
-          [style.touch-action]="scrolls() ? 'pan-x pan-y' : 'pan-y'"
-          tabindex="0"
-          role="slider"
-          aria-label="Month"
-          [attr.aria-valuemin]="0"
-          [attr.aria-valuemax]="months().length - 1"
-          [attr.aria-valuenow]="selectedIndex()"
-          [attr.aria-valuetext]="bars()[selectedIndex()]?.monthName"
-          (pointerdown)="startScrub($event)"
-          (pointermove)="scrub($event)"
-          (pointerup)="endScrub($event)"
-          (pointercancel)="cancelScrub()"
-          (keydown)="onKey($event)"
-        />
-      </svg>
-    </div>
-    @if (olderHidden()) {
-      <div
-        class="pointer-events-none absolute top-0 w-7 bg-linear-to-r from-ground to-transparent"
-        [style.left.px]="axisW"
-        [style.height.px]="height - pad.bottom"
-        aria-hidden="true"
-      ></div>
-    }
+          [attr.viewBox]="'0 0 ' + width() + ' ' + height"
+          class="block overflow-visible"
+          role="group"
+          [attr.aria-label]="mode() === 'spent' ? 'Spending per month' : 'Saved per month'"
+        >
+          <!-- € gridlines -->
+          @for (tick of ticks(); track tick.value) {
+            @if (tick.value !== 0) {
+              <line
+                [attr.x1]="pad.left"
+                [attr.x2]="width() - pad.right"
+                [attr.y1]="tick.y"
+                [attr.y2]="tick.y"
+                class="stroke-ink/10"
+                stroke-width="1"
+                shape-rendering="crispEdges"
+              />
+            }
+          }
+
+          <!-- The one reference line: the budget, or zero when saving -->
+          @if (referenceY(); as y) {
+            <line
+              [attr.x1]="pad.left"
+              [attr.x2]="width() - pad.right"
+              [attr.y1]="y"
+              [attr.y2]="y"
+              [class]="mode() === 'spent' ? 'stroke-ink-3' : 'stroke-ink/30'"
+              stroke-width="1"
+              shape-rendering="crispEdges"
+            />
+          }
+
+          @for (bar of bars(); track bar.id) {
+            @for (segment of bar.segments; track $index) {
+              <path
+                [attr.d]="segment.path"
+                [class]="segment.fill"
+                [attr.opacity]="segment.opacity"
+                class="transition-opacity duration-150"
+              />
+            }
+            @if (bar.selected) {
+              <text
+                [attr.x]="bar.labelX"
+                [attr.y]="bar.labelY"
+                text-anchor="middle"
+                class="fill-ink-2 stroke-ground text-[11px] font-medium tabular-nums [paint-order:stroke]"
+                stroke-width="3"
+                appSensitive="xs"
+              >
+                {{ bar.valueLabel }}
+              </text>
+            }
+            <text
+              [attr.x]="bar.cx"
+              [attr.y]="height - 21"
+              text-anchor="middle"
+              class="text-[11px]"
+              [class]="bar.selected ? 'fill-ink font-semibold' : 'fill-ink-3'"
+            >
+              {{ bar.label }}
+            </text>
+            @if (bar.year) {
+              <text [attr.x]="bar.cx" [attr.y]="height - 7" text-anchor="middle" class="fill-ink-3 text-[11px]">
+                {{ bar.year }}
+              </text>
+            }
+          }
+
+          <!-- One pointer surface over the plot: a tap anywhere picks the nearest month, so the
+               target is the whole chart, not a 24px slot. Keyboard: one stop, arrows move. -->
+          <rect
+            [attr.x]="0"
+            [attr.y]="0"
+            [attr.width]="width()"
+            [attr.height]="height"
+            fill="transparent"
+            class="cursor-pointer outline-none focus-visible:stroke-ember"
+            stroke-width="2"
+            [style.touch-action]="scrolls() ? 'pan-x pan-y' : 'pan-y'"
+            tabindex="0"
+            role="slider"
+            aria-label="Month"
+            [attr.aria-valuemin]="0"
+            [attr.aria-valuemax]="months().length - 1"
+            [attr.aria-valuenow]="selectedIndex()"
+            [attr.aria-valuetext]="bars()[selectedIndex()]?.monthName"
+            (pointerdown)="startScrub($event)"
+            (pointermove)="scrub($event)"
+            (pointerup)="endScrub($event)"
+            (pointercancel)="cancelScrub()"
+            (keydown)="onKey($event)"
+          />
+        </svg>
+      </div>
+      @if (olderHidden()) {
+        <div
+          class="pointer-events-none absolute top-0 w-7 bg-linear-to-r from-ground to-transparent"
+          [style.left.px]="axisW"
+          [style.height.px]="height - pad.bottom"
+          aria-hidden="true"
+        ></div>
+      }
     </div>
 
-    @if (anyOver()) {
-      <p class="mt-2 flex items-center gap-1.5 text-[12px] text-ink-3">
-        <span class="size-2.5 rounded-[2px] bg-cherry-fill" aria-hidden="true"></span>Red months went over budget
-      </p>
-    }
+    <!-- Key: what the lines and colours mean, outside the plot so nothing collides there -->
+    <p class="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-[12px] text-ink-3">
+      @if (mode() === 'spent') {
+        @if (budget() > 0) {
+          <span class="flex items-center gap-1.5">
+            <span class="h-px w-3.5 bg-ink-3" aria-hidden="true"></span>
+            <span appSensitive="xs">Budget €{{ budget() | number: '1.0-0' }}</span>
+          </span>
+        }
+        @if (anyNegative()) {
+          <span class="flex items-center gap-1.5">
+            <span class="size-2.5 rounded-[2px] bg-cherry-fill" aria-hidden="true"></span>Over budget
+          </span>
+        }
+      } @else {
+        <span class="flex items-center gap-1.5">
+          <span class="size-2.5 rounded-[2px] bg-avocado" aria-hidden="true"></span>Kept from the wage
+        </span>
+        @if (anyNegative()) {
+          <span class="flex items-center gap-1.5">
+            <span class="size-2.5 rounded-[2px] bg-cherry-fill" aria-hidden="true"></span>Spent more than the wage
+          </span>
+        }
+      }
+    </p>
 
     <table class="sr-only">
-      <caption>Spending per month</caption>
+      <caption>{{ mode() === 'spent' ? 'Spending per month' : 'Saved per month' }}</caption>
       <thead>
-        <tr><th scope="col">Month</th><th scope="col">Spent</th><th scope="col">Budget</th><th scope="col">Wage</th></tr>
+        <tr>
+          <th scope="col">Month</th>
+          <th scope="col">Spent</th>
+          <th scope="col">Budget</th>
+          <th scope="col">Wage</th>
+          <th scope="col">Saved</th>
+        </tr>
       </thead>
       <tbody>
         @for (m of months(); track m.id) {
@@ -209,6 +216,7 @@ const AXIS_W = 44;
             <td appSensitive="xs">€{{ m.spent | number: '1.2-2' }}</td>
             <td appSensitive="xs">€{{ m.budget | number: '1.2-2' }}</td>
             <td appSensitive="xs">€{{ m.wage | number: '1.2-2' }}</td>
+            <td appSensitive="xs">{{ m.saved < 0 ? '−' : '' }}€{{ abs(m.saved) | number: '1.2-2' }}</td>
           </tr>
         }
       </tbody>
@@ -221,6 +229,7 @@ export class MonthChartComponent {
   protected readonly axisW = AXIS_W;
 
   readonly months = input.required<MonthTotal[]>();
+  readonly mode = input<MonthChartMode>('spent');
   readonly selectedId = input<string | null>(null);
   readonly select = output<string>();
 
@@ -236,11 +245,20 @@ export class MonthChartComponent {
     return i === -1 ? this.months().length - 1 : i;
   });
 
-  /** The newest month's wage, labelled once at the right end. */
-  readonly wageLabel = computed(() => {
-    const last = this.months()[this.months().length - 1];
-    return last && last.wage > 0 ? { value: last.wage, y: this.y()(last.wage) } : null;
-  });
+  /** Budgets are not stored per month, so every month shares today's. */
+  readonly budget = computed(() => this.months()[0]?.budget ?? 0);
+
+  /** The value each column stands for. */
+  private value(m: MonthTotal): number {
+    return this.mode() === 'spent' ? m.spent : m.saved;
+  }
+
+  /** Any month in the red: over budget when spending, below zero when saving. */
+  readonly anyNegative = computed(() =>
+    this.mode() === 'spent'
+      ? this.months().some((m) => this.budget() > 0 && m.spent > this.budget() + 0.005)
+      : this.months().some((m) => m.saved < -0.005),
+  );
 
   /** True once older months have scrolled off to the left. */
   readonly olderHidden = signal(false);
@@ -311,8 +329,6 @@ export class MonthChartComponent {
     this.select.emit(months[next].id);
   }
 
-  readonly anyOver = computed(() => this.months().some((m) => m.budget > 0 && m.spent > m.budget + 0.005));
-
   private readonly x = computed(() =>
     scaleBand<string>()
       .domain(this.months().map((m) => m.id))
@@ -322,9 +338,13 @@ export class MonthChartComponent {
   );
 
   private readonly y = computed(() => {
-    const peak = Math.max(1, ...this.months().flatMap((m) => [m.spent, m.budget, m.wage]));
+    const values = this.months().map((m) => this.value(m));
+    const reference = this.mode() === 'spent' ? [this.budget()] : [];
+    const hi = Math.max(1, ...values, ...reference);
+    const lo = Math.min(0, ...values);
+    const room = (hi - lo) * 0.04;
     return scaleLinear()
-      .domain([0, peak * 1.04])
+      .domain([lo < 0 ? lo - room : 0, hi + room])
       .range([HEIGHT - PAD.bottom, PAD.top])
       .nice(3);
   });
@@ -334,48 +354,99 @@ export class MonthChartComponent {
     return y.ticks(3).map((value) => ({
       value,
       y: Math.round(y(value)) + 0.5,
-      label: value >= 10_000 ? `€${value / 1000}K` : `€${value.toLocaleString('en-US')}`,
+      label: euroTick(value),
     }));
   });
 
-  readonly budgetY = computed(() => {
-    const budget = this.months()[0]?.budget ?? 0;
-    return budget > 0 ? Math.round(this.y()(budget)) + 0.5 : null;
+  /** The budget line when spending; the zero line when saving. */
+  readonly referenceY = computed(() => {
+    if (this.mode() === 'saved') return Math.round(this.y()(0)) + 0.5;
+    return this.budget() > 0 ? Math.round(this.y()(this.budget())) + 0.5 : null;
   });
 
   readonly bars = computed(() => {
     const x = this.x();
     const y = this.y();
+    const mode = this.mode();
+    const budget = this.budget();
     const slotW = x.bandwidth();
     const barW = Math.min(24, Math.max(6, slotW * 0.62));
-    const base = HEIGHT - PAD.bottom;
+    const zero = y(0);
+    const selectedIndex = this.selectedIndex();
     const months = this.months();
-    const seen = new Map<number, number>();
-    months.forEach((m) => seen.set(m.month, (seen.get(m.month) ?? 0) + 1));
-    const repeats = new Set([...seen].filter(([, n]) => n > 1).map(([month]) => month));
+
     return months.map((m, i) => {
       const slotX = x(m.id) ?? 0;
       const cx = slotX + slotW / 2;
-      const top = Math.min(base, y(m.spent));
+      const left = cx - barW / 2;
+      const selected = i === selectedIndex;
+      const value = this.value(m);
+      const end = y(value);
+      const segments: Segment[] = [];
+
+      if (mode === 'spent') {
+        const over = budget > 0 && m.spent > budget + 0.005;
+        const fill = { path: '', fill: 'fill-ember', opacity: selected ? 1 : 0.5 };
+        if (!over) {
+          segments.push({ ...fill, path: column(left, end, barW, zero - end, 'up') });
+        } else {
+          // Ember up to the budget, a gap the budget line shows through, cherry for the excess.
+          const line = y(budget);
+          const capTop = Math.min(end, line - GAP / 2 - MIN_CAP);
+          segments.push({ ...fill, path: rect(left, line + GAP / 2, barW, zero - line - GAP / 2) });
+          segments.push({
+            path: column(left, capTop, barW, line - GAP / 2 - capTop, 'up'),
+            fill: selected ? 'fill-cherry' : 'fill-cherry-fill',
+            opacity: selected ? 1 : 0.85,
+          });
+        }
+      } else if (value >= 0) {
+        segments.push({
+          path: column(left, end, barW, zero - end, 'up'),
+          fill: 'fill-avocado',
+          // Avocado is darker than ember, so it needs more than 50% to stay green, not olive.
+          opacity: selected ? 1 : 0.65,
+        });
+      } else {
+        segments.push({
+          path: column(left, zero, barW, end - zero, 'down'),
+          fill: selected ? 'fill-cherry' : 'fill-cherry-fill',
+          opacity: selected ? 1 : 0.85,
+        });
+      }
+
+      const top = Math.min(zero, end);
+      const bottom = Math.max(zero, end);
+      const valueLabel =
+        mode === 'saved' && value < 0
+          ? `−€${Math.round(-value).toLocaleString('en-US')}`
+          : `€${Math.round(value).toLocaleString('en-US')}`;
+      // Keep the label inside the plot: the newest month sits against the right edge.
+      const half = valueLabel.length * 3.3 + 2;
+      // The selected value sits past the end of its column: above, or below one that dips.
+      let labelY = mode === 'saved' && value < 0 ? Math.min(bottom + 13, HEIGHT - PAD.bottom + 2) : top - 6;
+      // A column ending just under the budget would put its label on the line: lift it clear.
+      const line = mode === 'spent' && budget > 0 ? y(budget) : null;
+      if (line !== null && line > labelY - 11 && line < labelY + 4) labelY = line - 5;
       return {
         id: m.id,
         monthName: `${m.monthName}${m.current ? ', so far' : ''}`,
-        spent: m.spent,
-        over: m.budget > 0 && m.spent > m.budget + 0.005,
-        slotX,
-        slotW,
+        selected,
+        segments,
         cx,
-        top,
-        path: roundedTop(cx - barW / 2, top, barW, base - top, 4),
-        wageY: m.wage > 0 ? y(m.wage) : null,
+        labelX: Math.min(Math.max(cx, PAD.left + half), this.width() - PAD.right - half),
+        labelY,
+        valueLabel,
         label: m.short,
-        year:
-          (i === 0 && months.length > 1) || m.month === 0 || repeats.has(m.month)
-            ? `'${String(m.year).slice(-2)}`
-            : '',
+        // The year only where it changes: under the first month and under each January.
+        year: i === 0 || m.month === 0 ? `'${String(m.year).slice(-2)}` : '',
       };
     });
   });
+
+  abs(value: number): number {
+    return Math.abs(value);
+  }
 
   constructor() {
     afterNextRender(() => {
@@ -399,17 +470,43 @@ export class MonthChartComponent {
   private readonly destroyRef = inject(DestroyRef);
 }
 
-/** A column with 4px rounded top corners and a square foot on the baseline. */
-function roundedTop(x: number, y: number, w: number, h: number, r: number): string {
+function euroTick(value: number): string {
+  const sign = value < 0 ? '−' : '';
+  const abs = Math.abs(value);
+  return `${sign}€${abs >= 10_000 ? `${abs / 1000}K` : abs.toLocaleString('en-US')}`;
+}
+
+/** A plain rectangle: the part of an over-budget column below the budget line. */
+function rect(x: number, y: number, w: number, h: number): string {
   if (h <= 0) return '';
-  const radius = Math.min(r, w / 2, h);
+  return `M${x},${y}H${x + w}V${y + h}H${x}Z`;
+}
+
+/**
+ * A column with 4px rounded corners on its data end and a square foot on the baseline.
+ * 'up' rounds the top (the column rises from the baseline); 'down' rounds the bottom.
+ */
+function column(x: number, y: number, w: number, h: number, direction: 'up' | 'down'): string {
+  if (h <= 0) return '';
+  const r = Math.min(4, w / 2, h);
+  if (direction === 'up') {
+    return [
+      `M${x},${y + h}`,
+      `V${y + r}`,
+      `Q${x},${y} ${x + r},${y}`,
+      `H${x + w - r}`,
+      `Q${x + w},${y} ${x + w},${y + r}`,
+      `V${y + h}`,
+      'Z',
+    ].join(' ');
+  }
   return [
-    `M${x},${y + h}`,
-    `V${y + radius}`,
-    `Q${x},${y} ${x + radius},${y}`,
-    `H${x + w - radius}`,
-    `Q${x + w},${y} ${x + w},${y + radius}`,
-    `V${y + h}`,
+    `M${x},${y}`,
+    `V${y + h - r}`,
+    `Q${x},${y + h} ${x + r},${y + h}`,
+    `H${x + w - r}`,
+    `Q${x + w},${y + h} ${x + w},${y + h - r}`,
+    `V${y}`,
     'Z',
   ].join(' ');
 }

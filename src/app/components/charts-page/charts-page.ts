@@ -6,6 +6,8 @@ import {
   ChartRange,
   averageMonth,
   categoryAverages,
+  categorySwings,
+  finished,
   inRange,
   monthTotals,
 } from '../../utils/chart-data';
@@ -13,6 +15,7 @@ import { categoryLabel } from '../../utils/period-pace';
 import { SEGMENT_BASE, SEGMENT_FRAME, SEGMENT_OFF, SEGMENT_ON } from '../../utils/pill-styles';
 import { SensitiveDirective } from '../../utils/sensitive.directive';
 import { MonthChartComponent } from './month-chart';
+import { CategorySwingsComponent } from './category-swings';
 import { UtilitySumComponent } from '../utility-sum-component/utility-sum-component';
 import { CategoryAverageComponent } from '../category-average/category-average';
 
@@ -20,6 +23,15 @@ const RANGES: ReadonlyArray<{ id: ChartRange; label: string }> = [
   { id: 'all', label: 'All' },
   { id: '6m', label: '6M' },
   { id: '12m', label: '12M' },
+];
+
+type ChartView = 'spent' | 'saved' | 'swings';
+
+/** One chart at a time: what was spent, what was kept, and how steady each category is. */
+const VIEWS: ReadonlyArray<{ id: ChartView; label: string }> = [
+  { id: 'spent', label: 'Spending' },
+  { id: 'saved', label: 'Saving' },
+  { id: 'swings', label: 'Swings' },
 ];
 
 /**
@@ -33,6 +45,7 @@ const RANGES: ReadonlyArray<{ id: ChartRange; label: string }> = [
     DecimalPipe,
     SensitiveDirective,
     MonthChartComponent,
+    CategorySwingsComponent,
     UtilitySumComponent,
     CategoryAverageComponent,
   ],
@@ -107,6 +120,63 @@ const RANGES: ReadonlyArray<{ id: ChartRange; label: string }> = [
           Month by month
         </h2>
 
+        <div role="group" aria-label="Chart" [class]="frame + ' grid-cols-3'">
+          @for (option of views; track option.id) {
+            <button
+              type="button"
+              [class]="segment(view() === option.id)"
+              [attr.aria-pressed]="view() === option.id"
+              (click)="view.set(option.id)"
+            >
+              {{ option.label }}
+            </button>
+          }
+        </div>
+
+        @if (view() === 'swings') {
+          <p class="text-[13px] text-ink-3">
+            How much each category moves from month to month: its typical swing as a share of its
+            average. Lower is steadier.
+          </p>
+          <app-category-swings [swings]="swings()" />
+        } @else if (view() === 'saved') {
+          @if (selected(); as m) {
+            <div class="flex items-baseline justify-between gap-3" aria-live="polite">
+              <p class="text-[15px] font-medium text-ink">
+                {{ m.monthName }}
+                @if (m.current) {
+                  <span class="text-[13px] font-normal text-ink-3">so far</span>
+                }
+              </p>
+              <p
+                class="text-right text-[13px]"
+                [class]="m.saved >= 0 ? 'text-avocado' : 'font-semibold text-cherry'"
+                appSensitive="xs"
+              >
+                €{{ abs(m.saved) | number: '1.2-2' }} {{ m.saved >= 0 ? 'kept' : 'over the wage' }}
+              </p>
+            </div>
+            <p class="-mt-2 text-[13px] text-ink-3" appSensitive="xs">
+              Wage €{{ m.wage | number: '1.2-2' }} · spent €{{ m.spent | number: '1.2-2' }}
+            </p>
+          }
+
+          <app-month-chart
+            mode="saved"
+            [months]="months()"
+            [selectedId]="selected()?.id ?? null"
+            (select)="selectedId.set($event)"
+          />
+
+          @if (keptTotal(); as total) {
+            <p class="text-[13px] text-ink-3" appSensitive="xs">
+              <span [class]="total.saved >= 0 ? 'text-avocado' : 'font-semibold text-cherry'"
+                >{{ total.saved < 0 ? '−' : '' }}€{{ abs(total.saved) | number: '1.2-2' }}</span
+              >
+              kept over {{ total.count }} finished {{ total.count === 1 ? 'month' : 'months' }}
+            </p>
+          }
+        } @else {
         @if (selected(); as m) {
           <div class="flex items-baseline justify-between gap-3" aria-live="polite">
             <p class="text-[15px] font-medium text-ink">
@@ -142,10 +212,12 @@ const RANGES: ReadonlyArray<{ id: ChartRange; label: string }> = [
         }
 
         <app-month-chart
+          mode="spent"
           [months]="months()"
           [selectedId]="selected()?.id ?? null"
           (select)="selectedId.set($event)"
         />
+        }
       </section>
 
       <section aria-labelledby="chart-typical" class="flex flex-col gap-2">
@@ -230,7 +302,10 @@ export class ChartsPageComponent {
   protected readonly ranges = RANGES;
   protected readonly frame = SEGMENT_FRAME;
 
+  protected readonly views = VIEWS;
+
   readonly range = signal<ChartRange>('all');
+  readonly view = signal<ChartView>('spent');
   readonly selectedId = signal<string | null>(null);
 
   private readonly budgetFor = (name: string) => this.budgets.getCategoryBudget(name);
@@ -266,6 +341,17 @@ export class ChartsPageComponent {
       barPct: (row.average / peak) * 100,
       budgetPct: row.budget !== null ? (row.budget / peak) * 100 : null,
     }));
+  });
+
+  readonly swings = computed(() =>
+    categorySwings(this.state.expensesQuery.data() ?? [], this.months()),
+  );
+
+  /** Wage minus spending summed over the finished months in range. */
+  readonly keptTotal = computed(() => {
+    const done = finished(this.months());
+    if (!done.length) return null;
+    return { saved: done.reduce((sum, m) => sum + m.saved, 0), count: done.length };
   });
 
   readonly unused = computed(() =>

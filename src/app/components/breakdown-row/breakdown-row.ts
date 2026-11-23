@@ -34,12 +34,16 @@ export type RowTone = BudgetStatus | 'share';
             </span>
           }
           <span
-            class="truncate text-[15px] font-medium transition-colors duration-300"
-            [class]="dimmed() ? 'text-ink-2' : 'text-ink'"
+            class="truncate text-[15px] font-medium text-ink transition-opacity duration-300"
+            [class.opacity-35]="dimmed()"
             >{{ label() }}</span
           >
         </span>
-        <span class="shrink-0 text-[13px] text-ink tabular-nums" appSensitive="xs">
+        <span
+          class="shrink-0 text-[13px] text-ink tabular-nums transition-opacity duration-300"
+          [class.opacity-35]="dimmed()"
+          appSensitive="xs"
+        >
           €{{ amount() | number: '1.2-2' }}
           @if (budget() !== null) {
             <span class="text-ink-3">/ €{{ budget() | number: '1.2-2' }}</span>
@@ -56,8 +60,9 @@ export type RowTone = BudgetStatus | 'share';
       />
 
       <span
-        class="flex items-center justify-between gap-3 text-[12px]"
+        class="flex items-center justify-between gap-3 text-[12px] transition-opacity duration-300"
         [class.ml-7]="!!emoji()"
+        [class.opacity-35]="dimmed()"
       >
         <span [class]="statusClass()" appSensitive="xs">{{ statusText() }}</span>
         <span class="flex shrink-0 items-center gap-1 text-ink-3">

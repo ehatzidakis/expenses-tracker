@@ -3,6 +3,7 @@ import { Expense } from '../models/expenses.model';
 import {
   averageMonth,
   categoryAverages,
+  categorySwings,
   inRange,
   monthTotals,
   parseMonthName,
@@ -67,5 +68,34 @@ describe('chart data', () => {
     const rows = categoryAverages(EXPENSES, months, budgetFor);
     expect(rows[0]).toEqual({ name: 'Supermarket', average: 200, budget: 200 });
     expect(rows[1]).toEqual({ name: 'EatingOut', average: 90, budget: 100 });
+  });
+
+  describe('categorySwings', () => {
+    const SWING_EXPENSES = [
+      month('m1', 'August 2026', { Supermarket: 100, Gym: 50 }),
+      month('m2', 'September 2026', { Supermarket: 200, Gym: 50 }),
+      month('m3', 'October 2026', { Supermarket: 300, Gym: 50, EatingOut: 90 }),
+      month('m4', 'November 2026', { Supermarket: 5000 }),
+    ];
+    const months = monthTotals(SWING_EXPENSES, budgetFor, now);
+
+    it('ranks used categories least steady first, over finished months only', () => {
+      const rows = categorySwings(SWING_EXPENSES, months);
+      expect(rows.map((r) => r.name)).toEqual(['EatingOut', 'Supermarket', 'Gym']);
+      expect(rows[1]).toEqual({ name: 'Supermarket', mean: 200, sd: 100, cv: 0.5, low: 100, high: 300 });
+      expect(rows[2]).toMatchObject({ name: 'Gym', mean: 50, sd: 0, cv: 0 });
+    });
+
+    it('counts empty months as zero and floors the usual range at zero', () => {
+      const eatingOut = categorySwings(SWING_EXPENSES, months)[0];
+      expect(eatingOut.mean).toBe(30);
+      expect(eatingOut.sd).toBeCloseTo(Math.sqrt(2700));
+      expect(eatingOut.cv).toBeCloseTo(Math.sqrt(2700) / 30);
+      expect(eatingOut.low).toBe(0);
+    });
+
+    it('needs three finished months', () => {
+      expect(categorySwings(SWING_EXPENSES, months.slice(1))).toEqual([]);
+    });
   });
 });
