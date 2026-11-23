@@ -48,3 +48,5 @@ src/environments/environment.ts
 src/environments/environment.development.ts
 src/app/utils/seed-transactions.ts
 src/app/assets/antwerp.json
+# One-off data migrations: kept locally for reference, never committed
+/scripts/data-fix/
