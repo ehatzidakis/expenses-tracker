@@ -13,6 +13,19 @@ import { SheetComponent } from '../sheet/sheet';
 import { Transaction } from '../../models/transaction.model';
 import { STATUS_RANK, budgetStatus, categoryLabel } from '../../utils/period-pace';
 import { SEGMENT_BASE, SEGMENT_FRAME, SEGMENT_OFF, SEGMENT_ON } from '../../utils/pill-styles';
+import { CategorySort, isCategorySort, sortCategories } from '../../utils/category-sort';
+import { CategorySortMenuComponent } from './category-sort-menu';
+
+const SORT_STORAGE_KEY = 'categorySort';
+
+function readStoredSort(): CategorySort {
+  try {
+    const stored = localStorage.getItem(SORT_STORAGE_KEY);
+    return isCategorySort(stored) ? stored : 'default';
+  } catch {
+    return 'default';
+  }
+}
 
 @Component({
   selector: 'app-category-breakdown',
@@ -21,6 +34,7 @@ import { SEGMENT_BASE, SEGMENT_FRAME, SEGMENT_OFF, SEGMENT_ON } from '../../util
     DecimalPipe,
     SensitiveDirective,
     CategoryBreakdownItemComponent,
+    CategorySortMenuComponent,
     EditTransactionComponent,
     MonthBreakdownComponent,
     SheetComponent,
@@ -29,12 +43,17 @@ import { SEGMENT_BASE, SEGMENT_FRAME, SEGMENT_OFF, SEGMENT_ON } from '../../util
   template: `
     <section aria-labelledby="categories-heading">
       <div class="flex min-h-11 items-center justify-between gap-3">
-        <h2
-          id="categories-heading"
-          class="type-wide text-[13px] font-semibold uppercase text-ink-2"
-        >
-          {{ viewMode() === 'month' && showMonthView() ? 'Months' : 'Categories' }}
-        </h2>
+        <div class="flex min-w-0 items-center gap-1">
+          <h2
+            id="categories-heading"
+            class="type-wide text-[13px] font-semibold uppercase text-ink-2"
+          >
+            {{ viewMode() === 'month' && showMonthView() ? 'Months' : 'Categories' }}
+          </h2>
+          @if (!(viewMode() === 'month' && showMonthView())) {
+            <app-category-sort-menu [value]="sort()" (changed)="setSort($event)" />
+          }
+        </div>
 
         @if (showMonthView()) {
           <div role="group" aria-label="Group by" [class]="segmentFrame + ' grid-cols-2'">
@@ -179,24 +198,31 @@ export class CategoryBreakdownComponent {
   readonly selectedTransaction = signal<Transaction | null>(null);
   readonly showQuiet = signal(false);
 
-  /** Trouble first: over, ahead of pace, full, on pace, unbudgeted. Biggest gap leads each group. */
+  /** The chosen row order, remembered on this device for both the month and all-time lists. */
+  readonly sort = signal<CategorySort>(readStoredSort());
+
+  setSort(sort: CategorySort): void {
+    this.sort.set(sort);
+    try {
+      localStorage.setItem(SORT_STORAGE_KEY, sort);
+    } catch {
+      // Private browsing can refuse storage; the order still applies for this visit.
+    }
+  }
+
+  /** Rows in the chosen order; categories with nothing spent fold away below whatever the order. */
   readonly sortedCategories = computed(() => {
     const pace = this.pace();
-    return (
-      [...this.categories()]
-        .map((category) => {
-          const status = category.isAllTime
-            ? category.amount <= 0
-              ? 'quiet'
-              : category.isOverBudget
-                ? 'over'
-                : 'ok'
-            : budgetStatus(category.amount, category.budget, pace);
-          return { category, rank: STATUS_RANK[status] };
-        })
-        // Biggest spend first, whatever its budget; categories with nothing spent fold away below.
-        .sort((a, b) => b.category.amount - a.category.amount)
-    );
+    return sortCategories(this.categories(), this.sort()).map((category) => {
+      const status = category.isAllTime
+        ? category.amount <= 0
+          ? 'quiet'
+          : category.isOverBudget
+            ? 'over'
+            : 'ok'
+        : budgetStatus(category.amount, category.budget, pace);
+      return { category, rank: STATUS_RANK[status] };
+    });
   });
 
   readonly activeCategories = computed(() =>

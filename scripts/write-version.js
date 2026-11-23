@@ -32,4 +32,6 @@ function getGitVersion() {
 const version = getGitVersion();
 const content = `export const APP_VERSION = '${version}';\n`;
 
+// src/environments holds only generated files, so a fresh checkout (such as Vercel's) has no folder yet.
+fs.mkdirSync(path.dirname(outFile), { recursive: true });
 fs.writeFileSync(outFile, content, 'utf8');

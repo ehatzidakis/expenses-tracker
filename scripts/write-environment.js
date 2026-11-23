@@ -9,6 +9,8 @@ const apiKey = process.env.FIREBASE_API_KEY;
 
 if (apiKey) {
   const content = `export const environment = {\n  production: true,\n  apiKey: ${JSON.stringify(apiKey)},\n};\n`;
+  // src/environments holds only generated files, so a fresh checkout has no folder yet.
+  fs.mkdirSync(path.dirname(outFile), { recursive: true });
   fs.writeFileSync(outFile, content, 'utf8');
 } else if (!fs.existsSync(outFile)) {
   console.error(

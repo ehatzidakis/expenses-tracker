@@ -46,6 +46,9 @@ Thumbs.db
 
 src/environments/environment.ts
 src/environments/environment.development.ts
+# Written by scripts/write-version.js before every start, build and test run (the commit, or
+# Vercel's VERCEL_GIT_COMMIT_SHA on deploy). It keys the offline query cache to the deploy.
+src/environments/version.ts
 src/app/utils/seed-transactions.ts
 src/app/assets/antwerp.json
 # One-off data migrations: kept locally for reference, never committed

@@ -326,7 +326,7 @@ A warm, low-light palette: walnut and cream neutrals, one burnt-orange family, a
 
 There is one centred column with a maximum width of 512px. It has 16px side gutters and stacks its sections with 20px gaps. The column pads for the iOS status bar (the safe area, at least 8px) and leaves the safe area plus 92px at the bottom so the docked tab bar never covers content. On desktop the same column stays centred on the walnut ground and does not widen.
 
-The Budget page always runs in the same order: the Month / Trips / One-offs switch, the period pills, the summary panel, the breakdown, then the transactions. Category rows are sorted by amount spent, largest first. Categories with nothing spent fold into a single "quiet" line at the end. The transactions list starts collapsed behind a Show / Hide header and loads only when opened.
+The Budget page always runs in the same order: the Month / Trips / One-offs switch, the period pills, the summary panel, the breakdown, then the transactions. Category rows follow the sort chosen beside the Categories heading: a quiet 13px cream-3 text button (a sort icon and a short name such as "Most spent") that opens a raised menu. The menu lists Default order (Supermarket, Personal, Medical, Utilities, Eating out, Takeaway, Tickets, Gaming, Cats, Travel, Subscriptions, Gym), then Most/Least spent, Most/Least left (euros) and Most over/Furthest under budget (share of the budget used, marked with a small % badge in the menu and shown as "% over" or "% under" on the button). Each sort sits directly above its reverse, with a hairline between pairs and an ember check on the current one. The choice is remembered on the device and applies to the month and all-time lists alike. Unbudgeted categories go last in the left and over sorts. Whatever the order, categories with nothing spent fold into a single "quiet" line at the end. The transactions list starts collapsed behind a Show / Hide header and loads only when opened.
 
 The Add tab runs as a till, top to bottom on the ground with no wrapping card: the Transaction / Trip / One-off switch, the amount, the 3-column category grid, a horizontally scrolling row of recurring pills, description, date, split, the "More options" disclosure, the Add button, then the after-save impact line. Fields stack with 20px gaps; a label sits 6px above its field.
 
@@ -489,7 +489,7 @@ Motion uses one curve, expo-out (`cubic-bezier(0.16, 1, 0.3, 1)`). The only auth
 - **Do** use the shared pill, segment, field, button, well and dialog styles instead of restyling them; when a new size is needed, add it as its own named style.
 - **Do** make an on/off setting the shared switch, with the whole row as the control.
 - **Do** open secondary surfaces in the shared bottom sheet, step into a sub-view inside the same sheet, and confirm in the centred dialog with Cancel first.
-- **Do** sort category rows by what they measure, largest first (spent on Budget, average on Typical month, budget in the budgets sheet), and fold categories with nothing spent into one quiet line.
+- **Do** sort category rows by what they measure, largest first (average on Typical month, budget in the budgets sheet). On Budget the person picks the order, which starts at the fixed default order. Fold categories with nothing spent into one quiet line.
 - **Do** give every chart a single keyboard stop and a screen-reader table, and label its lines in place rather than in a legend.
 - **Do** give a new surface a black shadow only if it floats over the page.
 
