@@ -17,6 +17,9 @@ export const QUICK_PILL_GROW = 'flex-none max-w-[60%] ' + QUICK_PILL_SHAPE;
 /** Wraps the "More" picker: 1.5x a quick pill's width, and anchors its dropdown. */
 export const PICKER_WRAPPER = 'relative flex-[1.3] basis-0 min-w-0';
 
+/** The picker wrapper once an older item is picked: it keeps the whole name, like QUICK_PILL_GROW. */
+export const PICKER_WRAPPER_GROW = 'relative flex-none max-w-[60%]';
+
 /** The "More" picker toggle: a dashed pill that looks selected once an older item is picked. */
 export const PICKER_BASE =
   'w-full min-h-11 px-2.5 rounded-xl text-[13px] font-medium whitespace-nowrap border transition-colors duration-150 flex items-center justify-center gap-1 cursor-pointer';

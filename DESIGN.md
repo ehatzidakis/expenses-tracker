@@ -330,7 +330,7 @@ The Budget page always runs in the same order: the Month / Trips / One-offs swit
 
 The Add tab runs as a till, top to bottom on the ground with no wrapping card: the Transaction / Trip / One-off switch, the amount, the 3-column category grid, a horizontally scrolling row of recurring pills, description, date, split, the "More options" disclosure, the Add button, then the after-save impact line. Fields stack with 20px gaps; a label sits 6px above its field.
 
-The Charts tab stacks its sections 32px apart: the 6M / 12M / All switch with the average month under it, then "Month by month" (a Spending / Saving / Swings switch, then the chosen chart with its readout), then "Typical month", then "Typical costs" (Bills, then Per purchase, 24px apart). A section heading may carry a 12px cream-3 note on its right ("Monthly average vs budget", "All time"). The range scopes the first two sections only; typical costs are all-time.
+The Charts tab shows one section at a time. The All / 6M / 12M switch sits at the top with inner tabs 8px under it: "Month by month", "Typical month" and "Typical costs". The chosen panel follows 24px below. "Month by month" opens with the average month, then a Spending / Saving / Swings switch and the chosen chart with its readout. "Typical month" opens with the average month, then a 12px cream-3 note and the category rows. "Typical costs" opens with a 12px cream-3 "All time" note, then Bills and Per purchase, 24px apart. The range scopes the first two tabs only; on "Typical costs" the range switch is disabled at 40% opacity.
 
 Rows are at least 56px tall with 10px of vertical padding. Transaction rows are at least 48px. Panels use 20px of horizontal padding.
 
@@ -374,7 +374,7 @@ Flat and solid, with no gradient or lift. Every button comes from the shared but
 
 ### Chips (pills)
 - **Style:** at least 44px tall, 12px corners, 13px medium, 16px horizontal padding, from the shared pill styles. Idle pills are transparent with a teak-edge border and cream 2 text; hover brightens to cream 4 and cream.
-- **State:** the selected pill is a solid ember fill with walnut text. Recent period pills share their row equally; a selected trip pill grows to keep its full name (at most 60%). The "More" picker is dashed until an older item is picked, then it takes the selected style.
+- **State:** the selected pill is a solid ember fill with walnut text. Recent period pills share their row equally; the selected trip or month pill grows to keep its full name (at most 60%) and the idle ones share what is left. Month pills read "Nov" when idle and "November 2026" when selected. The "More" picker is dashed until an older item is picked, then it takes the selected style and grows the same way to show the full trip or month name.
 - **Other uses:** subcategory choices, recurring quick-picks, and the split row ("Just me" followed by one pill per person; "Paid by" uses the same pills once someone is added).
 
 ### Segmented switch
@@ -411,6 +411,7 @@ After a transaction posts, the form clears (keeping the date) and, below a 10% c
 
 ### Navigation
 - **Header:** at least 56px tall, with the icon tile, the wide uppercase wordmark, a Splitz outline button and a 44px round "ME" avatar. In stealth mode the avatar shows an ember border on an ember-deep fill with an ember dot.
+- **Inner tabs:** used on the Charts tab to switch between sections under the range switch, so they read as a different control from the segmented switches around them. Three equal text tabs, each at least 44px tall, sit over a 10% cream hairline with 13px medium labels. The active tab has ember-ink text and a 2px rounded ember rule on the hairline. Idle tabs are cream 3, and turn cream on hover. They use `role="tab"`.
 - **Tab bar:** docked full-width to the bottom edge, panel at 90% with a strong backdrop blur and a 10% cream top hairline. Four equal tabs, each at least 54px tall, with a 22px line icon (1.7 stroke) over an 11px label. The active tab has ember-ink text and a 2px ember rule along its top edge. Idle tabs are cream 3.
 
 ### Month summary
@@ -426,7 +427,7 @@ All time's month view, paged entry lists, yearly sums, the split summary, Splitz
 One rounded bar fills to spent ÷ budget on a fixed 0–100% scale over a 7% cream track. The fixed scale is for budget bars only; typical-month rows share one € scale instead. The large bar is 8px tall with 6px of space above and below; the small bar is 4px with 4px. The fill is ember, turns cherry once spending passes the budget, and is cream 4 for share-of-total and unbudgeted rows. On bars that show pace (the month summary and the Add tab's after-save bar, current month only) a 2px cream notch, cut out by a ground-coloured ring, marks today. Only the month summary captions it, with today's date in micro type ("Fri. 6th"), kept inside the bar near either end. Category rows show no notch.
 
 ### Month chart (signature)
-"Month by month" shows one chart at a time, picked with a Spending / Saving / Swings segmented switch under the heading. The 6M / 12M / All range scopes all three. Spending and Saving are columns on one € axis, drawn as plain SVG with d3-scale (pinned 4.0.2), the only chart dependency. The 206px plot sits on the walnut ground with no card, and nothing is labelled inside it except the selected month's value.
+"Month by month" shows one chart at a time, picked with a Spending / Saving / Swings segmented switch under the average month. The 6M / 12M / All range scopes all three. Spending and Saving are columns on one € axis, drawn as plain SVG with d3-scale (pinned 4.0.2), the only chart dependency. The 206px plot sits on the walnut ground with no card, and nothing is labelled inside it except the selected month's value.
 - **Spending columns:** ember, at most 24px wide (62% of each month's slot, never under 6px), with 4px rounded tops and square feet. Unselected columns sit at 50% opacity and the selected one is solid. An over-budget month stays ember up to the budget line. Only the excess above it is a cherry-fill cap (cherry when selected, at least 3px tall), separated from the ember by a 2px gap that the budget line shows through. So the red says how far over, not just that it was. Opacity changes take 150ms.
 - **Saving columns:** each month's wage minus its spending, on a € axis that includes zero. Money kept rises from the zero line in avocado (65% unselected, because avocado at 50% turns olive). A month that spent more than its wage hangs below the line in cherry-fill, with 4px rounded bottoms. The zero line is a 1px hairline at 30% cream.
 - **Axis:** hairline € gridlines at 10% cream. Their 11px cream-3 € ticks sit in a fixed 44px column on the left that does not scroll with the months. Negative ticks read "−€500".
