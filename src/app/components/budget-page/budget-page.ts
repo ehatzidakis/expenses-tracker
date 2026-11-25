@@ -145,7 +145,6 @@ import { SensitiveDirective } from '../../utils/sensitive.directive';
           <app-adjustment-selector
             [adjustments]="sortedAdjustments()"
             [selectedId]="trip.id"
-            [includeSingles]="false"
             (selectionChanged)="selectedTripId.set($event)"
           />
           <app-trip-breakdown [trip]="trip" />
