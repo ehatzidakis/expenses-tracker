@@ -342,7 +342,7 @@ The page is mostly flat and gets its depth from tone: ground, then panel, then r
 
 ### Shadow Vocabulary
 - **Glass top edge** (`box-shadow: inset 0 1px 0 rgb(241 230 210 / 0.06)`): every summary panel.
-- **Dropdown** (`box-shadow: 0 18px 40px -12px rgb(0 0 0 / 0.7)`): the "More" picker panel.
+- **Dropdown** (`box-shadow: 0 18px 40px -12px rgb(0 0 0 / 0.7)`): the pager's calendar panel.
 - **Sheet** (`box-shadow: 0 -24px 60px -20px rgb(0 0 0 / 0.8)`): the bottom sheet, cast upward.
 - **Dialog** (`box-shadow: 0 24px 60px -20px rgb(0 0 0 / 0.8)`): the centred dialog, cast downward.
 - **Toast** (`box-shadow: 0 10px 30px -10px rgb(0 0 0 / 0.8)`): the update notice.
@@ -355,7 +355,7 @@ The page is mostly flat and gets its depth from tone: ground, then panel, then r
 
 ## Shapes
 
-Corners are softly rounded and consistent: 12px on every control (pills, buttons, fields, category tiles, date chevrons, the segmented frame), on message wells and on the toast, 10px on segments inside that frame, 16px on panels, dropdowns and centred dialogs, and 28px on the top corners of the bottom sheet. Chart columns have 4px rounded tops and square feet on the baseline; the chart's status-key swatch is a 10px square with 2px corners. Fully round shapes are reserved for the budget bar and its track, the typical-month bar and its budget tick, the notch, the sheet grabber, the switch track and thumb, count badges, avatars and close buttons. Borders are 1px: teak edge on controls, fields, tiles, sheets and dialogs, and 10% cream on panels and hairlines. The amount field has no box, only a 1px bottom rule. The "More" picker is the only dashed border.
+Corners are softly rounded and consistent: 12px on every control (pills, buttons, fields, category tiles, date chevrons, the segmented frame), on message wells and on the toast, 10px on segments inside that frame, 16px on panels, dropdowns and centred dialogs, and 28px on the top corners of the bottom sheet. Chart columns have 4px rounded tops and square feet on the baseline; the chart's status-key swatch is a 10px square with 2px corners. Fully round shapes are reserved for the budget bar and its track, the typical-month bar and its budget tick, the notch, the sheet grabber, the switch track and thumb, count badges, avatars and close buttons. Borders are 1px: teak edge on controls, fields, tiles, sheets and dialogs, and 10% cream on panels and hairlines. The amount field has no box, only a 1px bottom rule.
 
 ## Components
 
@@ -374,7 +374,7 @@ Flat and solid, with no gradient or lift. Every button comes from the shared but
 
 ### Chips (pills)
 - **Style:** at least 44px tall, 12px corners, 13px medium, 16px horizontal padding, from the shared pill styles. Idle pills are transparent with a teak-edge border and cream 2 text; hover brightens to cream 4 and cream.
-- **State:** the selected pill is a solid ember fill with walnut text. Recent period pills share their row equally; the selected trip or month pill grows to keep its full name (at most 60%) and the idle ones share what is left. Month pills read "Nov" when idle and "November 2026" when selected. The "More" picker is dashed until an older item is picked, then it takes the selected style and grows the same way to show the full trip or month name.
+- **State:** the selected pill is a solid ember fill with walnut text. Months and trips page through a pager row, 6px apart: a newer arrow, three pills, a calendar button and an older arrow. The arrows and calendar are 36px-wide, 44px-tall teak-edge buttons with 16px glyphs; an arrow at the end of the list is disabled at 40%, and the calendar's border turns ember while its panel is open. The selected pill grows to keep its full name (at most 60% of the pills, 12px padding) and the idle ones share what is left (8px padding). Month pills read "Nov" when idle and "November 2026" when selected. Stepping older past the last pill pages so the new selection leads; stepping newer past the first pages back so it ends the row. A calendar pick leads the row, followed by the two items before it. The calendar only appears when there are more than three items.
 - **Other uses:** subcategory choices, recurring quick-picks, and the split row ("Just me" followed by one pill per person; "Paid by" uses the same pills once someone is added).
 
 ### Segmented switch

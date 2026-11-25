@@ -84,11 +84,59 @@ describe('MonthSelectorComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('shows the three newest months as pills plus the picker toggle', async () => {
+  /** Feed each emitted selection back in, as the Budget page does. */
+  function followSelection(): string[] {
+    const emitted: string[] = [];
+    component.monthSelected.subscribe((id) => {
+      emitted.push(id);
+      fixture.componentRef.setInput('selectedId', id);
+    });
+    return emitted;
+  }
+
+  async function click(testId: string) {
+    query(testId)!.click();
+    await fixture.whenStable();
+  }
+
+  it('shows the three newest months between the arrows, with the calendar', async () => {
     await setup(MONTHS, 'oct26');
 
     expect(quickPills()).toEqual(['October 2026', 'Sep', 'Aug']);
-    expect(query('month-picker-toggle')?.textContent?.trim()).toBe('More');
+    expect(query('month-newer')!.disabled).toBe(true);
+    expect(query('month-older')!.disabled).toBe(false);
+    expect(query('month-picker-toggle')).not.toBeNull();
+  });
+
+  it('steps older inside the row, then pages so the selection leads', async () => {
+    await setup(MONTHS, 'oct26');
+    const emitted = followSelection();
+
+    await click('month-older');
+    await click('month-older');
+    expect(quickPills()).toEqual(['Oct', 'Sep', 'August 2026']);
+
+    await click('month-older');
+    expect(emitted).toEqual(['sep26', 'aug26', 'jul26']);
+    expect(quickPills()).toEqual(['July 2026', 'Jun', 'Apr']);
+    expect(query('month-newer')!.disabled).toBe(false);
+  });
+
+  it('pages back when stepping newer past the first pill', async () => {
+    await setup(MONTHS, 'jul26');
+    const emitted = followSelection();
+    expect(quickPills()).toEqual(['July 2026', 'Jun', 'Apr']);
+
+    await click('month-newer');
+    expect(emitted).toEqual(['aug26']);
+    expect(quickPills()).toEqual(['Oct', 'Sep', 'August 2026']);
+  });
+
+  it('disables the older arrow on the oldest month', async () => {
+    await setup(MONTHS, 'sep25');
+
+    expect(quickPills()).toEqual(['Nov', 'Oct', 'September 2025']);
+    expect(query('month-older')!.disabled).toBe(true);
   });
 
   it('hides the picker when there are three months or fewer', async () => {
@@ -125,26 +173,25 @@ describe('MonthSelectorComponent', () => {
     expect(cell('Sep').disabled).toBe(false);
   });
 
-  it('emits the picked month and closes the popover', async () => {
+  it('puts a calendar pick first, followed by the two months before it', async () => {
     await setup(MONTHS, 'oct26');
-    const emitted: string[] = [];
-    component.monthSelected.subscribe((id) => emitted.push(id));
+    const emitted = followSelection();
 
     await openPicker();
     query('prev-year')!.click();
     await fixture.whenStable();
-    cell('Nov').click();
+    cell('Dec').click();
     await fixture.whenStable();
 
-    expect(emitted).toEqual(['nov25']);
+    expect(emitted).toEqual(['dec25']);
     expect(query('month-picker')).toBeNull();
-  });
+    expect(quickPills()).toEqual(['December 2025', 'Nov', 'Oct']);
 
-  it('shows an older selected month on the picker toggle', async () => {
-    await setup(MONTHS, 'nov25');
-
-    expect(query('month-picker-toggle')?.textContent?.trim()).toBe('November 2025');
-    expect(quickPills()).toEqual(['Oct', 'Sep', 'Aug']);
+    // A pick that is already visible still moves to the front.
+    await openPicker();
+    cell('Nov').click();
+    await fixture.whenStable();
+    expect(quickPills()).toEqual(['November 2025', 'Oct', 'Sep']);
   });
 
   it('closes on Escape and on outside clicks', async () => {

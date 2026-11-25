@@ -1,23 +1,35 @@
-import { Component, ElementRef, computed, inject, input, output, signal } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  computed,
+  inject,
+  input,
+  linkedSignal,
+  output,
+  signal,
+} from '@angular/core';
 import { DatePipe } from '@angular/common';
 import type { Adjustment } from '../../models/adjustments.model';
 import {
   ACTIVE_PILL,
   CALENDAR_ICON_PATH,
+  CHEVRON_LEFT_PATH,
+  CHEVRON_RIGHT_PATH,
   IDLE_PILL,
-  PICKER_ACTIVE,
-  PICKER_BASE,
-  PICKER_IDLE,
+  PAGER_BUTTON,
+  PAGER_BUTTON_OPEN,
+  PAGER_PILLS,
+  PAGER_ROW,
   PICKER_PANEL,
-  PICKER_WRAPPER,
-  PICKER_WRAPPER_GROW,
-  PILL_BASE,
   QUICK_PILL,
   QUICK_PILL_GROW,
 } from '../../utils/pill-styles';
+import { PAGER_SIZE, followWindow, windowStartAt } from '../../utils/pager-window';
 
-const QUICK_TRIPS = 2;
-
+/**
+ * Trip pager: newer arrow, three trips (the selected one keeps its whole name), a calendar of
+ * every trip by year, and an older arrow.
+ */
 @Component({
   selector: 'app-adjustment-selector',
   standalone: true,
@@ -28,76 +40,52 @@ const QUICK_TRIPS = 2;
     '(document:keydown.escape)': 'closePicker()',
   },
   template: `
-    <section class="flex items-center gap-2">
-      @if (includeSingles()) {
-        <!-- One-offs: standalone pill -->
-        <button
-          type="button"
-          data-testid="singles-pill"
-          (click)="onSelect(null)"
-          [class]="pillBase + ' ' + (selectedId() === null ? activePill : idlePill)"
-          [attr.aria-pressed]="selectedId() === null"
-        >
-          One-offs
-        </button>
-      }
+    <section [class]="pagerRow">
+      <button
+        type="button"
+        data-testid="trip-newer"
+        aria-label="Newer trip"
+        [class]="pagerButton"
+        [disabled]="selectedIndex() <= 0"
+        (click)="step(-1)"
+      >
+        <svg class="size-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+          <path fill-rule="evenodd" clip-rule="evenodd" [attr.d]="chevronLeft" />
+        </svg>
+      </button>
 
-      @if (quickTrips().length) {
-        @if (includeSingles()) {
-          <span class="w-px self-stretch my-1 bg-edge shrink-0" aria-hidden="true"></span>
+      <div role="group" aria-label="Trips" [class]="pagerPills">
+        @for (trip of visibleTrips(); track trip.id) {
+          <button
+            type="button"
+            data-testid="trip-pill"
+            (click)="onSelect(trip.id)"
+            [class]="
+              selectedId() === trip.id
+                ? quickPillGrow + ' ' + activePill
+                : quickPill + ' ' + idlePill
+            "
+            [attr.aria-pressed]="selectedId() === trip.id"
+            [attr.title]="trip.title"
+          >
+            <span data-testid="trip-pill-title">{{ trip.title }}</span>
+          </button>
         }
-
-        <!-- Recent trips: separate pills laid out directly in the row -->
-        <div role="group" aria-label="Recent trips" class="contents">
-          @for (trip of quickTrips(); track trip.id) {
-            <button
-              type="button"
-              data-testid="trip-pill"
-              (click)="onSelect(trip.id)"
-              [class]="selectedId() === trip.id ? quickPillGrow + ' ' + activePill : quickPill + ' ' + idlePill"
-              [attr.aria-pressed]="selectedId() === trip.id"
-              [attr.title]="trip.title"
-            >
-              <span data-testid="trip-pill-title">{{ trip.title }}</span>
-            </button>
-          }
-        </div>
-      }
+      </div>
 
       @if (showPicker()) {
-        <div [class]="olderSelected() ? pickerWrapperGrow : pickerWrapper">
+        <div class="flex shrink-0">
           <button
             type="button"
             data-testid="trip-picker-toggle"
+            aria-label="Pick a trip"
             (click)="togglePicker()"
-            [class]="pickerBase + ' ' + (olderSelected() ? pickerActive : pickerIdle)"
+            [class]="pickerOpen() ? pagerButtonOpen : pagerButton"
             aria-haspopup="dialog"
             [attr.aria-expanded]="pickerOpen()"
-            [attr.title]="olderSelected()?.title ?? null"
           >
-            @if (!olderSelected()) {
-              <svg
-                class="w-3 h-3 shrink-0"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-                aria-hidden="true"
-              >
-                <path fill-rule="evenodd" clip-rule="evenodd" [attr.d]="calendarIcon" />
-              </svg>
-            }
-            <span class="min-w-0 truncate">{{ olderSelected()?.title ?? 'More' }}</span>
-            <svg
-              class="w-3 h-3 shrink-0 transition-transform duration-150"
-              [class.rotate-180]="pickerOpen()"
-              viewBox="0 0 20 20"
-              fill="currentColor"
-              aria-hidden="true"
-            >
-              <path
-                fill-rule="evenodd"
-                d="M5.23 7.21a.75.75 0 011.06.02L10 11.17l3.71-3.94a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z"
-                clip-rule="evenodd"
-              />
+            <svg class="size-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+              <path fill-rule="evenodd" clip-rule="evenodd" [attr.d]="calendarIcon" />
             </svg>
           </button>
 
@@ -117,7 +105,9 @@ const QUICK_TRIPS = 2;
                   aria-label="Previous year"
                   class="flex size-11 items-center justify-center rounded-xl text-ink-2 hover:bg-raised-hi disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent"
                 >
-                  <svg class="size-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" clip-rule="evenodd" d="M12.79 5.23a.75.75 0 01-.02 1.06L8.832 10l3.938 3.71a.75.75 0 11-1.04 1.08l-4.5-4.25a.75.75 0 010-1.08l4.5-4.25a.75.75 0 011.06.02z" /></svg>
+                  <svg class="size-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                    <path fill-rule="evenodd" clip-rule="evenodd" [attr.d]="chevronLeft" />
+                  </svg>
                 </button>
                 <span data-testid="view-year" class="text-sm font-medium text-ink">
                   {{ viewYear() }}
@@ -130,7 +120,9 @@ const QUICK_TRIPS = 2;
                   aria-label="Next year"
                   class="flex size-11 items-center justify-center rounded-xl text-ink-2 hover:bg-raised-hi disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent"
                 >
-                  <svg class="size-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" clip-rule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z" /></svg>
+                  <svg class="size-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                    <path fill-rule="evenodd" clip-rule="evenodd" [attr.d]="chevronRight" />
+                  </svg>
                 </button>
               </div>
 
@@ -139,7 +131,7 @@ const QUICK_TRIPS = 2;
                   <button
                     type="button"
                     data-testid="trip-item"
-                    (click)="onSelect(trip.id)"
+                    (click)="pick(trip.id)"
                     [attr.aria-pressed]="selectedId() === trip.id"
                     [class]="
                       selectedId() === trip.id
@@ -162,10 +154,20 @@ const QUICK_TRIPS = 2;
           }
         </div>
       }
-    </section>
 
-    <!-- Separates the trip navigation from the content below -->
-    <!-- <div class="h-px mt-4 bg-raised" aria-hidden="true"></div> -->
+      <button
+        type="button"
+        data-testid="trip-older"
+        aria-label="Older trip"
+        [class]="pagerButton"
+        [disabled]="selectedIndex() >= tripAdjustments().length - 1"
+        (click)="step(1)"
+      >
+        <svg class="size-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+          <path fill-rule="evenodd" clip-rule="evenodd" [attr.d]="chevronRight" />
+        </svg>
+      </button>
+    </section>
   `,
 })
 export class AdjustmentSelectorComponent {
@@ -174,21 +176,19 @@ export class AdjustmentSelectorComponent {
   /** Expected newest-first by startDate. */
   adjustments = input.required<Adjustment[]>();
   selectedId = input<string | null>(null);
-  /** Show the standalone one-offs pill (off on the Budget page, where a switch handles it). */
-  includeSingles = input(true);
 
-  selectionChanged = output<string | null>();
+  selectionChanged = output<string>();
 
-  protected readonly pillBase = PILL_BASE;
   protected readonly activePill = ACTIVE_PILL;
   protected readonly idlePill = IDLE_PILL;
   protected readonly quickPill = QUICK_PILL;
   protected readonly quickPillGrow = QUICK_PILL_GROW;
-  protected readonly pickerWrapper = PICKER_WRAPPER;
-  protected readonly pickerWrapperGrow = PICKER_WRAPPER_GROW;
-  protected readonly pickerBase = PICKER_BASE;
-  protected readonly pickerActive = PICKER_ACTIVE;
-  protected readonly pickerIdle = PICKER_IDLE;
+  protected readonly pagerRow = PAGER_ROW;
+  protected readonly pagerPills = PAGER_PILLS;
+  protected readonly pagerButton = PAGER_BUTTON;
+  protected readonly pagerButtonOpen = PAGER_BUTTON_OPEN;
+  protected readonly chevronLeft = CHEVRON_LEFT_PATH;
+  protected readonly chevronRight = CHEVRON_RIGHT_PATH;
   protected readonly calendarIcon = CALENDAR_ICON_PATH;
   protected readonly pickerPanel = PICKER_PANEL;
 
@@ -197,15 +197,23 @@ export class AdjustmentSelectorComponent {
 
   readonly tripAdjustments = computed(() => this.adjustments().filter((a) => a.isTrip));
 
-  readonly quickTrips = computed(() => this.tripAdjustments().slice(0, QUICK_TRIPS));
+  /** Trips are newest-first, so index 0 is the latest trip. */
+  readonly selectedIndex = computed(() =>
+    this.tripAdjustments().findIndex((t) => t.id === this.selectedId()),
+  );
 
-  readonly showPicker = computed(() => this.tripAdjustments().length > QUICK_TRIPS);
-
-  readonly olderSelected = computed<Adjustment | null>(() => {
-    const id = this.selectedId();
-    if (!id || this.quickTrips().some((t) => t.id === id)) return null;
-    return this.tripAdjustments().find((t) => t.id === id) ?? null;
+  /** First of the three visible trips. Follows the selection; a calendar pick sets it directly. */
+  readonly windowStart = linkedSignal<{ index: number; count: number }, number>({
+    source: () => ({ index: this.selectedIndex(), count: this.tripAdjustments().length }),
+    computation: ({ index, count }, previous) =>
+      previous ? followWindow(previous.value, index, count) : windowStartAt(index, count),
   });
+
+  readonly visibleTrips = computed(() =>
+    this.tripAdjustments().slice(this.windowStart(), this.windowStart() + PAGER_SIZE),
+  );
+
+  readonly showPicker = computed(() => this.tripAdjustments().length > PAGER_SIZE);
 
   /** Years that have at least one trip, newest first. */
   readonly tripYears = computed(() =>
@@ -226,9 +234,22 @@ export class AdjustmentSelectorComponent {
     () => [...this.tripYears()].reverse().find((y) => y > this.viewYear()) ?? null,
   );
 
-  onSelect(id: string | null): void {
+  onSelect(id: string): void {
     this.closePicker();
     this.selectionChanged.emit(id);
+  }
+
+  /** Steps the selection one trip newer (-1) or older (+1). */
+  step(direction: -1 | 1): void {
+    const next = this.tripAdjustments()[this.selectedIndex() + direction];
+    if (next) this.onSelect(next.id);
+  }
+
+  /** A calendar pick leads the row, followed by the two trips before it. */
+  pick(id: string): void {
+    const index = this.tripAdjustments().findIndex((t) => t.id === id);
+    this.windowStart.set(windowStartAt(index, this.tripAdjustments().length));
+    this.onSelect(id);
   }
 
   togglePicker(): void {

@@ -1,18 +1,29 @@
-import { Component, ElementRef, computed, inject, input, output, signal } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  computed,
+  inject,
+  input,
+  linkedSignal,
+  output,
+  signal,
+} from '@angular/core';
 import { Expense } from '../../models/expenses.model';
 import {
   ACTIVE_PILL,
   CALENDAR_ICON_PATH,
+  CHEVRON_LEFT_PATH,
+  CHEVRON_RIGHT_PATH,
   IDLE_PILL,
-  PICKER_ACTIVE,
-  PICKER_BASE,
-  PICKER_IDLE,
+  PAGER_BUTTON,
+  PAGER_BUTTON_OPEN,
+  PAGER_PILLS,
+  PAGER_ROW,
   PICKER_PANEL,
-  PICKER_WRAPPER,
-  PICKER_WRAPPER_GROW,
   QUICK_PILL,
   QUICK_PILL_GROW,
 } from '../../utils/pill-styles';
+import { PAGER_SIZE, followWindow, windowStartAt } from '../../utils/pager-window';
 
 const MONTHS = [
   'January',
@@ -46,8 +57,6 @@ interface GridCell {
   selected: boolean;
 }
 
-const QUICK_COUNT = 3;
-
 @Component({
   selector: 'app-month-selector',
   standalone: true,
@@ -57,10 +66,22 @@ const QUICK_COUNT = 3;
     '(document:keydown.escape)': 'closePicker()',
   },
   template: `
-    <section class="flex items-center gap-2">
-      <!-- Recent months: separate pills laid out directly in the row -->
-      <div role="group" aria-label="Recent months" class="contents">
-        @for (item of quickMonths(); track item.id) {
+    <section [class]="pagerRow">
+      <button
+        type="button"
+        data-testid="month-newer"
+        aria-label="Newer month"
+        [class]="pagerButton"
+        [disabled]="selectedIndex() <= 0"
+        (click)="step(-1)"
+      >
+        <svg class="size-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+          <path fill-rule="evenodd" clip-rule="evenodd" [attr.d]="chevronLeft" />
+        </svg>
+      </button>
+
+      <div role="group" aria-label="Months" [class]="pagerPills">
+        @for (item of visibleMonths(); track item.id) {
           <button
             type="button"
             data-testid="month-pill"
@@ -79,28 +100,18 @@ const QUICK_COUNT = 3;
       </div>
 
       @if (showPicker()) {
-        <div [class]="olderSelected() ? pickerWrapperGrow : pickerWrapper">
+        <div class="flex shrink-0">
           <button
             type="button"
             data-testid="month-picker-toggle"
+            aria-label="Pick a month"
             (click)="togglePicker()"
-            [class]="pickerBase + ' ' + (olderSelected() ? pickerActive : pickerIdle)"
+            [class]="pickerOpen() ? pagerButtonOpen : pagerButton"
             aria-haspopup="dialog"
             [attr.aria-expanded]="pickerOpen()"
           >
-            <span class="min-w-0 truncate">{{ olderSelected()?.label ?? 'More' }}</span>
-            <svg
-              class="w-3 h-3 shrink-0 transition-transform duration-150"
-              [class.rotate-180]="pickerOpen()"
-              viewBox="0 0 20 20"
-              fill="currentColor"
-              aria-hidden="true"
-            >
-              <path
-                fill-rule="evenodd"
-                d="M5.23 7.21a.75.75 0 011.06.02L10 11.17l3.71-3.94a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z"
-                clip-rule="evenodd"
-              />
+            <svg class="size-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+              <path fill-rule="evenodd" clip-rule="evenodd" [attr.d]="calendarIcon" />
             </svg>
           </button>
 
@@ -175,6 +186,19 @@ const QUICK_COUNT = 3;
           }
         </div>
       }
+
+      <button
+        type="button"
+        data-testid="month-older"
+        aria-label="Older month"
+        [class]="pagerButton"
+        [disabled]="selectedIndex() >= parsedMonths().length - 1"
+        (click)="step(1)"
+      >
+        <svg class="size-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+          <path fill-rule="evenodd" clip-rule="evenodd" [attr.d]="chevronRight" />
+        </svg>
+      </button>
     </section>
   `,
 })
@@ -189,11 +213,12 @@ export class MonthSelectorComponent {
   protected readonly quickPillGrow = QUICK_PILL_GROW;
   protected readonly activePill = ACTIVE_PILL;
   protected readonly idlePill = IDLE_PILL;
-  protected readonly pickerWrapper = PICKER_WRAPPER;
-  protected readonly pickerWrapperGrow = PICKER_WRAPPER_GROW;
-  protected readonly pickerBase = PICKER_BASE;
-  protected readonly pickerActive = PICKER_ACTIVE;
-  protected readonly pickerIdle = PICKER_IDLE;
+  protected readonly pagerRow = PAGER_ROW;
+  protected readonly pagerPills = PAGER_PILLS;
+  protected readonly pagerButton = PAGER_BUTTON;
+  protected readonly pagerButtonOpen = PAGER_BUTTON_OPEN;
+  protected readonly chevronLeft = CHEVRON_LEFT_PATH;
+  protected readonly chevronRight = CHEVRON_RIGHT_PATH;
   protected readonly calendarIcon = CALENDAR_ICON_PATH;
   protected readonly pickerPanel = PICKER_PANEL;
 
@@ -208,16 +233,23 @@ export class MonthSelectorComponent {
       .filter((m): m is ParsedMonth => m !== null),
   );
 
-  // Months arrive newest-first, so these are the most recent ones.
-  readonly quickMonths = computed(() => this.parsedMonths().slice(0, QUICK_COUNT));
+  /** Months arrive newest-first, so index 0 is the latest month. */
+  readonly selectedIndex = computed(() =>
+    this.parsedMonths().findIndex((m) => m.id === this.selectedId()),
+  );
 
-  readonly showPicker = computed(() => this.parsedMonths().length > QUICK_COUNT);
-
-  readonly olderSelected = computed<ParsedMonth | null>(() => {
-    const id = this.selectedId();
-    if (!id || this.quickMonths().some((m) => m.id === id)) return null;
-    return this.parsedMonths().find((m) => m.id === id) ?? null;
+  /** First of the three visible months. Follows the selection; a calendar pick sets it directly. */
+  readonly windowStart = linkedSignal<{ index: number; count: number }, number>({
+    source: () => ({ index: this.selectedIndex(), count: this.parsedMonths().length }),
+    computation: ({ index, count }, previous) =>
+      previous ? followWindow(previous.value, index, count) : windowStartAt(index, count),
   });
+
+  readonly visibleMonths = computed(() =>
+    this.parsedMonths().slice(this.windowStart(), this.windowStart() + PAGER_SIZE),
+  );
+
+  readonly showPicker = computed(() => this.parsedMonths().length > PAGER_SIZE);
 
   readonly minYear = computed(() => Math.min(...this.parsedMonths().map((m) => m.year)));
   readonly maxYear = computed(() => Math.max(...this.parsedMonths().map((m) => m.year)));
@@ -243,7 +275,16 @@ export class MonthSelectorComponent {
     this.monthSelected.emit(id);
   }
 
+  /** Steps the selection one month newer (-1) or older (+1). */
+  step(direction: -1 | 1): void {
+    const next = this.parsedMonths()[this.selectedIndex() + direction];
+    if (next) this.onSelect(next.id);
+  }
+
+  /** A calendar pick leads the row, followed by the two months before it. */
   pick(id: string): void {
+    const index = this.parsedMonths().findIndex((m) => m.id === id);
+    this.windowStart.set(windowStartAt(index, this.parsedMonths().length));
     this.onSelect(id);
   }
 
