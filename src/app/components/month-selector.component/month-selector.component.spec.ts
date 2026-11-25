@@ -87,14 +87,14 @@ describe('MonthSelectorComponent', () => {
   it('shows the three newest months as pills plus the picker toggle', async () => {
     await setup(MONTHS, 'oct26');
 
-    expect(quickPills()).toEqual(['Oct 2026', 'Sep 2026', 'Aug 2026']);
+    expect(quickPills()).toEqual(['October 2026', 'Sep', 'Aug']);
     expect(query('month-picker-toggle')?.textContent?.trim()).toBe('More');
   });
 
   it('hides the picker when there are three months or fewer', async () => {
     await setup(MONTHS.slice(0, 4), 'oct26');
 
-    expect(quickPills()).toEqual(['Oct 2026', 'Sep 2026', 'Aug 2026']);
+    expect(quickPills()).toEqual(['October 2026', 'Sep', 'Aug']);
     expect(query('month-picker-toggle')).toBeNull();
   });
 
@@ -143,7 +143,8 @@ describe('MonthSelectorComponent', () => {
   it('shows an older selected month on the picker toggle', async () => {
     await setup(MONTHS, 'nov25');
 
-    expect(query('month-picker-toggle')?.textContent?.trim()).toBe('Nov 2025');
+    expect(query('month-picker-toggle')?.textContent?.trim()).toBe('November 2025');
+    expect(quickPills()).toEqual(['Oct', 'Sep', 'Aug']);
   });
 
   it('closes on Escape and on outside clicks', async () => {

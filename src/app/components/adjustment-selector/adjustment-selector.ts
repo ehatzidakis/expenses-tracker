@@ -10,6 +10,7 @@ import {
   PICKER_IDLE,
   PICKER_PANEL,
   PICKER_WRAPPER,
+  PICKER_WRAPPER_GROW,
   PILL_BASE,
   QUICK_PILL,
   QUICK_PILL_GROW,
@@ -64,7 +65,7 @@ const QUICK_TRIPS = 2;
       }
 
       @if (showPicker()) {
-        <div [class]="olderSelected() ? 'relative flex-none max-w-[60%]' : pickerWrapper">
+        <div [class]="olderSelected() ? pickerWrapperGrow : pickerWrapper">
           <button
             type="button"
             data-testid="trip-picker-toggle"
@@ -184,6 +185,7 @@ export class AdjustmentSelectorComponent {
   protected readonly quickPill = QUICK_PILL;
   protected readonly quickPillGrow = QUICK_PILL_GROW;
   protected readonly pickerWrapper = PICKER_WRAPPER;
+  protected readonly pickerWrapperGrow = PICKER_WRAPPER_GROW;
   protected readonly pickerBase = PICKER_BASE;
   protected readonly pickerActive = PICKER_ACTIVE;
   protected readonly pickerIdle = PICKER_IDLE;

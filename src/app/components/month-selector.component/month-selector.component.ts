@@ -9,7 +9,9 @@ import {
   PICKER_IDLE,
   PICKER_PANEL,
   PICKER_WRAPPER,
+  PICKER_WRAPPER_GROW,
   QUICK_PILL,
+  QUICK_PILL_GROW,
 } from '../../utils/pill-styles';
 
 const MONTHS = [
@@ -29,7 +31,9 @@ const MONTHS = [
 
 interface ParsedMonth {
   id: string;
+  /** Full name, shown on the selected pill: "November 2026". */
   label: string;
+  /** Three letters, shown on idle pills so the selected one has room: "Nov". */
   shortLabel: string;
   year: number;
   monthIndex: number;
@@ -61,17 +65,21 @@ const QUICK_COUNT = 3;
             type="button"
             data-testid="month-pill"
             (click)="onSelect(item.id)"
-            [class]="quickPill + ' ' + (selectedId() === item.id ? activePill : idlePill)"
+            [class]="
+              selectedId() === item.id
+                ? quickPillGrow + ' ' + activePill
+                : quickPill + ' ' + idlePill
+            "
             [attr.aria-pressed]="selectedId() === item.id"
             [attr.aria-label]="item.label"
           >
-            {{ item.shortLabel }}
+            {{ selectedId() === item.id ? item.label : item.shortLabel }}
           </button>
         }
       </div>
 
       @if (showPicker()) {
-        <div [class]="pickerWrapper">
+        <div [class]="olderSelected() ? pickerWrapperGrow : pickerWrapper">
           <button
             type="button"
             data-testid="month-picker-toggle"
@@ -80,9 +88,9 @@ const QUICK_COUNT = 3;
             aria-haspopup="dialog"
             [attr.aria-expanded]="pickerOpen()"
           >
-            <span class="min-w-0 truncate">{{ olderSelected()?.shortLabel ?? 'More' }}</span>
+            <span class="min-w-0 truncate">{{ olderSelected()?.label ?? 'More' }}</span>
             <svg
-              class="w-3 h-3 transition-transform duration-150"
+              class="w-3 h-3 shrink-0 transition-transform duration-150"
               [class.rotate-180]="pickerOpen()"
               viewBox="0 0 20 20"
               fill="currentColor"
@@ -112,7 +120,13 @@ const QUICK_COUNT = 3;
                   aria-label="Previous year"
                   class="flex size-11 items-center justify-center rounded-xl text-ink-2 hover:bg-raised-hi disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent"
                 >
-                  <svg class="size-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" clip-rule="evenodd" d="M12.79 5.23a.75.75 0 01-.02 1.06L8.832 10l3.938 3.71a.75.75 0 11-1.04 1.08l-4.5-4.25a.75.75 0 010-1.08l4.5-4.25a.75.75 0 011.06.02z" /></svg>
+                  <svg class="size-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                    <path
+                      fill-rule="evenodd"
+                      clip-rule="evenodd"
+                      d="M12.79 5.23a.75.75 0 01-.02 1.06L8.832 10l3.938 3.71a.75.75 0 11-1.04 1.08l-4.5-4.25a.75.75 0 010-1.08l4.5-4.25a.75.75 0 011.06.02z"
+                    />
+                  </svg>
                 </button>
                 <span data-testid="view-year" class="text-sm font-medium text-ink">
                   {{ viewYear() }}
@@ -125,7 +139,13 @@ const QUICK_COUNT = 3;
                   aria-label="Next year"
                   class="flex size-11 items-center justify-center rounded-xl text-ink-2 hover:bg-raised-hi disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent"
                 >
-                  <svg class="size-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" clip-rule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z" /></svg>
+                  <svg class="size-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                    <path
+                      fill-rule="evenodd"
+                      clip-rule="evenodd"
+                      d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z"
+                    />
+                  </svg>
                 </button>
               </div>
 
@@ -166,9 +186,11 @@ export class MonthSelectorComponent {
   monthSelected = output<string>();
 
   protected readonly quickPill = QUICK_PILL;
+  protected readonly quickPillGrow = QUICK_PILL_GROW;
   protected readonly activePill = ACTIVE_PILL;
   protected readonly idlePill = IDLE_PILL;
   protected readonly pickerWrapper = PICKER_WRAPPER;
+  protected readonly pickerWrapperGrow = PICKER_WRAPPER_GROW;
   protected readonly pickerBase = PICKER_BASE;
   protected readonly pickerActive = PICKER_ACTIVE;
   protected readonly pickerIdle = PICKER_IDLE;
@@ -265,7 +287,7 @@ function parseMonth(expense: Expense): ParsedMonth | null {
   return {
     id: expense.id,
     label: expense.MonthName,
-    shortLabel: `${monthName.slice(0, 3)} ${year}`,
+    shortLabel: monthName.slice(0, 3),
     year,
     monthIndex,
   };
