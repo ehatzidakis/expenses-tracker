@@ -78,7 +78,8 @@ describe('CategoryBreakdownComponent', () => {
     ]);
     fixture.componentRef.setInput('pace', 0.4);
     await fixture.whenStable();
-    const left = () => (fixture.nativeElement as HTMLElement).querySelector('.budget-left')?.textContent?.trim();
+    const left = () =>
+      (fixture.nativeElement as HTMLElement).querySelector('.budget-left')?.textContent?.trim();
     expect(left()).toBe('€129.45 left on budget');
 
     fixture.componentRef.setInput('pace', 1);
@@ -88,6 +89,81 @@ describe('CategoryBreakdownComponent', () => {
     fixture.componentRef.setInput('categories', [{ ...categories[0], amount: 120, budget: 110 }]);
     await fixture.whenStable();
     expect(left()).toBe('€10.00 over budget');
+  });
+
+  it('adds the share of budget to over/left only under the % sorts', async () => {
+    fixture.componentRef.setInput('categories', [
+      { ...categories[0], amount: 25, budget: 110 },
+      { ...categories[0], name: 'Gym', amount: 80, budget: 65 },
+      { ...categories[0], name: 'Cats', amount: 49.9, budget: 50 },
+    ]);
+    fixture.componentRef.setInput('pace', 1);
+    const text = () => (fixture.nativeElement as HTMLElement).textContent ?? '';
+
+    try {
+      await fixture.whenStable();
+      expect(text()).toContain('€85.00 under');
+      expect(text()).not.toContain('%)');
+
+      component.setSort('over-desc');
+      await fixture.whenStable();
+      expect(text()).toContain('€15.00 over (23%)');
+      expect(text()).toContain('€85.00 under (77%)');
+      expect(text()).toContain('€0.10 under (<1%)');
+
+      component.setSort('over-asc');
+      await fixture.whenStable();
+      expect(text()).toContain('€15.00 over (23%)');
+
+      component.setSort('left-desc');
+      await fixture.whenStable();
+      expect(text()).not.toContain('%)');
+    } finally {
+      localStorage.removeItem('categorySort');
+    }
+  });
+
+  it('shows a row ahead of pace as plain "left", with its % under a % sort', async () => {
+    // €200 of €280 at 40% through the month would have read "ahead of pace".
+    fixture.componentRef.setInput('categories', [
+      { ...categories[0], name: 'Supermarket', amount: 200, budget: 280 },
+    ]);
+    fixture.componentRef.setInput('pace', 0.4);
+    const text = () => (fixture.nativeElement as HTMLElement).textContent ?? '';
+
+    try {
+      await fixture.whenStable();
+      expect(text()).toContain('€80.00 left');
+      expect(text()).not.toContain('ahead of pace');
+
+      component.setSort('over-asc');
+      await fixture.whenStable();
+      expect(text()).toContain('€80.00 left (29%)');
+    } finally {
+      localStorage.removeItem('categorySort');
+    }
+  });
+
+  it('adds over/under and its % to all-time rows under the % sorts', async () => {
+    const allTime = { ...categories[0], isAllTime: true, amount: 1000 };
+    fixture.componentRef.setInput('categories', [
+      { ...allTime, name: 'Gym', monthlyAverage: 80, budget: 65, isOverBudget: true },
+      { ...allTime, name: 'Utilities', monthlyAverage: 99, budget: 110 },
+    ]);
+    const text = () => (fixture.nativeElement as HTMLElement).textContent ?? '';
+
+    try {
+      await fixture.whenStable();
+      expect(text()).toContain('Avg €80.00 a month vs €65.00 budget');
+      expect(text()).not.toContain('%)');
+
+      component.setSort('over-desc');
+      await fixture.whenStable();
+      expect(text()).toContain('Avg €80.00 a month · €15.00 over (23%)');
+      expect(text()).toContain('Avg €99.00 a month · €11.00 under (10%)');
+    } finally {
+      localStorage.removeItem('categorySort');
+    }
   });
 
   it('does not load anything without a month', async () => {

@@ -6,6 +6,12 @@ import { CategoryBreakdownDetailsComponent } from './category-breakdown-details'
 import { BreakdownRowComponent, RowTone } from '../breakdown-row/breakdown-row';
 import { budgetStatus, categoryLabel } from '../../utils/period-pace';
 
+/** 0.334 → "33%"; a sliver that would round to 0 reads "<1%". */
+function percent(fraction: number): string {
+  const value = Math.round(fraction * 100);
+  return value === 0 && fraction > 0 ? '<1%' : `${value}%`;
+}
+
 @Component({
   selector: 'app-category-breakdown-item',
   standalone: true,
@@ -45,6 +51,8 @@ export class CategoryBreakdownItemComponent {
   readonly dimmed = input(false);
   /** Share of the month gone by today (1 for finished months, null when unknown). */
   readonly pace = input<number | null>(null);
+  /** Adds the over/left share of the budget to the status, for the % sorts. */
+  readonly showPercent = input(false);
 
   readonly toggle = output<void>();
   readonly selectTransaction = output<Transaction>();
@@ -72,30 +80,45 @@ export class CategoryBreakdownItemComponent {
       if (avg > c.budget + 0.005) return 'over';
       return avg >= c.budget - 0.005 ? 'full' : 'ok';
     }
-    return budgetStatus(c.amount, c.budget, this.pace());
+    const status = budgetStatus(c.amount, c.budget, this.pace());
+    // "Ahead of pace" is switched off in the UI for now: those rows read as plain "left".
+    // To bring it back, return `status` unchanged (and restore the 'ahead' case in statusText).
+    return status === 'ahead' ? 'ok' : status;
   });
 
   readonly statusText = computed(() => {
     const c = this.category();
     const money = (value: number) => `€${this.decimal.transform(value, '1.2-2')}`;
 
+    const budget = c.budget ?? 0;
+    // Under a % sort, add the share of the budget so the order reads at a glance.
+    const share = (value: number) =>
+      this.showPercent() && budget > 0 ? ` (${percent(value / budget)})` : '';
+
     if (c.isAllTime) {
       if (c.monthlyAverage === null) return `${money(c.amount)} in total`;
-      const vs = c.budget !== null ? ` vs ${money(c.budget)} budget` : '';
-      return `Avg ${money(c.monthlyAverage)} a month${vs}`;
+      const avg = `Avg ${money(c.monthlyAverage)} a month`;
+      if (c.budget === null) return avg;
+      // Under a % sort, swap "vs budget" for how far the average sits over or under it.
+      if (this.showPercent()) {
+        const gap = c.monthlyAverage - budget;
+        if (this.tone() === 'over') return `${avg} · ${money(gap)} over${share(gap)}`;
+        if (this.tone() === 'ok') return `${avg} · ${money(-gap)} under${share(-gap)}`;
+      }
+      return `${avg} vs ${money(c.budget)} budget`;
     }
 
-    const budget = c.budget ?? 0;
     const pace = this.pace();
     switch (this.tone()) {
       case 'over':
-        return `${money(c.amount - budget)} over`;
-      case 'ahead':
-        return `${money(c.amount - budget * (pace ?? 1))} ahead of pace`;
+        return `${money(c.amount - budget)} over${share(c.amount - budget)}`;
+      // Switched off in the UI for now (see tone): these rows show "left" instead.
+      // case 'ahead':
+      //   return `${money(c.amount - budget * (pace ?? 1))} ahead of pace`;
       case 'full':
         return 'Budget used';
       case 'ok':
-        return pace === 1 ? `${money(budget - c.amount)} under` : `${money(budget - c.amount)} left`;
+        return `${money(budget - c.amount)} ${pace === 1 ? 'under' : 'left'}${share(budget - c.amount)}`;
       case 'none':
         return 'No budget set';
       default:
