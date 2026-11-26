@@ -13,7 +13,12 @@ import { SheetComponent } from '../sheet/sheet';
 import { Transaction } from '../../models/transaction.model';
 import { STATUS_RANK, budgetStatus, categoryLabel } from '../../utils/period-pace';
 import { SEGMENT_BASE, SEGMENT_FRAME, SEGMENT_OFF, SEGMENT_ON } from '../../utils/pill-styles';
-import { CategorySort, isCategorySort, sortCategories } from '../../utils/category-sort';
+import {
+  CATEGORY_SORTS,
+  CategorySort,
+  isCategorySort,
+  sortCategories,
+} from '../../utils/category-sort';
 import { CategorySortMenuComponent } from './category-sort-menu';
 
 const SORT_STORAGE_KEY = 'categorySort';
@@ -89,6 +94,7 @@ function readStoredSort(): CategorySort {
               [monthName]="monthName()"
               [pace]="pace()"
               [transactionCount]="transactionCounts()[category.name] ?? 0"
+              [showPercent]="percentSort()"
               [expanded]="expandedCategory() === category.name"
               [dimmed]="expandedCategory() !== null && expandedCategory() !== category.name"
               (toggle)="toggleCategory(category.name)"
@@ -200,6 +206,10 @@ export class CategoryBreakdownComponent {
 
   /** The chosen row order, remembered on this device for both the month and all-time lists. */
   readonly sort = signal<CategorySort>(readStoredSort());
+  /** "Most over budget" and "Furthest under budget" rank by share of budget, so rows show it. */
+  readonly percentSort = computed(
+    () => CATEGORY_SORTS.find((option) => option.id === this.sort())?.percent === true,
+  );
 
   setSort(sort: CategorySort): void {
     this.sort.set(sort);

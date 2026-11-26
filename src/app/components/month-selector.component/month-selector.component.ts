@@ -15,8 +15,10 @@ import {
   CHEVRON_LEFT_PATH,
   CHEVRON_RIGHT_PATH,
   IDLE_PILL,
-  PAGER_BUTTON,
-  PAGER_BUTTON_OPEN,
+  PAGER_ARROW,
+  PAGER_CALENDAR,
+  PAGER_CALENDAR_OPEN,
+  PAGER_DIVIDER,
   PAGER_PILLS,
   PAGER_ROW,
   PICKER_PANEL,
@@ -71,7 +73,7 @@ interface GridCell {
         type="button"
         data-testid="month-newer"
         aria-label="Newer month"
-        [class]="pagerButton"
+        [class]="pagerArrow"
         [disabled]="selectedIndex() <= 0"
         (click)="step(-1)"
       >
@@ -99,14 +101,28 @@ interface GridCell {
         }
       </div>
 
+      <button
+        type="button"
+        data-testid="month-older"
+        aria-label="Older month"
+        [class]="pagerArrow"
+        [disabled]="selectedIndex() >= parsedMonths().length - 1"
+        (click)="step(1)"
+      >
+        <svg class="size-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+          <path fill-rule="evenodd" clip-rule="evenodd" [attr.d]="chevronRight" />
+        </svg>
+      </button>
+
       @if (showPicker()) {
+        <span [class]="pagerDivider" aria-hidden="true"></span>
         <div class="flex shrink-0">
           <button
             type="button"
             data-testid="month-picker-toggle"
             aria-label="Pick a month"
             (click)="togglePicker()"
-            [class]="pickerOpen() ? pagerButtonOpen : pagerButton"
+            [class]="pickerOpen() ? pagerCalendarOpen : pagerCalendar"
             aria-haspopup="dialog"
             [attr.aria-expanded]="pickerOpen()"
           >
@@ -186,19 +202,6 @@ interface GridCell {
           }
         </div>
       }
-
-      <button
-        type="button"
-        data-testid="month-older"
-        aria-label="Older month"
-        [class]="pagerButton"
-        [disabled]="selectedIndex() >= parsedMonths().length - 1"
-        (click)="step(1)"
-      >
-        <svg class="size-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-          <path fill-rule="evenodd" clip-rule="evenodd" [attr.d]="chevronRight" />
-        </svg>
-      </button>
     </section>
   `,
 })
@@ -215,8 +218,10 @@ export class MonthSelectorComponent {
   protected readonly idlePill = IDLE_PILL;
   protected readonly pagerRow = PAGER_ROW;
   protected readonly pagerPills = PAGER_PILLS;
-  protected readonly pagerButton = PAGER_BUTTON;
-  protected readonly pagerButtonOpen = PAGER_BUTTON_OPEN;
+  protected readonly pagerArrow = PAGER_ARROW;
+  protected readonly pagerDivider = PAGER_DIVIDER;
+  protected readonly pagerCalendar = PAGER_CALENDAR;
+  protected readonly pagerCalendarOpen = PAGER_CALENDAR_OPEN;
   protected readonly chevronLeft = CHEVRON_LEFT_PATH;
   protected readonly chevronRight = CHEVRON_RIGHT_PATH;
   protected readonly calendarIcon = CALENDAR_ICON_PATH;
