@@ -14,18 +14,29 @@ export const QUICK_PILL = 'flex-1 basis-0 min-w-0 px-2 ' + QUICK_PILL_SHAPE;
 /** The selected pager pill keeps its whole name (up to 60% of the pills); idle pills give up the room. */
 export const QUICK_PILL_GROW = 'flex-none max-w-[60%] px-3 ' + QUICK_PILL_SHAPE;
 
-/** Pager row: newer arrow, three pills, calendar, older arrow. The row anchors the calendar panel. */
+/**
+ * Pager row: newer arrow, three pills, older arrow, then the calendar past a hairline.
+ * Each group has its own form: bare arrows step, outlined pills choose, a filled tile opens
+ * the picker. The row anchors the calendar panel.
+ */
 export const PAGER_ROW = 'relative flex items-center gap-1.5';
 export const PAGER_PILLS = 'flex min-w-0 flex-1 gap-1.5';
 
-/** The pager's icon buttons (newer, older, calendar): 36px wide, 44px tall, on a teak edge. */
-const PAGER_BUTTON_SHAPE =
-  'flex min-h-11 w-9 shrink-0 items-center justify-center rounded-xl border transition-colors duration-150 cursor-pointer disabled:cursor-not-allowed disabled:opacity-40';
-export const PAGER_BUTTON =
-  PAGER_BUTTON_SHAPE +
-  ' border-edge text-ink-2 hover:border-ink-4 hover:text-ink disabled:hover:border-edge disabled:hover:text-ink-2';
-/** The calendar button while its panel is open. */
-export const PAGER_BUTTON_OPEN = PAGER_BUTTON_SHAPE + ' border-ember text-ink';
+/** The step arrows: bare chevrons with no box, 36px wide and 44px tall, a raised well on hover. */
+export const PAGER_ARROW =
+  'flex min-h-11 w-9 shrink-0 items-center justify-center rounded-xl text-ink-2 transition-colors duration-150 cursor-pointer hover:bg-raised-hi hover:text-ink disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent disabled:hover:text-ink-2';
+
+/** Hairline between the arrows and pills and the calendar. */
+export const PAGER_DIVIDER = 'h-6 w-px shrink-0 bg-ink/10';
+
+/** The calendar: a filled 44px raised tile with no outline, so it reads as a tool, not a choice. */
+const PAGER_CALENDAR_SHAPE =
+  'flex size-11 shrink-0 items-center justify-center rounded-xl transition-colors duration-150 cursor-pointer';
+export const PAGER_CALENDAR =
+  PAGER_CALENDAR_SHAPE + ' bg-raised text-ink-2 hover:bg-raised-hi hover:text-ink';
+/** The calendar while its panel is open: the accent ring of an active segment. */
+export const PAGER_CALENDAR_OPEN =
+  PAGER_CALENDAR_SHAPE + ' bg-raised-hi text-ink ring-1 ring-inset ring-ember/60';
 
 /** 20x20 chevrons (evenodd) for the pager arrows and the calendar's year steps. */
 export const CHEVRON_LEFT_PATH =

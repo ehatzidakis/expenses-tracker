@@ -16,8 +16,10 @@ import {
   CHEVRON_LEFT_PATH,
   CHEVRON_RIGHT_PATH,
   IDLE_PILL,
-  PAGER_BUTTON,
-  PAGER_BUTTON_OPEN,
+  PAGER_ARROW,
+  PAGER_CALENDAR,
+  PAGER_CALENDAR_OPEN,
+  PAGER_DIVIDER,
   PAGER_PILLS,
   PAGER_ROW,
   PICKER_PANEL,
@@ -27,8 +29,8 @@ import {
 import { PAGER_SIZE, followWindow, windowStartAt } from '../../utils/pager-window';
 
 /**
- * Trip pager: newer arrow, three trips (the selected one keeps its whole name), a calendar of
- * every trip by year, and an older arrow.
+ * Trip pager: newer arrow, three trips (the selected one keeps its whole name), an older arrow,
+ * then past a hairline a calendar of every trip by year.
  */
 @Component({
   selector: 'app-adjustment-selector',
@@ -45,7 +47,7 @@ import { PAGER_SIZE, followWindow, windowStartAt } from '../../utils/pager-windo
         type="button"
         data-testid="trip-newer"
         aria-label="Newer trip"
-        [class]="pagerButton"
+        [class]="pagerArrow"
         [disabled]="selectedIndex() <= 0"
         (click)="step(-1)"
       >
@@ -73,14 +75,28 @@ import { PAGER_SIZE, followWindow, windowStartAt } from '../../utils/pager-windo
         }
       </div>
 
+      <button
+        type="button"
+        data-testid="trip-older"
+        aria-label="Older trip"
+        [class]="pagerArrow"
+        [disabled]="selectedIndex() >= tripAdjustments().length - 1"
+        (click)="step(1)"
+      >
+        <svg class="size-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+          <path fill-rule="evenodd" clip-rule="evenodd" [attr.d]="chevronRight" />
+        </svg>
+      </button>
+
       @if (showPicker()) {
+        <span [class]="pagerDivider" aria-hidden="true"></span>
         <div class="flex shrink-0">
           <button
             type="button"
             data-testid="trip-picker-toggle"
             aria-label="Pick a trip"
             (click)="togglePicker()"
-            [class]="pickerOpen() ? pagerButtonOpen : pagerButton"
+            [class]="pickerOpen() ? pagerCalendarOpen : pagerCalendar"
             aria-haspopup="dialog"
             [attr.aria-expanded]="pickerOpen()"
           >
@@ -154,19 +170,6 @@ import { PAGER_SIZE, followWindow, windowStartAt } from '../../utils/pager-windo
           }
         </div>
       }
-
-      <button
-        type="button"
-        data-testid="trip-older"
-        aria-label="Older trip"
-        [class]="pagerButton"
-        [disabled]="selectedIndex() >= tripAdjustments().length - 1"
-        (click)="step(1)"
-      >
-        <svg class="size-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-          <path fill-rule="evenodd" clip-rule="evenodd" [attr.d]="chevronRight" />
-        </svg>
-      </button>
     </section>
   `,
 })
@@ -185,8 +188,10 @@ export class AdjustmentSelectorComponent {
   protected readonly quickPillGrow = QUICK_PILL_GROW;
   protected readonly pagerRow = PAGER_ROW;
   protected readonly pagerPills = PAGER_PILLS;
-  protected readonly pagerButton = PAGER_BUTTON;
-  protected readonly pagerButtonOpen = PAGER_BUTTON_OPEN;
+  protected readonly pagerArrow = PAGER_ARROW;
+  protected readonly pagerDivider = PAGER_DIVIDER;
+  protected readonly pagerCalendar = PAGER_CALENDAR;
+  protected readonly pagerCalendarOpen = PAGER_CALENDAR_OPEN;
   protected readonly chevronLeft = CHEVRON_LEFT_PATH;
   protected readonly chevronRight = CHEVRON_RIGHT_PATH;
   protected readonly calendarIcon = CALENDAR_ICON_PATH;
