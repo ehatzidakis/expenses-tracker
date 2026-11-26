@@ -334,7 +334,12 @@ export class CreateTransactionFormComponent {
   readonly submitLabel = computed(() => {
     if (this.sendToKiosk()) return this.submitting() ? 'Sending…' : 'Send to kiosk';
     if (this.isKioskMode()) return this.submitting() ? 'Sending…' : 'Send for review';
-    return this.submitting() ? 'Adding…' : 'Add transaction';
+    if (this.submitting()) return 'Adding…';
+    // Same rule onSubmit uses, so the label matches where the save goes.
+    const goesToPending =
+      !this.linkWithAdjustment() &&
+      shouldSaveTransactionForApproval(this.transactionModel().date);
+    return goesToPending ? 'Add pending transaction' : 'Add transaction';
   });
   readonly amountHint = signal<number | null>(null);
 

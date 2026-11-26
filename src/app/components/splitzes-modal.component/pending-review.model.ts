@@ -75,6 +75,41 @@ export function pendingStatusLabel(pending: PendingTransaction): string | null {
   }
 }
 
+export interface PendingCategoryGroup {
+  /** The stored category name, or '' when it has none. */
+  category: string;
+  items: PendingTransaction[];
+  total: number;
+}
+
+/**
+ * Groups pending items by category, keeping each group's items in the order given.
+ * Categories are alphabetical; items without one go last.
+ */
+export function groupPendingByCategory(
+  items: readonly PendingTransaction[],
+): PendingCategoryGroup[] {
+  const groups = new Map<string, PendingCategoryGroup>();
+  for (const item of items) {
+    const category = item.category?.trim() ?? '';
+    let group = groups.get(category);
+    if (!group) {
+      group = { category, items: [], total: 0 };
+      groups.set(category, group);
+    }
+    group.items.push(item);
+    group.total += getPendingTransactionTotalAmount(item);
+  }
+
+  return [...groups.values()]
+    .map((group) => ({ ...group, total: Math.round(group.total * 100) / 100 }))
+    .sort((a, b) => {
+      if (!a.category) return 1;
+      if (!b.category) return -1;
+      return a.category.localeCompare(b.category);
+    });
+}
+
 export function participantName(id: 'me' | number | undefined): string {
   if (id === 'me') return 'Me';
   if (id === undefined) return 'Unknown';
