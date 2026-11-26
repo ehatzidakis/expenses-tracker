@@ -3,6 +3,7 @@ import { PendingTransaction } from '../../services/transaction-service';
 import { CreateSplitState } from '../create-transaction.component/split-fields.component';
 import {
   buildPendingAcceptPayload,
+  groupPendingByCategory,
   isAwaitingKiosk,
   needsAdminAttention,
   pendingStatusLabel,
@@ -175,5 +176,21 @@ describe('request status helpers', () => {
   it('knows when a request is still with the kiosk', () => {
     expect(isAwaitingKiosk(pending({ requestStatus: 'awaiting-kiosk' }))).toBe(true);
     expect(isAwaitingKiosk(pending({ requestStatus: 'declined' }))).toBe(false);
+  });
+});
+
+describe('groupPendingByCategory', () => {
+  it('groups by category alphabetically, keeps item order, and puts uncategorised last', () => {
+    const groups = groupPendingByCategory([
+      pending({ id: 'a', category: 'Supermarket', amount: 10 }),
+      pending({ id: 'b', category: '', amount: 3 }),
+      pending({ id: 'c', category: 'EatingOut', amount: 20 }),
+      pending({ id: 'd', category: 'Supermarket', amount: 6, isSplit: true, totalAmount: 12.4 }),
+    ]);
+
+    expect(groups.map((group) => group.category)).toEqual(['EatingOut', 'Supermarket', '']);
+    expect(groups[1].items.map((item) => item.id)).toEqual(['a', 'd']);
+    expect(groups[1].total).toBe(22.4);
+    expect(groups[2].items.map((item) => item.id)).toEqual(['b']);
   });
 });

@@ -83,7 +83,7 @@ export const RECURRING_TEMPLATES: ReadonlyArray<RecurringTemplate> = [
     label: 'Apple',
     description: 'Apple subscription',
     category: 'Subscriptions',
-    amount: 0.99,
+    amount: 2.99,
     dayOfMonth: 5,
     monthly: true,
     match: { descriptionIncludes: 'apple' },

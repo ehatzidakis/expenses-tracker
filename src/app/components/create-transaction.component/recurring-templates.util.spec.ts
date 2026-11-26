@@ -149,7 +149,7 @@ describe('buildMonthlyBatch', () => {
     ]);
     expect(batch.pending.every((item) => item.amount === 0)).toBe(true);
     expect(batch.direct.map((item) => [item.description, item.date, item.amount])).toEqual([
-      ['Apple subscription', '2026-11-05', 0.99],
+      ['Apple subscription', '2026-11-05', 2.99],
       ['Claude subscription', '2026-11-10', 22],
       ['OASA Monthly card', '2026-11-01', 27],
     ]);
