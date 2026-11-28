@@ -62,7 +62,9 @@ describe('CategoryBudgetCardsComponent', () => {
     it('offers a history only for categories whose budget changed', () => {
       expect(toggles()).toHaveLength(1);
       expect(toggles()[0].textContent).toContain('Gym');
-      expect(toggles()[0].textContent).toContain('History');
+      // The arrow marks it; no "History" label on each row.
+      expect(toggles()[0].textContent).not.toContain('History');
+      expect(toggles()[0].querySelector('svg')).not.toBeNull();
     });
 
     it('lists the past budgets with their months when opened', () => {
@@ -84,7 +86,7 @@ describe('CategoryBudgetCardsComponent', () => {
       fixture.componentRef.setInput('draftBudgets', { Gym: 65, Supermarket: 280 });
       fixture.detectChanges();
       expect(toggles()).toHaveLength(0);
-      expect(fixture.nativeElement.textContent).not.toContain('History');
+      expect(fixture.nativeElement.querySelector('svg')).toBeNull();
     });
   });
 });

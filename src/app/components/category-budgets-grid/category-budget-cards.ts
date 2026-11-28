@@ -41,7 +41,6 @@ export interface BudgetCardItem {
                   emoji(item.category)
                 }}</span>
                 <span class="truncate text-[15px] text-ink">{{ label(item.category) }}</span>
-                <span class="shrink-0 text-[12px] text-ink-3">History</span>
               </span>
               <span class="flex shrink-0 items-center gap-1.5">
                 <span class="text-[13px] text-ink tabular-nums" appSensitive="xs">

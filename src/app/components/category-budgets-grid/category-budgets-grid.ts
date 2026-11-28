@@ -1,4 +1,4 @@
-import { Component, effect, inject, OnInit } from '@angular/core';
+import { Component, computed, effect, inject, OnInit } from '@angular/core';
 import {
   CATEGORY_BUDGETS,
   DEFAULT_TOTAL_WAGE,
@@ -9,6 +9,7 @@ import { BudgetCardItem, CategoryBudgetCardsComponent } from './category-budget-
 import { CategoryBudgetEditControlsComponent } from './category-budget-edit-controls';
 import { CategoryBudgetSummaryComponent } from './category-budget-summary';
 import { BudgetPeriodsComponent } from './budget-periods';
+import { categoryHistory } from '../../utils/budget-history';
 import { PrivacyService } from '../../services/privacy.service';
 import { FormsModule } from '@angular/forms';
 
@@ -26,14 +27,21 @@ import { FormsModule } from '@angular/forms';
     <div class="flex flex-col gap-4 select-none">
       <app-category-budget-summary [wage]="wage" [totalBudget]="totalBudget" [projectedSave]="projectedSave" />
 
-      @if (!isEditing && !privacyService.isPrivacyMode()) {
-        <button
-          type="button"
-          class="min-h-11 self-start rounded-xl border border-edge px-4 text-[13px] font-medium text-ink-2 transition-colors hover:border-ink-4 hover:text-ink cursor-pointer"
-          (click)="startEditing()"
-        >
-          Edit budgets and wage
-        </button>
+      @if (!isEditing && (!privacyService.isPrivacyMode() || hasChangedBudgets())) {
+        <div class="flex items-center justify-between gap-3">
+          @if (!privacyService.isPrivacyMode()) {
+            <button
+              type="button"
+              class="min-h-11 shrink-0 rounded-xl border border-edge px-4 text-[13px] font-medium text-ink-2 transition-colors hover:border-ink-4 hover:text-ink cursor-pointer"
+              (click)="startEditing()"
+            >
+              Edit budgets and wage
+            </button>
+          }
+          @if (hasChangedBudgets()) {
+            <p class="text-right text-[12px] text-ink-3">Tap on a category to view its history</p>
+          }
+        </div>
       }
 
       @if (isEditing) {
@@ -87,6 +95,13 @@ export class CategoryBudgetsGrid implements OnInit {
   private readonly expenseState = inject(ExpenseStateService);
   readonly budgetSettingsService = inject(BudgetSettingsService);
   readonly privacyService = inject(PrivacyService);
+
+  /** Whether any category's budget changed, so it has a history to open. */
+  readonly hasChangedBudgets = computed(() => {
+    const history = this.budgetSettingsService.history();
+    const categories = Object.keys(history[history.length - 1]?.categoryBudgets ?? {});
+    return categories.some((category) => categoryHistory(history, category).length > 1);
+  });
 
   budgets: BudgetCardItem[] = [];
   totalBudget = 0;
