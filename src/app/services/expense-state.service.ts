@@ -367,7 +367,10 @@ export class ExpenseStateService {
         isAllTime && monthsExcludingCurrent > 0
           ? Math.ceil(amountExcludingCurrent / monthsExcludingCurrent / 5) * 5
           : null;
-      const budget = this.budgetSettingsService.getCategoryBudget(name);
+      // A month is judged by the budget it had; All Time by today's, to show what needs changing.
+      const budget = isAllTime
+        ? this.budgetSettingsService.getCategoryBudget(name)
+        : this.budgetSettingsService.getCategoryBudget(name, expense.MonthName);
       // For All Time, compare the normalized monthly average against the budget
       // instead of scaling the budget up, so it stays intuitive as a target.
       const comparisonAmount = monthlyAverage ?? amount;
