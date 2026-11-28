@@ -1,4 +1,4 @@
-import { Injectable, computed, effect, inject, signal } from '@angular/core';
+import { Injectable, InjectionToken, computed, effect, inject, signal } from '@angular/core';
 import { doc, getDoc, setDoc } from 'firebase/firestore/lite';
 import { db } from '../firebase.config';
 import { AuthService } from './auth.service';
@@ -65,11 +65,27 @@ export function normalizeBudgetSettings(value?: Partial<BudgetSettings> | null):
   };
 }
 
+/** Where the settings live: users/{uid}.settings in Firestore. */
+export interface BudgetSettingsStore {
+  read(uid: string): Promise<Partial<BudgetSettings> | undefined>;
+  /** Merges into the stored settings; arrays such as budgetHistory are replaced whole. */
+  write(uid: string, settings: BudgetSettings): Promise<void>;
+}
+
+export const BUDGET_SETTINGS_STORE = new InjectionToken<BudgetSettingsStore>('BudgetSettingsStore', {
+  providedIn: 'root',
+  factory: () => ({
+    read: async (uid) => (await getDoc(doc(db, 'users', uid))).data()?.['settings'],
+    write: (uid, settings) => setDoc(doc(db, 'users', uid), { settings }, { merge: true }),
+  }),
+});
+
 @Injectable({
   providedIn: 'root',
 })
 export class BudgetSettingsService {
   private readonly authService = inject(AuthService);
+  private readonly store = inject(BUDGET_SETTINGS_STORE);
 
   readonly isLoading = signal(false);
   readonly settings = signal<BudgetSettings>(normalizeBudgetSettings());
@@ -84,14 +100,6 @@ export class BudgetSettingsService {
     });
   }
 
-  private getUserSettingsRef() {
-    const uid = this.authService.user()?.uid;
-    if (!uid) {
-      return null;
-    }
-
-    return doc(db, 'users', uid);
-  }
 
   /**
    * A category's budget in a month ('March 2025'), from the period that month falls in.
@@ -116,18 +124,7 @@ export class BudgetSettingsService {
       return fallback;
     }
 
-    const profileRef = this.getUserSettingsRef();
-    if (!profileRef) {
-      const fallback = normalizeBudgetSettings();
-      this.settings.set(fallback);
-      return fallback;
-    }
-
-    const snapshot = await getDoc(profileRef);
-    const settings = snapshot.data()?.['settings'];
-    const normalized = normalizeBudgetSettings(
-      settings as Partial<BudgetSettings> | null | undefined,
-    );
+    const normalized = normalizeBudgetSettings(await this.store.read(uid));
     this.settings.set(normalized);
     return normalized;
   }
@@ -137,33 +134,37 @@ export class BudgetSettingsService {
     settings: Pick<Partial<BudgetSettings>, 'categoryBudgets' | 'defaultTotalWage'>,
     now: Date = new Date(),
   ): Promise<BudgetSettings> {
-    const profileRef = this.getUserSettingsRef();
+    const uid = this.authService.user()?.uid;
     const values = normalizeBudgetSettings(settings);
-    const budgetHistory = withSavedPeriod(this.settings().budgetHistory, {
+    const period = {
       from: monthKeyOf(now),
       categoryBudgets: values.categoryBudgets,
       wage: values.defaultTotalWage,
-    });
-    const normalized = normalizeBudgetSettings({ budgetHistory });
-    this.settings.set(normalized);
+    };
 
-    if (!profileRef) {
+    if (!uid) {
+      const normalized = normalizeBudgetSettings({
+        budgetHistory: withSavedPeriod(this.settings().budgetHistory, period),
+      });
+      this.settings.set(normalized);
       return normalized;
     }
 
     this.isLoading.set(true);
     try {
-      await setDoc(
-        profileRef,
-        {
-          settings: {
-            categoryBudgets: normalized.categoryBudgets,
-            defaultTotalWage: normalized.defaultTotalWage,
-            budgetHistory: normalized.budgetHistory,
-          },
-        },
-        { merge: true },
-      );
+      // Merge into the stored history, not the one in memory: settings that had not loaded yet
+      // (or another device's newer save) must never replace the periods already saved.
+      const stored = normalizeBudgetSettings(await this.store.read(uid));
+      const normalized = normalizeBudgetSettings({
+        budgetHistory: withSavedPeriod(stored.budgetHistory, period),
+      });
+      this.settings.set(normalized);
+
+      await this.store.write(uid, {
+        categoryBudgets: normalized.categoryBudgets,
+        defaultTotalWage: normalized.defaultTotalWage,
+        budgetHistory: normalized.budgetHistory,
+      });
 
       return normalized;
     } finally {
