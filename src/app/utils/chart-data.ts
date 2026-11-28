@@ -13,7 +13,7 @@ export interface MonthTotal {
   month: number;
   spent: number;
   wage: number;
-  /** Sum of today's category budgets (budgets are not stored per month). */
+  /** Sum of the category budgets that applied in this month. */
   budget: number;
   saved: number;
   /** The calendar month in progress, so its numbers are not final. */
@@ -23,8 +23,12 @@ export interface MonthTotal {
 export interface CategoryAverage {
   name: string;
   average: number;
+  /** Average of the budgets the averaged months had; null when none had one. */
   budget: number | null;
 }
+
+/** A category's budget in a month ('March 2025'); without a month, today's. */
+export type BudgetFor = (category: string, monthName?: string) => number | null;
 
 /** How much one category moves from month to month. */
 export interface CategorySwing {
@@ -66,10 +70,11 @@ function spentIn(expense: Expense): number {
 /** One entry per month record, oldest first. */
 export function monthTotals(
   expenses: Expense[],
-  budgetFor: (category: string) => number | null,
+  budgetFor: BudgetFor,
   now: Date = new Date(),
 ): MonthTotal[] {
-  const budget = CATEGORY_NAMES.reduce((sum, name) => sum + (budgetFor(name) ?? 0), 0);
+  const budgetIn = (monthName: string) =>
+    CATEGORY_NAMES.reduce((sum, name) => sum + (budgetFor(name, monthName) ?? 0), 0);
   return expenses
     .filter((e) => e.id !== 'ALL')
     .map((e) => ({ e, when: parseMonthName(e.MonthName) }))
@@ -86,7 +91,7 @@ export function monthTotals(
         month: when.month,
         spent,
         wage,
-        budget,
+        budget: budgetIn(e.MonthName),
         saved: wage - spent,
         current: when.year === now.getFullYear() && when.month === now.getMonth(),
       };
@@ -112,11 +117,17 @@ export function averageMonth(months: MonthTotal[]): { spent: number; saved: numb
   return { spent, saved, count: done.length };
 }
 
+function averageBudget(records: Expense[], name: string, budgetFor: BudgetFor): number | null {
+  const budgets = records.map((e) => budgetFor(name, e.MonthName));
+  if (budgets.every((b) => b === null)) return null;
+  return budgets.reduce<number>((sum, b) => sum + (b ?? 0), 0) / budgets.length;
+}
+
 /** Monthly average per category over the given finished months, biggest first. */
 export function categoryAverages(
   expenses: Expense[],
   months: MonthTotal[],
-  budgetFor: (category: string) => number | null,
+  budgetFor: BudgetFor,
 ): CategoryAverage[] {
   const ids = new Set(finished(months).map((m) => m.id));
   const records = expenses.filter((e) => ids.has(e.id));
@@ -125,7 +136,7 @@ export function categoryAverages(
     name,
     average:
       records.reduce((sum, e) => sum + (Number(e[name as keyof Expense]) || 0), 0) / records.length,
-    budget: budgetFor(name),
+    budget: averageBudget(records, name, budgetFor),
   })).sort((a, b) => b.average - a.average);
 }
 

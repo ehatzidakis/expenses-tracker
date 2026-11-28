@@ -388,7 +388,7 @@ export class CreateTransactionFormComponent {
     for (const name of CATEGORY_NAMES) {
       room[name] = {
         spent: Number(record?.[name as keyof typeof record] ?? 0) || 0,
-        budget: this.budgetSettings.getCategoryBudget(name),
+        budget: this.budgetSettings.getCategoryBudget(name, monthName),
       };
     }
     return room;

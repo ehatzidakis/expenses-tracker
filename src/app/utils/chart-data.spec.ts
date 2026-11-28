@@ -99,3 +99,27 @@ describe('chart data', () => {
     });
   });
 });
+
+describe('budgets that changed over time', () => {
+  const now = new Date(2026, 10, 28);
+  const records = [
+    month('feb', 'February 2026', { Gym: 70 }),
+    month('jul', 'July 2026', { Gym: 70 }),
+  ];
+  // Gym was 100 in February 2026 and 62.50 from March 2026.
+  const budgetFor = (name: string, monthName?: string) =>
+    name === 'Gym' ? (monthName === 'February 2026' ? 100 : 62.5) : null;
+
+  it('gives each month its own total budget', () => {
+    const months = monthTotals(records, budgetFor, now);
+    expect(months.map((m) => m.budget)).toEqual([100, 62.5]);
+  });
+
+  it('compares a category average with the average of those months’ budgets', () => {
+    const months = monthTotals(records, budgetFor, now);
+    const gym = categoryAverages(records, months, budgetFor).find((row) => row.name === 'Gym');
+    expect(gym?.budget).toBe(81.25);
+    expect(categoryAverages(records, months, budgetFor).find((r) => r.name === 'Cats')?.budget).toBeNull();
+  });
+});
+

@@ -86,14 +86,27 @@ interface Segment {
             }
           }
 
-          <!-- The one reference line: the budget, or zero when saving -->
+          <!-- The budget when spending, stepping where it changed -->
+          @for (segment of budgetSegments(); track $index) {
+            <line
+              [attr.x1]="segment.x1"
+              [attr.x2]="segment.x2"
+              [attr.y1]="segment.y"
+              [attr.y2]="segment.y"
+              class="stroke-ink-3"
+              stroke-width="1"
+              shape-rendering="crispEdges"
+            />
+          }
+
+          <!-- Zero when saving -->
           @if (referenceY(); as y) {
             <line
               [attr.x1]="pad.left"
               [attr.x2]="width() - pad.right"
               [attr.y1]="y"
               [attr.y2]="y"
-              [class]="mode() === 'spent' ? 'stroke-ink-3' : 'stroke-ink/30'"
+              class="stroke-ink/30"
               stroke-width="1"
               shape-rendering="crispEdges"
             />
@@ -245,8 +258,8 @@ export class MonthChartComponent {
     return i === -1 ? this.months().length - 1 : i;
   });
 
-  /** Budgets are not stored per month, so every month shares today's. */
-  readonly budget = computed(() => this.months()[0]?.budget ?? 0);
+  /** The selected month's budget, for the key below the chart. */
+  readonly budget = computed(() => this.months()[this.selectedIndex()]?.budget ?? 0);
 
   /** The value each column stands for. */
   private value(m: MonthTotal): number {
@@ -256,7 +269,7 @@ export class MonthChartComponent {
   /** Any month in the red: over budget when spending, below zero when saving. */
   readonly anyNegative = computed(() =>
     this.mode() === 'spent'
-      ? this.months().some((m) => this.budget() > 0 && m.spent > this.budget() + 0.005)
+      ? this.months().some((m) => m.budget > 0 && m.spent > m.budget + 0.005)
       : this.months().some((m) => m.saved < -0.005),
   );
 
@@ -339,7 +352,7 @@ export class MonthChartComponent {
 
   private readonly y = computed(() => {
     const values = this.months().map((m) => this.value(m));
-    const reference = this.mode() === 'spent' ? [this.budget()] : [];
+    const reference = this.mode() === 'spent' ? this.months().map((m) => m.budget) : [];
     const hi = Math.max(1, ...values, ...reference);
     const lo = Math.min(0, ...values);
     const room = (hi - lo) * 0.04;
@@ -358,17 +371,40 @@ export class MonthChartComponent {
     }));
   });
 
-  /** The budget line when spending; the zero line when saving. */
-  readonly referenceY = computed(() => {
-    if (this.mode() === 'saved') return Math.round(this.y()(0)) + 0.5;
-    return this.budget() > 0 ? Math.round(this.y()(this.budget())) + 0.5 : null;
+  /** The zero line when saving. */
+  readonly referenceY = computed(() =>
+    this.mode() === 'saved' ? Math.round(this.y()(0)) + 0.5 : null,
+  );
+
+  /**
+   * The budget line when spending: one level per run of months that shared a budget, each
+   * spanning those months' slots. The first and last reach the plot's edges.
+   */
+  readonly budgetSegments = computed(() => {
+    if (this.mode() !== 'spent') return [];
+    const x = this.x();
+    const y = this.y();
+    const slotW = x.bandwidth();
+    const months = this.months();
+    const segments: { x1: number; x2: number; y: number; budget: number }[] = [];
+    months.forEach((m, i) => {
+      const slotX = x(m.id) ?? 0;
+      const x1 = i === 0 ? PAD.left : slotX;
+      const x2 = i === months.length - 1 ? this.width() - PAD.right : slotX + slotW;
+      const last = segments[segments.length - 1];
+      if (last && Math.round(last.budget * 100) === Math.round(m.budget * 100)) {
+        last.x2 = x2;
+      } else {
+        segments.push({ x1, x2, y: Math.round(y(m.budget)) + 0.5, budget: m.budget });
+      }
+    });
+    return segments.filter((segment) => segment.budget > 0);
   });
 
   readonly bars = computed(() => {
     const x = this.x();
     const y = this.y();
     const mode = this.mode();
-    const budget = this.budget();
     const slotW = x.bandwidth();
     const barW = Math.min(24, Math.max(6, slotW * 0.62));
     const zero = y(0);
@@ -383,6 +419,7 @@ export class MonthChartComponent {
       const value = this.value(m);
       const end = y(value);
       const segments: Segment[] = [];
+      const budget = m.budget;
 
       if (mode === 'spent') {
         const over = budget > 0 && m.spent > budget + 0.005;

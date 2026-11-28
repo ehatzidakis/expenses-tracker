@@ -30,7 +30,10 @@ const month = (id: string, name: string, supermarket: number): Expense => ({
   Gym: 0,
 });
 
-function setup(expenses: Expense[]): ExpenseStateService {
+function setup(
+  expenses: Expense[],
+  getCategoryBudget: (category: string, monthName?: string) => number | null = () => 280,
+): ExpenseStateService {
   TestBed.configureTestingModule({
     providers: [
       {
@@ -41,7 +44,7 @@ function setup(expenses: Expense[]): ExpenseStateService {
         provide: BudgetSettingsService,
         useValue: {
           settings: signal(normalizeBudgetSettings()),
-          getCategoryBudget: () => 280,
+          getCategoryBudget,
         },
       },
     ],
@@ -90,5 +93,17 @@ describe('ExpenseStateService', () => {
     const service = setup([month('1', monthName(2), 100), month('2', monthName(1), 200)]);
 
     expect(supermarketAverage(service)).toBe(150);
+  });
+
+  it('judges a month by its own budget and All time by today’s', () => {
+    // March 2025 had a 100 budget for Gym; today's is 65.
+    const budgetFor = (_: string, month?: string) => (month === 'March 2025' ? 100 : 65);
+    const service = setup([month('1', 'March 2025', 0), month('2', monthName(0), 0)], budgetFor);
+    const gym = (items: { name: string; budget: number | null }[]) =>
+      items.find((item) => item.name === 'Gym')?.budget;
+
+    service.selectMonth('1');
+    expect(gym(service.categoryBreakdown())).toBe(100);
+    expect(gym(service.allTimeCategoryBreakdown())).toBe(65);
   });
 });
