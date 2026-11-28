@@ -352,7 +352,8 @@ export class ChartsPageComponent {
   readonly view = signal<ChartView>('spent');
   readonly selectedId = signal<string | null>(null);
 
-  private readonly budgetFor = (name: string) => this.budgets.getCategoryBudget(name);
+  private readonly budgetFor = (name: string, monthName?: string) =>
+    this.budgets.getCategoryBudget(name, monthName);
 
   private readonly allMonths = computed(() =>
     monthTotals(this.state.expensesQuery.data() ?? [], this.budgetFor),

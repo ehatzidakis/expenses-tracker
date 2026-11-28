@@ -67,3 +67,48 @@ describe('MonthChartComponent pointer handling', () => {
     expect(picked).toHaveBeenCalledWith('m4');
   });
 });
+
+describe('MonthChartComponent budgets per month', () => {
+  const at = (id: string, short: string, month: number, budget: number, spent: number): MonthTotal => ({
+    id,
+    monthName: `${short} 2026`,
+    short,
+    year: 2026,
+    month,
+    spent,
+    wage: 1540,
+    budget,
+    saved: 1540 - spent,
+    current: false,
+  });
+
+  async function render(input: MonthTotal[]) {
+    await TestBed.configureTestingModule({ imports: [MonthChartComponent] }).compileComponents();
+    const fixture = TestBed.createComponent(MonthChartComponent);
+    fixture.componentRef.setInput('months', input);
+    fixture.componentRef.setInput('selectedId', input[input.length - 1].id);
+    await fixture.whenStable();
+    return fixture.componentInstance;
+  }
+
+  it('marks a month over its own budget, not today’s', async () => {
+    // The same 1310 spent is over February's 1300 budget and under July's 1317.50.
+    const chart = await render([at('feb', 'Feb', 1, 1300, 1310), at('jul', 'Jul', 6, 1317.5, 1310)]);
+    expect(chart.bars()[0].segments).toHaveLength(2);
+    expect(chart.bars()[1].segments).toHaveLength(1);
+  });
+
+  it('steps the budget line where the budget changed', async () => {
+    const chart = await render([at('feb', 'Feb', 1, 1300, 1310), at('jul', 'Jul', 6, 1317.5, 1310)]);
+    const lines = chart.budgetSegments();
+    expect(lines).toHaveLength(2);
+    expect(lines[0].y).not.toBe(lines[1].y);
+    expect(lines[0].x2).toBeLessThanOrEqual(lines[1].x1);
+  });
+
+  it('draws one line while the budget stays the same', async () => {
+    const chart = await render(months);
+    expect(chart.budgetSegments()).toHaveLength(1);
+  });
+});
+
