@@ -8,6 +8,7 @@ import { BudgetSettingsService } from '../../services/budget-settings.service';
 import { BudgetCardItem, CategoryBudgetCardsComponent } from './category-budget-cards';
 import { CategoryBudgetEditControlsComponent } from './category-budget-edit-controls';
 import { CategoryBudgetSummaryComponent } from './category-budget-summary';
+import { BudgetPeriodsComponent } from './budget-periods';
 import { PrivacyService } from '../../services/privacy.service';
 import { FormsModule } from '@angular/forms';
 
@@ -19,6 +20,7 @@ import { FormsModule } from '@angular/forms';
     CategoryBudgetCardsComponent,
     CategoryBudgetEditControlsComponent,
     CategoryBudgetSummaryComponent,
+    BudgetPeriodsComponent,
   ],
   template: `
     <div class="flex flex-col gap-4 select-none">
@@ -59,8 +61,13 @@ import { FormsModule } from '@angular/forms';
         [budgets]="budgets"
         [isEditing]="isEditing"
         [draftBudgets]="draftBudgets"
+        [history]="budgetSettingsService.history()"
         (budgetChange)="updateDraftBudget($event.category, $event.value)"
       />
+
+      @if (!isEditing) {
+        <app-budget-periods class="mt-2" [history]="budgetSettingsService.history()" />
+      }
 
       @if (isEditing) {
         <!-- Pinned just above the tab bar while the budgets scroll past -->
@@ -78,7 +85,7 @@ import { FormsModule } from '@angular/forms';
 })
 export class CategoryBudgetsGrid implements OnInit {
   private readonly expenseState = inject(ExpenseStateService);
-  private readonly budgetSettingsService = inject(BudgetSettingsService);
+  readonly budgetSettingsService = inject(BudgetSettingsService);
   readonly privacyService = inject(PrivacyService);
 
   budgets: BudgetCardItem[] = [];
